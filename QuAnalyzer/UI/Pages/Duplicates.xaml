@@ -1,0 +1,255 @@
+﻿<Page x:Class="QuAnalyzer.UI.Pages.Duplicates"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+      mc:Ignorable="d" 
+      xmlns:myself="clr-namespace:QuAnalyzer.UI.Pages"
+      d:DesignHeight="600" d:DesignWidth="850"
+      x:Name="thisWindow"
+	  Title="DataViewer"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top">
+            <WrapPanel Style="{StaticResource ToolBar}">
+                <WrapPanel.Resources>
+                    <Style TargetType="UC:ToolBarButton" BasedOn="{StaticResource {x:Type UC:ToolBarButton}}">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                    <Style TargetType="UC:ToolBarToggleButton" BasedOn="{StaticResource {x:Type UC:ToolBarToggleButton}}">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                </WrapPanel.Resources>
+                <Label Width="75" FontWeight="Bold" Content="Provider:" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <ComboBox Width="180" Name="lstDataProviders" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" VerticalAlignment="Center">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <WrapPanel>
+                                <Image HorizontalAlignment="Center" Grid.Column="0" Height="16" VerticalAlignment="Center" Margin="2" Source="{Binding ProviderTypeInfo.IconPath}" />
+                                <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="2" Text="{Binding Name}" VerticalAlignment="Center" />
+                            </WrapPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Label Width="75" FontWeight="Bold" Content="Repository:" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <ComboBox Name="lstDataSources" Width="180" Grid.Row="1" ItemsSource="{Binding SelectedItem.Repositories.Keys, ElementName=lstDataProviders}" SelectionChanged="lstDataSources_SelectionChanged" VerticalAlignment="Center" />
+                <UC:ToolBarButton x:Name="btnRun" Click="btnRun_Click" Text="Run" BorderBrush="Green" Image="{StaticResource appbar_control_play}" />
+                <Rectangle />
+                <UC:ToolBarToggleButton x:Name="btnAggregate" Text="Advanced" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" Image="{StaticResource appbar_page_copy}" />
+                <Rectangle />
+                <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" Image="{StaticResource appbar_page_copy}" Click="GlobalCopy_Click" />
+                <Rectangle />
+                <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{StaticResource appbar_page_excel}" Click="GlobalExportCSV_Click" />
+                <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{StaticResource appbar_page_xml}" Click="GlobalExportHTML_Click" />
+            </WrapPanel>
+            <WrapPanel Style="{StaticResource ToolBar}" Height="35">
+                <CheckBox Style="{StaticResource ToggleSwitch}" Content=" Keep all duplicates" IsChecked="{Binding KeepDuplicates,Mode=TwoWay}" Margin="7" />
+                <CheckBox Style="{StaticResource ToggleSwitch}" Content=" Show other columns" IsChecked="{Binding KeepColumns,Mode=TwoWay}" IsEnabled="{Binding KeepDuplicates,Mode=OneWay}" Margin="7" />
+            </WrapPanel>
+        </StackPanel>
+        <ListBox BorderThickness="0,0,2,0" BorderBrush="LightGray" DockPanel.Dock="Left" VerticalAlignment="Stretch" x:Name="lstColumns" SelectionMode="Extended" MinWidth="200" Padding="5">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding Key}" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid Height="30" Background="WhiteSmoke">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="10,0" VerticalAlignment="Center">
+                    <!--<Run Text="{Binding LoadingProgress,Mode=OneWay}" />
+                    <Run Text="/" />-->
+                    <Run Text="{Binding Items.Count,Mode=OneWay,ElementName=gridData}" />
+                    <Run Text=" item(s) found" />
+                </TextBlock>
+                <Label Grid.Column="1" Content="{Binding Status,StringFormat='Status: {0}'}" />
+                <ProgressBar Value="{Binding LoadingProgress}" Margin="10,0" Grid.Column="2">
+                    <ProgressBar.Style>
+                        <Style TargetType="ProgressBar" BasedOn="{StaticResource {x:Type ProgressBar}}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding LoadingProgress}" Value="-1">
+                                    <Setter Property="IsIndeterminate" Value="True" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ProgressBar.Style>
+                </ProgressBar>
+            </Grid>
+            <DataGrid Grid.Row="1" Sorting="gridData_Sorting" x:Name="gridData" IsReadOnly="True" CanUserAddRows="False" CanUserSortColumns="True" CanUserReorderColumns="True" BorderThickness="0" ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                        <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGrid_PreviewMouseLeftButtonDown" />
+                        <EventSetter Event="PreviewMouseMove" Handler="DataGrid_MouseMove" />
+                    </Style>
+                </DataGrid.Resources>
+            </DataGrid>
+            <Rectangle Grid.Column="1" Grid.RowSpan="2" Width="4" Fill="LightGray" />
+            <DockPanel Grid.Column="2" Grid.RowSpan="2" Width="250px">
+                <DockPanel.Style>
+                    <Style TargetType="DockPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsChecked, ElementName=btnAggregate}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DockPanel.Style>
+                <Border DockPanel.Dock="Bottom" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource ButtonBar}">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Apply" Padding="5" Width="75" Margin="5" x:Name="btnApply" Click="btnApply_Click"/>
+                        <Button Content="Clear" Padding="5" Width="75" Margin="5" Click="btnClear_Click" />
+                    </StackPanel>
+                </Border>
+                <ScrollViewer>
+                    <StackPanel>
+                        <Expander IsExpanded="True"  Header="Filtering">
+                            <DockPanel>
+                                <Grid DockPanel.Dock="Bottom">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Label Content="Custom filter:" />
+                                    <TextBox TextWrapping="Wrap" MinHeight="25" HorizontalAlignment="Stretch" Text="{Binding CustomFilter}" Grid.Row="1">
+                                        <TextBox.Style>
+                                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCustomFilterError}" Value="True">
+                                                        <Setter Property="Foreground" Value="Red" />
+                                                        <Setter Property="ToolTip" Value="{Binding CustomFilterError}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBox.Style>
+                                    </TextBox>
+                                </Grid>
+                                <DataGrid Margin="-5" AllowDrop="True" AutoGenerateColumns="False" CanUserAddRows="False" ItemsSource="{Binding Filters}" MinHeight="150" x:Name="gridFilters" Drop="gridFilters_Drop">
+                                    <DataGrid.Style>
+                                        <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate>
+                                                                <TextBlock Margin="10" TextWrapping="Wrap" Text="Drag and drop column headers here to add a filter. You can also directly type the filter below." FontStyle="Italic" />
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGrid.Style>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" />
+                                        <DataGridComboBoxColumn Width="*" Header="Operator" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedValueBinding="{Binding ComparerExpression,Mode=TwoWay}" ItemsSource="{Binding Source={x:Static myself:Viewer.FilterFormula},Mode=OneTime}">
+                                            <DataGridComboBoxColumn.EditingElementStyle>
+                                                <Style BasedOn="{StaticResource MetroComboBox}" TargetType="ComboBox" />
+                                            </DataGridComboBoxColumn.EditingElementStyle>
+                                        </DataGridComboBoxColumn>
+                                        <DataGridTextColumn Width="*" Header="Value" Binding="{Binding TargetValue}"/>
+                                        <DataGridTemplateColumn CanUserSort="False">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteFilter_Click">
+                                                        <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                                                    </Button>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </DockPanel>
+                        </Expander>
+                        <Expander IsExpanded="True" Header="Aggregation">
+                            <StackPanel Margin="-5">
+                                <Label FontWeight="Bold" Content="Group by the following attributes:" />
+                                <ListBox Height="100" ItemsSource="{Binding Grouping}" AllowDrop="True" x:Name="lstGrouping" Drop="lstGrouping_Drop">
+                                    <ListBox.Style>
+                                        <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate>
+                                                                <TextBlock Margin="10" TextWrapping="Wrap" Text="Drag and drop column headers here to group by the related attribute" FontStyle="Italic" />
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ListBox.Style>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Label Content="{Binding}" />
+                                                <Button Grid.Column="1" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteGrp_Click">
+                                                    <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <Label FontWeight="Bold" Content="Aggregated attributes:" />
+                                <DataGrid Grid.Column="1" CanUserAddRows="False" MinHeight="150" x:Name="gridCompute" AutoGenerateColumns="False" AllowDrop="True" Drop="gridCompute_Drop" ItemsSource="{Binding Compute}">
+                                    <DataGrid.Style>
+                                        <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate>
+                                                                <TextBlock Margin="10" TextWrapping="Wrap" Text="Drag and drop column headers here or add a 'group by attribute' above to aggregate data. Note: at least one 'group by' attribute is required for the aggregation to be computed." FontStyle="Italic" />
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGrid.Style>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" IsReadOnly="True" />
+                                        <DataGridComboBoxColumn Width="*" Header="Aggregation" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedValueBinding="{Binding Aggregate,Mode=TwoWay}" ItemsSource="{Binding Source={x:Static myself:Viewer.AggregationFormula},Mode=OneTime}">
+                                            <DataGridComboBoxColumn.EditingElementStyle>
+                                                <Style BasedOn="{StaticResource MetroComboBox}" TargetType="ComboBox" />
+                                            </DataGridComboBoxColumn.EditingElementStyle>
+                                        </DataGridComboBoxColumn>
+                                        <DataGridTemplateColumn>
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Button Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteAggreg_Click">
+                                                        <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                                                    </Button>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </Expander>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Grid>
+    </DockPanel>
+</Page>

@@ -1,0 +1,139 @@
+﻿<Page x:Class="QuAnalyzer.UI.Pages.Statistics"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:chart="clr-namespace:De.TorstenMandelkow.MetroChart;assembly=De.TorstenMandelkow.MetroChart"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
+      mc:Ignorable="d" x:Name="thisPage"
+       d:DesignHeight="400" d:DesignWidth="840"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}"
+	Title="Statistics">
+    <DockPanel Grid.Row="1" Grid.Column="1">
+        <WrapPanel Style="{StaticResource ToolBar}">
+            <Label FontWeight="Bold" Content="Provider:" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <ComboBox Width="200" Name="lstDataProviders" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" VerticalAlignment="Center">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <WrapPanel>
+                            <Image HorizontalAlignment="Center" Grid.Column="0" Height="16" VerticalAlignment="Center" Margin="2" Source="{Binding ProviderTypeInfo.IconPath}" />
+                            <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="2" Text="{Binding Name}" VerticalAlignment="Center" />
+                        </WrapPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Label FontWeight="Bold" Content="Repository:" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <ComboBox Name="lstDataSources" Width="200" Grid.Row="1" ItemsSource="{Binding SelectedItem.Repositories.Keys, ElementName=lstDataProviders}" SelectionChanged="lstDataSources_SelectionChanged" VerticalAlignment="Center" />
+            <Rectangle />
+            <UC:ToolBarToggleButton x:Name="btnAuto" IsChecked="True" Text="Auto update" ToolTip="Compute statistics automatically" BorderBrush="Blue" Image="{StaticResource appbar_calculator}" />
+            <UC:ToolBarButton Click="btnCompute_Click"  Text="Compute" ToolTip="Compute statistics" BorderBrush="Green" Image="{StaticResource appbar_calculator}" />
+            <Rectangle />
+            <Label Content="Type: " VerticalAlignment="Center" />
+            <ComboBox IsEditable="False" VerticalAlignment="Center" ItemsSource="{Binding ChartTypes}" SelectedItem="{Binding ChartType}" />
+        </WrapPanel>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StackPanel Orientation="Horizontal">
+                <ProgressBar Value="{Binding Progress}" Maximum="100" Width="500" />
+            </StackPanel>
+        </StatusBar>
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding ComputedStats, Mode=OneWay}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid IsItemsHost="True" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="10" Background="Gainsboro">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <ContentControl Content="{Binding}">
+                                <ContentControl.Style>
+                                    <Style TargetType="ContentControl">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ChartType,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}" Value="Doughnut">
+                                                <Setter Property="ContentTemplate">
+                                                    <Setter.Value>
+                                                        <DataTemplate>
+                                                            <chart:DoughnutChart ChartLegendVisibility="Hidden" IsRowColumnSwitched="True" ChartTitle="{Binding Key}" ChartSubTitle="">
+                                                                <chart:DoughnutChart.ChartTitleStyle>
+                                                                    <Style TargetType="chart:ChartTitle">
+                                                                        <Setter Property="FontSize" Value="10" />
+                                                                    </Style>
+                                                                </chart:DoughnutChart.ChartTitleStyle>
+                                                                <chart:DoughnutChart.Series>
+                                                                    <chart:ChartSeries SeriesTitle="{Binding Key}" DisplayMember="Category" ValueMember="Frequency" ItemsSource="{Binding Value.Frequencies}" />
+                                                                </chart:DoughnutChart.Series>
+                                                            </chart:DoughnutChart>
+                                                        </DataTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ChartType,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}" Value="Pie">
+                                                <Setter Property="ContentTemplate">
+                                                    <Setter.Value>
+                                                        <DataTemplate>
+                                                            <chart:PieChart ChartLegendVisibility="Hidden" IsRowColumnSwitched="True" ChartTitle="{Binding Key}" ChartSubTitle="">
+                                                                <chart:PieChart.ChartTitleStyle>
+                                                                    <Style TargetType="chart:ChartTitle">
+                                                                        <Setter Property="FontSize" Value="10" />
+                                                                    </Style>
+                                                                </chart:PieChart.ChartTitleStyle>
+                                                                <chart:PieChart.Series>
+                                                                    <chart:ChartSeries SeriesTitle="{Binding Key}" DisplayMember="Category" ValueMember="Frequency" ItemsSource="{Binding Value.Frequencies}" />
+                                                                </chart:PieChart.Series>
+                                                            </chart:PieChart>
+                                                        </DataTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ChartType,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}" Value="Bar">
+                                                <Setter Property="ContentTemplate">
+                                                    <Setter.Value>
+                                                        <DataTemplate>
+                                                            <chart:ClusteredBarChart ChartLegendVisibility="Hidden" IsRowColumnSwitched="True" ChartTitle="{Binding Key}" ChartSubTitle="">
+                                                                <chart:ClusteredBarChart.ChartTitleStyle>
+                                                                    <Style TargetType="chart:ChartTitle">
+                                                                        <Setter Property="FontSize" Value="10" />
+                                                                    </Style>
+                                                                </chart:ClusteredBarChart.ChartTitleStyle>
+                                                                <chart:ClusteredBarChart.Series>
+                                                                    <chart:ChartSeries SeriesTitle="{Binding Key}" DisplayMember="Category" ValueMember="Frequency" ItemsSource="{Binding Value.Frequencies}" />
+                                                                </chart:ClusteredBarChart.Series>
+                                                            </chart:ClusteredBarChart>
+                                                        </DataTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentControl.Style>
+                            </ContentControl>
+                            <UniformGrid Grid.Row="2" Columns="2" DataContext="{Binding Value.Statistics}">
+                                <UniformGrid.Resources>
+                                    <Style TargetType="Label">
+                                        <Setter Property="Padding" Value="10,2" />
+                                    </Style>
+                                </UniformGrid.Resources>
+                                <Label Content="Distinct count: " FontWeight="Bold" />
+                                <Label Content="{Binding DistinctCount}" Grid.Column="1" />
+                                <Label Content="Empty values: " FontWeight="Bold" />
+                                <Label Content="{Binding EmptyCount}" Grid.Column="1" />
+                                <Label Content="Minimum: " FontWeight="Bold" />
+                                <Label Content="{Binding Min}" Grid.Column="1" />
+                                <Label Content="Maximum: " FontWeight="Bold" Grid.Row="1" />
+                                <Label Content="{Binding Max}" Grid.Row="1" Grid.Column="1"/>
+                                <Label Content="Average: " FontWeight="Bold" Grid.Row="2" />
+                                <Label Content="{Binding Average}" Grid.Row="2" Grid.Column="1" />
+                            </UniformGrid>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</Page>

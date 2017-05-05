@@ -1,0 +1,287 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+<body style="" lang="EN-US" link="black" vlink="purple">
+    <div class="Section1">
+        <h1>
+            Oracle Data Provider for .NET<br>
+        </h1>
+        <div class="MsoNormal" style="text-align: center;" align="center">
+            <hr align="center" size="1" width="100%">
+        </div>
+        <p>
+            <big style="font-weight: bold;"><big><big>Release Notes</big></big></big>
+        </p>
+        <p><strong>Release 12.1.0.2.0 for ODAC 12c Release 3</strong></p>
+        <h4>
+            December 2014<br>
+        </h4>
+        <h4>Copyright (c) Oracle Corporation 2014</h4>
+        <p>
+            This document provides information that supplements the Oracle Data Provider for .NET
+            (ODP.NET) documentation.
+        </p>
+        <h2>TABLE OF CONTENTS</h2>
+        <ul>
+            <li><a href="#Doc">Documentation Corrections and Additions</a></li>
+            <li><a href="#Managed Known Issues">ODP.NET, Managed Driver Tips, Limitations, and Known Issues</a></li>
+            <li><a href="#Unmanaged Known Issues">ODP.NET, Unmanaged Driver Tips, Limitations, and Known Issues</a></li>
+            <li><a href="#EF">Entity Framework Tips, Limitations, and Known Issues</a></li>
+        </ul>
+
+        <p>&nbsp;</p>
+        <a name="Doc"></a><h2>Documentation Corrections and Additions</h2>
+        This section contains information that corrects or adds to existing ODP.NET documentation.<br /><br />
+
+        <b>Custom Entity Data Model (EDM) Type Mapping Not Applied to Generated Complex Types</b>
+        <br />
+        When using the EDM wizard to create a complex type from a function import, any custom EDM type mappings
+        specified will not be applied. The EDM wizard uses the default type mappings and the only known workaround
+        is to manually edit the resulting complex type. After the complex type is generated any type declaration
+        (field, property, constructor parameter, etc.) in the complex object which has an undesired type (such as
+        Decimal rather than Boolean) should be manually edited to be of the desired type.
+        <br /><br />
+        <br />
+
+        <b>ODP.NET Configuration Files: Unified Managed and Unmanaged ODP.NET Format</b>
+        <br />
+        ODP.NET, Unmanaged Driver now has the option of using the same configuration file
+        format as ODP.NET, Managed Driver. The format simplifies configuration by using a
+        single unified scheme. To utilize this format, the existing unmanaged ODP.NET
+        configuration section should be renamed from &lt;oracle.dataaccess.client&gt; to
+        &lt;oracle.unmanageddataaccess.client&gt;. The existing unmanaged ODP.NET elements and
+        values are supported within the new section using the same format as with ODP.NET,
+        Managed Driver. For example, converting the FetchSize element and value from the
+        traditional to the new format would be done as follows:
+        <p>
+
+            &lt;oracle.dataaccess.client&gt;<br />
+            &nbsp;&nbsp; &lt;settings&gt;<br />
+            &nbsp;&nbsp;&nbsp;&nbsp; &lt;add name="FetchSize" value="131072" /&gt;<br />
+            &nbsp;&nbsp; &lt;/settings&gt;<br />
+            &lt;/oracle.dataaccess.client&gt;
+            &nbsp;
+        </p>
+        &lt;oracle.unmanageddataaccess.client&gt;<br />
+        &nbsp;&nbsp;    &lt;version number="*"&gt;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;        &lt;settings&gt;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; setting name="FetchSize" value="131072" /&gt;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;                                   &lt;/settings&gt;<br />
+        &nbsp;&nbsp;                                    &lt;/version&gt;<br />
+        &lt;/oracle.unmanageddataaccess.client&gt;
+        <br /><br />
+        <br />
+        <b>Specifying UDT Mappings with Unified Configuration for Unmanaged ODP.NET</b>
+        <br />
+        To support custom UDT mappings in the unified configuration format, a new section
+        within the &lt;version&gt; section is used. This new section is identified as &lt;udtmappings&gt;
+        and each mapping is identified using a &lt;udtmapping&gt; element. The
+        following attributes may be specified for each udtMapping element:
+        <br /><br />
+        - typeName (required)<br />
+        - factoryName (required)<br />
+        - dataSource (optional)<br />
+        - schemaName (optional)
+        <br /><br />
+        These elements retain the same name and meaning as when used with the traditional
+        configuration format. For additional information refer to the Oracle User-Defined
+        Types (UDTs) and .NET Custom Types chapter in the Oracle Data Provider for .NET
+        Developer's Guide.
+        <br /><br />
+        Example of converting traditional format to unified format:
+        <br /><br />
+        &lt;configuration&gt;<br />
+        &nbsp;&nbsp; &lt;oracle.dataaccess.client&gt;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp; &lt;settings&gt;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;add name="Person" value="udtMapping factoryName='PersonFactory, Sample,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null' typeName='PERSON'
+        schemaName='SCOTT' dataSource='oracle'" /&gt;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp; &lt;/settings&gt;<br />
+        &nbsp;&nbsp; &lt;/oracle.dataaccess.client&gt;<br />
+        &lt;/configuration&gt;<br />
+        <br />
+        &lt;configuration&gt;<br />
+        &nbsp;&nbsp; &lt;oracle.unmanageddataaccess.client&gt;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp; &lt;udtmappings&gt;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;udtmapping typename="PERSON" factoryname="PersonFactory, Sample,
+        Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        schemaname="SCOTT" datasource="oracle" /&gt;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp; &lt;/udtmappings&gt;<br />
+        &nbsp;&nbsp; &lt;/oracle.unmanageddataaccess.client&gt;<br />
+        &lt;/configuration&gt;
+        <br /><br />
+        Note: UDT mapping does not apply to the ODP.NET, Managed Driver.
+
+        <br /><br />
+        <br />
+        <b>ODP.NET, Managed Driver Support for Oracle Database 12c Implicit Ref Cursor</b>
+        <br />
+        ODP.NET, Managed Driver introduces support for the new Oracle Database 12c Implicit
+        Ref Cursor. Configuration occurs using the &lt;implicitrefcursor&gt;
+        .NET configuration section. When using database implicit ref cursors, the bindInfo element should be
+        specified with a mode of "Implicit":
+        <br /><br />
+        &lt;bindinfo mode="Implicit" /&gt;
+        <br /><br />
+        For additional information refer to the implicitRefCursor section in Chapter 2 of  the Oracle Data Provider for .NET Developer's Guide.
+        <br /><br />
+        <br />
+        <b>Entity Framework Code First: Code-Based Migrations With No Supporting Code Migration File</b>
+        <br />
+        When using code-based migrations with the Entity Framework provider, the migration
+        history table may be dropped if no supporting code migration file existed prior to
+        updating the database.
+        <br /><br />
+        Workaround: Ensure the supporting code migration file has been added prior to updating the database.
+        <br /><br />
+
+
+        The following steps can remove the migration history table:
+        <ol>
+            <li> Execute application to create database objects</li>
+            <li> Enable-Migrations</li>
+            <li> Make code change to POCO</li>
+            <li> Update-Database</li>
+        </ol>
+        The workaround is to ensure code file is created:
+
+        <ol>
+            <li> Execute application to create database objects</li>
+            <li> Enable-Migrations</li>
+            <li> Make code change to POCO</li>
+            <li> Add-Migration (This step will create the necessary code migration file).</li>
+            <li> Update-Database</li>
+        </ol>
+
+                <br />
+                <b>Session Time Zone Hour Offset in ODP.NET Managed and Unmanaged Drivers</b>
+                <br />
+                ODP.NET managed and unmanaged drivers set the default session time zone differently. While the session
+                time zone for unmanaged ODP.NET uses an hour offset, managed ODP.NET uses the region identifier for setting
+                its session time zone. As a result, managed ODP.NET is sensitive to daylight savings in scenarios where the
+                timestamp LTZ values have to be converted from/to the session time zone.<br /><br />
+
+                There are two methods to resolve this difference if needed.
+                For ODP.NET, Unmanaged Driver, the application explicitly sets the region identifier with the environment
+                variable 'ORA_SDTZ' (e.g. 'set ORA_SDTZ = &lt;Region ID&gt;'). If ORA_SDTZ variable is set, Oracle Client
+                considers this value as the session time zone. The second method is to execute an alter session command to
+                set the session time zone property to the region identifier.
+
+                <br /><br />
+                <br />
+                <b>ODP.NET, Managed Driver with NTS Authentication</b>
+                <br />
+                ODP.NET, Managed Driver supports NTS authentication to the database, except when the Windows domain is constrained to only support Kerberos-based domain authentication.
+                <br /><br />
+                <br />
+                <b>ODP.NET, Managed Driver SSL Connections with Firewalls</b>
+                <br />
+                ODP.NET, Managed Driver SSL connections require a redirect to a dynamic
+                port on the database server side. If a firewall exists between the
+                database client and server, then all firewall ports must be enabled or
+                the dynamic firewall port Oracle chooses must be enabled at run-time.
+    </div>
+    <p>&nbsp;</p>
+
+
+    <a name="Managed Known Issues"></a><h2>ODP.NET, Managed Driver Tips, Limitations, and Known Issues</h2>
+    This section contains information that is specific to ODP.NET, Managed Driver.
+
+    <ol>
+	<li>OracleConnection object&#39;s OpenWithNewPassword() method invocation will result in 
+            an ORA-1017 error with 11.2.0.3.0 and earlier versions of the database. [Bug 12876992]<br/>
+    <br /></li>
+        <li>Stored functions/procedures in a PDB cannot be added to a .NET Entity Framework model. [Bug 17344899]<br/></li>
+    </ol>
+
+    <p>&nbsp;</p>
+
+    <a name="Unmanaged Known Issues"></a><h2>ODP.NET, Unmanaged Driver Tips, Limitations, and Known Issues</h2>
+    This section contains information that is specific to ODP.NET, Unmanaged Driver.
+
+    <ol>
+        <li>If SenderId is specified in OracleAQMessage object while enqueuing, the 
+            sender id of dequeued message will have &quot;@ODP.NE&quot; appended in the end. [Bug 
+            7315542]<br /><br /></li>
+
+        <li>An &quot;ORA-00942: table or view does not exist&quot; error may be thrown from Dequeue or 
+            DequeueArray method invocations when OracleAQDequeueOptions.DeliveryMode is 
+            specified as OracleAQMessageDeliveryMode.Buffered and 
+            OracleAQDequeueOptions.Correlation is specified and there are no messages 
+            available in the queue. [Bug 7343633]<br />
+            <br />
+        </li>
+        <li>Applications may not receive group notifications if GroupingInterval property on 
+            the OracleNotificationRequest object is set to 0. [Bug 7373765]<br />
+            <br />
+        </li>
+        <li>OracleConnection object&#39;s OpenWithNewPassword() method invocation will result in 
+            an ORA-1017 error with pre-11.2.0.3.0 database versions. [Bug 12876992]
+        </li>
+    </ol>
+    <p>&nbsp;</p>
+
+    <a name="EF"><h2>Entity Framework Tips, Limitations, and Known Issues</h2>
+    This section contains Entity Framework related information that pertains to both ODP.NET, Managed Driver and ODP.NET, Unmanaged Driver.
+    <ol>
+        <li>Interval Day to Second and Interval Year to Month column values cannot be 
+            compared to literals in a WHERE clause of a LINQ to Entities or an Entity SQL 
+            query.<br /><br /> </li>
+        <li>LINQ to Entities and Entity SQL (ESQL) queries that require the usage of SQL 
+            APPLY in the generated queries will cause SQL syntax error(s) if the Oracle 
+            Database being used does not support APPLY. In such cases, the inner exception 
+            message will indicate that APPLY is not supported by the database.<br /><br /> </li>
+        <li>ODP.NET does not currently support wildcards that accept character ranges for 
+            the LIKE operator in Entity SQL (i.e. [] and [^]). [Bug 11683837]<br /><br /> </li>
+        <li>Executing LINQ or ESQL query against tables with one or more column names 
+            that are close to or equal to the maximum length of identifiers (30 bytes) may 
+            encounter &quot;ORA-00972: identifier is too long&quot; error, due to the usage of alias 
+            identifier(s) in the generated SQL that exceed the limit.<br /><br /> </li>
+        <li>An &quot;ORA-00932: inconsistent datatypes: expected - got NCLOB&quot; error will be 
+            encountered when trying to bind a string that is equal to or greater than 2,000 
+            characters in length to an XMLType column or parameter. [Bug 12630958]<br /><br /> </li>
+        <li>An &quot;ORA-00932 : inconsistent datatypes&quot; error can be encountered if a string of 
+            2,000 or more characters, or a byte array with 4,000 bytes or more in length, is 
+            bound in a WHERE clause of a LINQ/ESQL query. The same error can be encountered 
+            if an entity property that maps to a BLOB, CLOB, NCLOB, LONG, LONG RAW, XMLTYPE 
+            column is used in a WHERE clause of a LINQ/ESQL query.<br /><br /> </li>
+        <li>An &quot;Arithmetic operation resulted in an overflow&quot; exception can be 
+            encountered when fetching numeric values that have more precision than what the 
+            .NET type can support. In such cases, the LINQ or ESQL query can &quot;cast&quot; the 
+            value to a particular .NET or EDM type to limit the precision and avoid the 
+            exception. This approach can be useful if the LINQ/ESQL query has 
+            computed/calculated columns which will store up to 38 precision in Oracle, which 
+            cannot be represented as .NET decimal unless the value is casted. <br /><br /></li>
+        <li>Oracle Database treats NULLs and empty strings the same. When executing string 
+            related operations on NULLS or empty strings, the result will be NULL. When 
+            comparing strings with NULLs, use the equals operator (i.e. &quot;x == NULL&quot;) in the 
+            LINQ query, which will in turn use the &quot;IS NULL&quot; condition in the generated SQL 
+            that will appropriately detect NULL-ness.<br /><br /></li>
+        <li>If an exception message of &quot;The store provider factory type 
+          &#39;Oracle.ManagedDataAccess.Client.OracleClientFactory&#39; does not implement the 
+          IServiceProvider interface.&quot; is encountered when executing an Entity Framework 
+          application with ODP.NET, the machine.config requires and entry for ODP.NET 
+          under the &lt;DbProviderFactories&gt; section. To resolve this issue by adding an 
+          entry in the machine.config, reinstall ODAC.<br /><br /></li>
+        <li>Creating a second instance of the context that derives from DbContext within 
+          an application and executing methods within the scope of that context that 
+          result in an interaction with the database may result in unexpected recreation 
+          of the database objects if the DropCreateDatabaseAlways database initializer is 
+          used.<br /><br />More Information: 
+          https://entityframework.codeplex.com/workitem/2362 <br /><br />Known Workarounds: <br />- Use a 
+          different database initializer, <br />- Use an operating system authenticated user for 
+          the connection, or <br />- Include &quot;Persist Security Info=true&quot; in the connection 
+          string (Warning: Turning on &quot;Persist Security Info&quot; will cause the password to 
+          remain as part of the connection string). <br /><br /></li>
+          <li>Deinstallation of ODP.NET versions that are prior to ODAC 12c Release 3 
+            production can cause entries with .NET 2.x assembly references to be entered in 
+            the .NET 4.0 machine.config. This can cause side-by-side execution errors unless 
+            config section entry for &quot;oracle.unmanageddataaccess.client&quot; that references 2.x 
+            version of Oracle.DataAccess.Client is manually removed from the .NET 4.0 
+            machine.config. It is also advised that a DbProviderFactories entry that 
+            references 2.x version of Oracle.DataAccess.Client be removed manually as well. <br /><br /></li>
+    </ol>
+
+</body>
+</html>
