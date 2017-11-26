@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuAnalyzer", "QuAnalyzer\QuAnalyzer.csproj", "{C080DFD3-CC65-4442-96FB-A8C08630398F}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDataProvider", "ExcelDataProvider\ExcelDataProvider.csproj", "{1CECEE50-B636-4844-BABE-FA8501DEC32E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAPDataProvider", "SAPDataProvider\SAPDataProvider.csproj", "{6ABDD9EF-0312-41EB-AB16-F86AD08F251E}"
+EndProject
+Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "Package", "Package\Package.wapproj", "{145613BA-5EEF-4E1E-9550-C3606AA9049B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,9 +85,30 @@ Global
 		{6ABDD9EF-0312-41EB-AB16-F86AD08F251E}.Release|x64.Build.0 = Release|x64
 		{6ABDD9EF-0312-41EB-AB16-F86AD08F251E}.Release|x86.ActiveCfg = Release|x86
 		{6ABDD9EF-0312-41EB-AB16-F86AD08F251E}.Release|x86.Build.0 = Release|x86
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Debug|x64.ActiveCfg = Debug|x64
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Debug|x64.Build.0 = Debug|x64
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Debug|x64.Deploy.0 = Debug|x64
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Debug|x86.ActiveCfg = Debug|x86
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Debug|x86.Build.0 = Debug|x86
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Debug|x86.Deploy.0 = Debug|x86
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Release|x64.ActiveCfg = Release|x64
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Release|x64.Build.0 = Release|x64
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Release|x64.Deploy.0 = Release|x64
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Release|x86.ActiveCfg = Release|x86
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Release|x86.Build.0 = Release|x86
+		{145613BA-5EEF-4E1E-9550-C3606AA9049B}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4BB7C6B8-DAF4-4E01-B502-9E26075F82B2}
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
