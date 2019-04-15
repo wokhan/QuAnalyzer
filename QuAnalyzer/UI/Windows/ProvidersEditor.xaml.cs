@@ -1,18 +1,13 @@
 ﻿using MahApps.Metro.Controls;
-using QuAnalyzer.DataProviders.Bases;
-using QuAnalyzer.DataProviders.Contracts;
+using Wokhan.Data.Providers.Bases;
+using Wokhan.Data.Providers.Contracts;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using MahApps.Metro.Controls.Dialogs;
-using System.Windows.Markup;
-using System.Windows.Media;
 using System.ComponentModel;
-using QuAnalyzer.Helpers;
 using Microsoft.Win32;
 using System.Threading.Tasks;
 

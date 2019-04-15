@@ -1,21 +1,15 @@
 ﻿using De.TorstenMandelkow.MetroChart;
-using QuAnalyzer.DataProviders.Contracts;
 using QuAnalyzer.Helpers;
 using QuAnalyzer.Extensions;
 using QuAnalyzer.UI.Windows;
-using Sparrow.Chart;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
 using System.Windows.Threading;
+using Wokhan.Core.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {

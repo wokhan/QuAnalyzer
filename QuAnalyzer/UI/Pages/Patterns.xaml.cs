@@ -1,8 +1,5 @@
-﻿using QuAnalyzer.DataProviders.Contracts;
-using System.Collections.Generic;
+﻿using Wokhan.Data.Providers.Contracts;
 using System.Linq;
-using System.Linq.Dynamic;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 

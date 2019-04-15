@@ -32,11 +32,11 @@ namespace QuAnalyzer
         private readonly ResourcesWatcher _perfs;
         public ResourcesWatcher Performance { get { return _perfs; } }
 
-        private readonly ApplicationBase _appBase = new ApplicationBase();
+        //public string ApplicationInfo { get { return String.Format("{0} {1} v{2}", _appBase.Info.CompanyName, _appBase.Info.ProductName, _appBase.Info.Version); } }
+        public string ApplicationInfo { get { return String.Format("{0} {1} v{2}", "", "", ""); } }
 
-        public string ApplicationInfo { get { return String.Format("{0} {1} v{2}", _appBase.Info.CompanyName, _appBase.Info.ProductName, _appBase.Info.Version); } }
-
-        public string Copyright { get { return _appBase.Info.Copyright; } }
+        //public string Copyright { get { return _appBase.Info.Copyright; } }
+        public string Copyright { get { return ""; } }
 
         public string HelpLink { get { return "http://wokhan.online.fr"; } }
 

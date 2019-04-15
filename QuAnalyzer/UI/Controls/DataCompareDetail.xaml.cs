@@ -24,5 +24,6 @@ namespace QuAnalyzer.UI.Controls
         {
             InitializeComponent();
         }
+
     }
 }

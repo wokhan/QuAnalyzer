@@ -95,10 +95,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QuAnalyzer\QuAnalyzer.csproj">
-      <Project>{c080dfd3-cc65-4442-96fb-a8c08630398f}</Project>
-      <Name>QuAnalyzer</Name>
-      <Private>False</Private>
+    <ProjectReference Include="..\DataProviders\DataProviders.csproj">
+      <Project>{ab2c616c-8b8d-40db-b460-36c71a9fef21}</Project>
+      <Name>DataProviders</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

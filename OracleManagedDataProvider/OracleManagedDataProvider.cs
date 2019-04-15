@@ -1,6 +1,6 @@
-﻿using QuAnalyzer.DataProviders.Attributes;
-using QuAnalyzer.DataProviders.Bases;
-using QuAnalyzer.DataProviders.Contracts;
+﻿using Wokhan.Data.Providers.Attributes;
+using Wokhan.Data.Providers.Bases;
+using Wokhan.Data.Providers.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +8,9 @@ using Oracle.ManagedDataAccess.Client;
 using System.Data.Common;
 using System.Text.RegularExpressions;
 
-namespace QuAnalyzer.DataProviders
+namespace Wokhan.Data.Providers
 {
-    [DataProvider(Category = "Database", Name = "Oracle ODP.NET Managed Driver", Copyright = "Developed by Wokhan Solutions. Based on Oracle official driver.", Icon = "pack://application:,,,/OracleManagedDataProvider;component/Resources/SQL.png")]
+    [DataProvider(Category = "Database", Name = "Oracle ODP.NET Managed Driver", Icon = "/Resources/Providers/SQL.png")]
     public class OracleManagedDataProvider : DBDataProvider, IDBDataProvider, IExposedDataProvider
     {
         [ProviderParameter("SID", ExclusionGroup = "Connection details", Position = 25)]

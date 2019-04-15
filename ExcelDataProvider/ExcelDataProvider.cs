@@ -1,20 +1,20 @@
-﻿using Excel;
-using QuAnalyzer.DataProviders.Attributes;
-using QuAnalyzer.DataProviders.Bases;
-using QuAnalyzer.DataProviders.Contracts;
-using QuAnalyzer.Extensions;
+﻿using Wokhan.Data.Providers.Attributes;
+using Wokhan.Data.Providers.Bases;
+using Wokhan.Data.Providers.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
 using System.Linq;
+using System.IO;
+using System.Data;
+using ExcelDataReader;
+using Wokhan.Core.Extensions;
 
-namespace QuAnalyzer.DataProviders
+namespace Wokhan.Data.Providers
 {
-    [DataProvider(Category = "Files", Name = "Excel Workbook", Copyright = "Developed by Wokhan Solutions", Icon = "pack://application:,,,/ExcelDataProvider;component/Resources/Excel.png")]
+    [DataProvider(Category = "Files", Name = "Excel Workbook", Copyright = "Developed by Wokhan Solutions", Icon = "/Resources/Providers/Excel.png")]
     public class ExcelDataProvider : DataProvider, IDataProvider, IExposedDataProvider
     {
-        [ProviderParameter("File", IsFile = true, FileFilter = "Excel workbook|*.xls;*.xlsx")]
+        [ProviderParameter("File", IsFile = true)]
         public string File
         {
             get;
@@ -38,6 +38,14 @@ namespace QuAnalyzer.DataProviders
             }
         }
 
+        ExcelDataSetConfiguration defaultConf = new ExcelDataSetConfiguration()
+        {
+            ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
+            {
+                UseHeaderRow = true
+            }
+        };
+
         private Dictionary<string, Dictionary<string, Type>> cachedHeaders = new Dictionary<string, Dictionary<string, Type>>();
         public new Dictionary<string, Type> GetHeaders(string repository = null)
         {
@@ -52,7 +60,7 @@ namespace QuAnalyzer.DataProviders
                         reader.NextResult();
                     }
 
-                    cachedHeaders.Add(repository, reader.AsDataSet().Tables[rep].Columns.Cast<DataColumn>()
+                    cachedHeaders.Add(repository, reader.AsDataSet(defaultConf).Tables[rep].Columns.Cast<DataColumn>()
                                                           .ToDictionary(c => c.ColumnName, c => c.DataType));
                 }
             }
@@ -62,7 +70,7 @@ namespace QuAnalyzer.DataProviders
 
         public new Dictionary<string, object> GetDefaultRepositories()
         {
-            Dictionary<string, object> ret = new Dictionary<string, object>();
+            var ret = new Dictionary<string, object>();
             using (var reader = getReader())
             {
                 var res = reader.ResultsCount;
@@ -82,11 +90,11 @@ namespace QuAnalyzer.DataProviders
         //    {
         //        if (attributes != null)
         //        {
-        //            return reader.AsDataSet().Tables[repository].AsEnumerable().Select(r => attributes.Select(a => r[a]));
+        //            return reader.AsDataSet(defaultConf).Tables[repository].AsEnumerable().Select(r => attributes.Select(a => r[a]));
         //        }
         //        else
         //        {
-        //            return reader.AsDataSet().Tables[repository].AsEnumerable().Select(r => r.ItemArray);
+        //            return reader.AsDataSet(defaultConf).Tables[repository].AsEnumerable().Select(r => r.ItemArray);
         //        }
         //    }
         //}
@@ -119,8 +127,6 @@ namespace QuAnalyzer.DataProviders
             {
                 ret = ExcelReaderFactory.CreateBinaryReader(new FileStream(File, FileMode.Open, FileAccess.Read));
             }
-
-            ret.IsFirstRowAsColumnNames = HasHeader;
 
             return ret;
         }

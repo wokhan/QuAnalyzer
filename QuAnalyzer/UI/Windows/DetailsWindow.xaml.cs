@@ -1,7 +1,5 @@
 ﻿using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
 using QuAnalyzer.Extensions;
 using QuAnalyzer.Helpers;
 using QuAnalyzer.Logic;
@@ -10,15 +8,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using Wokhan.Core.Extensions;
 using LinqExpressions = System.Linq.Expressions;
-using WinForms = System.Windows.Forms;
 
 namespace QuAnalyzer.UI.Windows
 {

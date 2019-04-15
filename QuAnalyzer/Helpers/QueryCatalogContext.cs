@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-/// <summary>
-/// Context class for dynamic queries and catalog information
-/// </summary>
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.ModelConfiguration;
 using System.Linq;
-using DLinq = System.Linq.Dynamic;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Linq.Dynamic;
+using System.Linq.Dynamic.Core;
+using System.Data.SqlClient;
+using System.Configuration;
 
+/// <summary>
+/// Context class for dynamic queries and catalog information
+/// </summary>
 public class QueryCatalogContext : DbContext
 {
     private bool modelProvided;
@@ -34,7 +35,7 @@ public class QueryCatalogContext : DbContext
     /// <returns></returns>
     public IQueryable<T> GetDynamicQueryResults<T>(Dictionary<string, Type> columns)
     {
-        var t = DLinq.DynamicExpression.CreateClass(columns.Select(c => new DynamicProperty(c.Key, c.Value)));
+        var t = DynamicClassFactory.CreateType(columns.Select(c => new DynamicProperty(c.Key, c.Value)).ToList());
         
         // Build the query and execute
         string sql = string.Format("SELECT VALUE {0} FROM CodeFirstContainer.{0} AS {0}", t.FullName);

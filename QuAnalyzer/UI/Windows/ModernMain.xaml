@@ -12,8 +12,7 @@
     MinWidth="900" MinHeight="600" Height="600"
     Background="White" EnableDWMDropShadow="True"
     Width="900" BorderThickness="1" UseLayoutRounding="True" SnapsToDevicePixels="True"
-    BorderBrush="Gray" WindowTitleBrush="White" TitleForeground="Black"
-    Icon="/QuAnalyzer;component/Resources/IconNewTrans.ico">
+    BorderBrush="Gray" WindowTitleBrush="White" TitleForeground="Black">
     <Window.Resources>
         <Style TargetType="{x:Type Controls:WindowButtonCommands}">
             <Style.Triggers>

@@ -1,7 +1,7 @@
 ﻿using MahApps.Metro;
 using Microsoft.Win32;
-using QuAnalyzer.DataProviders.Bases;
-using QuAnalyzer.DataProviders.Contracts;
+using Wokhan.Data.Providers.Bases;
+using Wokhan.Data.Providers.Contracts;
 using QuAnalyzer.UI.Windows;
 using System;
 using System.ComponentModel;
@@ -105,8 +105,16 @@ namespace QuAnalyzer.UI.Menus
 
         private void btnEditProvider_Click(object sender, RoutedEventArgs e)
         {
-            ((IDataProvider)((Button)sender).Tag).OpenEditor();
+            OpenEditor((IDataProvider)((Button)sender).Tag);
         }
+
+        public void OpenEditor(IDataProvider prv)
+        {
+            var editor = new ProvidersEditor(prv);
+            editor.Show();
+            editor.Activate();
+        }
+
 
         private void btnDeleteProvider_Click(object sender, RoutedEventArgs e)
         {
@@ -120,7 +128,7 @@ namespace QuAnalyzer.UI.Menus
             
             newprv.Name = ((DataProviderStruct)((Button)sender).Tag).Name + "#" + ((App)Application.Current).CurrentProject.CurrentProviders.Count;
 
-            newprv.OpenEditor();
+            OpenEditor(newprv);
         }
     }
 

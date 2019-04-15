@@ -1,4 +1,4 @@
-﻿using QuAnalyzer.DataProviders.Contracts;
+﻿using Wokhan.Data.Providers.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;

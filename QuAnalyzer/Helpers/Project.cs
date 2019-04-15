@@ -1,12 +1,10 @@
 ﻿using Microsoft.Win32;
-using QuAnalyzer.DataProviders.Bases;
-using QuAnalyzer.DataProviders.Contracts;
+using Wokhan.Data.Providers.Bases;
+using Wokhan.Data.Providers.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows.Media;

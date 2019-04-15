@@ -1,7 +1,7 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using OfficeOpenXml;
-using QuAnalyzer.DataProviders.Contracts;
+using Wokhan.Data.Providers.Contracts;
 using QuAnalyzer.Extensions;
 using QuAnalyzer.Helpers;
 using QuAnalyzer.Logic;
@@ -21,6 +21,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Shell;
 using WinForms = System.Windows.Forms;
+using Wokhan.Core.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {

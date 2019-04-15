@@ -3,8 +3,8 @@
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:Converters="clr-namespace:MahApps.Metro.Converters;assembly=MahApps.Metro"
              xmlns:local="clr-namespace:QuAnalyzer.UI.Controls"
-             xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:BindingConverters="clr-namespace:QuAnalyzer.Helpers.BindingConverters"
+             xmlns:System="clr-namespace:System;assembly=System.Runtime"
              x:Class="QuAnalyzer.App"
              StartupUri="UI/Windows/ModernMain.xaml">
     <Application.Resources>

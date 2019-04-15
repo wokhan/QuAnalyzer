@@ -1,4 +1,4 @@
-﻿using QuAnalyzer.DataProviders.Contracts;
+﻿using Wokhan.Data.Providers.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,17 +9,12 @@ using System.Windows.Input;
 using QuAnalyzer.Extensions;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
-using QuAnalyzer.Logic;
-using LinqExpressions = System.Linq.Expressions;
 using System.Linq.Dynamic;
-using System.Collections;
-using System.Data.Entity;
-using AlphaChiTech.Virtualization;
 using QuAnalyzer.Helpers;
 using System.Windows.Threading;
 using System.ComponentModel;
-using System.Collections.Specialized;
 using System.Threading.Tasks;
+using System.Linq.Dynamic.Core;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -262,8 +257,8 @@ namespace QuAnalyzer.UI.Pages
                 var cmpAttrs = _compute.Where(c => c.Aggregate != null);
                 if (_grouping.Any() && cmpAttrs.Any())
                 {
-                    query = DynamicQueryable.GroupBy(query, "new(" + String.Join(",", _grouping) + ")", "it")
-                                                 .Select("new(it.Key." + String.Join(",it.Key.", _grouping) + "," + String.Join(",", cmpAttrs.Select(c => String.Format(c.Aggregate, c.Attribute) + " as " + c.Attribute)) + ")");
+                    query = DynamicQueryableExtensions.GroupBy(query, "new(" + String.Join(",", _grouping) + ")", "it")
+                                                      .Select("new(it.Key." + String.Join(",it.Key.", _grouping) + "," + String.Join(",", cmpAttrs.Select(c => String.Format(c.Aggregate, c.Attribute) + " as " + c.Attribute)) + ")");
                 }
                 else
                 {

@@ -1,16 +1,13 @@
-﻿using QuAnalyzer.DataProviders.Contracts;
+﻿using Wokhan.Data.Providers.Contracts;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Linq.Dynamic;
 using System.Windows.Controls;
 using System;
-using QuAnalyzer.Extensions;
 using System.ComponentModel;
 using QuAnalyzer.Helpers;
-using System.Collections;
-using System.Reflection;
 using System.Linq.Expressions;
+using Wokhan.Core.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {

@@ -1,11 +1,9 @@
 ﻿using QuAnalyzer.Helpers;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using QuAnalyzer.Extensions;
 using System.Diagnostics;
 using System.IO;
 

@@ -1,12 +1,12 @@
 ﻿using AlphaChiTech.Virtualization;
-using QuAnalyzer.DataProviders.Contracts;
+using Wokhan.Data.Providers.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Linq.Dynamic;
+using DLinq = System.Linq.Dynamic.Core;
 using System.Windows.Threading;
 
 namespace QuAnalyzer.Helpers
@@ -86,7 +86,7 @@ namespace QuAnalyzer.Helpers
                     var ret = new PagedSourceItemsPacket<T>();
 
                     ret.LoadedAt = DateTime.Now;
-                    ret.Items = (basequery ?? ((IQueryable<T>)prv.GetData(src).OrderBy(prv.GetHeaders(src).First().Key))).Skip(pageoffset).Take(count).AsEnumerable();
+                    ret.Items = DLinq.DynamicQueryableExtensions.OrderBy(basequery ?? (IQueryable<T>)prv.GetData(src), prv.GetHeaders(src).First().Key).Skip(pageoffset).Take(count).AsEnumerable();
 
                     return ret;
                 }

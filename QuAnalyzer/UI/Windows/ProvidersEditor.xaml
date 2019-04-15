@@ -6,7 +6,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
       xmlns:sys="clr-namespace:System;assembly=mscorlib"
-      xmlns:providers="clr-namespace:QuAnalyzer.DataProviders.Bases"
+      xmlns:providers="clr-namespace:Wokhan.Data.Providers.Bases"
         BorderBrush="Gray"
         BorderThickness="1"
         mc:Ignorable="d"

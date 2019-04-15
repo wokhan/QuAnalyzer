@@ -1,4 +1,4 @@
-﻿using QuAnalyzer.DataProviders.Contracts;
+﻿using Wokhan.Data.Providers.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +10,12 @@ using QuAnalyzer.Extensions;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
 using QuAnalyzer.Logic;
-using LinqExpressions = System.Linq.Expressions;
-using System.Linq.Dynamic;
-using System.Collections;
 using System.Data.Entity;
-using AlphaChiTech.Virtualization;
 using QuAnalyzer.Helpers;
 using System.Windows.Threading;
 using System.ComponentModel;
-using System.Collections.Specialized;
 using System.Threading.Tasks;
+using Wokhan.Core.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -302,7 +298,7 @@ namespace QuAnalyzer.UI.Pages
             var allHeadersFu = prov.GetHeaders(repository);
             string[] keys;
             string[] headers;
-            if (lstColumns.SelectedItems.Any())
+            if (lstColumns.SelectedItems.Count > 0)
             {
                 keys = lstColumns.SelectedItems.Cast<KeyValuePair<string, Type>>().Select(a => a.Key).ToArray();
                 headers = allHeadersFu.OrderBy(h => keys.Contains(h.Key) ? 0 : 1).Select(h => h.Key).ToArray();
@@ -327,7 +323,7 @@ namespace QuAnalyzer.UI.Pages
                 LoadingProgress = 1;
 
                 var keyComparer = new Comparison.SequenceEqualityComparer(0, keys.Length);
-                var cnt = dataObjectArray.Count;
+                var cnt = dataObjectArray.Count();
                 var ret = Comparison.InitiateDuplicates(dataObjectArray.Select((a, i) => { Status = "Checked " + i + " entries"; LoadingProgress = i * 100 / cnt; return a; }), keyComparer, new Comparison.SequenceEqualityComparer()).Duplicates;
 
                 if (!KeepDuplicates)
