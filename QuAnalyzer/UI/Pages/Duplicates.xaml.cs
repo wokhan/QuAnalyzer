@@ -16,6 +16,7 @@ using System.Windows.Threading;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Wokhan.Core.Extensions;
+using Wokhan.Collections.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {

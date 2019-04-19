@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using QuAnalyzer.Extensions;
 using Wokhan.Core.Extensions;
+using Wokhan.Collections.Extensions;
 
 namespace QuAnalyzer.Helpers
 {

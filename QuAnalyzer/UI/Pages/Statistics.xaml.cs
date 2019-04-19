@@ -7,7 +7,8 @@ using System;
 using System.ComponentModel;
 using QuAnalyzer.Helpers;
 using System.Linq.Expressions;
-using Wokhan.Core.Extensions;
+using Wokhan.Collections.Extensions;
+using Wokhan.Types.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {

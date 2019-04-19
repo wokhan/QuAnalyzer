@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Diagnostics;
-using Wokhan.Core.Extensions;
+using Wokhan.Collections.Extensions;
 
 namespace QuAnalyzer.Logic
 {

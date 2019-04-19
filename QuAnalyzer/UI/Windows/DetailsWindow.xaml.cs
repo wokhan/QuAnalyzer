@@ -13,7 +13,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using Wokhan.Core.Extensions;
+using Wokhan.Collections.Extensions;
 using LinqExpressions = System.Linq.Expressions;
 
 namespace QuAnalyzer.UI.Windows

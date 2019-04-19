@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Wokhan.Core.Extensions;
+using Wokhan.Collections.Extensions;
 
 namespace QuAnalyzer.UI.Windows
 {

@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:QuAnalyzerHelpers="clr-namespace:QuAnalyzer.Helpers"
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-      xmlns:providers="clr-namespace:Wokhan.Data.Providers.Bases;assembly=DataProviders"
+      xmlns:providers="clr-namespace:Wokhan.Data.Providers.Bases;assembly=Wokhan.Data.Providers"
       xmlns:local="clr-namespace:QuAnalyzer.UI.Controls"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       mc:Ignorable="d" d:DesignHeight="460">

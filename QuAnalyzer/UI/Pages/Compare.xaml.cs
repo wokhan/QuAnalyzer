@@ -21,7 +21,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Shell;
 using WinForms = System.Windows.Forms;
-using Wokhan.Core.Extensions;
+using Wokhan.Collections.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {
