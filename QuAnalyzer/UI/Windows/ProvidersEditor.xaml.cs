@@ -32,10 +32,7 @@ namespace QuAnalyzer.UI.Windows
 
         protected void NotifyPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public class RepositoryView
@@ -45,8 +42,7 @@ namespace QuAnalyzer.UI.Windows
             public object Value { get; set; }
         }
 
-        private ObservableCollection<RepositoryView> _repositories = new ObservableCollection<RepositoryView>();
-        public ObservableCollection<RepositoryView> Repositories { get { return _repositories; } }
+        public ObservableCollection<RepositoryView> Repositories { get; } = new ObservableCollection<RepositoryView>();
 
         public ProvidersEditor(IDataProvider currentProvider)
         {
@@ -104,9 +100,9 @@ namespace QuAnalyzer.UI.Windows
         {
             ((IDataProvider)CurrentProvider).Repositories = Repositories.Where(r => r.Selected).ToDictionary(r => r.Key, r => r.Value);
 
-            if (!((App)App.Current).CurrentProject.CurrentProviders.Contains(CurrentProvider))
+            if (!((App)Application.Current).CurrentProject.CurrentProviders.Contains(CurrentProvider))
             {
-                ((App)App.Current).CurrentProject.CurrentProviders.Add(CurrentProvider);
+                ((App)Application.Current).CurrentProject.CurrentProviders.Add(CurrentProvider);
             }
             //((App)App.Current).CurrentProject.CurrentProviders[((App)App.Current).CurrentProject.CurrentProviders.IndexOf((IDataProvider)lstProviders.SelectedItem)] = CurrentProvider;
 

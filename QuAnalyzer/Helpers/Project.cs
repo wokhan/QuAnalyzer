@@ -11,7 +11,6 @@ using System.Windows.Media;
 
 namespace QuAnalyzer.Helpers
 {
-
     public class Project : NotifierHelper
     {
         private string _name;
@@ -48,18 +47,14 @@ namespace QuAnalyzer.Helpers
             set { App.Current.Resources["AccentColorBrush"] = value; }
         }
 
-        private readonly ObservableCollection<IDataProvider> _currentProviders = new ObservableCollection<IDataProvider>();
-        public ObservableCollection<IDataProvider> CurrentProviders { get { return _currentProviders; } }
+        public ObservableCollection<IDataProvider> CurrentProviders { get; } = new ObservableCollection<IDataProvider>();
 
-        private readonly ObservableCollection<MonitorItem> _monitorItems = new ObservableCollection<MonitorItem>();
-        public ObservableCollection<MonitorItem> MonitorItems { get { return _monitorItems; } }
-
-        private readonly ObservableCollection<SourcesMapper> _sourcemapper = new ObservableCollection<SourcesMapper>();
-        public ObservableCollection<SourcesMapper> SourceMapper { get { return _sourcemapper; } }
+        public ObservableCollection<MonitorItem> MonitorItems { get; } = new ObservableCollection<MonitorItem>();
+        public ObservableCollection<SourcesMapper> SourceMapper { get; } = new ObservableCollection<SourcesMapper>();
 
         internal void Open(string p)
         {
-            DataContractSerializer ser = new DataContractSerializer(typeof(Project), DataProvider.AllProviders.Select(a => a.Type).Concat(new[] { typeof(Dictionary<string, object>), typeof(IDataProvider), typeof(DataProvider), typeof(DBDataProvider), typeof(FileDataProvider), typeof(ObservableCollection<IDataProvider>), typeof(SourcesMapper), typeof(MonitorItem) }));
+            var ser = new DataContractSerializer(typeof(Project), DataProvider.AllProviders.Select(a => a.Type).Concat(new[] { typeof(Dictionary<string, object>), typeof(IDataProvider), typeof(DataProvider), typeof(DBDataProvider), typeof(FileDataProvider), typeof(ObservableCollection<IDataProvider>), typeof(SourcesMapper), typeof(MonitorItem) }));
             FileStream stream = null;
             try
             {
@@ -103,13 +98,13 @@ namespace QuAnalyzer.Helpers
 
         internal void Save(string p = null)
         {
-            if (String.IsNullOrEmpty(this.FilePath) && String.IsNullOrEmpty(p))
+            if (string.IsNullOrEmpty(FilePath) && string.IsNullOrEmpty(p))
             {
                 this.SaveAs();
                 return;
             }
 
-            DataContractSerializer ser = new DataContractSerializer(typeof(Project), DataProvider.AllProviders.Select(a => a.Type).Concat(new[] { typeof(Dictionary<string, object>), typeof(IDataProvider), typeof(DataProvider), typeof(DBDataProvider), typeof(FileDataProvider), typeof(ObservableCollection<IDataProvider>), typeof(SourcesMapper), typeof(MonitorItem) }));
+            var ser = new DataContractSerializer(typeof(Project), DataProvider.AllProviders.Select(a => a.Type).Concat(new[] { typeof(Dictionary<string, object>), typeof(IDataProvider), typeof(DataProvider), typeof(DBDataProvider), typeof(FileDataProvider), typeof(ObservableCollection<IDataProvider>), typeof(SourcesMapper), typeof(MonitorItem) }));
             
             if (p != null)
             {

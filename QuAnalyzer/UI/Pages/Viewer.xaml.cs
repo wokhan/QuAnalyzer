@@ -9,12 +9,12 @@ using System.Windows.Input;
 using QuAnalyzer.Extensions;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
-using System.Linq.Dynamic;
 using QuAnalyzer.Helpers;
 using System.Windows.Threading;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
+using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -72,17 +72,9 @@ namespace QuAnalyzer.UI.Pages
             set { _loadingProgress = value; NotifyPropertyChanged("LoadingProgress"); }
         }
 
-        private ObservableCollection<string> _grouping = new ObservableCollection<string>();
-        public ObservableCollection<string> Grouping
-        {
-            get { return _grouping; }
-        }
+        public ObservableCollection<string> Grouping { get; } = new ObservableCollection<string>();
 
-        private ObservableCollection<FilterStruct> _filters = new ObservableCollection<FilterStruct>();
-        public ObservableCollection<FilterStruct> Filters
-        {
-            get { return _filters; }
-        }
+        public ObservableCollection<FilterStruct> Filters { get; } = new ObservableCollection<FilterStruct>();
 
 
         public class ComputeStruct
@@ -116,13 +108,9 @@ namespace QuAnalyzer.UI.Pages
             set { _customFilterError = value; NotifyPropertyChanged("CustomFilterError"); NotifyPropertyChanged("IsCustomFilterError"); }
         }
 
-        private ObservableCollection<ComputeStruct> _compute = new ObservableCollection<ComputeStruct>();
-        public ObservableCollection<ComputeStruct> Compute
-        {
-            get { return _compute; }
-        }
+        public ObservableCollection<ComputeStruct> Compute { get; } = new ObservableCollection<ComputeStruct>();
 
-        private string SortOrder { get { return (currentSortAttribute != null && (!_grouping.Any() || _grouping.Concat(_compute.Select(f => f.Attribute)).Contains(currentSortAttribute))) ? currentSortAttribute : (_grouping.FirstOrDefault() ?? allHeaders.Keys.First()); } }
+        private string SortOrder { get { return (currentSortAttribute != null && (!Grouping.Any() || Grouping.Concat(Compute.Select(f => f.Attribute)).Contains(currentSortAttribute))) ? currentSortAttribute : (Grouping.FirstOrDefault() ?? allHeaders.First().Name); } }
 
         public Viewer()
         {
@@ -131,7 +119,7 @@ namespace QuAnalyzer.UI.Pages
             VirtualizationHelper.Init(Dispatcher);
         }
 
-        private Dictionary<string, Type> allHeaders;
+        private List<ColumnDescription> allHeaders;
         private List<string> dispHeaders;
         private void lstDataSources_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -201,25 +189,25 @@ namespace QuAnalyzer.UI.Pages
         private void lstGrouping_Drop(object sender, DragEventArgs e)
         {
             var src = (string)e.Data.GetData(typeof(string));
-            if (!_grouping.Contains(src))
+            if (!Grouping.Contains(src))
             {
-                _grouping.Add(src);
-                foreach (var h in gridData.Columns.Select(c => c.SortMemberPath).Except(_grouping).Except(_compute.Select(c => c.Attribute)))
+                Grouping.Add(src);
+                foreach (var h in gridData.Columns.Select(c => c.SortMemberPath).Except(Grouping).Except(Compute.Select(c => c.Attribute)))
                 {
-                    _compute.Add(new ComputeStruct() { Attribute = h, Aggregate = null });
+                    Compute.Add(new ComputeStruct() { Attribute = h, Aggregate = null });
                 }
             }
         }
 
         private void gridCompute_Drop(object sender, DragEventArgs e)
         {
-            _compute.Add(new ComputeStruct() { Attribute = (string)e.Data.GetData(typeof(string)), Aggregate = null });
+            Compute.Add(new ComputeStruct() { Attribute = (string)e.Data.GetData(typeof(string)), Aggregate = null });
         }
 
         private void gridFilters_Drop(object sender, DragEventArgs e)
         {
             var attr = (string)e.Data.GetData(typeof(string));
-            _filters.Add(new FilterStruct() { Attribute = attr, Type = allHeaders[attr] });
+            Filters.Add(new FilterStruct() { Attribute = attr, Type = allHeaders.First(c => c.Name == attr).Type });
         }
 
         private async void btnApply_Click(object sender, RoutedEventArgs e)
@@ -233,12 +221,12 @@ namespace QuAnalyzer.UI.Pages
                 Status = "Initializing...";
 
                 IQueryable query = prov.GetData(repository);
-                allHeaders = prov.GetHeaders(repository);
+                allHeaders = prov.GetColumns(repository);
 
-                if (_filters.Any())
+                if (Filters.Any())
                 {
-                    var values = _filters.Select(f => f.TargetValueAsObject).ToArray();
-                    query = query.Where(_filters.Select((f, i) => f.Attribute + f.ComparerExpression + " @" + i).Aggregate((a, b) => a + " AND " + b), values);
+                    var values = Filters.Select(f => f.TargetValueAsObject).ToArray();
+                    query = query.Where(Filters.Select((f, i) => f.Attribute + f.ComparerExpression + " @" + i).Aggregate((a, b) => a + " AND " + b), values);
                 }
 
                 if (!String.IsNullOrEmpty(CustomFilter))
@@ -254,11 +242,11 @@ namespace QuAnalyzer.UI.Pages
                     }
                 }
 
-                var cmpAttrs = _compute.Where(c => c.Aggregate != null);
-                if (_grouping.Any() && cmpAttrs.Any())
+                var cmpAttrs = Compute.Where(c => c.Aggregate != null);
+                if (Grouping.Any() && cmpAttrs.Any())
                 {
-                    query = DynamicQueryableExtensions.GroupBy(query, "new(" + String.Join(",", _grouping) + ")", "it")
-                                                      .Select("new(it.Key." + String.Join(",it.Key.", _grouping) + "," + String.Join(",", cmpAttrs.Select(c => String.Format(c.Aggregate, c.Attribute) + " as " + c.Attribute)) + ")");
+                    query = DynamicQueryableExtensions.GroupBy(query, "new(" + String.Join(",", Grouping) + ")", "it")
+                                                      .Select("new(it.Key." + String.Join(",it.Key.", Grouping) + "," + String.Join(",", cmpAttrs.Select(c => String.Format(c.Aggregate, c.Attribute) + " as " + c.Attribute)) + ")");
                 }
                 else
                 {

@@ -153,7 +153,7 @@ namespace QuAnalyzer.UI.Pages
         {
             if (lstDataSources.SelectedItem != null)
             {
-                lstColumns.ItemsSource = ((IDataProvider)lstDataProviders.SelectedItem).GetHeaders((string)lstDataSources.SelectedItem);
+                lstColumns.ItemsSource = ((IDataProvider)lstDataProviders.SelectedItem).GetColumns((string)lstDataSources.SelectedItem);
             }
         }
 
@@ -296,17 +296,17 @@ namespace QuAnalyzer.UI.Pages
 
             var prov = (IDataProvider)lstDataProviders.SelectedItem;
             var repository = (string)lstDataSources.SelectedItem;
-            var allHeadersFu = prov.GetHeaders(repository);
+            var allHeadersFu = prov.GetColumns(repository);
             string[] keys;
             string[] headers;
             if (lstColumns.SelectedItems.Count > 0)
             {
-                keys = lstColumns.SelectedItems.Cast<KeyValuePair<string, Type>>().Select(a => a.Key).ToArray();
-                headers = allHeadersFu.OrderBy(h => keys.Contains(h.Key) ? 0 : 1).Select(h => h.Key).ToArray();
+                keys = lstColumns.SelectedItems.Cast<string>().ToArray();
+                headers = allHeadersFu.OrderBy(h => keys.Contains(h.Name) ? 0 : 1).Select(h => h.Name).ToArray();
             }
             else
             {
-                headers = allHeadersFu.Select(h => h.Key).ToArray();
+                headers = allHeadersFu.Select(h => h.Name).ToArray();
                 keys = headers;
             }
 

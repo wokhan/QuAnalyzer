@@ -51,7 +51,7 @@
         <ListBox BorderThickness="0,0,2,0" BorderBrush="LightGray" DockPanel.Dock="Left" VerticalAlignment="Stretch" x:Name="lstColumns" SelectionMode="Extended" MinWidth="200" Padding="5">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <CheckBox Content="{Binding Key}" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" />
+                        <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
