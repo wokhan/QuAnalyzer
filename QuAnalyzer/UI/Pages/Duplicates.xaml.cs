@@ -10,12 +10,10 @@ using QuAnalyzer.Extensions;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
 using QuAnalyzer.Logic;
-using System.Data.Entity;
 using QuAnalyzer.Helpers;
 using System.Windows.Threading;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using Wokhan.Core.Extensions;
 using Wokhan.Collections.Extensions;
 
 namespace QuAnalyzer.UI.Pages
@@ -88,18 +86,8 @@ namespace QuAnalyzer.UI.Pages
             set { _loadingProgress = value; NotifyPropertyChanged("LoadingProgress"); }
         }
 
-        private ObservableCollection<string> _grouping = new ObservableCollection<string>();
-        public ObservableCollection<string> Grouping
-        {
-            get { return _grouping; }
-        }
-
-        private ObservableCollection<FilterStruct> _filters = new ObservableCollection<FilterStruct>();
-        public ObservableCollection<FilterStruct> Filters
-        {
-            get { return _filters; }
-        }
-
+        public ObservableCollection<string> Grouping { get; } = new ObservableCollection<string>();
+        public ObservableCollection<FilterStruct> Filters { get; } = new ObservableCollection<FilterStruct>();
 
         public class ComputeStruct
         {
@@ -132,19 +120,15 @@ namespace QuAnalyzer.UI.Pages
             set { _customFilterError = value; NotifyPropertyChanged("CustomFilterError"); NotifyPropertyChanged("IsCustomFilterError"); }
         }
 
-        private ObservableCollection<ComputeStruct> _compute = new ObservableCollection<ComputeStruct>();
-        public ObservableCollection<ComputeStruct> Compute
-        {
-            get { return _compute; }
-        }
+        public ObservableCollection<ComputeStruct> Compute { get; } = new ObservableCollection<ComputeStruct>();
 
-        private string SortOrder { get { return (currentSortAttribute != null && (!_grouping.Any() || _grouping.Concat(_compute.Select(f => f.Attribute)).Contains(currentSortAttribute))) ? currentSortAttribute : (_grouping.FirstOrDefault() ?? allHeaders.Keys.First()); } }
+        private string SortOrder { get { return (currentSortAttribute != null && (!Grouping.Any() || Grouping.Concat(Compute.Select(f => f.Attribute)).Contains(currentSortAttribute))) ? currentSortAttribute : (Grouping.FirstOrDefault() ?? allHeaders.Keys.First()); } }
 
         public Duplicates()
         {
             InitializeComponent();
 
-            VirtualizationHelper.Init(Dispatcher);
+            VirtualizedQueryableExtensions.Init(Dispatcher);
         }
 
         private Dictionary<string, Type> allHeaders;
@@ -200,25 +184,25 @@ namespace QuAnalyzer.UI.Pages
         private void lstGrouping_Drop(object sender, DragEventArgs e)
         {
             var src = (string)e.Data.GetData(typeof(string));
-            if (!_grouping.Contains(src))
+            if (!Grouping.Contains(src))
             {
-                _grouping.Add(src);
-                foreach (var h in gridData.Columns.Select(c => c.SortMemberPath).Except(_grouping).Except(_compute.Select(c => c.Attribute)))
+                Grouping.Add(src);
+                foreach (var h in gridData.Columns.Select(c => c.SortMemberPath).Except(Grouping).Except(Compute.Select(c => c.Attribute)))
                 {
-                    _compute.Add(new ComputeStruct() { Attribute = h, Aggregate = null });
+                    Compute.Add(new ComputeStruct() { Attribute = h, Aggregate = null });
                 }
             }
         }
 
         private void gridCompute_Drop(object sender, DragEventArgs e)
         {
-            _compute.Add(new ComputeStruct() { Attribute = (string)e.Data.GetData(typeof(string)), Aggregate = null });
+            Compute.Add(new ComputeStruct() { Attribute = (string)e.Data.GetData(typeof(string)), Aggregate = null });
         }
 
         private void gridFilters_Drop(object sender, DragEventArgs e)
         {
             var attr = (string)e.Data.GetData(typeof(string));
-            _filters.Add(new FilterStruct() { Attribute = attr, Type = allHeaders[attr] });
+            Filters.Add(new FilterStruct() { Attribute = attr, Type = allHeaders[attr] });
         }
 
         private async void btnApply_Click(object sender, RoutedEventArgs e)

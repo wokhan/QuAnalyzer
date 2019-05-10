@@ -36,7 +36,7 @@ namespace QuAnalyzer.UI.Pages
 
             if (repo != null && attr == null)
             {
-                lstAttributes.ItemsSource = prov.GetHeaders(repo).Where(h => h.Value == typeof(string)).Select(h => h.Key);
+                lstAttributes.ItemsSource = prov.GetColumns(repo).Where(h => h.Type == typeof(string)).Select(h => h.Name);
             }
             else if (AutoUpdate)
             {

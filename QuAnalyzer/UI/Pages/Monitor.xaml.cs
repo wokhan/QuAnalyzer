@@ -19,19 +19,10 @@ namespace QuAnalyzer.UI.Pages
     public partial class Monitor : Page
     {
         private static DateTime firstStart;
-        DispatcherTimer timer = new DispatcherTimer();
+        readonly DispatcherTimer timer = new DispatcherTimer();
 
-        private static ObservableCollection<ResultsClass> _monitorResults = new ObservableCollection<ResultsClass>();
-        public static ObservableCollection<ResultsClass> MonitorResults
-        {
-            get { return _monitorResults; }
-        }
-
-        private ListCollectionView _monitorResultsView = new ListCollectionView(_monitorResults);
-        public ListCollectionView MonitorResultsView
-        {
-            get { return _monitorResultsView; }
-        }
+        public static ObservableCollection<ResultsClass> MonitorResults { get; } = new ObservableCollection<ResultsClass>();
+        public ListCollectionView MonitorResultsView { get; } = new ListCollectionView(MonitorResults);
 
         public Monitor()
         {

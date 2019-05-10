@@ -11,7 +11,7 @@ using System.Windows.Threading;
 
 namespace QuAnalyzer.Helpers
 {
-    public class VirtualizationHelper
+    public static class VirtualizedQueryableExtensions
     {
         private static Dictionary<Type, Type> cachedTypes = new Dictionary<Type, Type>();
         //public static IEnumerable GetVirtualizedSource(IDataProvider provider, string repository)
@@ -21,27 +21,27 @@ namespace QuAnalyzer.Helpers
         //    return (IEnumerable)Activator.CreateInstance(gt, provider, repository);
         //}
 
-        private static Type CreateDynamicType(IDataProvider provider, string repository)
-        {
-            Type t = provider.GetTypedClass(repository);
-            Type gt;
-            if (!cachedTypes.TryGetValue(t, out gt))
-            {
-                gt = typeof(VirtualizationHelper).GetNestedType("TypedVirtualSource`1").MakeGenericType(t);
+        //private static Type CreateDynamicType(IDataProvider provider, string repository)
+        //{
+        //    Type t = provider.GetTypedClass(repository);
+        //    Type gt;
+        //    if (!cachedTypes.TryGetValue(t, out gt))
+        //    {
+        //        gt = typeof(VirtualizationHelper).GetNestedType("TypedVirtualSource`1").MakeGenericType(t);
 
-                cachedTypes.Add(t, gt);
-            }
+        //        cachedTypes.Add(t, gt);
+        //    }
 
-            return gt;
-        }
+        //    return gt;
+        //}
 
-        public static IEnumerable GetVirtualizedSource(IQueryable query)
+        public static IEnumerable AsVirtualized(this IQueryable query)
         {
             Type t = query.ElementType;
             Type gt;
             if (!cachedTypes.TryGetValue(t, out gt))
             {
-                gt = typeof(VirtualizationHelper).GetNestedType("TypedVirtualSource`1").MakeGenericType(t);
+                gt = typeof(TypedVirtualSource<>).MakeGenericType(t);
 
                 cachedTypes.Add(t, gt);
             }
@@ -86,7 +86,7 @@ namespace QuAnalyzer.Helpers
                     var ret = new PagedSourceItemsPacket<T>();
 
                     ret.LoadedAt = DateTime.Now;
-                    ret.Items = DLinq.DynamicQueryableExtensions.OrderBy(basequery ?? (IQueryable<T>)prv.GetData(src), prv.GetHeaders(src).First().Key).Skip(pageoffset).Take(count).AsEnumerable();
+                    ret.Items = DLinq.DynamicQueryableExtensions.OrderBy(basequery ?? (IQueryable<T>)prv.GetData(src), prv.GetColumns(src).First().Name).Skip(pageoffset).Take(count).AsEnumerable();
 
                     return ret;
                 }

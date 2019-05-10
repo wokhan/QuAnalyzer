@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Wokhan.Core.Extensions;
 using Wokhan.Collections.Extensions;
 
 namespace QuAnalyzer.UI.Windows
@@ -19,11 +18,11 @@ namespace QuAnalyzer.UI.Windows
 
         bool isNew = false;
 
-        private ObservableCollection<SourcesMapper.SimpleMap> currentMaps = new ObservableCollection<SourcesMapper.SimpleMap>();
+        private readonly ObservableCollection<SourcesMapper.SimpleMap> currentMaps = new ObservableCollection<SourcesMapper.SimpleMap>();
 
-        private ObservableCollection<string> SourceAttributes = new ObservableCollection<string>();
+        private readonly ObservableCollection<string> SourceAttributes = new ObservableCollection<string>();
 
-        private ObservableCollection<string> TargetAttributes = new ObservableCollection<string>();
+        private readonly ObservableCollection<string> TargetAttributes = new ObservableCollection<string>();
 
         public MappingsEditor() : this(null) { }
 
@@ -61,8 +60,8 @@ namespace QuAnalyzer.UI.Windows
 
             if (lstSrc.SelectedItem != null && lstSrcRepo.SelectedItem != null)
             {
-                ((IDataProvider)lstSrc.SelectedItem).GetHeaders((string)lstSrcRepo.SelectedItem)
-                                                    .Select(a => a.Key)
+                ((IDataProvider)lstSrc.SelectedItem).GetColumns((string)lstSrcRepo.SelectedItem)
+                                                    .Select(a => a.Name)
                                                     .ToList()
                                                     .ForEach(SourceAttributes.Add);
             }
@@ -85,8 +84,8 @@ namespace QuAnalyzer.UI.Windows
 
             if (lstTrg.SelectedItem != null && lstTrgRepo.SelectedItem != null)
             {
-                ((IDataProvider)lstTrg.SelectedItem).GetHeaders((string)lstTrgRepo.SelectedItem)
-                                                    .Select(a => a.Key)
+                ((IDataProvider)lstTrg.SelectedItem).GetColumns((string)lstTrgRepo.SelectedItem)
+                                                    .Select(a => a.Name)
                                                     .ToList()
                                                     .ForEach(TargetAttributes.Add);
             }

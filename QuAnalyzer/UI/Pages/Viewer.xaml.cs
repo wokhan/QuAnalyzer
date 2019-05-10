@@ -15,6 +15,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
 using Wokhan.Data.Providers.Bases;
+using Wokhan.Linq.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -89,12 +90,12 @@ namespace QuAnalyzer.UI.Pages
             public Type Type { get; set; }
             public string ComparerExpression { get; set; }
 
-            public object TargetValueAsObject { get; private set; }
-            public string TargetValue
+            public object TargetValue { get; private set; }
+            /*public string TargetValue
             {
                 get { return TargetValueAsObject != null ? TargetValueAsObject.ToString() : String.Empty; }
                 set { TargetValueAsObject = Convert.ChangeType(value, Type); }
-            }
+            }*/
         }
 
         public string CustomFilter { get; set; }
@@ -116,7 +117,7 @@ namespace QuAnalyzer.UI.Pages
         {
             InitializeComponent();
 
-            VirtualizationHelper.Init(Dispatcher);
+            VirtualizedQueryableExtensions.Init(Dispatcher);
         }
 
         private List<ColumnDescription> allHeaders;
@@ -214,7 +215,7 @@ namespace QuAnalyzer.UI.Pages
         {
             var prov = (IDataProvider)lstDataProviders.SelectedItem;
             var repository = (string)lstDataSources.SelectedItem;
-            
+
             await Task.Run(() =>
             {
                 LoadingProgress = -1;
@@ -225,7 +226,7 @@ namespace QuAnalyzer.UI.Pages
 
                 if (Filters.Any())
                 {
-                    var values = Filters.Select(f => f.TargetValueAsObject).ToArray();
+                    var values = Filters.Select(f => f.TargetValue).ToArray();
                     query = query.Where(Filters.Select((f, i) => f.Attribute + f.ComparerExpression + " @" + i).Aggregate((a, b) => a + " AND " + b), values);
                 }
 
@@ -242,13 +243,7 @@ namespace QuAnalyzer.UI.Pages
                     }
                 }
 
-                var cmpAttrs = Compute.Where(c => c.Aggregate != null);
-                if (Grouping.Any() && cmpAttrs.Any())
-                {
-                    query = DynamicQueryableExtensions.GroupBy(query, "new(" + String.Join(",", Grouping) + ")", "it")
-                                                      .Select("new(it.Key." + String.Join(",it.Key.", Grouping) + "," + String.Join(",", cmpAttrs.Select(c => String.Format(c.Aggregate, c.Attribute) + " as " + c.Attribute)) + ")");
-                }
-                else
+                query = query.AggregateBy(Grouping, Compute.Where(c => c.Aggregate != null).ToDictionary(c => c.Attribute, c => c.Aggregate));
                 {
                     /*if (!prov.IsDirectlyBindable)
                     {
@@ -261,7 +256,8 @@ namespace QuAnalyzer.UI.Pages
                 LoadingProgress = 0;
                 Status = "Loading data...";
 
-                var data = VirtualizationHelper.GetVirtualizedSource(query.OrderBy(SortOrder + (currentSortDirectionAsc ? "" : " descending")));
+                var data = query.OrderBy(SortOrder + (currentSortDirectionAsc ? "" : " descending"))
+                                .AsVirtualized();
                 Dispatcher.Invoke(() =>
                 {
                     gridData.ItemsSource = data;

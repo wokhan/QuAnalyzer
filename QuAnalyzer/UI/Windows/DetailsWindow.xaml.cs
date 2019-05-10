@@ -27,10 +27,7 @@ namespace QuAnalyzer.UI.Windows
 
         protected void NotifyPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public class DiffClass
@@ -79,17 +76,9 @@ namespace QuAnalyzer.UI.Windows
                 };
             }
         }
-        private ObservableCollection<string> _grouping = new ObservableCollection<string>();
-        public ObservableCollection<string> Grouping
-        {
-            get { return _grouping; }
-        }
 
-        private ObservableCollection<FilterStruct> _filters = new ObservableCollection<FilterStruct>();
-        public ObservableCollection<FilterStruct> Filters
-        {
-            get { return _filters; }
-        }
+        public ObservableCollection<string> Grouping { get; } = new ObservableCollection<string>();
+        public ObservableCollection<FilterStruct> Filters { get; } = new ObservableCollection<FilterStruct>();
 
 
         public class ComputeStruct
@@ -112,11 +101,7 @@ namespace QuAnalyzer.UI.Windows
             }
         }
 
-        private ObservableCollection<ComputeStruct> _compute = new ObservableCollection<ComputeStruct>();
-        public ObservableCollection<ComputeStruct> Compute
-        {
-            get { return _compute; }
-        }
+        public ObservableCollection<ComputeStruct> Compute { get; } = new ObservableCollection<ComputeStruct>();
 
         private Dictionary<string, Type> allHeaders;
         private List<string> dispHeaders;
@@ -259,40 +244,40 @@ namespace QuAnalyzer.UI.Windows
         private void lstGrouping_Drop(object sender, DragEventArgs e)
         {
             var src = (string)e.Data.GetData(typeof(string));
-            if (!_grouping.Contains(src))
+            if (!Grouping.Contains(src))
             {
-                _grouping.Add(src);
-                foreach (var h in allHeaders.Keys.Except(_grouping).Except(_compute.Select(c => c.Attribute)))
+                Grouping.Add(src);
+                foreach (var h in allHeaders.Keys.Except(Grouping).Except(Compute.Select(c => c.Attribute)))
                 {
-                    _compute.Add(new ComputeStruct() { Attribute = h, Aggregate = null });
+                    Compute.Add(new ComputeStruct() { Attribute = h, Aggregate = null });
                 }
             }
         }
 
         private void gridCompute_Drop(object sender, DragEventArgs e)
         {
-            _compute.Add(new ComputeStruct() { Attribute = (string)e.Data.GetData(typeof(string)), Aggregate = null });
+            Compute.Add(new ComputeStruct() { Attribute = (string)e.Data.GetData(typeof(string)), Aggregate = null });
         }
 
         private void gridFilters_Drop(object sender, DragEventArgs e)
         {
             var attr = (string)e.Data.GetData(typeof(string));
-            _filters.Add(new FilterStruct() { Attribute = attr, Type = allHeaders[attr] });
+            Filters.Add(new FilterStruct() { Attribute = attr, Type = allHeaders[attr] });
         }
 
         private void btnApply_Click(object sender, RoutedEventArgs e)
         {
             // TODO: Improve.
-            var grpAttrs = _grouping.Select(g => new { Attribute = g, i = allHeaders.Keys.ToList().IndexOf(g) }).ToArray();
-            var cmpAttrs = _compute.Where(c => c.Aggregate != null).Select(c => new { c.Attribute, i = allHeaders.Keys.ToList().IndexOf(c.Attribute), f = c.Aggregate });
+            var grpAttrs = Grouping.Select(g => new { Attribute = g, i = allHeaders.Keys.ToList().IndexOf(g) }).ToArray();
+            var cmpAttrs = Compute.Where(c => c.Aggregate != null).Select(c => new { c.Attribute, i = allHeaders.Keys.ToList().IndexOf(c.Attribute), f = c.Aggregate });
             var grpAndCmpIx = grpAttrs.Concat(cmpAttrs.Select(c => new { c.Attribute, c.i })).ToDictionary(c => c.Attribute, c => c.i);
 
             IEnumerable<object[]> multigroup = currentData;
-            if (_filters.Any())
+            if (Filters.Any())
             {
                 var param = LinqExpressions.Expression.Parameter(typeof(object[]));
 
-                var computedFilters = _filters.Select(f => f.ComparerExpression(LinqExpressions.Expression.Convert(LinqExpressions.Expression.ArrayIndex(param, LinqExpressions.Expression.Constant(allHeaders.Keys.ToList().IndexOf(f.Attribute))), f.Type), LinqExpressions.Expression.Constant(f.TargetValueAsObject, f.Type)));
+                var computedFilters = Filters.Select(f => f.ComparerExpression(LinqExpressions.Expression.Convert(LinqExpressions.Expression.ArrayIndex(param, LinqExpressions.Expression.Constant(allHeaders.Keys.ToList().IndexOf(f.Attribute))), f.Type), LinqExpressions.Expression.Constant(f.TargetValueAsObject, f.Type)));
 
                 var filtersExpr = LinqExpressions.Expression.Lambda<Func<object[], bool>>(computedFilters.Aggregate((f, ff) => LinqExpressions.Expression.AndAlso(f, ff)), param);
 

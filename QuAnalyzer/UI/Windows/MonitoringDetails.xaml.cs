@@ -24,8 +24,8 @@ namespace QuAnalyzer.UI.Windows
 
             if (CurrentItem.Provider != null && !String.IsNullOrEmpty(CurrentItem.Repository))
             {
-                lstAttributes.ItemsSource = CurrentItem.Provider.GetHeaders(CurrentItem.Repository)
-                                                         .ToDictionary(h => h.Key, h => CurrentItem.AttributesList.Contains(h.Key));
+                lstAttributes.ItemsSource = CurrentItem.Provider.GetColumns(CurrentItem.Repository)
+                                                                .ToDictionary(h => h.Name, h => CurrentItem.AttributesList.Contains(h.Name));
             }
         }
 
@@ -51,9 +51,8 @@ namespace QuAnalyzer.UI.Windows
         {
             if (lstSrcRepo.SelectedItem != null)
             {
-                lstAttributes.ItemsSource = ((IDataProvider)lstSrc.SelectedItem).GetHeaders((string)lstSrcRepo.SelectedItem)
-                                                                                .Select(h => h.Key)
-                                                                                .ToDictionary(h => h, h => CurrentItem.AttributesList.Contains(h));
+                lstAttributes.ItemsSource = ((IDataProvider)lstSrc.SelectedItem).GetColumns((string)lstSrcRepo.SelectedItem)
+                                                                                .ToDictionary(h => h.Name, h => CurrentItem.AttributesList.Contains(h.Name));
             }
         }
 

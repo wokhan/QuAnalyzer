@@ -1,12 +1,9 @@
-﻿using Microsoft.VisualBasic.ApplicationServices;
-using QuAnalyzer.Helpers;
+﻿using QuAnalyzer.Helpers;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Threading;
+using Wokhan.Data.Providers;
 
 namespace QuAnalyzer
 {
@@ -15,7 +12,7 @@ namespace QuAnalyzer
     /// </summary>
     public partial class App
     {
-        private readonly List<SolidColorBrush> _availableColors = new List<SolidColorBrush> {
+        public List<SolidColorBrush> AvailableColors { get; } = new List<SolidColorBrush> {
             new SolidColorBrush(Color.FromRgb(0x41, 0xB1, 0xE1)),
             new SolidColorBrush(Colors.LightCoral),
             new SolidColorBrush(Colors.LightSeaGreen),
@@ -23,14 +20,9 @@ namespace QuAnalyzer
             new SolidColorBrush(Colors.MediumPurple),
             new SolidColorBrush(Colors.PaleVioletRed)
         };
-        public List<SolidColorBrush> AvailableColors { get { return _availableColors; } }
 
-        private readonly Project _currentProject = new Project();
-
-        public Project CurrentProject { get { return _currentProject; } }
-
-        private readonly ResourcesWatcher _perfs;
-        public ResourcesWatcher Performance { get { return _perfs; } }
+        public Project CurrentProject { get; } = new Project();
+        public ResourcesWatcher Performance { get; }
 
         //public string ApplicationInfo { get { return String.Format("{0} {1} v{2}", _appBase.Info.CompanyName, _appBase.Info.ProductName, _appBase.Info.Version); } }
         public string ApplicationInfo { get { return String.Format("{0} {1} v{2}", "", "", ""); } }
@@ -38,13 +30,15 @@ namespace QuAnalyzer
         //public string Copyright { get { return _appBase.Info.Copyright; } }
         public string Copyright { get { return ""; } }
 
-        public string HelpLink { get { return "http://wokhan.online.fr"; } }
+        public string HelpLink { get { return "https://www.wokhan.com"; } }
 
         public App()
         {
-            _perfs = new ResourcesWatcher();
+            Performance = new ResourcesWatcher();
 
-            this.ShutdownMode = System.Windows.ShutdownMode.OnMainWindowClose;
+            DataProviders.Init(AppDomain.CurrentDomain.BaseDirectory + "\\providers");
+
+            this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             this.Exit += App_Exit;
         }
 

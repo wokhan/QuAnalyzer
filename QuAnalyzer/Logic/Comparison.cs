@@ -197,15 +197,15 @@ namespace QuAnalyzer.Logic
                 throw new ArgumentNullException("Target");
             }
 
-            List<T> srcMissing = new List<T>();
-            List<T> trgMissing = new List<T>();
-            List<T> srcDiff = new List<T>();
-            List<T> trgDiff = new List<T>();
-            List<T> srcDups = new List<T>();
-            List<T> trgDups = new List<T>();
+            var srcMissing = new List<T>();
+            var trgMissing = new List<T>();
+            var srcDiff = new List<T>();
+            var trgDiff = new List<T>();
+            var srcDups = new List<T>();
+            var trgDups = new List<T>();
 
-            T srcPrev = default(T);
-            T trgPrev = default(T);
+            var srcPrev = default(T);
+            var trgPrev = default(T);
 
             var scmp = new SequenceComparer(f.SourceKeys != null ? f.SourceKeys.ToArray() : Enumerable.Range(0, f.SourceHeaders.Count).Select(i => i.ToString()).ToArray());
             var sqc = new SequenceEqualityComparer();
@@ -390,7 +390,7 @@ namespace QuAnalyzer.Logic
 
         public static ItemResult<T> InitiateDuplicates<T>(IEnumerable<T> srcData, IEqualityComparer<T> keyComparer, IEqualityComparer<T> comparer)
         {
-            ItemResult<T> ret = new ItemResult<T>();
+            var ret = new ItemResult<T>();
 
             InitiateDuplicates(srcData, ret, keyComparer, comparer);
 

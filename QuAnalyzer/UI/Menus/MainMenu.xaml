@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:QuAnalyzerHelpers="clr-namespace:QuAnalyzer.Helpers"
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-      xmlns:providers="clr-namespace:Wokhan.Data.Providers.Bases;assembly=Wokhan.Data.Providers"
+      xmlns:providers="clr-namespace:Wokhan.Data.Providers;assembly=Wokhan.Data.Providers"
       xmlns:local="clr-namespace:QuAnalyzer.UI.Controls"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       mc:Ignorable="d" d:DesignHeight="460">
@@ -226,7 +226,7 @@
                 <UC:ToolBarButton Text="New connector" BorderBrush="Green" Image="{StaticResource appbar_add_multiple}"/>
             </WrapPanel>
             <ScrollViewer Grid.Row="2">
-                <ItemsControl Margin="5" Name="lstProvidersTypes" ItemsSource="{Binding Source={x:Static providers:DataProvider.AllProviders}, Mode=OneTime}">
+                <ItemsControl Margin="5" Name="lstProvidersTypes" ItemsSource="{Binding Source={x:Static providers:DataProviders.AllProviders}, Mode=OneTime}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" IsItemsHost="True" />

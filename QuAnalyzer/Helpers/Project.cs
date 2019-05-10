@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows.Media;
+using Wokhan.Data.Providers;
 
 namespace QuAnalyzer.Helpers
 {
@@ -54,7 +55,7 @@ namespace QuAnalyzer.Helpers
 
         internal void Open(string p)
         {
-            var ser = new DataContractSerializer(typeof(Project), DataProvider.AllProviders.Select(a => a.Type).Concat(new[] { typeof(Dictionary<string, object>), typeof(IDataProvider), typeof(DataProvider), typeof(DBDataProvider), typeof(FileDataProvider), typeof(ObservableCollection<IDataProvider>), typeof(SourcesMapper), typeof(MonitorItem) }));
+            var ser = new DataContractSerializer(typeof(Project), DataProviders.AllProviders.Select(a => a.Type).Concat(new[] { typeof(Dictionary<string, object>), typeof(IDataProvider), typeof(DataProvider), typeof(DBDataProvider), typeof(FileDataProvider), typeof(ObservableCollection<IDataProvider>), typeof(SourcesMapper), typeof(MonitorItem) }));
             FileStream stream = null;
             try
             {
@@ -104,7 +105,7 @@ namespace QuAnalyzer.Helpers
                 return;
             }
 
-            var ser = new DataContractSerializer(typeof(Project), DataProvider.AllProviders.Select(a => a.Type).Concat(new[] { typeof(Dictionary<string, object>), typeof(IDataProvider), typeof(DataProvider), typeof(DBDataProvider), typeof(FileDataProvider), typeof(ObservableCollection<IDataProvider>), typeof(SourcesMapper), typeof(MonitorItem) }));
+            var ser = new DataContractSerializer(typeof(Project), DataProviders.AllProviders.Select(a => a.Type).Concat(new[] { typeof(Dictionary<string, object>), typeof(IDataProvider), typeof(DataProvider), typeof(DBDataProvider), typeof(FileDataProvider), typeof(ObservableCollection<IDataProvider>), typeof(SourcesMapper), typeof(MonitorItem) }));
             
             if (p != null)
             {

@@ -4,10 +4,6 @@ using QuAnalyzer.UI.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using QuAnalyzer.Extensions;
-using Wokhan.Core.Extensions;
 using Wokhan.Collections.Extensions;
 
 namespace QuAnalyzer.Helpers
@@ -56,14 +52,13 @@ namespace QuAnalyzer.Helpers
             internal set { _totalTime = value; NotifyPropertyChanged("TotalTime"); }
         }
 
-        private IEnumerable<DetailsWindow.DiffClass> _mergedDiff = null;
-        public IEnumerable<DetailsWindow.DiffClass> MergedDiff { get { return _mergedDiff; } }
+        public IEnumerable<DetailsWindow.DiffClass> MergedDiff { get; private set; } = null;
 
         public void InitDiff(IDataComparer r)
         {
-            if (_mergedDiff == null)
+            if (MergedDiff == null)
             {
-                _mergedHeaders = r.SourceHeaders.Select((h, i) => new { a = h, b = r.TargetHeaders[i] })
+                MergedHeaders = r.SourceHeaders.Select((h, i) => new { a = h, b = r.TargetHeaders[i] })
                                                 .Select(x => x.a + (x.a != x.b ? "/" + x.b : String.Empty))
                                                 .ToArray();
 
@@ -91,7 +86,7 @@ namespace QuAnalyzer.Helpers
                 var all = sortedMiss.Concat(sortedTrg);
                 var ordered = (r.SourceKeys.Count > 0 ? all.OrderByMany(r.SourceKeys.Count, 1) : all.OrderByAll(1));
 
-                _mergedDiff = ordered.ThenBy(t => t[0]).Select(x =>
+                MergedDiff = ordered.ThenBy(t => t[0]).Select(x =>
                 {
                     var ret = new DetailsWindow.DiffClass()
                     {
@@ -107,7 +102,6 @@ namespace QuAnalyzer.Helpers
             }
         }
 
-        private string[] _mergedHeaders;
-        public string[] MergedHeaders { get { return _mergedHeaders; } }
+        public string[] MergedHeaders { get; private set; }
     }
 }

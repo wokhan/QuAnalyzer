@@ -8,7 +8,7 @@ using System.ComponentModel;
 using QuAnalyzer.Helpers;
 using System.Linq.Expressions;
 using Wokhan.Collections.Extensions;
-using Wokhan.Types.Extensions;
+using Wokhan.Core.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -33,17 +33,13 @@ namespace QuAnalyzer.UI.Pages
             set { _progress = value; NotifyPropertyChanged("Progress"); }
         }
 
-        private ObservableDictionary<string, ResultsStruct> _computedStats = new ObservableDictionary<string, ResultsStruct>();
-        public ObservableDictionary<string, ResultsStruct> ComputedStats { get { return _computedStats; } }
+        public ObservableDictionary<string, ResultsStruct> ComputedStats { get; } = new ObservableDictionary<string, ResultsStruct>();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void NotifyPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public class Values
@@ -77,41 +73,41 @@ namespace QuAnalyzer.UI.Pages
             var prv = (IDataProvider)lstDataProviders.SelectedItem;
             var repo = (string)lstDataSources.SelectedItem;
 
-            var headers = prv.GetHeaders(repo);
+            var headers = prv.GetColumns(repo);
 
-            foreach (var h in headers.Keys)
+            foreach (var h in headers)
             {
-                ComputedStats.Add(h, new ResultsStruct());
+                ComputedStats.Add(h.Name, new ResultsStruct());
             }
 
             await System.Threading.Tasks.Task.Run(() =>
             {
                 Progress = -1;
-                var defaults = headers.Select(h => h.Value.GetDefault()).ToList();
+                var defaults = headers.Select(h => h.Type.GetDefault()).ToList();
 
                 var data = prv.GetData(repo);
 
                 headers.AsParallel(false).ForAll((h) =>
                 {
                     var m = typeof(Statistics).GetMethod("GetTypedData", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
-                                              .MakeGenericMethod(data.GetInnerType(), h.Value);
-                    var test = (IEnumerable<Values>)m.Invoke(null, new object[] { data, h.Key });
+                                              .MakeGenericMethod(data.GetInnerType(), h.Type);
+                    var test = (IEnumerable<Values>)m.Invoke(null, new object[] { data, h.Name });
 
                     foreach (var x in test)
                     {
-                        UpdateFrequencies(h.Key, x);
+                        UpdateFrequencies(h.Name, x);
                     }
 
                     var mx = typeof(Statistics).GetMethod("GetTypedStats", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
-                                               .MakeGenericMethod(data.GetInnerType(), h.Value);
-                    var bobby = (ResultsStruct.Stats)mx.Invoke(null, new object[] { data, h.Key });
+                                               .MakeGenericMethod(data.GetInnerType(), h.Type);
+                    var bobby = (ResultsStruct.Stats)mx.Invoke(null, new object[] { data, h.Name });
 
-                    UpdateMinMaxAvg(h.Key, bobby);
+                    UpdateMinMaxAvg(h.Name, bobby);
                 });
             });
         }
 
-        static Type[] numericTypes = new[] { typeof(int), typeof(int?), typeof(decimal), typeof(decimal?), typeof(double), typeof(double?), typeof(long), typeof(long?) };
+        static readonly Type[] numericTypes = new[] { typeof(int), typeof(int?), typeof(decimal), typeof(decimal?), typeof(double), typeof(double?), typeof(long), typeof(long?) };
 
         private static ResultsStruct.Stats GetTypedStats<T, TK>(IQueryable data, string key)
         {
@@ -162,12 +158,7 @@ namespace QuAnalyzer.UI.Pages
 
         public class ResultsStruct : NotifierHelper
         {
-            ObservableCollection<Values> _frequencies = new ObservableCollection<Values>();
-
-            public ObservableCollection<Values> Frequencies
-            {
-                get { return _frequencies; }
-            }
+            public ObservableCollection<Values> Frequencies { get; } = new ObservableCollection<Values>();
 
             private Stats _statistics;
             public Stats Statistics

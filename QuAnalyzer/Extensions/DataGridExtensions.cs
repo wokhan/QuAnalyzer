@@ -73,7 +73,9 @@ namespace QuAnalyzer.Extensions
 
         public static void ExportAsXLSX(this DataGrid grid, string path = null, string worksheetName = null, Panel host = null, Action<double> callback = null)
         {
+#pragma warning disable CS0219 // La variable 'canceled' est assignée, mais sa valeur n'est jamais utilisée
             bool canceled = false;
+#pragma warning restore CS0219 // La variable 'canceled' est assignée, mais sa valeur n'est jamais utilisée
             //try
             {
                 if (path == null)

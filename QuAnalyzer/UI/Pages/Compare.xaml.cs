@@ -22,6 +22,7 @@ using System.Windows.Data;
 using System.Windows.Shell;
 using WinForms = System.Windows.Forms;
 using Wokhan.Collections.Extensions;
+using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -30,10 +31,9 @@ namespace QuAnalyzer.UI.Pages
     /// </summary>
     public partial class Compare : Page
     {
-        private ObservableCollection<object[]> _real = new ObservableCollection<object[]>();
-        public ObservableCollection<object[]> real { get { return _real; } }
+        public ObservableCollection<object[]> real { get; } = new ObservableCollection<object[]>();
 
-        private List<CancellationTokenSource> tokensources = new List<CancellationTokenSource>();
+        private readonly List<CancellationTokenSource> tokensources = new List<CancellationTokenSource>();
 
         public class DiffClass
         {
@@ -43,7 +43,7 @@ namespace QuAnalyzer.UI.Pages
 
         public Compare()
         {
-            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            if (DesignerProperties.GetIsInDesignMode(this))
             {
                 real.Add(new object[1] { "TEST" });
             }
@@ -58,7 +58,7 @@ namespace QuAnalyzer.UI.Pages
         }
 
         private int cpdCount = 0;
-        private List<ComparerStruct<object[]>> cpd = new List<ComparerStruct<object[]>>();
+        private readonly List<ComparerStruct<object[]>> cpd = new List<ComparerStruct<object[]>>();
         private async void btnRun_Click(object sender, RoutedEventArgs e)
         {
             prgGlobal.IsIndeterminate = true;
@@ -115,25 +115,25 @@ namespace QuAnalyzer.UI.Pages
             {
                 return await Task.Run(() =>
                 {
-                    var srcHeaders = srcPrv.GetHeaders(srcRepo);
-                    var trgHeaders = trgPrv.GetHeaders(trgRepo);
+                    IEnumerable<ColumnDescription> srcHeaders = srcPrv.GetColumns(srcRepo);
+                    IEnumerable<ColumnDescription> trgHeaders = trgPrv.GetColumns(trgRepo);
 
-                    if (trgHeaders.Count > srcHeaders.Count)
+                    if (trgHeaders.Count() > srcHeaders.Count())
                     {
-                        trgHeaders = trgHeaders.Take(srcHeaders.Count).ToDictionary(a => a.Key, a => a.Value);
+                        trgHeaders = trgHeaders.Take(srcHeaders.Count());
                     }
-                    else if (srcHeaders.Count > trgHeaders.Count)
+                    else if (srcHeaders.Count() > trgHeaders.Count())
                     {
-                        srcHeaders = srcHeaders.Take(trgHeaders.Count).ToDictionary(a => a.Key, a => a.Value);
+                        srcHeaders = srcHeaders.Take(trgHeaders.Count());
                     }
 
-                    Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>> fnc = srcHeaders.Values.SequenceEqual(trgHeaders.Values) ? new Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>(KeepSame) : new Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>(ConvertType);
+                    Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>> fnc = srcHeaders.Select(h => h.Type).SequenceEqual(trgHeaders.Select(h => h.Type)) ? new Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>(KeepSame) : new Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>(ConvertType);
 
-                    var srcKeys = srcHeaders.Keys.ToArray();
-                    var trgKeys = trgHeaders.Keys.ToArray();
+                    var srcKeys = srcHeaders.Select(h => h.Name).ToArray();
+                    var trgKeys = trgHeaders.Select(h => h.Name).ToArray();
 
-                    var srcDataGetter = srcPrv.GetData(srcRepo, srcHeaders.Keys);
-                    var trgDataGetter = srcPrv.GetData(trgRepo, trgHeaders.Keys);
+                    var srcDataGetter = srcPrv.GetData(srcRepo, srcKeys);
+                    var trgDataGetter = srcPrv.GetData(trgRepo, trgKeys);
 
                     return new[] { new ComparerStruct<object[]>()
                                         {
@@ -143,9 +143,9 @@ namespace QuAnalyzer.UI.Pages
                                             SourceHeaders = srcKeys,
                                             TargetHeaders = trgKeys,
                                             Comparer = new Comparison.SequenceEqualityComparer(),
-                                            GetSourceData = () => fnc(srcDataGetter.AsObjectCollection(srcHeaders.Select(h => h.Key).ToArray()), trgHeaders.Values.ToArray()),
-                                            GetTargetData = () => fnc(trgDataGetter.AsObjectCollection(trgHeaders.Select(h => h.Key).ToArray()), trgHeaders.Values.ToArray())
-                                        } 
+                                            GetSourceData = () => fnc(srcDataGetter.AsObjectCollection(srcKeys), trgHeaders.Select(h => h.Type).ToArray()),
+                                            GetTargetData = () => fnc(trgDataGetter.AsObjectCollection(trgKeys), trgHeaders.Select(h => h.Type).ToArray())
+                                        }
                     };
                 });
             }
@@ -153,13 +153,14 @@ namespace QuAnalyzer.UI.Pages
             // Case 4: Automatic mapping (name)
             return await Task.Run(() =>
             {
-                var srcHeaders = srcPrv.GetHeaders(srcRepo);
-                var trgHeaders = trgPrv.GetHeaders(trgRepo);
+                var srcHeaders = srcPrv.GetColumns(srcRepo);
+                var trgHeaders = trgPrv.GetColumns(trgRepo);
 
-                var inter = srcHeaders.Keys.Intersect(trgHeaders.Keys, StringComparer.InvariantCultureIgnoreCase).ToList();
+                var inter = srcHeaders.Select(h => h.Name).Intersect(trgHeaders.Select(h => h.Name), StringComparer.InvariantCultureIgnoreCase).ToList();
 
-                var allTypesSrc = inter.Select(m => srcHeaders[m]).ToArray();
-                var allTypesTrg = inter.Select(m => trgHeaders[m]).ToArray();
+                //TODO: yurk
+                var allTypesSrc = inter.Select(m => srcHeaders.First(h => h.Name == m).Type).ToArray();
+                var allTypesTrg = inter.Select(m => trgHeaders.First(h => h.Name == m).Type).ToArray();
 
                 Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>> fncx = allTypesSrc.SequenceEqual(allTypesTrg) ? new Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>(KeepSame) : new Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>(ConvertType);
 
@@ -171,9 +172,9 @@ namespace QuAnalyzer.UI.Pages
                                             SourceHeaders = inter,
                                             TargetHeaders = inter,
                                             Comparer = new Comparison.SequenceEqualityComparer(),
-                                            GetSourceData = () => fncx(srcPrv.GetData(srcRepo, inter).AsObjectCollection(srcHeaders.Select(h => h.Key).ToArray()), allTypesTrg),
-                                            GetTargetData = () => fncx(trgPrv.GetData(trgRepo, inter).AsObjectCollection(trgHeaders.Select(h => h.Key).ToArray()), allTypesTrg)
-                                        } 
+                                            GetSourceData = () => fncx(srcPrv.GetData(srcRepo, inter).AsObjectCollection(srcHeaders.Select(h => h.Name).ToArray()), allTypesTrg),
+                                            GetTargetData = () => fncx(trgPrv.GetData(trgRepo, inter).AsObjectCollection(trgHeaders.Select(h => h.Name).ToArray()), allTypesTrg)
+                                        }
                 };
             });
         }
@@ -183,11 +184,11 @@ namespace QuAnalyzer.UI.Pages
             var fieldsSrc = s.AllMappings.Select(m => m.Source).ToList();
             var fieldsTrg = s.AllMappings.Select(m => m.Target).ToList();
 
-            var srcHeaders = s.Source.GetHeaders(s.SourceRepository);
-            var trgHeaders = s.Target.GetHeaders(s.TargetRepository);
+            var srcHeaders = s.Source.GetColumns(s.SourceRepository);
+            var trgHeaders = s.Target.GetColumns(s.TargetRepository);
 
-            var allTypesSrc = fieldsSrc.Select(m => srcHeaders[m]).ToArray();
-            var allTypesTrg = fieldsTrg.Select(m => trgHeaders[m]).ToArray();
+            var allTypesSrc = fieldsSrc.Select(m => srcHeaders.First(h => h.Name == m).Type).ToArray();
+            var allTypesTrg = fieldsTrg.Select(m => trgHeaders.First(h => h.Name == m).Type).ToArray();
 
             string[] srcKeys = null;
             string[] trgKeys = null;
@@ -199,14 +200,14 @@ namespace QuAnalyzer.UI.Pages
 
             Func<IEnumerable<IEnumerable<object>>, Type[], IEnumerable<object[]>> fnc = allTypesSrc.SequenceEqual(allTypesTrg) ? new Func<IEnumerable<IEnumerable<object>>, Type[], IEnumerable<object[]>>(KeepSame) : new Func<IEnumerable<IEnumerable<object>>, Type[], IEnumerable<object[]>>(ConvertType);
 
-            var srcDataGetter = s.Source.GetData(s.SourceRepository, fieldsSrc, srcKeys != null ? srcKeys.ToDictionary(sk => sk, sk => srcHeaders[sk]) : null);
-            var trgDataGetter = s.Target.GetData(s.TargetRepository, fieldsTrg, trgKeys != null ? trgKeys.ToDictionary(sk => sk, sk => trgHeaders[sk]) : null);
+            var srcDataGetter = s.Source.GetData(s.SourceRepository, fieldsSrc, srcKeys != null ? srcKeys.ToDictionary(sk => sk, sk => srcHeaders.First(h => h.Name == sk).Type) : null);
+            var trgDataGetter = s.Target.GetData(s.TargetRepository, fieldsTrg, trgKeys != null ? trgKeys.ToDictionary(sk => sk, sk => trgHeaders.First(h => h.Name == sk).Type) : null);
             if (s.IsOrdered)
             {
                 if (srcKeys != null && trgKeys != null)
                 {
-                    srcDataGetter = srcDataGetter.OrderByMany(srcHeaders.Join(srcKeys, h => h.Key, k => k, (h, k) => new { h, k }).ToDictionary(x => x.k, x => x.h.Value));
-                    trgDataGetter = trgDataGetter.OrderByMany(trgHeaders.Join(trgKeys, h => h.Key, k => k, (h, k) => new { h, k }).ToDictionary(x => x.k, x => x.h.Value));
+                    srcDataGetter = srcDataGetter.OrderByMany(srcHeaders.Join(srcKeys, h => h.Name, k => k, (h, k) => new { h, k }).ToDictionary(x => x.k, x => x.h.Type));
+                    trgDataGetter = trgDataGetter.OrderByMany(trgHeaders.Join(trgKeys, h => h.Name, k => k, (h, k) => new { h, k }).ToDictionary(x => x.k, x => x.h.Type));
                 }
                 else
                 {
@@ -235,7 +236,9 @@ namespace QuAnalyzer.UI.Pages
         {
             if (false)
             {
+#pragma warning disable CS0162 // Code inaccessible détecté
                 return src.Select(c => c.Select(a => a is DBNull ? null : a is DateTime ? ((DateTime)a).Date : a).ToArray());
+#pragma warning restore CS0162 // Code inaccessible détecté
             }
             else
             {
@@ -313,7 +316,9 @@ namespace QuAnalyzer.UI.Pages
             {
                 this.Dispatcher.Invoke(() => LocalProgress(name));
             }
+#pragma warning disable CS0168 // La variable 'e' est déclarée, mais jamais utilisée
             catch (TaskCanceledException e)
+#pragma warning restore CS0168 // La variable 'e' est déclarée, mais jamais utilisée
             {
 
             }
@@ -480,13 +485,13 @@ namespace QuAnalyzer.UI.Pages
                 var cb5 = SharedCallback.GetCallBackForExport(host, "Target duplicates", file.Name);
                 var cb6 = SharedCallback.GetCallBackForExport(host, "Source clones", file.Name);
                 var cb7 = SharedCallback.GetCallBackForExport(host, "Target clones", file.Name);
-         
+
                 Task.Run(() =>
                 {
                     using (var xl = new ExcelPackage(file))
                     {
                         cmp.Results.InitDiff(cmp);
-                        xl.AddWorksheet(cmp.Results.MergedDiff, new [] { "Name" }.Concat(cmp.Results.MergedHeaders).ToArray(), cmp.SourceKeys.Count, "Differences", (x, i, h, s) => { if (x.IsDiff[i]) s.Font.Color.SetColor(System.Drawing.Color.Red); return x.Values[i]; }, cb1);
+                        xl.AddWorksheet(cmp.Results.MergedDiff, new[] { "Name" }.Concat(cmp.Results.MergedHeaders).ToArray(), cmp.SourceKeys.Count, "Differences", (x, i, h, s) => { if (x.IsDiff[i]) s.Font.Color.SetColor(System.Drawing.Color.Red); return x.Values[i]; }, cb1);
 
                         //if (cmp.Results.Source.Missing != null)
                         xl.AddWorksheet(cmp.Results.Source.Missing.Cast<object[]>(), cmp.SourceHeaders, cmp.SourceKeys.Count, "Missing from source", (x, i, h, s) => x[i], cb2);
@@ -544,7 +549,7 @@ namespace QuAnalyzer.UI.Pages
                 {
                     var map = allprv.Where(p => p != pr).Select(p => new { source = pr, target = p, matches = p.Repositories.Keys.Intersect(pr.Repositories.Keys).ToList() })
                                     .Where(rel => rel.matches.Count > 0)
-                                    .SelectMany(rel => rel.matches.Select(m => new { source = rel.source, target = rel.target, repository = m, sourceheaders = rel.source.GetHeaders(m), targetheaders = rel.target.GetHeaders(m) }))
+                                    .SelectMany(rel => rel.matches.Select(m => new { source = rel.source, target = rel.target, repository = m, sourceheaders = rel.source.GetColumns(m).Select(h => h.Name), targetheaders = rel.target.GetColumns(m).Select(h => h.Name) }))
                                     .Select(m => new SourcesMapper()
                                     {
                                         Name = String.Format("{0} ({1}) / {2} ({1})", m.source.Name, m.repository, m.target.Name),
@@ -552,7 +557,7 @@ namespace QuAnalyzer.UI.Pages
                                         Target = m.target,
                                         SourceRepository = m.repository,
                                         TargetRepository = m.repository,
-                                        AllMappings = m.sourceheaders.Keys.Where(k => m.targetheaders.ContainsKey(k)).Select(k => new SourcesMapper.SimpleMap() { Source = k, Target = k }).ToList()
+                                        AllMappings = m.sourceheaders.Where(k => m.targetheaders.Contains(k)).Select(k => new SourcesMapper.SimpleMap() { Source = k, Target = k }).ToList()
                                     });
 
                     mapper.AddAll(map);
