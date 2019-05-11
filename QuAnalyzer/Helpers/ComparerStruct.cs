@@ -22,9 +22,7 @@ namespace QuAnalyzer.Helpers
         
         public CancellationTokenSource TokenSource { get; private set; }
 
-        private ResultStruct<T> _results = new ResultStruct<T>();
-        
-        public ResultStruct<T> Results { get { return _results; } }
+        public ResultStruct<T> Results { get; } = new ResultStruct<T>();
 
         public object[][] AsArray
         {
