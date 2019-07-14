@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace QuAnalyzer.Logic.Contracts
+namespace QuAnalyzer.Features.Comparison
 {
     public interface IDataComparer
     {

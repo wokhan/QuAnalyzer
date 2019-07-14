@@ -1,15 +1,18 @@
 ﻿using MahApps.Metro;
 using Microsoft.Win32;
-using Wokhan.Data.Providers.Bases;
-using Wokhan.Data.Providers.Contracts;
 using QuAnalyzer.UI.Windows;
 using System;
 using System.ComponentModel;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Wokhan.Data.Providers;
+using Wokhan.Data.Providers.Bases;
+using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Menus
 {
@@ -18,10 +21,8 @@ namespace QuAnalyzer.UI.Menus
     /// </summary>
     public partial class MainMenu : UserControl
     {
-        public string ApplicationName
-        {
-            get { return "QuAnalyzer v" + Assembly.GetExecutingAssembly().GetName().Version; }
-        }
+        public string ApplicationName { get; } = "QuAnalyzer v" + Assembly.GetExecutingAssembly().GetName().Version;
+
 
         [Category("Behavior")]
         [EditorBrowsable(EditorBrowsableState.Advanced)]
@@ -86,12 +87,12 @@ namespace QuAnalyzer.UI.Menus
                 Close(this, null);
             }
         }
-        
+
         private void lstRecentFiles_Click(object sender, RoutedEventArgs e)
         {
             ctxRecentFiles.IsOpen = true;
         }
-        
+
         public void ctxRecentFiles_Click(object sender, RoutedEventArgs e)
         {
             ctxRecentFiles.IsOpen = false;
@@ -125,11 +126,19 @@ namespace QuAnalyzer.UI.Menus
         {
             var newprv = (IDataProvider)Activator.CreateInstance(((DataProviderStruct)((Button)sender).Tag).Type);
             //((App)Application.Current).CurrentProject.CurrentProviders.Add(newprv);
-            
+
             newprv.Name = ((DataProviderStruct)((Button)sender).Tag).Name + "#" + ((App)Application.Current).CurrentProject.CurrentProviders.Count;
 
             OpenEditor(newprv);
         }
-    }
 
+        private void btnImportPrv_Click(object sender, RoutedEventArgs e)
+        {
+            var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = "QuAnalyzer Data Provider archive|*.qax" };
+            if (dial.ShowDialog().Value)
+            {
+                ((App)Application.Current).ProvidersMan.AddProvider(dial.FileName);
+            }
+        }
+    }
 }

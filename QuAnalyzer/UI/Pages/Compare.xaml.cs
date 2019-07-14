@@ -1,11 +1,9 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using OfficeOpenXml;
-using Wokhan.Data.Providers.Contracts;
-using QuAnalyzer.Extensions;
+using QuAnalyzer.Features.Comparison;
+using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.Helpers;
-using QuAnalyzer.Logic;
-using QuAnalyzer.Logic.Contracts;
 using QuAnalyzer.UI.Windows;
 using System;
 using System.Collections.Generic;
@@ -20,9 +18,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Shell;
-using WinForms = System.Windows.Forms;
 using Wokhan.Collections.Extensions;
 using Wokhan.Data.Providers.Bases;
+using Wokhan.Data.Providers.Contracts;
+using WinForms = System.Windows.Forms;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -491,7 +490,7 @@ namespace QuAnalyzer.UI.Pages
                     using (var xl = new ExcelPackage(file))
                     {
                         cmp.Results.InitDiff(cmp);
-                        xl.AddWorksheet(cmp.Results.MergedDiff, new[] { "Name" }.Concat(cmp.Results.MergedHeaders).ToArray(), cmp.SourceKeys.Count, "Differences", (x, i, h, s) => { if (x.IsDiff[i]) s.Font.Color.SetColor(System.Drawing.Color.Red); return x.Values[i]; }, cb1);
+                        xl.AddWorksheet(cmp.Results.MergedDiff, new[] { "Name" }.Concat(cmp.Results.MergedHeaders).ToArray(), cmp.SourceKeys.Count, "Differences", (x, i, h, s) => { if (x.IsDiff[i]) { s.Font.Color.SetColor(System.Drawing.Color.Red); } return x.Values[i]; }, cb1);
 
                         //if (cmp.Results.Source.Missing != null)
                         xl.AddWorksheet(cmp.Results.Source.Missing.Cast<object[]>(), cmp.SourceHeaders, cmp.SourceKeys.Count, "Missing from source", (x, i, h, s) => x[i], cb2);

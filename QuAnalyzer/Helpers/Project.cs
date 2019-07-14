@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
-using Wokhan.Data.Providers.Bases;
-using Wokhan.Data.Providers.Contracts;
+using QuAnalyzer.Features.Monitoring;
+using QuAnalyzer.Generic;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +9,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows.Media;
 using Wokhan.Data.Providers;
+using Wokhan.Data.Providers.Bases;
+using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.Helpers
 {
@@ -60,7 +62,7 @@ namespace QuAnalyzer.Helpers
             try
             {
                 stream = new FileStream(p, FileMode.Open, FileAccess.Read);
-                
+
                 var restProject = (Project)ser.ReadObject(stream);
 
                 this.Name = restProject.Name;
@@ -106,7 +108,7 @@ namespace QuAnalyzer.Helpers
             }
 
             var ser = new DataContractSerializer(typeof(Project), DataProviders.AllProviders.Select(a => a.Type).Concat(new[] { typeof(Dictionary<string, object>), typeof(IDataProvider), typeof(DataProvider), typeof(DBDataProvider), typeof(FileDataProvider), typeof(ObservableCollection<IDataProvider>), typeof(SourcesMapper), typeof(MonitorItem) }));
-            
+
             if (p != null)
             {
                 this.FilePath = p;

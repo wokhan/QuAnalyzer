@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 
-namespace QuAnalyzer.Helpers
+namespace QuAnalyzer.Generic.Collections
 {
     public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INotifyCollectionChanged
     {
@@ -42,10 +42,7 @@ namespace QuAnalyzer.Helpers
 
         protected virtual void NotifyCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (CollectionChanged != null)
-            {
-                CollectionChanged(this, e);
-            }
+            CollectionChanged?.Invoke(this, e);
         }
     }
 }

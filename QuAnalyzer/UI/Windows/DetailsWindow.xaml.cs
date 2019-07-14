@@ -1,9 +1,7 @@
 ﻿using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
-using QuAnalyzer.Extensions;
-using QuAnalyzer.Helpers;
-using QuAnalyzer.Logic;
-using QuAnalyzer.Logic.Contracts;
+using QuAnalyzer.Features.Comparison;
+using QuAnalyzer.Generic.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

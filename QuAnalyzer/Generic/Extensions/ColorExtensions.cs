@@ -1,4 +1,4 @@
-﻿namespace QuAnalyzer.Extensions
+﻿namespace QuAnalyzer.Generic.Extensions
 {
     public static class ColorExtensions
     {

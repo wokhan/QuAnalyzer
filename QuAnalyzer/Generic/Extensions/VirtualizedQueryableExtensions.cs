@@ -1,15 +1,14 @@
 ﻿using AlphaChiTech.Virtualization;
-using Wokhan.Data.Providers.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using DLinq = System.Linq.Dynamic.Core;
 using System.Windows.Threading;
+using Wokhan.Data.Providers.Contracts;
+using DLinq = System.Linq.Dynamic.Core;
 
-namespace QuAnalyzer.Helpers
+namespace QuAnalyzer.Generic.Extensions
 {
     public static class VirtualizedQueryableExtensions
     {
@@ -72,7 +71,7 @@ namespace QuAnalyzer.Helpers
 
                 public Source(IOrderedQueryable<T> query)
                 {
-                    this.basequery = query;
+                    basequery = query;
                 }
 
                 public Source(IDataProvider provider, string repository)
@@ -93,12 +92,12 @@ namespace QuAnalyzer.Helpers
 
                 public int Count
                 {
-                    get { return (basequery ?? ((IQueryable<T>)prv.GetData(src))).Count(); }
+                    get { return (basequery ?? (IQueryable<T>)prv.GetData(src)).Count(); }
                 }
 
                 public int IndexOf(T item)
                 {
-                    return (basequery ?? ((IQueryable<T>)prv.GetData(src))).ToList().IndexOf(item);
+                    return (basequery ?? (IQueryable<T>)prv.GetData(src)).ToList().IndexOf(item);
                 }
 
                 public void OnReset(int count)

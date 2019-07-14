@@ -1,4 +1,4 @@
-﻿using Wokhan.Data.Providers.Contracts;
+﻿using QuAnalyzer.Generic;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,10 +8,11 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using Wokhan.Data.Providers.Contracts;
 
-namespace QuAnalyzer.Helpers
+namespace QuAnalyzer.Features.Monitoring
 {
-    public class DatePoint:NotifierHelper
+    public class DatePoint : NotifierHelper
     {
         public DateTime X { get; set; }
 
@@ -107,8 +108,8 @@ namespace QuAnalyzer.Helpers
         [IgnoreDataMember()]
         public IDataProvider Provider
         {
-            get { return ((App)App.Current).CurrentProject.CurrentProviders.SingleOrDefault(c => c.Name == ProviderName); }
-            set { ProviderName = value != null ? value.Name : String.Empty; }
+            get { return ((App)System.Windows.Application.Current).CurrentProject.CurrentProviders.SingleOrDefault(c => c.Name == ProviderName); }
+            set { ProviderName = value != null ? value.Name : string.Empty; }
         }
 
         public string Repository { get; set; }
@@ -120,7 +121,7 @@ namespace QuAnalyzer.Helpers
             get { return _interval; }
             set { _interval = value; NotifyPropertyChanged("Interval"); }
         }
-       
+
         private string _status;
         public string Status
         {
@@ -198,26 +199,20 @@ namespace QuAnalyzer.Helpers
             r.ResultCount = -1;
             r.Occurence = cnt++;
 
-            if (OnAdd != null)
-            {
-                OnAdd(r);
-            }
+            OnAdd?.Invoke(r);
 
-            Stopwatch sw = Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
 
             object data = null;
-            r.ResultCount = await Task<long>.Run(() => Provider.Monitor(Type, Repository, out data, Filter, Attributes));
+            r.ResultCount = await Task.Run(() => Monitoring.Monitor(Provider, Type, Repository, out data, Filter, Attributes));
             r.Data = data;
             sw.Stop();
-            
+
             var dbc = new DoubleConverter();
 
             r.Duration = sw.ElapsedMilliseconds;
 
-            if (OnResult != null)
-            {
-                OnResult(r);
-            }
+            OnResult?.Invoke(r);
 
             _isChecking = false;
         }
@@ -231,10 +226,10 @@ namespace QuAnalyzer.Helpers
 
         public void AttachEvent(Action<ResultsClass> monitor_OnAdd, Action<ResultsClass> monitor_OnResult)
         {
-            this.OnAdd -= monitor_OnAdd;
-            this.OnAdd += monitor_OnAdd;
-            this.OnResult -= monitor_OnResult;
-            this.OnResult += monitor_OnResult;
+            OnAdd -= monitor_OnAdd;
+            OnAdd += monitor_OnAdd;
+            OnResult -= monitor_OnResult;
+            OnResult += monitor_OnResult;
         }
 
         private string _attributes = "";

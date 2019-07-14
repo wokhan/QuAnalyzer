@@ -1,9 +1,13 @@
-﻿using QuAnalyzer.Helpers;
+﻿using QuAnalyzer.Generic.Diagnostics;
+using QuAnalyzer.Helpers;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using Wokhan.Data.Providers;
+using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer
 {
@@ -21,23 +25,24 @@ namespace QuAnalyzer
             new SolidColorBrush(Colors.PaleVioletRed)
         };
 
-        public Project CurrentProject { get; } = new Project();
-        public ResourcesWatcher Performance { get; }
+        public Project CurrentProject { get; private set; }
+        public ResourcesWatcher Performance { get; private set; }
+        public ProvidersManager ProvidersMan { get; private set; }
 
         //public string ApplicationInfo { get { return String.Format("{0} {1} v{2}", _appBase.Info.CompanyName, _appBase.Info.ProductName, _appBase.Info.Version); } }
-        public string ApplicationInfo { get { return String.Format("{0} {1} v{2}", "", "", ""); } }
+        public string ApplicationInfo { get; } = String.Format("{0} {1} v{2}", "", "", "");
 
         //public string Copyright { get { return _appBase.Info.Copyright; } }
-        public string Copyright { get { return ""; } }
+        public string Copyright { get; } = "";
 
-        public string HelpLink { get { return "https://www.wokhan.com"; } }
+        public string HelpLink { get; } = "https://www.wokhan.com";
 
         public App()
         {
+            CurrentProject = new Project();
             Performance = new ResourcesWatcher();
-
-            DataProviders.Init(AppDomain.CurrentDomain.BaseDirectory + "\\providers");
-
+            ProvidersMan = new ProvidersManager();
+            
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             this.Exit += App_Exit;
         }

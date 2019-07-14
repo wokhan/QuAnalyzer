@@ -1,9 +1,8 @@
-﻿using QuAnalyzer.Logic.Contracts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace QuAnalyzer.Helpers
+namespace QuAnalyzer.Features.Comparison
 {
     public class ComparerStruct<T> : IDataComparer
     {
@@ -18,8 +17,8 @@ namespace QuAnalyzer.Helpers
         public IList<string> TargetHeaders { get; set; }
         public IEqualityComparer<T> Comparer { get; set; }
         public IEqualityComparer<T> KeysComparer { get; set; }
-        public bool IsOrdered {get;set;}
-        
+        public bool IsOrdered { get; set; }
+
         public CancellationTokenSource TokenSource { get; private set; }
 
         public ResultStruct<T> Results { get; } = new ResultStruct<T>();
@@ -28,8 +27,8 @@ namespace QuAnalyzer.Helpers
         {
             get
             {
-                return new object[][] 
-                { 
+                return new object[][]
+                {
                     new object[] { Name, SourceName, Results, Results.Source, this },
                     new object[] { Name, TargetName, Results, Results.Target, this }
                 };

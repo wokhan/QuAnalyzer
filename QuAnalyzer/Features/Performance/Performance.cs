@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Diagnostics;
+using System.Linq;
 using Wokhan.Collections.Extensions;
 
-namespace QuAnalyzer.Logic
+namespace QuAnalyzer.Features.Performance
 {
     public static class Performance
     {

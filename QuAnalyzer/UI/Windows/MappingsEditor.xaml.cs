@@ -1,11 +1,11 @@
 ﻿using MahApps.Metro.Controls;
-using Wokhan.Data.Providers.Contracts;
 using QuAnalyzer.Helpers;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Wokhan.Collections.Extensions;
+using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Windows
 {

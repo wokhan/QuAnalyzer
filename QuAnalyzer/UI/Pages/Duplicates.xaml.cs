@@ -1,20 +1,19 @@
-﻿using Wokhan.Data.Providers.Contracts;
+﻿using QuAnalyzer.Features.Comparison;
+using QuAnalyzer.Generic.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
-using QuAnalyzer.Extensions;
-using System.Collections.ObjectModel;
-using System.Windows.Controls.Primitives;
-using QuAnalyzer.Logic;
-using QuAnalyzer.Helpers;
 using System.Windows.Threading;
-using System.ComponentModel;
-using System.Threading.Tasks;
 using Wokhan.Collections.Extensions;
+using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages
 {

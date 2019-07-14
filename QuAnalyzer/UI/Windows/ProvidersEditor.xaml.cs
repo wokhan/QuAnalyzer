@@ -1,15 +1,17 @@
 ﻿using MahApps.Metro.Controls;
-using Wokhan.Data.Providers.Bases;
-using Wokhan.Data.Providers.Contracts;
+using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using MahApps.Metro.Controls.Dialogs;
-using System.ComponentModel;
-using Microsoft.Win32;
-using System.Threading.Tasks;
+using Wokhan.Data.Providers;
+using Wokhan.Data.Providers.Bases;
+using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Windows
 {
@@ -22,8 +24,10 @@ namespace QuAnalyzer.UI.Windows
         public IDataProvider CurrentProvider
         {
             get { return _currentProvider; }
-            set { _currentProvider = value; NotifyPropertyChanged("CurrentProvider"); NotifyPropertyChanged("CurrentType"); fillProvider(); }
+            set { _currentProvider = value; NotifyPropertyChanged(nameof(CurrentProvider)); NotifyPropertyChanged(nameof(CurrentType)); fillProvider(); }
         }
+
+        public IList<IGrouping<string, DataProviderMemberStruct>> ExpParameters => DataProviders.GetParameters(CurrentProvider);
 
         public DataProviderStruct CurrentType
         {

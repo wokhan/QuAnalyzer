@@ -1,8 +1,9 @@
-﻿using Wokhan.Data.Providers.Contracts;
+﻿using QuAnalyzer.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.Helpers
 {

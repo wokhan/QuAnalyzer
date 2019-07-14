@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Wokhan.Collections.Extensions;
 
-namespace QuAnalyzer.Extensions
+namespace QuAnalyzer.Generic.Extensions
 {
     public static class DataGridExtensions
     {
@@ -74,7 +74,7 @@ namespace QuAnalyzer.Extensions
         public static void ExportAsXLSX(this DataGrid grid, string path = null, string worksheetName = null, Panel host = null, Action<double> callback = null)
         {
 #pragma warning disable CS0219 // La variable 'canceled' est assignée, mais sa valeur n'est jamais utilisée
-            bool canceled = false;
+            var canceled = false;
 #pragma warning restore CS0219 // La variable 'canceled' est assignée, mais sa valeur n'est jamais utilisée
             //try
             {
@@ -108,7 +108,7 @@ namespace QuAnalyzer.Extensions
             }*/
         }
 
-        public static void AddWorksheet<T>(this ExcelPackage xl, IEnumerable<T> src, IList<string> headers, int keysCount, string worksheetName, Func<T, int, string, ExcelStyle, object> GetValueSetStyle, Action<double> callback = null)
+        /*public static void AddWorksheet<T>(this ExcelPackage xl, IEnumerable<T> src, IList<string> headers, int keysCount, string worksheetName, Func<T, int, string, ExcelStyle, object> GetValueSetStyle, Action<double> callback = null)
         {
             var sheet = xl.Workbook.Worksheets[worksheetName ?? "Report"];
             if (sheet != null)
@@ -118,11 +118,11 @@ namespace QuAnalyzer.Extensions
 
             sheet = xl.Workbook.Worksheets.Add(worksheetName ?? "Report");
 
-            for (int i = 0; i < headers.Count; i++)
+            for (var i = 0; i < headers.Count; i++)
             {
                 sheet.Cells[1, i + 1].Value = headers[i];
                 sheet.Column(i + 1).BestFit = true;
-                sheet.Column(i + 1).Style.Font.Bold = (i < keysCount);
+                sheet.Column(i + 1).Style.Font.Bold = i < keysCount;
             }
 
             //sheet.Row(1).Style.Font.Bold = true;
@@ -137,7 +137,7 @@ namespace QuAnalyzer.Extensions
                     callback((double)(j - 2) / cnt);
                 }
 
-                for (int k = 1; k <= headers.Count; k++)
+                for (var k = 1; k <= headers.Count; k++)
                 {
                     sheet.Cells[j, k].Value = GetValueSetStyle(x, k - 1, headers[k - 1], sheet.Cells[j, k].Style);
                 }
@@ -206,18 +206,18 @@ namespace QuAnalyzer.Extensions
 
             sheet = xl.Workbook.Worksheets.Add(worksheetName ?? "Report");
 
-            for (int i = 0; i < grid.Columns.Count; i++)
+            for (var i = 0; i < grid.Columns.Count; i++)
             {
                 sheet.Cells[1, i + 1].Value = (string)grid.Columns[i].Header;
                 sheet.Column(i + 1).BestFit = true;
-                sheet.Column(i + 1).Style.Font.Bold = (((DataGridTextColumn)grid.Columns[i]).FontWeight != FontWeights.Normal);
+                sheet.Column(i + 1).Style.Font.Bold = ((DataGridTextColumn)grid.Columns[i]).FontWeight != FontWeights.Normal;
             }
 
             //sheet.Row(1).Style.Font.Bold = true;
 
-            var noColor = System.Windows.Media.Color.FromArgb(255, 255, 255, 255);
+            var noColor = Color.FromArgb(255, 255, 255, 255);
 
-            for (int j = 2; j < gridClone.Items.Count + 2; j++)
+            for (var j = 2; j < gridClone.Items.Count + 2; j++)
             {
                 var row = (DataGridRow)gridClone.ItemContainerGenerator.ContainerFromIndex(j - 2);
 
@@ -245,7 +245,7 @@ namespace QuAnalyzer.Extensions
                     sheet.Row(j).Style.Font.Color.SetColor(((SolidColorBrush)row.Foreground).Color.AsDrawingColor());
                 }
 
-                for (int k = 1; k < gridClone.Columns.Count + 1; k++)
+                for (var k = 1; k < gridClone.Columns.Count + 1; k++)
                 {
                     var txt = (TextBlock)gridClone.Columns[k - 1].GetCellContent(row);
                     if (txt != null)
@@ -279,9 +279,13 @@ namespace QuAnalyzer.Extensions
         public static void DoEvents()
         {
             if (Application.Current == null)
+            {
                 return;
+            }
+
             Application.Current.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
         }
+        */
 
         public static void CopyToClipboard(this DataGrid grid)
         {

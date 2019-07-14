@@ -29,7 +29,7 @@ namespace QuAnalyzer.Helpers
             innerhost.Children.Add(txtb);
             innerhost.Children.Add(pb);
 
-            return new Action<double>((i) => { pb.Dispatcher.Invoke(() => { if (pb.Value != i) pb.Value = i; }); });
+            return new Action<double>((i) => { pb.Dispatcher.Invoke(() => { if (pb.Value != i) { pb.Value = i; } }); });
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using Wokhan.Data.Providers.Contracts;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -58,7 +58,7 @@ namespace QuAnalyzer.UI.Pages
                 {
                     var data = prov.GetData(repo, new[] { attr })
                                    .AsEnumerable()
-                                   .Select((a, i) => 
+                                   .Select((a, i) =>
                                    {
                                        Dispatcher.InvokeAsync(() => txtStatus.Text = "Loaded " + i + " entries...");
                                        return a.ToString();

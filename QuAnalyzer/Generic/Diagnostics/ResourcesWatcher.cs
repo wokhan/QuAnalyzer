@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Threading;
 
-namespace QuAnalyzer.Helpers
+namespace QuAnalyzer.Generic.Diagnostics
 {
     public class ResourcesWatcher : NotifierHelper
     {
@@ -14,7 +14,7 @@ namespace QuAnalyzer.Helpers
         public ResourcesWatcher()
         {
             string processName;
-     
+
             using (var p = Process.GetCurrentProcess())
             {
                 processName = p.ProcessName;
@@ -24,7 +24,7 @@ namespace QuAnalyzer.Helpers
             threadsCounter = new PerformanceCounter("Process", "Thread Count", processName, true);
             cpuCounter = new PerformanceCounter("Process", "% Processor Time", processName, true);
 
-            var timer = new DispatcherTimer(TimeSpan.FromSeconds(1.0), DispatcherPriority.Normal, ResourcesR_Tick, App.Current.Dispatcher);
+            var timer = new DispatcherTimer(TimeSpan.FromSeconds(1.0), DispatcherPriority.Normal, ResourcesR_Tick, System.Windows.Application.Current.Dispatcher);
             timer.Start();
         }
 

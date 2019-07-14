@@ -1,7 +1,8 @@
-﻿using System;
+﻿using QuAnalyzer.Generic;
+using System;
 using System.Collections.Generic;
 
-namespace QuAnalyzer.Helpers
+namespace QuAnalyzer.Features.Comparison
 {
     public class ItemResult<T> : NotifierHelper
     {

@@ -223,10 +223,10 @@
             </Grid.RowDefinitions>
             <Label Content="Connectors" Foreground="Black" Background="LightGray" FontWeight="Bold" />
             <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
-                <UC:ToolBarButton Text="New connector" BorderBrush="Green" Image="{StaticResource appbar_add_multiple}"/>
+                <UC:ToolBarButton Text="New connector" Click="btnImportPrv_Click" BorderBrush="Green" Image="{StaticResource appbar_add_multiple}"/>
             </WrapPanel>
             <ScrollViewer Grid.Row="2">
-                <ItemsControl Margin="5" Name="lstProvidersTypes" ItemsSource="{Binding Source={x:Static providers:DataProviders.AllProviders}, Mode=OneTime}">
+                <ItemsControl Margin="5" Name="lstProvidersTypes" ItemsSource="{Binding ProvidersMan.Providers, Source={x:Static Application.Current}, Mode=OneWay}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" IsItemsHost="True" />

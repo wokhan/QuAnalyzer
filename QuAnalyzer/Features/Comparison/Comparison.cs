@@ -1,13 +1,12 @@
-﻿using QuAnalyzer.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using System.IO;
 
-namespace QuAnalyzer.Logic
+namespace QuAnalyzer.Features.Comparison
 {
     public static class Comparison
     {
@@ -166,11 +165,11 @@ namespace QuAnalyzer.Logic
 
         public static T[][] GetSamples<T>(int nbSamples, params IEnumerable<T>[] collections)
         {
-            Random rdm = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
-            int min = collections.Min(c => c.Count());
+            var rdm = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
+            var min = collections.Min(c => c.Count());
             nbSamples = Math.Min(min, nbSamples);
 
-            int[] rdmIdxs = new byte[nbSamples].Select(i => rdm.Next(min)).ToArray();
+            var rdmIdxs = new byte[nbSamples].Select(i => rdm.Next(min)).ToArray();
 
             return collections.Select(c => rdmIdxs.Select(i => c.ElementAtOrDefault(i)).ToArray()).ToArray();
         }
@@ -213,8 +212,8 @@ namespace QuAnalyzer.Logic
             using (var srcEnum = srcData.GetEnumerator())
             using (var trgEnum = trgData.GetEnumerator())
             {
-                bool issrc = true;
-                bool istrg = true;
+                var issrc = true;
+                var istrg = true;
                 bool samesrc;
                 bool sametrg;
                 bool scannext;
@@ -314,8 +313,8 @@ namespace QuAnalyzer.Logic
                 throw new ArgumentNullException("Target");
             }
 
-            int countA = f.Results.Source.Count;
-            int countB = f.Results.Target.Count;
+            var countA = f.Results.Source.Count;
+            var countB = f.Results.Target.Count;
 
             if (countA == 0)
             {
@@ -340,7 +339,7 @@ namespace QuAnalyzer.Logic
             InitiateDuplicates(trgData, f.Results.Target, f.KeysComparer, f.Comparer);
 
             //progressCallback(cName, ProgressType.Comparing, 0);
-            int i = 0;
+            var i = 0;
             var matchingItems = srcPrl.Select(m => { setProgress(f, ProgressType.Comparing, Interlocked.Increment(ref i) * 20 / countA, progressCallback); return m; })
                                       .Intersect(trgPrl, f.Comparer)
                                       .ToList()
@@ -412,7 +411,7 @@ namespace QuAnalyzer.Logic
 
         private static List<T> RetrieveOnly<T>(List<T> a, List<T> b, ComparerStruct<T> f, Action<ComparerStruct<T>> progressCallback, ProgressType type)
         {
-            int ix = 0;
+            var ix = 0;
             return a.AsParallel()
                     .Select(m => { setProgress(f, type, Interlocked.Increment(ref ix) * 10 / a.Count, progressCallback); return m; })
                     .Except(b.AsParallel(), f.Comparer)
@@ -455,7 +454,7 @@ namespace QuAnalyzer.Logic
                 var yi = y.ElementAt(id);
                 if (xi is string)
                 {
-                    return String.CompareOrdinal((string)xi, (string)yi);
+                    return string.CompareOrdinal((string)xi, (string)yi);
                 }
 
                 return ((IComparable)xi).CompareTo((IComparable)yi);
@@ -486,7 +485,7 @@ namespace QuAnalyzer.Logic
             // To ensure that Equals is always called, you can return 0.
             public int GetHashCode(IEnumerable<object> obj)
             {
-                return obj.Skip(startFrom).Take(maxCount).Aggregate(17, (a, i) => (a * 23) + (i == null || i is DBNull ? 0 : i.GetHashCode()));
+                return obj.Skip(startFrom).Take(maxCount).Aggregate(17, (a, i) => a * 23 + (i == null || i is DBNull ? 0 : i.GetHashCode()));
             }
         }
 
@@ -494,7 +493,7 @@ namespace QuAnalyzer.Logic
         {
             public new bool Equals(object x, object y)
             {
-                return (x is DBNull && y == null) || (y is DBNull && x == null) || Object.Equals(x, y);
+                return x is DBNull && y == null || y is DBNull && x == null || object.Equals(x, y);
             }
 
             public int GetHashCode(object obj)

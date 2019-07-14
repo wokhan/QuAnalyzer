@@ -1,6 +1,6 @@
 ﻿using De.TorstenMandelkow.MetroChart;
-using QuAnalyzer.Helpers;
-using QuAnalyzer.Extensions;
+using QuAnalyzer.Features.Monitoring;
+using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Windows;
 using System;
 using System.Collections.ObjectModel;
