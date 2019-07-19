@@ -2,6 +2,7 @@
 using QuAnalyzer.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -39,6 +40,8 @@ namespace QuAnalyzer
 
         public App()
         {
+            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+            
             CurrentProject = new Project();
             Performance = new ResourcesWatcher();
             ProvidersMan = new ProvidersManager();

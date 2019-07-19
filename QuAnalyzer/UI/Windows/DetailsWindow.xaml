@@ -5,7 +5,7 @@
         xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
         Title="{Binding Name, StringFormat='Comparison details - {0}'}" Height="600" Width="800"
         ShowIconOnTitleBar="False" ShowTitleBar="True" 
-        ResizeMode="CanResizeWithGrip" TitleCaps="False"
+        ResizeMode="CanResizeWithGrip"
         MinWidth="800" MinHeight="500" BorderThickness="1" UseLayoutRounding="True" SnapsToDevicePixels="True"
         BorderBrush="Gray" xmlns:myself="clr-namespace:QuAnalyzer.UI.Windows">
     <Controls:MetroWindow.Flyouts>

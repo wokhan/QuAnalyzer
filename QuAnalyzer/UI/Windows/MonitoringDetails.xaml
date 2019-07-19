@@ -4,7 +4,6 @@
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         x:Class="QuAnalyzer.UI.Windows.MonitoringDetails"
         Title="{Binding Name,StringFormat='Monitoring settings - {0}',FallbackValue='New monitor'}" ShowIconOnTitleBar="False" ShowTitleBar="True" 
-        TitleCaps="False"
         ResizeMode="NoResize" BorderThickness="1" UseLayoutRounding="True" SnapsToDevicePixels="True"
         BorderBrush="Gray" x:Name="myself" Width="388" SizeToContent="Height">
     <Window.Resources>

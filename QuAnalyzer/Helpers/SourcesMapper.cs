@@ -1,8 +1,8 @@
-﻿using QuAnalyzer.Generic;
+﻿using Newtonsoft.Json;
+using QuAnalyzer.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.Helpers
@@ -33,7 +33,7 @@ namespace QuAnalyzer.Helpers
 
         public string Name { get; set; }
 
-        [IgnoreDataMember()]
+        [JsonIgnore]
         public IDataProvider Source
         {
             get { return ((App)App.Current).CurrentProject.CurrentProviders.SingleOrDefault(c => c.Name == SourceName); }
@@ -44,7 +44,7 @@ namespace QuAnalyzer.Helpers
 
         public string SourceRepository { get; set; }
 
-        [IgnoreDataMember()]
+        [JsonIgnore]
         public IDataProvider Target
         {
             get { return ((App)App.Current).CurrentProject.CurrentProviders.SingleOrDefault(c => c.Name == TargetName); }

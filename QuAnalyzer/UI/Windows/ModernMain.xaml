@@ -2,15 +2,13 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     x:Class="QuAnalyzer.UI.Windows.ModernMain"
     xmlns:UserControls="clr-namespace:QuAnalyzer.UI.Menus"
-     xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-     xmlns:Pages="clr-namespace:QuAnalyzer.UI.Pages"
+    xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls" 
     Title="QuAnalyzer" ShowIconOnTitleBar="True" ShowTitleBar="True"
-    ResizeMode="CanResizeWithGrip" TitleAlignment="Center" TitleCaps="False"
+    ResizeMode="CanResizeWithGrip" TitleAlignment="Center"
     MinWidth="900" MinHeight="600" Height="600"
-    Background="White" EnableDWMDropShadow="True"
+    
     Width="900" BorderThickness="1" UseLayoutRounding="True" SnapsToDevicePixels="True"
     BorderBrush="Gray" WindowTitleBrush="White" TitleForeground="Black">
     <Window.Resources>

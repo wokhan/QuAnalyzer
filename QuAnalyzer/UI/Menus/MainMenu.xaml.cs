@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using QuAnalyzer.UI.Windows;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
@@ -76,17 +77,17 @@ namespace QuAnalyzer.UI.Menus
             Application.Current.Shutdown();
         }
 
-        private void setTheme(object sender, RoutedEventArgs e)
-        {
-            ThemeManager.ChangeAppStyle(Application.Current, ThemeManager.Accents.First(), ThemeManager.AppThemes.First());
+        //private void setTheme(object sender, RoutedEventArgs e)
+        //{
+        //    ThemeManager.ChangeTheme(Application.Current, ThemeManager.Accents.First(), ThemeManager.AppThemes.First());
 
-            if (Close != null)
-            {
-                ctxRecentFiles.IsOpen = false;
-                ctxSaveAs.IsOpen = false;
-                Close(this, null);
-            }
-        }
+        //    if (Close != null)
+        //    {
+        //        ctxRecentFiles.IsOpen = false;
+        //        ctxSaveAs.IsOpen = false;
+        //        Close(this, null);
+        //    }
+        //}
 
         private void lstRecentFiles_Click(object sender, RoutedEventArgs e)
         {
@@ -124,10 +125,11 @@ namespace QuAnalyzer.UI.Menus
 
         private void btnNewPrv_Click(object sender, RoutedEventArgs e)
         {
-            var newprv = (IDataProvider)Activator.CreateInstance(((DataProviderStruct)((Button)sender).Tag).Type);
+            var providerName = ((DataProviderStruct)((Button)sender).Tag).Name;
+            var newprv = DataProviders.CreateInstance(providerName, new Dictionary<string, object>());
             //((App)Application.Current).CurrentProject.CurrentProviders.Add(newprv);
 
-            newprv.Name = ((DataProviderStruct)((Button)sender).Tag).Name + "#" + ((App)Application.Current).CurrentProject.CurrentProviders.Count;
+            newprv.Name = providerName + "#" + ((App)Application.Current).CurrentProject.CurrentProviders.Count;
 
             OpenEditor(newprv);
         }

@@ -1,11 +1,11 @@
-﻿using QuAnalyzer.Generic;
+﻿using Newtonsoft.Json;
+using QuAnalyzer.Generic;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Wokhan.Data.Providers.Contracts;
@@ -44,12 +44,7 @@ namespace QuAnalyzer.Features.Monitoring
         public MonitorItem Step { get; set; }
 
         public bool IsOK { get; set; }
-
-        private DateTime _lastcheck = DateTime.Now;
-        public DateTime LastCheck
-        {
-            get { return _lastcheck; }
-        }
+        public DateTime LastCheck { get; } = DateTime.Now;
 
         private long _resultCount;
         public long ResultCount
@@ -105,7 +100,7 @@ namespace QuAnalyzer.Features.Monitoring
 
         public string ProviderName { get; set; }
 
-        [IgnoreDataMember()]
+        [JsonIgnore]
         public IDataProvider Provider
         {
             get { return ((App)System.Windows.Application.Current).CurrentProject.CurrentProviders.SingleOrDefault(c => c.Name == ProviderName); }
@@ -217,12 +212,7 @@ namespace QuAnalyzer.Features.Monitoring
             _isChecking = false;
         }
 
-        private ObservableCollection<DatePoint> _points = new ObservableCollection<DatePoint>();
-
-        public ObservableCollection<DatePoint> Points
-        {
-            get { return _points; }
-        }
+        public ObservableCollection<DatePoint> Points { get; } = new ObservableCollection<DatePoint>();
 
         public void AttachEvent(Action<ResultsClass> monitor_OnAdd, Action<ResultsClass> monitor_OnResult)
         {
@@ -232,11 +222,6 @@ namespace QuAnalyzer.Features.Monitoring
             OnResult += monitor_OnResult;
         }
 
-        private string _attributes = "";
-        public string Attributes
-        {
-            get { return _attributes; }
-            set { _attributes = value; }
-        }
+        public string Attributes { get; set; } = "";
     }
 }

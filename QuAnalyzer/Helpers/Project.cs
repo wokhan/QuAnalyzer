@@ -1,15 +1,12 @@
 ﻿using Microsoft.Win32;
+using Newtonsoft.Json;
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Generic;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Runtime.Serialization;
 using System.Windows.Media;
-using Wokhan.Data.Providers;
-using Wokhan.Data.Providers.Bases;
+using Wokhan.Collections.Extensions;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.Helpers
@@ -43,7 +40,7 @@ namespace QuAnalyzer.Helpers
             set { AccentColor = new SolidColorBrush(Color.FromArgb(value[0], value[1], value[2], value[3])); }
         }
 
-        [IgnoreDataMember]
+        [JsonIgnore]
         public SolidColorBrush AccentColor
         {
             get { return (SolidColorBrush)App.Current.Resources["AccentColorBrush"]; }
@@ -57,46 +54,20 @@ namespace QuAnalyzer.Helpers
 
         internal void Open(string p)
         {
-            var ser = new DataContractSerializer(typeof(Project), DataProviders.AllProviders.Select(a => a.Type).Concat(new[] { typeof(Dictionary<string, object>), typeof(IDataProvider), typeof(DataProvider), typeof(DBDataProvider), typeof(FileDataProvider), typeof(ObservableCollection<IDataProvider>), typeof(SourcesMapper), typeof(MonitorItem) }));
-            FileStream stream = null;
-            try
-            {
-                stream = new FileStream(p, FileMode.Open, FileAccess.Read);
+            var ser = new JsonSerializer();
 
-                var restProject = (Project)ser.ReadObject(stream);
+            using var stream = new JsonTextReader(new StreamReader(p));
 
-                this.Name = restProject.Name;
+            var restProject = ser.Deserialize<Project>(stream);
 
-                this.CurrentProviders.Clear();
-                foreach (var prv in restProject.CurrentProviders)
-                {
-                    this.CurrentProviders.Add(prv);
-                }
+            this.Name = restProject.Name;
+            this.CurrentProviders.ReplaceAll(restProject.CurrentProviders);
+            this.SourceMapper.ReplaceAll(restProject.SourceMapper);
+            this.MonitorItems.ReplaceAll(restProject.MonitorItems);
 
-                this.SourceMapper.Clear();
-                foreach (var sm in restProject.SourceMapper)
-                {
-                    this.SourceMapper.Add(sm);
-                }
+            this.FilePath = p;
 
-                this.MonitorItems.Clear();
-                foreach (var mi in restProject.MonitorItems)
-                {
-                    this.MonitorItems.Add(mi);
-                }
-
-                this.FilePath = p;
-
-                MRUManager.AddRecentFile(this.FilePath);
-
-            }
-            finally
-            {
-                if (stream != null)
-                {
-                    stream.Close();
-                }
-            }
+            MRUManager.AddRecentFile(this.FilePath);
         }
 
         internal void Save(string p = null)
@@ -107,18 +78,16 @@ namespace QuAnalyzer.Helpers
                 return;
             }
 
-            var ser = new DataContractSerializer(typeof(Project), DataProviders.AllProviders.Select(a => a.Type).Concat(new[] { typeof(Dictionary<string, object>), typeof(IDataProvider), typeof(DataProvider), typeof(DBDataProvider), typeof(FileDataProvider), typeof(ObservableCollection<IDataProvider>), typeof(SourcesMapper), typeof(MonitorItem) }));
+            var ser = new JsonSerializer();
 
             if (p != null)
             {
                 this.FilePath = p;
             }
 
-            var str = new FileStream(this.FilePath, FileMode.Create, FileAccess.Write);
+            using var str = new JsonTextWriter(new StreamWriter(this.FilePath, false));
 
-            ser.WriteObject(str, this);
-
-            str.Close();
+            ser.Serialize(str, this);
         }
 
         internal void CreateNew()

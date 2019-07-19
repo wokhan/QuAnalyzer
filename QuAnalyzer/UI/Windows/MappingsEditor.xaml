@@ -4,7 +4,7 @@
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
         Title="{Binding Name, StringFormat='Comparison details - {0}'}" Height="500" Width="700"
-        ShowIconOnTitleBar="False" ShowTitleBar="True" TitleCaps="False"
+        ShowIconOnTitleBar="False" ShowTitleBar="True"
         ResizeMode="CanResizeWithGrip" 
         MinWidth="700" MinHeight="500" BorderThickness="1" UseLayoutRounding="True" SnapsToDevicePixels="True"
         BorderBrush="Gray">
