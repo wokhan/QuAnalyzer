@@ -1,5 +1,4 @@
-﻿using MahApps.Metro.Controls;
-using QuAnalyzer.Helpers;
+﻿using QuAnalyzer.Features.Comparison;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -7,12 +6,12 @@ using System.Windows.Controls;
 using Wokhan.Collections.Extensions;
 using Wokhan.Data.Providers.Contracts;
 
-namespace QuAnalyzer.UI.Windows
+namespace QuAnalyzer.UI.Popups
 {
     /// <summary>
     /// Interaction logic for MappingsEditor.xaml
     /// </summary>
-    public partial class MappingsEditor : MetroWindow
+    public partial class MappingsEditor : Page
     {
         SourcesMapper currentMap = null;
 

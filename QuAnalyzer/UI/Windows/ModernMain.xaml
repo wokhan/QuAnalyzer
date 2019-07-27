@@ -7,7 +7,7 @@
     xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls" 
     Title="QuAnalyzer" ShowIconOnTitleBar="True" ShowTitleBar="True"
     ResizeMode="CanResizeWithGrip" TitleAlignment="Center"
-    MinWidth="900" MinHeight="600" Height="600"
+    MinWidth="1000" MinHeight="600" Height="600"
     
     Width="900" BorderThickness="1" UseLayoutRounding="True" SnapsToDevicePixels="True"
     BorderBrush="Gray" WindowTitleBrush="White" TitleForeground="Black">

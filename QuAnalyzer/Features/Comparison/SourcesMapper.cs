@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Wokhan.Data.Providers.Contracts;
 
-namespace QuAnalyzer.Helpers
+namespace QuAnalyzer.Features.Comparison
 {
     public class SourcesMapper : NotifierHelper
     {

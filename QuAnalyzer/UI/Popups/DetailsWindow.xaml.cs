@@ -14,24 +14,18 @@ using System.Windows.Media;
 using Wokhan.Collections.Extensions;
 using LinqExpressions = System.Linq.Expressions;
 
-namespace QuAnalyzer.UI.Windows
+namespace QuAnalyzer.UI.Popups
 {
     /// <summary>
     /// Interaction logic for DetailsWindow.xaml
     /// </summary>
-    public partial class DetailsWindow
+    public partial class DetailsWindow : Page
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void NotifyPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public class DiffClass
-        {
-            public object[] Values { get; set; }
-            public bool[] IsDiff { get; set; }
         }
 
         public static Dictionary<string, Func<IEnumerable<object>, object>> AggregationFormula
@@ -285,7 +279,7 @@ namespace QuAnalyzer.UI.Windows
             if (grpAndCmpIx.Any())
             {
                 //multigroup = multigroup.Select(c => grpAndCmpIx.Select(k => c[k.Value]).ToArray());
-                var sc = new Comparison.SequenceEqualityComparer();
+                var sc = new SequenceEqualityComparer();
                 multigroup = multigroup.GroupBy(c => grpAttrs.Select(a => c[a.i]), sc)
                                        .Select(g => g.Key.Select(gg => gg)
                                                          .Concat(cmpAttrs.Select(h => h.f(g.Select(gg => gg[h.i]))))

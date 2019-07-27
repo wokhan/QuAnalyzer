@@ -4,6 +4,7 @@ using OfficeOpenXml;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.Helpers;
+using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
 using System;
 using System.Collections.Generic;
@@ -141,7 +142,7 @@ namespace QuAnalyzer.UI.Pages
                                             TargetName = trgPrv.Name + " " + trgRepo,
                                             SourceHeaders = srcKeys,
                                             TargetHeaders = trgKeys,
-                                            Comparer = new Comparison.SequenceEqualityComparer(),
+                                            Comparer = new SequenceEqualityComparer(),
                                             GetSourceData = () => fnc(srcDataGetter.AsObjectCollection(srcKeys), trgHeaders.Select(h => h.Type).ToArray()),
                                             GetTargetData = () => fnc(trgDataGetter.AsObjectCollection(trgKeys), trgHeaders.Select(h => h.Type).ToArray())
                                         }
@@ -170,7 +171,7 @@ namespace QuAnalyzer.UI.Pages
                                             TargetName = trgPrv.Name + " " + trgRepo,
                                             SourceHeaders = inter,
                                             TargetHeaders = inter,
-                                            Comparer = new Comparison.SequenceEqualityComparer(),
+                                            Comparer = new SequenceEqualityComparer(),
                                             GetSourceData = () => fncx(srcPrv.GetData(srcRepo, inter).AsObjectCollection(srcHeaders.Select(h => h.Name).ToArray()), allTypesTrg),
                                             GetTargetData = () => fncx(trgPrv.GetData(trgRepo, inter).AsObjectCollection(trgHeaders.Select(h => h.Name).ToArray()), allTypesTrg)
                                         }
@@ -223,8 +224,8 @@ namespace QuAnalyzer.UI.Pages
                 TargetHeaders = fieldsTrg,
                 SourceKeys = srcKeys,
                 TargetKeys = trgKeys,
-                Comparer = new Comparison.SequenceEqualityComparer(),
-                KeysComparer = (srcKeys != null ? new Comparison.SequenceEqualityComparer(0, srcKeys.Length) : null),
+                Comparer = new SequenceEqualityComparer(),
+                KeysComparer = (srcKeys != null ? new SequenceEqualityComparer(0, srcKeys.Length) : null),
                 GetSourceData = () => fnc(srcDataGetter.AsObjectCollection(fieldsSrc.ToArray()), allTypesTrg), //.Select(r => allIdxSr.Select(i => r[i]).ToArray()),
                 GetTargetData = () => fnc(trgDataGetter.AsObjectCollection(fieldsTrg.ToArray()), allTypesTrg),//.Select(r => allIdxTr.Select(i => r[i]).ToArray())
                 IsOrdered = s.IsOrdered
@@ -327,12 +328,12 @@ namespace QuAnalyzer.UI.Pages
         {
             switch (r.Results.Progress)
             {
-                case Comparison.ProgressType.Failed:
-                case Comparison.ProgressType.Canceling:
+                case ProgressType.Failed:
+                case ProgressType.Canceling:
                     progressDC.Remove(r.Name);
                     break;
 
-                case Comparison.ProgressType.Done:
+                case ProgressType.Done:
                 default:
                     progressDC[r.Name] = r.Results.LocalProgress;
 
@@ -375,14 +376,14 @@ namespace QuAnalyzer.UI.Pages
             //ts.Cancel(true);
         }
 
-        Dictionary<IDataComparer, DetailsWindow> openWindows = new Dictionary<IDataComparer, DetailsWindow>();
+        Dictionary<IDataComparer, Popup> openWindows = new Dictionary<IDataComparer, Popup>();
         public void btnDetails_Click(object sender, RoutedEventArgs e)
         {
             Button src = (Button)sender;
             var cmp = (IDataComparer)src.Tag;
             if (!openWindows.ContainsKey(cmp))
             {
-                var dWin = new DetailsWindow(cmp);
+                var dWin = new Popup(new DetailsWindow(cmp));
                 dWin.Closed += dWin_Closed;
                 openWindows.Add(cmp, dWin);
             }
@@ -459,7 +460,7 @@ namespace QuAnalyzer.UI.Pages
 
             allProgress.ExportAsXLSX(dial.SelectedPath + "\\Summary.xlsx", "Summary", host, SharedCallback.GetCallBackForExport(host, "Summary", null));
 
-            foreach (var cmp in cpd.Where(c => c.Results.Progress == Comparison.ProgressType.Done))
+            foreach (var cmp in cpd.Where(c => c.Results.Progress == ProgressType.Done))
             {
                 /*if (!openWindows.ContainsKey(cmp))
                 {
@@ -527,7 +528,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnNewPrv_Click(object sender, RoutedEventArgs e)
         {
-            var editor = new MappingsEditor();
+            var editor = new Popup(new MappingsEditor());
             editor.Show();
             editor.Activate();
         }
@@ -568,7 +569,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnEditMapping_Click(object sender, RoutedEventArgs e)
         {
-            var editor = new MappingsEditor((SourcesMapper)((Button)sender).Tag);
+            var editor = new Popup(new MappingsEditor((SourcesMapper)((Button)sender).Tag));
             editor.Show();
             editor.Activate();
         }

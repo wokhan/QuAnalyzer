@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using Newtonsoft.Json;
+using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Monitoring;
+using QuAnalyzer.Features.Performance;
 using QuAnalyzer.Generic;
 using System;
 using System.Collections.ObjectModel;
@@ -51,6 +53,7 @@ namespace QuAnalyzer.Helpers
 
         public ObservableCollection<MonitorItem> MonitorItems { get; } = new ObservableCollection<MonitorItem>();
         public ObservableCollection<SourcesMapper> SourceMapper { get; } = new ObservableCollection<SourcesMapper>();
+        public ObservableCollection<TestCasesCollection> PerformanceItems { get; } = new ObservableCollection<TestCasesCollection>();
 
         internal void Open(string p)
         {

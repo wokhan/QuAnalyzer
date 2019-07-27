@@ -57,8 +57,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="350" />
-            <ColumnDefinition Width="350" />
+            <ColumnDefinition Width="500" />
         </Grid.ColumnDefinitions>
         <StackPanel Background="LightGray">
             <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
@@ -144,6 +143,9 @@
                 <Label Content="Project name" Foreground="Black" Background="LightGray" FontWeight="Bold" />
                 <TextBox TextWrapping="Wrap" Background="White" Foreground="Black" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}" Margin="10,10" />
                 <Label Content="Sources" Foreground="Black" Background="LightGray" FontWeight="Bold" />
+                <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
+                    <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{StaticResource appbar_add}"/>
+                </WrapPanel>
                 <ListBox Height="200" Margin="5" Grid.Column="0" Grid.RowSpan="3" Name="lstProviders" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" VerticalAlignment="Stretch">
                     <ListBox.Style>
                         <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
@@ -214,60 +216,6 @@
                     </ListBox>
                 </StackPanel>
             </StackPanel>
-        </Grid>
-        <Grid Background="White" Margin="0,10,10,10" Grid.Column="3">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Label Content="Connectors" Foreground="Black" Background="LightGray" FontWeight="Bold" />
-            <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
-                <UC:ToolBarButton Text="New connector" Click="btnImportPrv_Click" BorderBrush="Green" Image="{StaticResource appbar_add_multiple}"/>
-            </WrapPanel>
-            <ScrollViewer Grid.Row="2">
-                <ItemsControl Margin="5" Name="lstProvidersTypes" ItemsSource="{Binding ProvidersMan.Providers, Source={x:Static Application.Current}, Mode=OneWay}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" IsItemsHost="True" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid ToolTip="{Binding Description}" Margin="0,5">
-                                <Grid.Style>
-                                    <Style TargetType="Grid">
-                                        <Setter Property="Background" Value="#F5F5F5" />
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="LightGray" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Grid.Style>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" SharedSizeGroup="ImgCol" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="40" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <Border Grid.RowSpan="2" BorderBrush="Gray" BorderThickness="1" Background="White" Margin="10">
-                                    <Image HorizontalAlignment="Center" Height="28" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding IconPath}" />
-                                </Border>
-                                <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" FontWeight="Bold" Text="{Binding Name}" VerticalAlignment="Center" />
-                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Copyright}" Margin="5,0" HorizontalAlignment="Left" TextWrapping="Wrap" FontSize="10" />
-                                <Border Grid.RowSpan="2" BorderThickness="4,0,0,0" BorderBrush="{DynamicResource AccentColorBrush}" />
-                                <Button Grid.Column="2" Grid.RowSpan="3" Name="btnAddProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnNewPrv_Click">
-                                    <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Green" Data="{StaticResource appbar_add}" Stretch="Uniform" />
-                                </Button>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
         </Grid>
     </Grid>
 </UserControl>

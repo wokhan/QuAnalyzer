@@ -30,11 +30,18 @@
     <Compile Remove="UI\Controls\DataCompareDetail.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="UI\Pages\Perform.xaml" />
+    <None Remove="UI\Pages\ProviderEditor.xaml" />
+    <None Remove="UI\Pages\ProviderPicker.xaml" />
+    <None Remove="UI\Windows\Popup.xaml" />
+  </ItemGroup>
+  <ItemGroup>
     <Page Remove="UI\Controls\DataCompareDetail.xaml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="4.5.3.2" />
     <PackageReference Include="MahApps.Metro" Version="2.0.0-alpha0409" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.1.0" />
     <PackageReference Include="NuGet.Commands" Version="5.1.0" />
     <PackageReference Include="NuGet.DependencyResolver.Core" Version="5.1.0" />
     <PackageReference Include="NuGet.Packaging" Version="5.1.0" />
@@ -43,7 +50,7 @@
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.18" />
     <PackageReference Include="System.Management" Version="4.6.0-preview6.19303.8" />
     <PackageReference Include="VirtualizingObservableCollection" Version="1.2.0" />
-    <PackageReference Include="Wokhan.Data.Providers" Version="1.190714.1.98" />
+    <PackageReference Include="Wokhan.Data.Providers" Version="1.190727.1.99" />
     <PackageReference Include="Wokhan.Extensions" Version="1.190624.1.96" />
   </ItemGroup>
   <ItemGroup>

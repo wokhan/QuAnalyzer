@@ -10,23 +10,6 @@ namespace QuAnalyzer.Features.Comparison
 {
     public static class Comparison
     {
-        public enum ProgressType
-        {
-            LoadingData = 0,
-            LoadingDone = 1,
-            GettingSamples = 10,
-            Filtering = 20,
-            Comparing = 30,
-            CheckingSourceOnly = 50,
-            CheckingTargetOnly = 60,
-            CheckingSourceMissing = 70,
-            CheckingTargetMissing = 80,
-            Done = 100,
-            Canceling = -1,
-            Canceled = -2,
-            Failed = -3
-        }
-
         public static void Run<T>(IEnumerable<ComparerStruct<T>> comparerData, int nbSamplesCompared, int nbSamplesShown, Action<ComparerStruct<T>> progressCallback = null, bool useParallelism = true) where T : class
         {
             if (progressCallback == null)
@@ -416,90 +399,6 @@ namespace QuAnalyzer.Features.Comparison
                     .Select(m => { setProgress(f, type, Interlocked.Increment(ref ix) * 10 / a.Count, progressCallback); return m; })
                     .Except(b.AsParallel(), f.Comparer)
                     .ToList();
-        }
-
-
-        public class SequenceComparer : IComparer<IEnumerable<object>>
-        {
-            private static SequenceEqualityComparer sec = new SequenceEqualityComparer();
-            private string[] keys;
-
-            public SequenceComparer()
-            {
-                keys = null;
-            }
-
-            public SequenceComparer(params string[] keys)
-            {
-                this.keys = keys;
-            }
-
-            public int Compare(IEnumerable<object> x, IEnumerable<object> y)
-            {
-                if (sec.Equals(x, y))
-                {
-                    return 0;
-                }
-
-                if (sec.Equals(keys.Select((k, i) => x.ElementAt(i)), keys.Select((k, i) => y.ElementAt(i))))
-                {
-                    return int.MaxValue;
-                }
-
-                var id = keys.Select((k, i) => i)
-                           .SkipWhile(i => x.ElementAt(i).Equals(y.ElementAt(i)))
-                           .First();
-
-                var xi = x.ElementAt(id);
-                var yi = y.ElementAt(id);
-                if (xi is string)
-                {
-                    return string.CompareOrdinal((string)xi, (string)yi);
-                }
-
-                return ((IComparable)xi).CompareTo((IComparable)yi);
-            }
-        }
-
-        public class SequenceEqualityComparer : IEqualityComparer<IEnumerable<object>>
-        {
-            private static IEqualityComparer<object> cmp = new SmartEqualityComparer();// EqualityComparer<object>.Default;
-
-            private int startFrom;
-            private int maxCount;
-
-            public SequenceEqualityComparer(int startFrom = 0, int maxCount = int.MaxValue)
-            {
-                this.startFrom = startFrom;
-                this.maxCount = maxCount;
-            }
-
-            public bool Equals(IEnumerable<object> x, IEnumerable<object> y)
-            {
-                return x.Skip(startFrom).Take(maxCount).SequenceEqual(y.Skip(startFrom).Take(maxCount), cmp);
-            }
-
-            // Computes an aggregated Hash Code to speed up comparison process.
-            // If two hashcodes are different, then it means that the object are different. Calling Equals is only required
-            // if two hashcodes are equal (meaning that equality will be checked at a deeper level).
-            // To ensure that Equals is always called, you can return 0.
-            public int GetHashCode(IEnumerable<object> obj)
-            {
-                return obj.Skip(startFrom).Take(maxCount).Aggregate(17, (a, i) => a * 23 + (i == null || i is DBNull ? 0 : i.GetHashCode()));
-            }
-        }
-
-        public class SmartEqualityComparer : IEqualityComparer<object>
-        {
-            public new bool Equals(object x, object y)
-            {
-                return x is DBNull && y == null || y is DBNull && x == null || object.Equals(x, y);
-            }
-
-            public int GetHashCode(object obj)
-            {
-                return obj == null || obj is DBNull ? 0 : obj.GetHashCode();
-            }
         }
     }
 }

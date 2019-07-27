@@ -1,5 +1,6 @@
 ﻿using MahApps.Metro;
 using Microsoft.Win32;
+using QuAnalyzer.UI.Pages;
 using QuAnalyzer.UI.Windows;
 using System;
 using System.Collections.Generic;
@@ -112,7 +113,7 @@ namespace QuAnalyzer.UI.Menus
 
         public void OpenEditor(IDataProvider prv)
         {
-            var editor = new ProvidersEditor(prv);
+            var editor = new Popup(new ProviderEditor(prv));
             editor.Show();
             editor.Activate();
         }
@@ -123,17 +124,7 @@ namespace QuAnalyzer.UI.Menus
             ((App)Application.Current).CurrentProject.CurrentProviders.Remove((IDataProvider)((Button)sender).Tag);
         }
 
-        private void btnNewPrv_Click(object sender, RoutedEventArgs e)
-        {
-            var providerName = ((DataProviderStruct)((Button)sender).Tag).Name;
-            var newprv = DataProviders.CreateInstance(providerName, new Dictionary<string, object>());
-            //((App)Application.Current).CurrentProject.CurrentProviders.Add(newprv);
-
-            newprv.Name = providerName + "#" + ((App)Application.Current).CurrentProject.CurrentProviders.Count;
-
-            OpenEditor(newprv);
-        }
-
+       
         private void btnImportPrv_Click(object sender, RoutedEventArgs e)
         {
             var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = "QuAnalyzer Data Provider archive|*.qax" };
@@ -141,6 +132,13 @@ namespace QuAnalyzer.UI.Menus
             {
                 ((App)Application.Current).ProvidersMan.AddProvider(dial.FileName);
             }
+        }
+
+        private void btnNewSource_Click(object sender, RoutedEventArgs e)
+        {
+            var editor = new Popup(new ProviderPicker());
+            editor.Show();
+            editor.Activate();
         }
     }
 }

@@ -306,9 +306,9 @@ namespace QuAnalyzer.UI.Pages
 
                 LoadingProgress = 1;
 
-                var keyComparer = new Comparison.SequenceEqualityComparer(0, keys.Length);
+                var keyComparer = new SequenceEqualityComparer(0, keys.Length);
                 var cnt = dataObjectArray.Count();
-                var ret = Comparison.InitiateDuplicates(dataObjectArray.Select((a, i) => { Status = "Checked " + i + " entries"; LoadingProgress = i * 100 / cnt; return a; }), keyComparer, new Comparison.SequenceEqualityComparer()).Duplicates;
+                var ret = Comparison.InitiateDuplicates(dataObjectArray.Select((a, i) => { Status = "Checked " + i + " entries"; LoadingProgress = i * 100 / cnt; return a; }), keyComparer, new SequenceEqualityComparer()).Duplicates;
 
                 if (!KeepDuplicates)
                 {

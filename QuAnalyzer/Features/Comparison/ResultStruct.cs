@@ -16,8 +16,8 @@ namespace QuAnalyzer.Features.Comparison
             internal set { _message = value; NotifyPropertyChanged("Message"); }
         }
 
-        private Comparison.ProgressType _progress;
-        public Comparison.ProgressType Progress
+        private ProgressType _progress;
+        public ProgressType Progress
         {
             get { return _progress; }
             internal set { _progress = value; NotifyPropertyChanged("Progress"); NotifyPropertyChanged("LocalProgress"); }
@@ -25,17 +25,8 @@ namespace QuAnalyzer.Features.Comparison
         public int SubProgress { get; internal set; }
         public int LocalProgress { get { return (int)Progress + SubProgress; } }
 
-        private readonly ItemResult<T> _sourceResult = new ItemResult<T>();
-        public ItemResult<T> Source
-        {
-            get { return _sourceResult; }
-        }
-
-        private readonly ItemResult<T> _targetResult = new ItemResult<T>();
-        public ItemResult<T> Target
-        {
-            get { return _targetResult; }
-        }
+        public ItemResult<T> Source { get; } = new ItemResult<T>();
+        public ItemResult<T> Target { get; } = new ItemResult<T>();
 
         private int _matchincount;
         public int MatchingCount
@@ -51,7 +42,7 @@ namespace QuAnalyzer.Features.Comparison
             internal set { _totalTime = value; NotifyPropertyChanged("TotalTime"); }
         }
 
-        public IEnumerable<DetailsWindow.DiffClass> MergedDiff { get; private set; } = null;
+        public IEnumerable<DiffClass> MergedDiff { get; private set; } = null;
 
         public void InitDiff(IDataComparer r)
         {
@@ -87,7 +78,7 @@ namespace QuAnalyzer.Features.Comparison
 
                 MergedDiff = ordered.ThenBy(t => t[0]).Select(x =>
                 {
-                    var ret = new DetailsWindow.DiffClass()
+                    var ret = new DiffClass()
                     {
                         //IsDiff = (prev == null || prev[0].Equals(x[0]) || (sortSrc != null && sortSrc.Any(i => !Object.Equals(prev[i], x[i]))) ? new bool[x.Length] : prev.Select((y, i) => !Object.Equals(y, x[i])).ToArray()),
                         IsDiff = prev == null || prev[0].Equals(x[0]) || r.SourceKeys.Count > 0 && !prev.Skip(1).Take(r.SourceKeys.Count).SequenceEqual(x.Skip(1).Take(r.SourceKeys.Count)) ? new bool[x.Length] : prev.Select((y, i) => !Equals(y, x[i])).ToArray(),

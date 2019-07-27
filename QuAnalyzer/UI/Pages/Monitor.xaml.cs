@@ -1,6 +1,7 @@
 ﻿using De.TorstenMandelkow.MetroChart;
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Generic.Extensions;
+using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
 using System;
 using System.Collections.ObjectModel;
@@ -81,7 +82,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
-            var editor = new MonitoringDetails(new MonitorItem() { Name = "Monitor #" + (((App)Application.Current).CurrentProject.MonitorItems.Count + 1) });
+            var editor = new Popup(new MonitoringDetails(new MonitorItem() { Name = "Monitor #" + (((App)Application.Current).CurrentProject.MonitorItems.Count + 1) }));
             editor.Show();
             editor.Activate();
         }
@@ -98,7 +99,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnEdit_Click(object sender, RoutedEventArgs e)
         {
-            var editor = new MonitoringDetails((MonitorItem)((Button)sender).Tag);
+            var editor = new Popup(new MonitoringDetails((MonitorItem)((Button)sender).Tag));
             editor.Show();
             editor.Activate();
         }

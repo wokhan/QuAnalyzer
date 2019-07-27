@@ -1,26 +1,29 @@
-﻿using MahApps.Metro.Controls;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
+using Wokhan.Data.Providers.Bases;
+using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
 using Wokhan.Data.Providers;
-using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
 
-namespace QuAnalyzer.UI.Windows
+namespace QuAnalyzer.UI.Pages
 {
     /// <summary>
-    /// Interaction logic for ProviderPage.xaml
+    /// Logique d'interaction pour ProviderEditor.xaml
     /// </summary>
-    public partial class ProvidersEditor : MetroWindow, INotifyPropertyChanged
+    public partial class ProviderEditor : Page
     {
         private IDataProvider _currentProvider;
+
+        private MetroWindow _owner => (MetroWindow)Window.GetWindow(this);
+
         public IDataProvider CurrentProvider
         {
             get { return _currentProvider; }
@@ -48,12 +51,12 @@ namespace QuAnalyzer.UI.Windows
 
         public ObservableCollection<RepositoryView> Repositories { get; } = new ObservableCollection<RepositoryView>();
 
-        public ProvidersEditor(IDataProvider currentProvider)
+        public ProviderEditor(IDataProvider currentProvider)
         {
             Repositories.CollectionChanged += Repositories_CollectionChanged;
 
             CurrentProvider = currentProvider;
-
+            
             InitializeComponent();
         }
 
@@ -110,7 +113,7 @@ namespace QuAnalyzer.UI.Windows
             }
             //((App)App.Current).CurrentProject.CurrentProviders[((App)App.Current).CurrentProject.CurrentProviders.IndexOf((IDataProvider)lstProviders.SelectedItem)] = CurrentProvider;
 
-            Close();
+            _owner.Close();
             //if (lstProviders.SelectedItem == null)
             ////{
             ////((App)App.Current).CurrentProject.CurrentProviders[((App)App.Current).CurrentProject.CurrentProviders.IndexOf((IDataProvider)lstProviders.SelectedItem)] = currentProvider;
@@ -126,7 +129,7 @@ namespace QuAnalyzer.UI.Windows
 
         private async void btnRepoRetr_Click(object sender, RoutedEventArgs e)
         {
-            var msg = await this.ShowProgressAsync("Please wait", "Retrieving repositories...", true);
+            var msg = await _owner.ShowProgressAsync("Please wait", "Retrieving repositories...", true);
 
             string res = null;
             try
@@ -160,7 +163,7 @@ namespace QuAnalyzer.UI.Windows
             if (res != null)
             {
                 await msg.CloseAsync();
-                await this.ShowMessageAsync("Unexpected error", res);
+                await _owner.ShowMessageAsync("Unexpected error", res);
             }
             /*catch (Exception exc)
             {
@@ -238,7 +241,7 @@ namespace QuAnalyzer.UI.Windows
 
         private void btnRevert_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            _owner.Close();
         }
 
         private void btnTest_Click(object sender, RoutedEventArgs e)
@@ -267,8 +270,8 @@ namespace QuAnalyzer.UI.Windows
             }
             else
             {
-                dockRepositories.Visibility = System.Windows.Visibility.Visible;
-                gridParameters.Visibility = System.Windows.Visibility.Hidden;
+                dockRepositories.Visibility = Visibility.Visible;
+                gridParameters.Visibility = Visibility.Hidden;
                 btnBack.IsEnabled = true;
                 btnNext.Content = "Finish";
             }
@@ -276,8 +279,8 @@ namespace QuAnalyzer.UI.Windows
 
         private void btnBack_Click(object sender, RoutedEventArgs e)
         {
-            dockRepositories.Visibility = System.Windows.Visibility.Hidden;
-            gridParameters.Visibility = System.Windows.Visibility.Visible;
+            dockRepositories.Visibility = Visibility.Hidden;
+            gridParameters.Visibility = Visibility.Visible;
             btnNext.Content = "Next >";
             btnBack.IsEnabled = false;
         }

@@ -1,5 +1,4 @@
-﻿using MahApps.Metro.Controls;
-using QuAnalyzer.Features.Monitoring;
+﻿using QuAnalyzer.Features.Monitoring;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +6,15 @@ using System.Windows;
 using System.Windows.Controls;
 using Wokhan.Data.Providers.Contracts;
 
-namespace QuAnalyzer.UI.Windows
+namespace QuAnalyzer.UI.Popups
 {
     /// <summary>
     /// Interaction logic for MonitoringDetails.xaml
     /// </summary>
-    public partial class MonitoringDetails : MetroWindow
+    public partial class MonitoringDetails : Page
     {
+        private Window _owner => Window.GetWindow(this);
+
         public MonitoringDetails(MonitorItem monitorItem)
         {
             InitializeComponent();
@@ -31,7 +32,7 @@ namespace QuAnalyzer.UI.Windows
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            _owner.Close();
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -44,7 +45,7 @@ namespace QuAnalyzer.UI.Windows
                 ((App)App.Current).CurrentProject.MonitorItems.Add(CurrentItem);
             }
 
-            Close();
+            _owner.Close();
         }
 
         private void lstSrcRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
