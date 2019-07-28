@@ -6,5 +6,6 @@ namespace QuAnalyzer.Features.Performance
     {
         public string Name { get; set; }
         public IDataProvider Provider { get; set; }
+        public string Repository { get; set; }
     }
 }

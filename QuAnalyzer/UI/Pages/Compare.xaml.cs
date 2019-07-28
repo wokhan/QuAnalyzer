@@ -200,8 +200,8 @@ namespace QuAnalyzer.UI.Pages
 
             Func<IEnumerable<IEnumerable<object>>, Type[], IEnumerable<object[]>> fnc = allTypesSrc.SequenceEqual(allTypesTrg) ? new Func<IEnumerable<IEnumerable<object>>, Type[], IEnumerable<object[]>>(KeepSame) : new Func<IEnumerable<IEnumerable<object>>, Type[], IEnumerable<object[]>>(ConvertType);
 
-            var srcDataGetter = s.Source.GetData(s.SourceRepository, fieldsSrc, srcKeys != null ? srcKeys.ToDictionary(sk => sk, sk => srcHeaders.First(h => h.Name == sk).Type) : null);
-            var trgDataGetter = s.Target.GetData(s.TargetRepository, fieldsTrg, trgKeys != null ? trgKeys.ToDictionary(sk => sk, sk => trgHeaders.First(h => h.Name == sk).Type) : null);
+            var srcDataGetter = s.Source.GetData(s.SourceRepository, fieldsSrc, null, srcKeys != null ? srcKeys.ToDictionary(sk => sk, sk => srcHeaders.First(h => h.Name == sk).Type) : null);
+            var trgDataGetter = s.Target.GetData(s.TargetRepository, fieldsTrg, null, trgKeys != null ? trgKeys.ToDictionary(sk => sk, sk => trgHeaders.First(h => h.Name == sk).Type) : null);
             if (s.IsOrdered)
             {
                 if (srcKeys != null && trgKeys != null)

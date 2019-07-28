@@ -3,8 +3,6 @@ using QuAnalyzer.Generic;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -21,16 +19,13 @@ namespace QuAnalyzer.Features.Monitoring
 
         public List<MonitorItem> PrecedingSteps { get; set; }
 
-        public List<string> AttributesList
-        {
-            get { return Attributes.Split(',').ToList(); }
-        }
+        public List<string> AttributesList => Attributes.Split(',').ToList();
 
         private string _name;
         public string Name
         {
             get { return _name; }
-            set { _name = value; NotifyPropertyChanged("Name"); }
+            set { _name = value; NotifyPropertyChanged(); }
         }
 
         public string ProviderName { get; set; }
@@ -49,14 +44,14 @@ namespace QuAnalyzer.Features.Monitoring
         public int Interval
         {
             get { return _interval; }
-            set { _interval = value; NotifyPropertyChanged("Interval"); }
+            set { _interval = value; NotifyPropertyChanged(); }
         }
 
         private string _status;
         public string Status
         {
             get { return _status; }
-            set { _status = value; NotifyPropertyChanged("Status"); }
+            set { _status = value; NotifyPropertyChanged(); }
         }
 
         private string _type;
@@ -64,7 +59,7 @@ namespace QuAnalyzer.Features.Monitoring
         public string Type
         {
             get { return _type; }
-            set { _type = value; NotifyPropertyChanged("Type"); }
+            set { _type = value; NotifyPropertyChanged(); }
         }
 
         private DispatcherTimer timer = new DispatcherTimer();
@@ -124,30 +119,22 @@ namespace QuAnalyzer.Features.Monitoring
 
             _isChecking = true;
 
-            var r = new ResultsClass();
-            r.Step = this;
-            r.ResultCount = -1;
-            r.Occurence = cnt++;
-
-            OnAdd?.Invoke(r);
-
-            var sw = Stopwatch.StartNew();
-
-            object data = null;
-            r.ResultCount = await Task.Run(() => Monitoring.Monitor(Provider, Type, Repository, out data, Filter, Attributes));
-            r.Data = data;
-            sw.Stop();
-
-            var dbc = new DoubleConverter();
-
-            r.Duration = sw.ElapsedMilliseconds;
-
-            OnResult?.Invoke(r);
+            await Task.Run(() => Monitoring.Monitor(this, cnt++));
 
             _isChecking = false;
         }
 
-        public ObservableCollection<DatePoint> Points { get; } = new ObservableCollection<DatePoint>();
+        public void raiseAdd(ResultsClass r)
+        {
+            OnAdd?.Invoke(r);
+        }
+
+        public void raiseResult(ResultsClass r)
+        {
+            OnResult?.Invoke(r);
+        }
+
+        public ObservableCollection<MultiValueDatePoint> Points { get; } = new ObservableCollection<MultiValueDatePoint>();
 
         public void AttachEvent(Action<ResultsClass> monitor_OnAdd, Action<ResultsClass> monitor_OnResult)
         {

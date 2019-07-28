@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuAnalyzer.Features.Monitoring;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -10,7 +11,7 @@ namespace QuAnalyzer.Features.Performance
 {
     public static class Performance
     {
-        public static void Run(TestCasesCollection tests, int nbSamples, int nbThreads, ObservableCollection<ResultStruct> results, Action<ResultStruct, IList<Dictionary<string, string>>> callback = null)
+        public static void Run(TestCasesCollection tests, int nbSamples, int nbThreads, ObservableCollection<ResultsClass> results, Action<ResultsClass, IList<Dictionary<string, string>>> callback = null)
         {
             if (nbSamples <= 0)
             {
@@ -37,11 +38,9 @@ namespace QuAnalyzer.Features.Performance
                           //.WithMergeOptions(ParallelMergeOptions.NotBuffered)
                           .ForAll(x =>
                           {
-                                  //var x = xx.x;
-                                  //var values = xx.valueset;
-                                  IList<Dictionary<string, string>> values = null;
+                              IList<Dictionary<string, string>> values = null;
                               if (tests.ValuesSet != null)// && tests.DistinctParallelValues)
-                                  {
+                              {
                                   values = (tests.Selector ?? ValueSelectors.SequentialSelector).Invoke(tests.ValuesSet, x);
                               }
                               tests.TestCases.AsParallel()
@@ -49,7 +48,7 @@ namespace QuAnalyzer.Features.Performance
                                      .Select((test, ix) => new { test, ix })
                                      .ForAll(a =>
                                      {
-                                         var result = new ResultStruct() { Id = $"{x}.{a.ix}", Name = a.test.Name, Index = x, Start = DateTime.Now.Subtract(dtRun).TotalMilliseconds, Status = Status.Loading };
+                                         var result = new ResultsClass() { Id = $"{x}.{a.ix}", Name = a.test.Name, Index = x, Status = Status.Loading };
                                          callback?.Invoke(result, null);
 
                                          lock (results)
@@ -60,13 +59,13 @@ namespace QuAnalyzer.Features.Performance
                                          var sw = Stopwatch.StartNew();
                                          try
                                          {
-                                             var data = a.test.Provider.GetData(a.test.Name, statisticsBag: result.Duration);
+                                             var data = a.test.Provider.GetData(a.test.Repository, values: values, statisticsBag: result.Duration);
                                              result.Status = Status.Success;
-                                             result.Result = data;
+                                             result.Data = data;
                                          }
                                          catch (Exception e)
                                          {
-                                             result.Result = e;
+                                             result.Data = e;
                                              result.Status = Status.Error;
                                          }
                                          finally
@@ -74,8 +73,8 @@ namespace QuAnalyzer.Features.Performance
                                              sw.Stop();
                                          }
 
-                                         result.End = result.Start + sw.ElapsedMilliseconds;
-                                         
+                                         result.End = result.LastCheck.AddMilliseconds(sw.ElapsedMilliseconds);
+
                                          callback?.Invoke(result, values);
                                      });
                           });

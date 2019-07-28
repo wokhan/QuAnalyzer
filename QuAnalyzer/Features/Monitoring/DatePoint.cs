@@ -1,31 +1,33 @@
 ﻿using QuAnalyzer.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace QuAnalyzer.Features.Monitoring
 {
-    public class DatePoint : NotifierHelper
+    public class MultiValueDatePoint : NotifierHelper
     {
         public DateTime X { get; set; }
 
         private double _y;
         public double Y
         {
-            get { return _y; }
-            set { _y = value; NotifyPropertyChanged("Y"); }
+            get => _y;
+            set { _y = value; NotifyPropertyChanged(nameof(Y)); }
         }
 
-        private long _duration;
-        public long Duration
+        private Dictionary<string, long> values;
+        public Dictionary<string, long> Values
         {
-            get { return _duration; }
-            set { _duration = value; NotifyPropertyChanged("Duration"); }
+            get => values;
+            set { values = value; NotifyPropertyChanged(nameof(Values)); }
         }
 
         private string _name;
         public string Name
         {
-            get { return _name; }
-            set { _name = value; NotifyPropertyChanged("Name"); }
+            get => _name;
+            set { _name = value; NotifyPropertyChanged(nameof(Name)); }
         }
+
     }
 }

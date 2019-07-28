@@ -41,6 +41,7 @@ namespace QuAnalyzer.UI.Pages
             if (btnEnable.IsChecked.Value)
             {
                 var gcd = gridSteps.SelectedItems.Cast<MonitorItem>().Select(m => m.Interval).GreatestCommonDiv();
+                // TODO: * 30 ??? Why?
                 timer.Interval = TimeSpan.FromSeconds(gcd * 30);
                 timer.Tick += timer_Tick;
                 timer.Start();
@@ -61,20 +62,20 @@ namespace QuAnalyzer.UI.Pages
             }
         }
 
-        void monitor_OnAdd(ResultsClass obj)
+        void monitor_OnAdd(ResultsClass results)
         {
-            MonitorResults.Add(obj);
-            gridResults.ScrollIntoView(obj);
+            MonitorResults.Add(results);
+            gridResults.ScrollIntoView(results);
         }
 
-        void monitor_OnResult(ResultsClass obj)
+        void monitor_OnResult(ResultsClass results)
         {
             if (btnEnable.IsChecked.Value)
             {
-                var series = graph.Series.OrderByDescending(s => (DateTime)s.Tag).First(s => obj.LastCheck >= ((DateTime)s.Tag));
-                var p = series.Items.Cast<DatePoint>().First(i => i.Name == obj.Step.Name);
-                p.Duration = obj.Duration;
-                p.Y = obj.ResultCount;
+                var series = graph.Series.OrderByDescending(s => (DateTime)s.Tag).First(s => results.LastCheck >= ((DateTime)s.Tag));
+                var p = series.Items.Cast<MultiValueDatePoint>().First(i => i.Name == results.Step.Name);
+                p.Values = results.Duration;
+                p.Y = results.ResultCount;
 
                 series.BringIntoView();
             }
@@ -107,11 +108,11 @@ namespace QuAnalyzer.UI.Pages
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
             var mtoremove = (MonitorItem)((Button)sender).Tag;
-            foreach (var m in ((App)App.Current).CurrentProject.MonitorItems.Where(m => m.PrecedingSteps.Any()))
+            foreach (var m in ((App)Application.Current).CurrentProject.MonitorItems.Where(m => m.PrecedingSteps.Any()))
             {
                 m.PrecedingSteps.Remove(mtoremove);
             }
-            ((App)App.Current).CurrentProject.MonitorItems.Remove(mtoremove);
+            ((App)Application.Current).CurrentProject.MonitorItems.Remove(mtoremove);
         }
 
         private void btnStartAll_Click(object sender, RoutedEventArgs e)
@@ -159,14 +160,14 @@ namespace QuAnalyzer.UI.Pages
                     {
                         Name = uname,
                         SeriesTitle = xname,
-                        ValueMember = "Y",
-                        DisplayMember = "Name",
+                        ValueMember = nameof(MultiValueDatePoint.Y),
+                        DisplayMember = nameof(MultiValueDatePoint.Name),
                         Tag = x
                     };
 
                     graph.Series.Add(series);
 
-                    mis.ForEach(m => series.Items.Add(new DatePoint() { Name = m.Name }));
+                    mis.ForEach(m => series.Items.Add(new MultiValueDatePoint() { Name = m.Name }));
                 }
             }
             /*
@@ -192,20 +193,11 @@ namespace QuAnalyzer.UI.Pages
             }
         }
 
-        private void btnGrHTML_Click(object sender, RoutedEventArgs e)
-        {
-            gridResults.ExportAsHTML();
-        }
+        private void btnGrHTML_Click(object sender, RoutedEventArgs e) => gridResults.ExportAsHTML();
 
-        private void btnGrCopy_Click(object sender, RoutedEventArgs e)
-        {
-            gridResults.CopyToClipboard();
-        }
+        private void btnGrCopy_Click(object sender, RoutedEventArgs e) => gridResults.CopyToClipboard();
 
-        private void btnGrCSV_Click(object sender, RoutedEventArgs e)
-        {
-            gridResults.ExportAsXLSX();
-        }
+        private void btnGrCSV_Click(object sender, RoutedEventArgs e) => gridResults.ExportAsXLSX();
 
     }
 }

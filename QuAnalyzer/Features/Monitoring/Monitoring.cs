@@ -1,6 +1,9 @@
-﻿using System;
+﻿using QuAnalyzer.Features.Performance;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -19,58 +22,80 @@ namespace QuAnalyzer.Features.Monitoring
             //{ "Any modification", "CHECKMOD" },
         };
 
-        public static long Monitor(IDataProvider provider, string key, string repository, out object data, string filter = null, string attribute = null)
+        public static ResultsClass Monitor(MonitorItem item, int occurence)
         {
-            if (!MonitoringTypes.ContainsKey(key))
+            var r = new ResultsClass();
+            r.Step = item;
+            r.Occurence = occurence;
+
+            item.raiseAdd(r);
+
+            if (!MonitoringTypes.ContainsKey(item.Type))
             {
                 throw new ArgumentException("The specified monitoring type does not exist for the current provider.");
             }
 
-            switch (key)
+            switch (item.Type)
             {
                 case MonitoringModes.PING:
-                    data = null;
-                    return Ping(provider.Host);
+                    r.Data = null;
+                    r.Duration = new Dictionary<string, long> { [nameof(MonitoringModes.PING)] = Ping(item.Provider.Host) };
+                    break;
 
                 case MonitoringModes.PERF:
-                    data = null;
-                    return PerfTest(provider, repository);
+                    var res = new ObservableCollection<ResultsClass>();
+                    res.CollectionChanged += (o, e) =>
+                    {
+                        if (e.Action == NotifyCollectionChangedAction.Add)
+                        {
+                            var resstruct = (ResultsClass)e.NewItems[0];
+                            item.raiseAdd(resstruct);
+                        }
+                    };
+                    Performance.Performance.Run(new TestCasesCollection() { TestCases = new[] { new TestCase() { Provider = item.Provider } } }, 10, 10, res);
+                    r.Data = item.Provider.GetData(item.Repository, statisticsBag: r.Duration).ToList();
+                    break;
 
                 case MonitoringModes.CHECKVAL:
-                    if (string.IsNullOrEmpty(attribute))
+                    if (string.IsNullOrEmpty(item.Attributes))
                     {
                         throw new ArgumentNullException("attribute");
                     }
-                    var q = provider.GetData(repository);
-                    if (!string.IsNullOrEmpty(filter))
+                    var q = item.Provider.GetData(item.Repository, statisticsBag: r.Duration);
+                    if (!string.IsNullOrEmpty(item.Filter))
                     {
-                        q = q.Where(filter);
+                        q = q.Where(item.Filter);
                     }
-                    data = ((IEnumerable<dynamic>)q.Select("new(" + attribute + ")")).ToList();
-                    return ((IList)data).Count;
+                    // Removed new(attribute)
+                    r.Data = q.Select(item.Attributes).AsEnumerable().ToList();
+                    break;
 
                 case MonitoringModes.COUNTALL:
-                    data = null;
-                    var qc = provider.GetData(repository);
-                    if (!string.IsNullOrEmpty(filter))
+                    var qc = item.Provider.GetData(item.Repository, statisticsBag: r.Duration);
+                    if (!string.IsNullOrEmpty(item.Filter))
                     {
-                        qc = qc.Where(filter);
+                        qc = qc.Where(item.Filter);
                     }
-                    return qc.Count();
+                    r.Data = new { Count = qc.Count() };
+                    break;
 
                 default:
-                    data = null;
-                    return 0;
+                    r.Data = null;
+                    break;
             }
+
+            return r;
 
         }
 
+        private static void Res_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
 
         public static long GetMTU(string host)
         {
             var pong = new Ping();
-            PingReply ret = null;
-
             var startsize = 2000;
             var smaller = 0;
             var higher = 4000;
@@ -78,8 +103,7 @@ namespace QuAnalyzer.Features.Monitoring
             var keepgoing = true;
             while (keepgoing)
             {
-                ret = pong.Send(host, 5000, new byte[startsize], new PingOptions() { DontFragment = true });
-
+                PingReply ret = pong.Send(host, 5000, new byte[startsize], new PingOptions() { DontFragment = true });
                 if (ret.Status == IPStatus.PacketTooBig)
                 {
                     higher = startsize;
@@ -101,16 +125,6 @@ namespace QuAnalyzer.Features.Monitoring
             }
 
             return startsize;
-        }
-
-        // TODO: replace with new PerfTest implementation
-        public static long PerfTest(IDataProvider provider, string repository)
-        {
-            var sw = Stopwatch.StartNew();
-            provider.GetData(repository).ToList();
-            sw.Stop();
-
-            return sw.ElapsedMilliseconds;
         }
 
         public static long Ping(string host)
