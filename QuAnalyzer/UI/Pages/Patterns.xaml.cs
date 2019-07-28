@@ -71,7 +71,7 @@ namespace QuAnalyzer.UI.Pages
                         prg.Maximum = data.Count;
                     });
 
-                    return data.Select((d, i) => { Dispatcher.InvokeAsync(() => prg.Value = i); return new { val = d, reg = GetRegEx(d) }; })
+                    return data.Select((d, i) => { Dispatcher.InvokeAsync(() => prg.Value = i); return new { val = d, reg = Features.Patterns.Patterns.GetRegEx(d, SimThreshold) }; })
                                .ToList()
                                .GroupBy(s => s.reg)
                                .Select(g => new { Pattern = g.Key, Count = g.Count(), Sample = g.First().val })
@@ -86,52 +86,7 @@ namespace QuAnalyzer.UI.Pages
             }
         }
 
-        private string GetRegEx(string src)
-        {
-            if (src == null)
-            {
-                return null;
-            }
-
-            var ex = ' ';
-            var cpt = 1;
-
-            return src.Select(c => c >= 'A' && c <= 'Z' ? 'w' : c >= 'a' && c <= 'z' ? 'w' : c >= '0' && c <= '9' ? 'd' : SimThreshold == 3 ? 'x' : c)
-                  .Select(c =>
-                  {
-                      if (c == ex)
-                      {
-                          cpt++;
-                          return "";
-                      }
-                      else if (ex != ' ')
-                      {
-                          var ret = form(ex, cpt);
-                          ex = c;
-                          cpt = 1;
-                          return ret;
-                      }
-                      else
-                      {
-                          ex = c;
-                          return "";
-                      }
-                  })
-                  .Aggregate((a, b) => a + b) + form(ex, cpt);
-        }
-
-        private string form(char c, int cpt)
-        {
-            if (SimThreshold == 1)
-            {
-                return "\\" + c + "{" + cpt + "}";
-            }
-            else
-            {
-                return "\\" + c + "*";
-            }
-        }
-
+       
         private void slideSim_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
             SimThreshold = (int)e.NewValue;

@@ -62,14 +62,14 @@ namespace QuAnalyzer.UI.Pages
         public string Status
         {
             get { return _status; }
-            set { _status = value; NotifyPropertyChanged("Status"); }
+            set { _status = value; NotifyPropertyChanged(nameof(Status)); }
         }
 
         private int _loadingProgress;
         public int LoadingProgress
         {
             get { return _loadingProgress; }
-            set { _loadingProgress = value; NotifyPropertyChanged("LoadingProgress"); }
+            set { _loadingProgress = value; NotifyPropertyChanged(nameof(LoadingProgress)); }
         }
 
         public ObservableCollection<string> Grouping { get; } = new ObservableCollection<string>();
@@ -105,7 +105,7 @@ namespace QuAnalyzer.UI.Pages
         public string CustomFilterError
         {
             get { return _customFilterError; }
-            set { _customFilterError = value; NotifyPropertyChanged("CustomFilterError"); NotifyPropertyChanged("IsCustomFilterError"); }
+            set { _customFilterError = value; NotifyPropertyChanged(nameof(CustomFilterError)); NotifyPropertyChanged(nameof(IsCustomFilterError)); }
         }
 
         public ObservableCollection<ComputeStruct> Compute { get; } = new ObservableCollection<ComputeStruct>();
@@ -155,20 +155,11 @@ namespace QuAnalyzer.UI.Pages
             }
         }
 
-        private void GlobalExportCSV_Click(object sender, RoutedEventArgs e)
-        {
-            gridData.ExportAsXLSX();
-        }
+        private void GlobalExportCSV_Click(object sender, RoutedEventArgs e) => gridData.ExportAsXLSX();
 
-        private void GlobalExportHTML_Click(object sender, RoutedEventArgs e)
-        {
-            gridData.ExportAsHTML();
-        }
+        private void GlobalExportHTML_Click(object sender, RoutedEventArgs e) => gridData.ExportAsHTML();
 
-        private void GlobalCopy_Click(object sender, RoutedEventArgs e)
-        {
-            gridData.CopyToClipboard();
-        }
+        private void GlobalCopy_Click(object sender, RoutedEventArgs e) => gridData.CopyToClipboard();
 
         Point startPoint;
         private void DataGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -268,33 +259,19 @@ namespace QuAnalyzer.UI.Pages
             });
         }
 
-        private void btnDeleteAggreg_Click(object sender, RoutedEventArgs e)
-        {
-            Compute.Remove((ComputeStruct)((Button)sender).Tag);
-        }
+        private void btnDeleteAggreg_Click(object sender, RoutedEventArgs e) => Compute.Remove((ComputeStruct)((Button)sender).Tag);
 
-        private void btnDeleteGrp_Click(object sender, RoutedEventArgs e)
-        {
-            Grouping.Remove((string)((Button)sender).Tag);
-        }
+        private void btnDeleteGrp_Click(object sender, RoutedEventArgs e) => Grouping.Remove((string)((Button)sender).Tag);
 
-        private void btnDeleteFilter_Click(object sender, RoutedEventArgs e)
-        {
-            Filters.Remove((FilterStruct)((Button)sender).Tag);
-        }
+        private void btnDeleteFilter_Click(object sender, RoutedEventArgs e) => Filters.Remove((FilterStruct)((Button)sender).Tag);
 
-        private void btnClear_Click(object sender, RoutedEventArgs e)
-        {
-            ClearAll();
-        }
+        private void btnClear_Click(object sender, RoutedEventArgs e) => ClearAll();
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         protected void NotifyPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private string currentSortAttribute = null;

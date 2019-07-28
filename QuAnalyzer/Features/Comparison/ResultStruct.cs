@@ -13,14 +13,14 @@ namespace QuAnalyzer.Features.Comparison
         public string Message
         {
             get { return _message; }
-            internal set { _message = value; NotifyPropertyChanged("Message"); }
+            internal set { _message = value; NotifyPropertyChanged(); }
         }
 
         private ProgressType _progress;
         public ProgressType Progress
         {
             get { return _progress; }
-            internal set { _progress = value; NotifyPropertyChanged("Progress"); NotifyPropertyChanged("LocalProgress"); }
+            internal set { _progress = value; NotifyPropertyChanged(); NotifyPropertyChanged("LocalProgress"); }
         }
         public int SubProgress { get; internal set; }
         public int LocalProgress { get { return (int)Progress + SubProgress; } }
@@ -32,14 +32,14 @@ namespace QuAnalyzer.Features.Comparison
         public int MatchingCount
         {
             get { return _matchincount; }
-            internal set { _matchincount = value; NotifyPropertyChanged("MatchingCount"); }
+            internal set { _matchincount = value; NotifyPropertyChanged(); }
         }
 
         private long _totalTime;
         public long TotalTime
         {
             get { return _totalTime; }
-            internal set { _totalTime = value; NotifyPropertyChanged("TotalTime"); }
+            internal set { _totalTime = value; NotifyPropertyChanged(); }
         }
 
         public IEnumerable<DiffClass> MergedDiff { get; private set; } = null;

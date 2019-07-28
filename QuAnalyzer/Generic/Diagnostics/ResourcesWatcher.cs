@@ -31,9 +31,9 @@ namespace QuAnalyzer.Generic.Diagnostics
         void ResourcesR_Tick(object sender, EventArgs e)
         {
             //currentProcess.Refresh();
-            NotifyPropertyChanged("MemoryUseFormatted");
-            NotifyPropertyChanged("CPUUsage");
-            NotifyPropertyChanged("ThreadsCount");
+            NotifyPropertyChanged(nameof(MemoryUseFormatted));
+            NotifyPropertyChanged(nameof(CPUUsage));
+            NotifyPropertyChanged(nameof(ThreadsCount));
             //MemoryUse = currentProcess.WorkingSet64;
         }
 

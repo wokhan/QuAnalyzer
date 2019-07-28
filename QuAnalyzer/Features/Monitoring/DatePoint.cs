@@ -12,21 +12,21 @@ namespace QuAnalyzer.Features.Monitoring
         public double Y
         {
             get => _y;
-            set { _y = value; NotifyPropertyChanged(nameof(Y)); }
+            set { _y = value; NotifyPropertyChanged(); }
         }
 
         private Dictionary<string, long> values;
         public Dictionary<string, long> Values
         {
             get => values;
-            set { values = value; NotifyPropertyChanged(nameof(Values)); }
+            set { values = value; NotifyPropertyChanged(); }
         }
 
         private string _name;
         public string Name
         {
             get => _name;
-            set { _name = value; NotifyPropertyChanged(nameof(Name)); }
+            set { _name = value; NotifyPropertyChanged(); }
         }
 
     }

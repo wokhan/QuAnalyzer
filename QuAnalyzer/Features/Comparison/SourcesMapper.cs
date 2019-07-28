@@ -61,7 +61,7 @@ namespace QuAnalyzer.Features.Comparison
         public bool IsOrdered
         {
             get { return _isOrdered; }
-            set { _isOrdered = value; NotifyPropertyChanged("IsOrdered"); }
+            set { _isOrdered = value; NotifyPropertyChanged(); }
         }
 
         public SourcesMapper()

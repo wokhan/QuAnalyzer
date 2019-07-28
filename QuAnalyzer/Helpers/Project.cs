@@ -19,21 +19,21 @@ namespace QuAnalyzer.Helpers
         public string Name
         {
             get { return _name; }
-            set { _name = value; NotifyPropertyChanged("Name"); }
+            set { _name = value; NotifyPropertyChanged(); }
         }
 
         private string _filePath;
         public string FilePath
         {
             get { return _filePath; }
-            set { _filePath = value; NotifyPropertyChanged("FilePath"); }
+            set { _filePath = value; NotifyPropertyChanged(); }
         }
 
         private bool _useParallelism = true;
         public bool UseParallelism
         {
             get { return _useParallelism; }
-            set { _useParallelism = value; NotifyPropertyChanged("UseParallelism"); }
+            set { _useParallelism = value; NotifyPropertyChanged(); }
         }
 
         public byte[] AccentColorBrushSaved
