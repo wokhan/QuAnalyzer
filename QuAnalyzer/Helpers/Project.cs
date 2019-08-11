@@ -58,6 +58,7 @@ namespace QuAnalyzer.Helpers
         internal void Open(string p)
         {
             var ser = new JsonSerializer();
+            ser.TypeNameHandling = TypeNameHandling.Auto;
 
             using var stream = new JsonTextReader(new StreamReader(p));
 
@@ -82,6 +83,7 @@ namespace QuAnalyzer.Helpers
             }
 
             var ser = new JsonSerializer();
+            ser.TypeNameHandling = TypeNameHandling.Auto;
 
             if (p != null)
             {

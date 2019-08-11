@@ -211,7 +211,7 @@ namespace QuAnalyzer.UI.Pages
                 LoadingProgress = -1;
                 Status = "Initializing...";
 
-                IQueryable query = prov.GetData(repository);
+                IQueryable query = prov.GetQueryable(repository);
                 allHeaders = prov.GetColumns(repository);
 
                 if (Filters.Any())

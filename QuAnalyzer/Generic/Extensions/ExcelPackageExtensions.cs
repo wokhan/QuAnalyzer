@@ -206,7 +206,7 @@ namespace QuAnalyzer.Generic.Extensions
             {
                 var str = new StreamWriter(path);
 
-                str.Write((string)Clipboard.GetData(p2));
+                str.Write((string)Clipboard.GetQueryable(p2));
 
                 str.Close();
 

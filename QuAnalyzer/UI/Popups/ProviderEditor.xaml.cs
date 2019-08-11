@@ -66,7 +66,7 @@ namespace QuAnalyzer.UI.Pages
             {
                 foreach (RepositoryView repo in e.NewItems)
                 {
-                    CurrentProvider.RemoveCachedHeaders(repo.Key);
+                    CurrentProvider.InvalidateColumnsCache(repo.Key);
                 }
             }
 
@@ -74,7 +74,7 @@ namespace QuAnalyzer.UI.Pages
             {
                 foreach (RepositoryView repo in e.OldItems)
                 {
-                    CurrentProvider.RemoveCachedHeaders(repo.Key);
+                    CurrentProvider.InvalidateColumnsCache(repo.Key);
                 }
             }
         }

@@ -6,10 +6,19 @@
       xmlns:local="clr-namespace:QuAnalyzer.UI.Pages"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="Add a new source">
+      Title="Provider type">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Border BorderBrush="Gray" BorderThickness="0,0,0,2" Background="WhiteSmoke" Padding="10">
+                   <Label Content="Select a provider type below and press Next to continue." />
+        </Border>
         <ScrollViewer x:Name="gridProviders" Grid.Row="2">
-            <ItemsControl Margin="5" Name="lstProvidersTypes" ItemsSource="{Binding ProvidersMan.Providers, Source={x:Static Application.Current}, Mode=OneWay}">
+            <ListView Margin="5" Name="lstProvidersTypes" ItemsSource="{Binding ProvidersMan.Providers, Source={x:Static Application.Current}, Mode=OneWay}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" IsItemsHost="True" />
@@ -17,17 +26,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid ToolTip="{Binding Description}" Margin="0,5">
-                            <Grid.Style>
-                                <Style TargetType="Grid">
-                                    <Setter Property="Background" Value="#F5F5F5" />
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="LightGray" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Grid.Style>
+                        <Grid ToolTip="{Binding Description}" Margin="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="ImgCol" />
                                 <ColumnDefinition Width="*" />
@@ -38,18 +37,25 @@
                                 <RowDefinition />
                             </Grid.RowDefinitions>
                             <Border Grid.RowSpan="2" BorderBrush="Gray" BorderThickness="1" Background="White" Margin="10">
-                                <Image HorizontalAlignment="Center" Height="28" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding IconPath}" />
+                                <Image HorizontalAlignment="Center" Height="28" VerticalAlignment="Center" Margin="2" Stretch="Uniform" MaxWidth="50" Source="{Binding IconPath}" />
                             </Border>
                             <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" FontWeight="Bold" Text="{Binding Name}" VerticalAlignment="Center" />
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Copyright}" Margin="5,0" HorizontalAlignment="Left" TextWrapping="Wrap" FontSize="10" />
-                            <Border Grid.RowSpan="2" BorderThickness="4,0,0,0" BorderBrush="{DynamicResource AccentColorBrush}" />
-                            <Button Grid.Column="2" Grid.RowSpan="3" Name="btnAddProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnNewPrv_Click">
-                                <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Green" Data="{StaticResource appbar_add}" Stretch="Uniform" />
-                            </Button>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            </ListView>
         </ScrollViewer>
+        <Border Grid.Row="3" Style="{StaticResource ButtonBar}">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Content="Cancel" Name="btnRevert" HorizontalAlignment="Center" Click="btnCancel_Click" />
+                    <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Next &gt;" Name="btnNext" HorizontalAlignment="Center" Click="btnNewPrv_Click" />
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Page>

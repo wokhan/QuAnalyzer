@@ -13,6 +13,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Wokhan.Collections.Extensions;
+using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages
@@ -149,20 +150,11 @@ namespace QuAnalyzer.UI.Pages
             Filters.Clear();
         }
 
-        private void GlobalExportCSV_Click(object sender, RoutedEventArgs e)
-        {
-            gridData.ExportAsXLSX();
-        }
+        private void GlobalExportCSV_Click(object sender, RoutedEventArgs e) => gridData.ExportAsXLSX();
 
-        private void GlobalExportHTML_Click(object sender, RoutedEventArgs e)
-        {
-            gridData.ExportAsHTML();
-        }
+        private void GlobalExportHTML_Click(object sender, RoutedEventArgs e) => gridData.ExportAsHTML();
 
-        private void GlobalCopy_Click(object sender, RoutedEventArgs e)
-        {
-            gridData.CopyToClipboard();
-        }
+        private void GlobalCopy_Click(object sender, RoutedEventArgs e) => gridData.CopyToClipboard();
 
         Point startPoint;
         private void DataGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -214,7 +206,7 @@ namespace QuAnalyzer.UI.Pages
                 LoadingProgress = -1;
                 Status = "Initializing...";
 
-                IEnumerable<object> data = null;// ((IDataProvider)prov).GetData(repository);
+                IEnumerable<object> data = null;// ((IDataProvider)prov).GetQueryable(repository);
                 //var ret = Comparison.InitiateDuplicates(data.Select(c => c), new Comparison.SequenceEqualityComparer(), new Comparison.SequenceEqualityComparer());
                 LoadingProgress = 0;
                 Status = "Loading data...";
@@ -253,10 +245,7 @@ namespace QuAnalyzer.UI.Pages
         public event PropertyChangedEventHandler PropertyChanged;
         protected void NotifyPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private string currentSortAttribute = null;
@@ -284,7 +273,7 @@ namespace QuAnalyzer.UI.Pages
             string[] headers;
             if (lstColumns.SelectedItems.Count > 0)
             {
-                keys = lstColumns.SelectedItems.Cast<string>().ToArray();
+                keys = lstColumns.SelectedItems.Cast<ColumnDescription>().Select(c => c.Name).ToArray();
                 headers = allHeadersFu.OrderBy(h => keys.Contains(h.Name) ? 0 : 1).Select(h => h.Name).ToArray();
             }
             else
@@ -298,17 +287,18 @@ namespace QuAnalyzer.UI.Pages
                 LoadingProgress = -1;
                 Status = "Loading data...";
 
-                var data = prov.GetData(repository, headers);
+                var data = prov.GetQueryable(repository).Select<dynamic>(headers);
 
                 LoadingProgress = -1;
 
-                var dataObjectArray = data.AsObjectCollection(KeepDuplicates && KeepDuplicates ? headers : keys).Select((a, i) => { Status = "Parsed " + i + " entries"; return a; }).ToList();
+                var dataObjectArray = data.AsObjectCollection(KeepDuplicates && KeepDuplicates ? headers : keys)
+                                          .WithProgress(i => Status = $"Parsed {i} entries")
+                                          .ToList();
 
                 LoadingProgress = 1;
-
+                
                 var keyComparer = new SequenceEqualityComparer(0, keys.Length);
-                var cnt = dataObjectArray.Count();
-                var ret = Comparison.InitiateDuplicates(dataObjectArray.Select((a, i) => { Status = "Checked " + i + " entries"; LoadingProgress = i * 100 / cnt; return a; }), keyComparer, new SequenceEqualityComparer()).Duplicates;
+                var ret = Comparison.InitiateDuplicates(dataObjectArray.WithProgress(i => { Status = $"Checked {i} entries"; LoadingProgress = (int)(i * 100 / dataObjectArray.Count); }), keyComparer, new SequenceEqualityComparer()).Duplicates;
 
                 if (!KeepDuplicates)
                 {
@@ -323,8 +313,6 @@ namespace QuAnalyzer.UI.Pages
                 });
 
                 LoadingProgress = 100;
-                Status = "Done. " + cnt + " entries checked.";
-
             });
         }
 

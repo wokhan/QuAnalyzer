@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Wokhan.Data.Providers;
 using Wokhan.Data.Providers.Bases;
@@ -22,7 +23,8 @@ namespace QuAnalyzer.Helpers
 
         public ProvidersManager()
         {
-            Directory.EnumerateDirectories(AppDomain.CurrentDomain.BaseDirectory + "\\providers").ToList().ForEach(d => DataProviders.Init(d));
+            DataProviders.AddTypes(typeof(RandomDataProvider));
+            Directory.EnumerateDirectories(AppDomain.CurrentDomain.BaseDirectory + "\\providers").ToList().ForEach(d => DataProviders.AddPath(d));
         }
 
         internal void TriggerUpdate()
@@ -50,7 +52,7 @@ namespace QuAnalyzer.Helpers
             using (var fileStream = new FileStream(zipPath, FileMode.Open))
             {
                 new ZipArchive(fileStream, ZipArchiveMode.Read, false).ExtractToDirectory(path);
-                DataProviders.Init(path);
+                DataProviders.AddPath(path);
                 NotifyPropertyChanged(nameof(Providers));
             }
         }

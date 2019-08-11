@@ -9,6 +9,8 @@ namespace QuAnalyzer.UI.Pages
 {
     public partial class ProviderPicker : Page
     {
+        private Window _owner => Window.GetWindow(this);
+
         public ProviderPicker()
         {
             InitializeComponent();
@@ -16,13 +18,18 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnNewPrv_Click(object sender, RoutedEventArgs e)
         {
-            var providerName = ((DataProviderStruct)((Button)sender).Tag).Name;
+            var providerName = ((DataProviderStruct)lstProvidersTypes.SelectedItem).Name;
             var newprv = DataProviders.CreateInstance(providerName, new Dictionary<string, object>());
             //((App)Application.Current).CurrentProject.CurrentProviders.Add(newprv);
 
             newprv.Name = providerName + "#" + ((App)Application.Current).CurrentProject.CurrentProviders.Count;
 
             this.NavigationService.Navigate(new ProviderEditor(newprv));
+        }
+
+        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            _owner.Close();
         }
     }
 }

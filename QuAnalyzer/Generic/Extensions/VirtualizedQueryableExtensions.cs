@@ -85,19 +85,20 @@ namespace QuAnalyzer.Generic.Extensions
                     var ret = new PagedSourceItemsPacket<T>();
 
                     ret.LoadedAt = DateTime.Now;
-                    ret.Items = DLinq.DynamicQueryableExtensions.OrderBy(basequery ?? (IQueryable<T>)prv.GetData(src), prv.GetColumns(src).First().Name).Skip(pageoffset).Take(count).AsEnumerable();
+                    ///ret.Items = DLinq.DynamicQueryableExtensions.OrderBy(basequery ?? (IQueryable<T>)prv.GetQueryable(src), prv.GetColumns(src).First().Name).Skip(pageoffset).Take(count).AsEnumerable();
+                    ret.Items = basequery.Skip(pageoffset).Take(count).AsEnumerable();
 
                     return ret;
                 }
 
                 public int Count
                 {
-                    get { return (basequery ?? (IQueryable<T>)prv.GetData(src)).Count(); }
+                    get { return (basequery ?? (IQueryable<T>)prv.GetQueryable(src)).Count(); }
                 }
 
                 public int IndexOf(T item)
                 {
-                    return (basequery ?? (IQueryable<T>)prv.GetData(src)).ToList().IndexOf(item);
+                    return (basequery ?? (IQueryable<T>)prv.GetQueryable(src)).ToList().IndexOf(item);
                 }
 
                 public void OnReset(int count)

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace QuAnalyzer.Features.Patterns
 {
@@ -20,11 +21,11 @@ namespace QuAnalyzer.Features.Patterns
                       if (c == ex)
                       {
                           cpt++;
-                          return "";
+                          return String.Empty;
                       }
                       else if (ex != ' ')
                       {
-                          var ret = form(ex, cpt, threshold);
+                          var ret = Form(ex, cpt, threshold);
                           ex = c;
                           cpt = 1;
                           return ret;
@@ -32,13 +33,13 @@ namespace QuAnalyzer.Features.Patterns
                       else
                       {
                           ex = c;
-                          return "";
+                          return String.Empty;
                       }
                   })
-                  .Aggregate((a, b) => a + b) + form(ex, cpt, threshold);
+                  .Aggregate((a, b) => a + b) + Form(ex, cpt, threshold);
         }
 
-        internal static string form(char c, int cpt, int threshold)
+        private static string Form(char c, int cpt, int threshold)
         {
             if (threshold == 1)
             {

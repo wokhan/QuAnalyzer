@@ -55,7 +55,7 @@ namespace QuAnalyzer.Features.Comparison
                 IEnumerable<object[]> sortedMiss;
                 if (Source.Differences != null)
                 {
-                    sortedMiss = Source.Differences.Cast<object[]>().Select(m => new object[] { r.SourceName }.Concat(m).ToArray());
+                    sortedMiss = Source.Differences.Cast<object[]>().Select(m => m.Prepend(r.SourceName).ToArray());
                 }
                 else
                 {
@@ -65,7 +65,7 @@ namespace QuAnalyzer.Features.Comparison
                 IEnumerable<object[]> sortedTrg;
                 if (Target.Differences != null)
                 {
-                    sortedTrg = Target.Differences.Cast<object[]>().Select(m => new object[] { r.TargetName }.Concat(m).ToArray());
+                    sortedTrg = Target.Differences.Cast<object[]>().Select(m => m.Prepend(r.TargetName).ToArray());
                 }
                 else
                 {

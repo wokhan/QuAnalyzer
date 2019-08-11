@@ -59,7 +59,8 @@ namespace QuAnalyzer.Features.Performance
                                          var sw = Stopwatch.StartNew();
                                          try
                                          {
-                                             var data = a.test.Provider.GetData(a.test.Repository, values: values, statisticsBag: result.Duration);
+                                             //TODO : Values override!!!
+                                             var data = a.test.Provider.GetQueryable(a.test.Repository, statisticsBag: result.Duration);
                                              result.Status = Status.Success;
                                              result.Data = data;
                                          }

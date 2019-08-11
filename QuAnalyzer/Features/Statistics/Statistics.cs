@@ -41,14 +41,14 @@ namespace QuAnalyzer.Features.Statistics
             return xx;
         }
 
-        internal static IEnumerable<Values> GetData(IQueryable<dynamic> data, ColumnDescription groupKey)
+        internal static IEnumerable<Values> GetData(IQueryable data, ColumnDescription groupKey)
         {
             var m = typeof(Statistics).GetMethod(nameof(GetTypedData), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
                                               .MakeGenericMethod(data.GetInnerType(), groupKey.Type);
             return (IEnumerable<Values>)m.Invoke(null, new object[] { data, groupKey.Name });
         }
 
-        internal static ResultsStruct.Stats GetStats(IQueryable<dynamic> data, ColumnDescription groupKey)
+        internal static ResultsStruct.Stats GetStats(IQueryable data, ColumnDescription groupKey)
         {
             var mx = typeof(Statistics).GetMethod(nameof(GetTypedStats), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
                                                            .MakeGenericMethod(data.GetInnerType(), groupKey.Type);

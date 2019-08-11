@@ -1,7 +1,9 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using Wokhan.Collections.Extensions;
 using Wokhan.Data.Providers.Contracts;
+using System.Linq.Dynamic.Core;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -56,13 +58,11 @@ namespace QuAnalyzer.UI.Pages
 
                 var res = await Task.Run(() =>
                 {
-                    var data = prov.GetData(repo, new[] { attr })
+                    var data = prov.GetQueryable(repo)
+                                   .Select(attr)
                                    .AsEnumerable()
-                                   .Select((a, i) =>
-                                   {
-                                       Dispatcher.InvokeAsync(() => txtStatus.Text = "Loaded " + i + " entries...");
-                                       return a.ToString();
-                                   })
+                                   .WithProgress(i => Dispatcher.InvokeAsync(() => txtStatus.Text = $"Loaded {i} entries..."))
+                                   .Select(a => a.ToString())
                                    .ToList();
 
                     Dispatcher.Invoke(() =>
@@ -71,7 +71,8 @@ namespace QuAnalyzer.UI.Pages
                         prg.Maximum = data.Count;
                     });
 
-                    return data.Select((d, i) => { Dispatcher.InvokeAsync(() => prg.Value = i); return new { val = d, reg = Features.Patterns.Patterns.GetRegEx(d, SimThreshold) }; })
+                    return data.WithProgress(i => Dispatcher.InvokeAsync(() => prg.Value = i))
+                               .Select(d => new { val = d, reg = Features.Patterns.Patterns.GetRegEx(d, SimThreshold) })
                                .ToList()
                                .GroupBy(s => s.reg)
                                .Select(g => new { Pattern = g.Key, Count = g.Count(), Sample = g.First().val })
@@ -86,7 +87,7 @@ namespace QuAnalyzer.UI.Pages
             }
         }
 
-       
+
         private void slideSim_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
             SimThreshold = (int)e.NewValue;

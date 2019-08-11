@@ -159,7 +159,7 @@
                                         <DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" />
                                         <DataGridComboBoxColumn Width="*" Header="Operator" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedValueBinding="{Binding ComparerExpression,Mode=TwoWay}" ItemsSource="{Binding Source={x:Static myself:Viewer.FilterFormula},Mode=OneTime}">
                                             <DataGridComboBoxColumn.EditingElementStyle>
-                                                <Style BasedOn="{StaticResource MetroComboBox}" TargetType="ComboBox" />
+                                                <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
                                             </DataGridComboBoxColumn.EditingElementStyle>
                                         </DataGridComboBoxColumn>
                                         <DataGridTextColumn Width="*" Header="Value" Binding="{Binding TargetValue}"/>
@@ -231,7 +231,7 @@
                                         <DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" IsReadOnly="True" />
                                         <DataGridComboBoxColumn Width="*" Header="Aggregation" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedValueBinding="{Binding Aggregate,Mode=TwoWay}" ItemsSource="{Binding Source={x:Static myself:Viewer.AggregationFormula},Mode=OneTime}">
                                             <DataGridComboBoxColumn.EditingElementStyle>
-                                                <Style BasedOn="{StaticResource MetroComboBox}" TargetType="ComboBox" />
+                                                <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
                                             </DataGridComboBoxColumn.EditingElementStyle>
                                         </DataGridComboBoxColumn>
                                         <DataGridTemplateColumn>

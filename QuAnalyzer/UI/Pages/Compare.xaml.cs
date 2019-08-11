@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,7 +23,6 @@ using System.Windows.Shell;
 using Wokhan.Collections.Extensions;
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
-using WinForms = System.Windows.Forms;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -132,8 +132,8 @@ namespace QuAnalyzer.UI.Pages
                     var srcKeys = srcHeaders.Select(h => h.Name).ToArray();
                     var trgKeys = trgHeaders.Select(h => h.Name).ToArray();
 
-                    var srcDataGetter = srcPrv.GetData(srcRepo, srcKeys);
-                    var trgDataGetter = srcPrv.GetData(trgRepo, trgKeys);
+                    var srcDataGetter = srcPrv.GetQueryable(srcRepo).Select(String.Join(",", srcKeys));
+                    var trgDataGetter = srcPrv.GetQueryable(trgRepo).Select(String.Join(",", trgKeys));
 
                     return new[] { new ComparerStruct<object[]>()
                                         {
@@ -163,7 +163,6 @@ namespace QuAnalyzer.UI.Pages
                 var allTypesTrg = inter.Select(m => trgHeaders.First(h => h.Name == m).Type).ToArray();
 
                 Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>> fncx = allTypesSrc.SequenceEqual(allTypesTrg) ? new Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>(KeepSame) : new Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>(ConvertType);
-
                 return new[] { new ComparerStruct<object[]>()
                                        {
                                             Name = "Automatic mapping (by name)",
@@ -172,8 +171,8 @@ namespace QuAnalyzer.UI.Pages
                                             SourceHeaders = inter,
                                             TargetHeaders = inter,
                                             Comparer = new SequenceEqualityComparer(),
-                                            GetSourceData = () => fncx(srcPrv.GetData(srcRepo, inter).AsObjectCollection(srcHeaders.Select(h => h.Name).ToArray()), allTypesTrg),
-                                            GetTargetData = () => fncx(trgPrv.GetData(trgRepo, inter).AsObjectCollection(trgHeaders.Select(h => h.Name).ToArray()), allTypesTrg)
+                                            GetSourceData = () => fncx(srcPrv.GetQueryable(srcRepo).Select<dynamic>(inter).AsObjectCollection(srcHeaders.Select(h => h.Name).ToArray()), allTypesTrg),
+                                            GetTargetData = () => fncx(trgPrv.GetQueryable(trgRepo).Select<dynamic>(inter).AsObjectCollection(trgHeaders.Select(h => h.Name).ToArray()), allTypesTrg)
                                         }
                 };
             });
@@ -200,8 +199,8 @@ namespace QuAnalyzer.UI.Pages
 
             Func<IEnumerable<IEnumerable<object>>, Type[], IEnumerable<object[]>> fnc = allTypesSrc.SequenceEqual(allTypesTrg) ? new Func<IEnumerable<IEnumerable<object>>, Type[], IEnumerable<object[]>>(KeepSame) : new Func<IEnumerable<IEnumerable<object>>, Type[], IEnumerable<object[]>>(ConvertType);
 
-            var srcDataGetter = s.Source.GetData(s.SourceRepository, fieldsSrc, null, srcKeys != null ? srcKeys.ToDictionary(sk => sk, sk => srcHeaders.First(h => h.Name == sk).Type) : null);
-            var trgDataGetter = s.Target.GetData(s.TargetRepository, fieldsTrg, null, trgKeys != null ? trgKeys.ToDictionary(sk => sk, sk => trgHeaders.First(h => h.Name == sk).Type) : null);
+            var srcDataGetter = s.Source.GetQueryable(s.SourceRepository).Select<dynamic>(fieldsSrc);//, srcKeys != null ? srcKeys.ToDictionary(sk => sk, sk => srcHeaders.First(h => h.Name == sk).Type) : null);
+            var trgDataGetter = s.Target.GetQueryable(s.TargetRepository).Select<dynamic>(fieldsTrg);//, trgKeys != null ? trgKeys.ToDictionary(sk => sk, sk => trgHeaders.First(h => h.Name == sk).Type) : null);
             if (s.IsOrdered)
             {
                 if (srcKeys != null && trgKeys != null)
@@ -449,16 +448,18 @@ namespace QuAnalyzer.UI.Pages
 
         private void GlobalReport_Click(object sender, RoutedEventArgs e)
         {
-            var dial = new WinForms.FolderBrowserDialog() { ShowNewFolderButton = true, Description = "Pick the folder all reports will be saved in. Existing files will be overwritten." };
-            if (dial.ShowDialog() != WinForms.DialogResult.OK)
+            var dial = new OpenFileDialog() { CheckFileExists = false, CheckPathExists = true, ValidateNames = false, FileName = "Pick a folder to save reports in. Existing files will be overwritten." };
+            if (!(bool)dial.ShowDialog())
             {
                 return;
             }
 
+
+            var folderPath = Directory.GetParent(dial.FileName);
             StackPanel host = ((ModernMain)Window.GetWindow(this)).stackExports;
             ((ModernMain)Window.GetWindow(this)).flyExports.IsOpen = true;
 
-            allProgress.ExportAsXLSX(dial.SelectedPath + "\\Summary.xlsx", "Summary", host, SharedCallback.GetCallBackForExport(host, "Summary", null));
+            allProgress.ExportAsXLSX(folderPath + "\\Summary.xlsx", "Summary", host, SharedCallback.GetCallBackForExport(host, "Summary", null));
 
             foreach (var cmp in cpd.Where(c => c.Results.Progress == ProgressType.Done))
             {
@@ -474,7 +475,7 @@ namespace QuAnalyzer.UI.Pages
                 */
                 string name = String.Join("_", cmp.Name.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
 
-                string p = dial.SelectedPath + "\\" + name + "_Details.xlsx";
+                string p = folderPath + "\\" + name + "_Details.xlsx";
 
                 var file = new FileInfo(p);
                 //if (cmp.Results.MergedDiff != null)
@@ -491,7 +492,7 @@ namespace QuAnalyzer.UI.Pages
                     using (var xl = new ExcelPackage(file))
                     {
                         cmp.Results.InitDiff(cmp);
-                        xl.AddWorksheet(cmp.Results.MergedDiff, new[] { "Name" }.Concat(cmp.Results.MergedHeaders).ToArray(), cmp.SourceKeys.Count, "Differences", (x, i, h, s) => { if (x.IsDiff[i]) { s.Font.Color.SetColor(System.Drawing.Color.Red); } return x.Values[i]; }, cb1);
+                        xl.AddWorksheet(cmp.Results.MergedDiff, cmp.Results.MergedHeaders.Prepend("Name").ToArray(), cmp.SourceKeys.Count, "Differences", (x, i, h, s) => { if (x.IsDiff[i]) { s.Font.Color.SetColor(System.Drawing.Color.Red); } return x.Values[i]; }, cb1);
 
                         //if (cmp.Results.Source.Missing != null)
                         xl.AddWorksheet(cmp.Results.Source.Missing.Cast<object[]>(), cmp.SourceHeaders, cmp.SourceKeys.Count, "Missing from source", (x, i, h, s) => x[i], cb2);

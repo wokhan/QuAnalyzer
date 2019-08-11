@@ -13,6 +13,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+                <!--<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />-->
                 <ResourceDictionary Source="/Resources/Icons.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BindingConverters:BooleanNegator x:Key="booleanNegator" />
@@ -20,7 +21,7 @@
             <!--<Style TargetType="Button" BasedOn="{StaticResource MetroButton}"></Style>
             <Style TargetType="CheckBox" BasedOn="{StaticResource MetroCheckBox}"></Style>
             <Style TargetType="GroupBox" BasedOn="{StaticResource MetroGroupBox}"></Style>
-            <Style TargetType="ComboBox" BasedOn="{StaticResource MetroComboBox}"></Style>
+            <Style TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}"></Style>
             <Style TargetType="Expander" BasedOn="{StaticResource MetroExpander}"></Style>
             <Style TargetType="DataGrid" BasedOn="{StaticResource MetroDataGrid}"></Style>-->
             <Style TargetType="{x:Type DataGrid}" BasedOn="{StaticResource {x:Type DataGrid}}">
@@ -107,7 +108,7 @@
                 <Setter Property="BorderThickness" Value="0,2,0,0" />
                 <Setter Property="BorderBrush" Value="LightGray" />
                 <Style.Resources>
-                    <Style TargetType="Button" BasedOn="{StaticResource MetroFlatButton}">
+                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Flat}">
                         <Setter Property="Width" Value="75" />
                         <Setter Property="Margin" Value="10" />
                         <Setter Property="FontSize" Value="11" />

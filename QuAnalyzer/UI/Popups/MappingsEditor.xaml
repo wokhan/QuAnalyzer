@@ -65,12 +65,12 @@
                     <DataGrid.Columns>
                         <DataGridComboBoxColumn Width="*" Header="Source field" TextBinding="{Binding Source, Mode=TwoWay}">
                             <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style BasedOn="{StaticResource MetroComboBox}" TargetType="ComboBox" />
+                                <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
                             </DataGridComboBoxColumn.EditingElementStyle>
                         </DataGridComboBoxColumn>
                         <DataGridComboBoxColumn Width="*" Header="Target field" TextBinding="{Binding Target, Mode=TwoWay}">
                             <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style BasedOn="{StaticResource MetroComboBox}" TargetType="ComboBox" />
+                                <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
                             </DataGridComboBoxColumn.EditingElementStyle>
                         </DataGridComboBoxColumn>
                         <DataGridTemplateColumn Width="80" Header="Use as keys">

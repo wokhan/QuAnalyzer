@@ -3,12 +3,8 @@ using QuAnalyzer.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using Wokhan.Data.Providers;
-using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer
 {

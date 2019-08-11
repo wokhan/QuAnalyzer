@@ -98,7 +98,7 @@ namespace QuAnalyzer.UI.Pages
                 Progress = -1;
                 var defaults = headers.Select(h => h.Type.GetDefault()).ToList();
 
-                var data = prv.GetData(repo);
+                var data = prv.GetQueryable(repo);
 
                 headers.AsParallel(false).ForAll((h) =>
                 {

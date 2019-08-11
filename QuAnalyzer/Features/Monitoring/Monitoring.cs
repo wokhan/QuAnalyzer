@@ -53,7 +53,7 @@ namespace QuAnalyzer.Features.Monitoring
                         }
                     };
                     Performance.Performance.Run(new TestCasesCollection() { TestCases = new[] { new TestCase() { Provider = item.Provider } } }, 10, 10, res);
-                    r.Data = item.Provider.GetData(item.Repository, statisticsBag: r.Duration).ToList();
+                    r.Data = item.Provider.GetQueryable(item.Repository, statisticsBag: r.Duration).Cast<dynamic>().ToList();
                     break;
 
                 case MonitoringModes.CHECKVAL:
@@ -61,7 +61,7 @@ namespace QuAnalyzer.Features.Monitoring
                     {
                         throw new ArgumentNullException("attribute");
                     }
-                    var q = item.Provider.GetData(item.Repository, statisticsBag: r.Duration);
+                    var q = item.Provider.GetQueryable(item.Repository, statisticsBag: r.Duration);
                     if (!string.IsNullOrEmpty(item.Filter))
                     {
                         q = q.Where(item.Filter);
@@ -71,7 +71,7 @@ namespace QuAnalyzer.Features.Monitoring
                     break;
 
                 case MonitoringModes.COUNTALL:
-                    var qc = item.Provider.GetData(item.Repository, statisticsBag: r.Duration);
+                    var qc = item.Provider.GetQueryable(item.Repository, statisticsBag: r.Duration);
                     if (!string.IsNullOrEmpty(item.Filter))
                     {
                         qc = qc.Where(item.Filter);
