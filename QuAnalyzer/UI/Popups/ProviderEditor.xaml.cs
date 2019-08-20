@@ -30,12 +30,9 @@ namespace QuAnalyzer.UI.Pages
             set { _currentProvider = value; NotifyPropertyChanged(nameof(CurrentProvider)); NotifyPropertyChanged(nameof(CurrentType)); fillProvider(); }
         }
 
-        public IList<IGrouping<string, DataProviderMemberStruct>> ExpParameters => DataProviders.GetParameters(CurrentProvider);
+        public IList<IGrouping<string, DataProviderMemberDefinition>> ExpParameters => DataProviders.GetParameters(CurrentProvider);
 
-        public DataProviderStruct CurrentType
-        {
-            get { return CurrentProvider.ProviderTypeInfo; }
-        }
+        public DataProviderDefinition CurrentType => CurrentProvider.Definition;
 
         protected void NotifyPropertyChanged(string propertyName)
         {
@@ -254,7 +251,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void ShowFileDialog(object sender, RoutedEventArgs e)
         {
-            var txt = (DataProviderMemberStruct)((Button)sender).Tag;
+            var txt = (DataProviderMemberDefinition)((Button)sender).Tag;
             var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = txt.FileFilter };
             if (dial.ShowDialog().Value)
             {

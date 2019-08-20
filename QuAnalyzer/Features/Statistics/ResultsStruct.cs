@@ -1,5 +1,6 @@
 ﻿using QuAnalyzer.Generic;
 using System.Collections.ObjectModel;
+using Wokhan.Core.ComponentModel;
 
 namespace QuAnalyzer.Features.Statistics
 {

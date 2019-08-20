@@ -12,31 +12,34 @@ namespace QuAnalyzer.Features.Patterns
                 return null;
             }
 
-            var ex = ' ';
+            var previous = ' ';
             var cpt = 1;
 
-            return src.Select(c => c >= 'A' && c <= 'Z' ? 'w' : c >= 'a' && c <= 'z' ? 'w' : c >= '0' && c <= '9' ? 'd' : threshold == 3 ? 'x' : c)
-                  .Select(c =>
-                  {
-                      if (c == ex)
+            return src.Select(chr => (chr >= 'A' && chr <= 'Z') || (chr >= 'a' && chr <= 'z') ? 'w'
+                                    : chr >= '0' && chr <= '9' ? 'd'
+                                    : threshold == 3 ? 'x'
+                                    : chr)
+                      .Select(chr =>
                       {
-                          cpt++;
-                          return String.Empty;
-                      }
-                      else if (ex != ' ')
-                      {
-                          var ret = Form(ex, cpt, threshold);
-                          ex = c;
-                          cpt = 1;
-                          return ret;
-                      }
-                      else
-                      {
-                          ex = c;
-                          return String.Empty;
-                      }
-                  })
-                  .Aggregate((a, b) => a + b) + Form(ex, cpt, threshold);
+                          if (chr == previous)
+                          {
+                              cpt++;
+                              return String.Empty;
+                          }
+                          else if (previous != ' ')
+                          {
+                              var ret = Form(previous, cpt, threshold);
+                              previous = chr;
+                              cpt = 1;
+                              return ret;
+                          }
+                          else
+                          {
+                              previous = chr;
+                              return String.Empty;
+                          }
+                      })
+                      .Aggregate((a, b) => a + b) + Form(previous, cpt, threshold);
         }
 
         private static string Form(char c, int cpt, int threshold)

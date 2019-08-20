@@ -1,17 +1,19 @@
 ﻿using Microsoft.Win32;
 using Newtonsoft.Json;
+using QuAnalyzer.Core.Helpers;
+using QuAnalyzer.Core.Project.Exceptions;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Features.Performance;
-using QuAnalyzer.Generic;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows.Media;
 using Wokhan.Collections.Extensions;
+using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers.Contracts;
 
-namespace QuAnalyzer.Helpers
+namespace QuAnalyzer.Core.Project
 {
     public class Project : NotifierHelper
     {
@@ -57,42 +59,56 @@ namespace QuAnalyzer.Helpers
 
         internal void Open(string p)
         {
-            var ser = new JsonSerializer();
-            ser.TypeNameHandling = TypeNameHandling.Auto;
+            try
+            {
+                var ser = new JsonSerializer();
+                ser.TypeNameHandling = TypeNameHandling.Auto;
 
-            using var stream = new JsonTextReader(new StreamReader(p));
+                using var stream = new JsonTextReader(new StreamReader(p));
 
-            var restProject = ser.Deserialize<Project>(stream);
+                var restProject = ser.Deserialize<Project>(stream);
 
-            this.Name = restProject.Name;
-            this.CurrentProviders.ReplaceAll(restProject.CurrentProviders);
-            this.SourceMapper.ReplaceAll(restProject.SourceMapper);
-            this.MonitorItems.ReplaceAll(restProject.MonitorItems);
+                this.Name = restProject.Name;
+                this.CurrentProviders.ReplaceAll(restProject.CurrentProviders);
+                this.SourceMapper.ReplaceAll(restProject.SourceMapper);
+                this.MonitorItems.ReplaceAll(restProject.MonitorItems);
 
-            this.FilePath = p;
+                this.FilePath = p;
 
-            MRUManager.AddRecentFile(this.FilePath);
+                MRUManager.AddRecentFile(this.FilePath);
+            }
+            catch (Exception e)
+            {
+                throw new ProjectLoadException(e);
+            }
         }
 
         internal void Save(string p = null)
         {
-            if (string.IsNullOrEmpty(FilePath) && string.IsNullOrEmpty(p))
+            try
             {
-                this.SaveAs();
-                return;
+                if (string.IsNullOrEmpty(FilePath) && string.IsNullOrEmpty(p))
+                {
+                    this.SaveAs();
+                    return;
+                }
+
+                var ser = new JsonSerializer();
+                ser.TypeNameHandling = TypeNameHandling.Auto;
+
+                if (p != null)
+                {
+                    this.FilePath = p;
+                }
+
+                using var str = new JsonTextWriter(new StreamWriter(this.FilePath, false));
+
+                ser.Serialize(str, this);
             }
-
-            var ser = new JsonSerializer();
-            ser.TypeNameHandling = TypeNameHandling.Auto;
-
-            if (p != null)
+            catch (Exception e)
             {
-                this.FilePath = p;
+                throw new ProjectSaveException(e);
             }
-
-            using var str = new JsonTextWriter(new StreamWriter(this.FilePath, false));
-
-            ser.Serialize(str, this);
         }
 
         internal void CreateNew()

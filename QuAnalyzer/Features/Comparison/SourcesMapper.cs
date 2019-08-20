@@ -1,35 +1,14 @@
 ﻿using Newtonsoft.Json;
-using QuAnalyzer.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.Features.Comparison
 {
-    public class SourcesMapper : NotifierHelper
+    public partial class SourcesMapper : NotifierHelper
     {
-        public class SimpleMap
-        {
-            public string Source { get; set; }
-            public string Target { get; set; }
-
-            public bool IsKey { get; set; }
-
-            public SimpleMap()
-            {
-                Source = String.Empty;
-                Target = String.Empty;
-            }
-
-            public SimpleMap(string s, string t)
-            {
-                this.Source = s;
-                this.Target = t;
-            }
-
-
-        }
 
         public string Name { get; set; }
 

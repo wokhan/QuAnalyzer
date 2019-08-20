@@ -190,7 +190,8 @@ namespace QuAnalyzer.Features.Comparison
             var trgPrev = default(T);
 
             var scmp = new SequenceComparer(f.SourceKeys != null ? f.SourceKeys.ToArray() : Enumerable.Range(0, f.SourceHeaders.Count).Select(i => i.ToString()).ToArray());
-            var sqc = new SequenceEqualityComparer();
+            // TODO : gen type
+            var sqc = new SequenceEqualityComparer<object>();
 
             using (var srcEnum = srcData.GetEnumerator())
             using (var trgEnum = trgData.GetEnumerator())

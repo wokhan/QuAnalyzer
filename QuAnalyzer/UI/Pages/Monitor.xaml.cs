@@ -83,9 +83,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
-            var editor = new Popup(new MonitoringDetails(new MonitorItem() { Name = "Monitor #" + (((App)Application.Current).CurrentProject.MonitorItems.Count + 1) }));
-            editor.Show();
-            editor.Activate();
+            Popup.OpenNew(new MonitoringDetails(new MonitorItem() { Name = "Monitor #" + (((App)Application.Current).CurrentProject.MonitorItems.Count + 1) }));
         }
 
         private void btnClear_Click(object sender, RoutedEventArgs e)
@@ -98,12 +96,7 @@ namespace QuAnalyzer.UI.Pages
 
         }
 
-        private void btnEdit_Click(object sender, RoutedEventArgs e)
-        {
-            var editor = new Popup(new MonitoringDetails((MonitorItem)((Button)sender).Tag));
-            editor.Show();
-            editor.Activate();
-        }
+        private void btnEdit_Click(object sender, RoutedEventArgs e) => Popup.OpenNew(new MonitoringDetails((MonitorItem)((Button)sender).Tag));
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {

@@ -1,4 +1,6 @@
-﻿using QuAnalyzer.Generic.Diagnostics;
+﻿using QuAnalyzer.Core.Helpers;
+using QuAnalyzer.Core.Project;
+using QuAnalyzer.Generic.Diagnostics;
 using QuAnalyzer.Helpers;
 using System;
 using System.Collections.Generic;

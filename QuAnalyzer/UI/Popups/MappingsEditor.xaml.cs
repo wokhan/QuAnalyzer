@@ -13,11 +13,11 @@ namespace QuAnalyzer.UI.Popups
     /// </summary>
     public partial class MappingsEditor : Page
     {
-        SourcesMapper currentMap = null;
+        private readonly SourcesMapper currentMap = null;
 
-        bool isNew = false;
+        private bool isNew = false;
 
-        private readonly ObservableCollection<SourcesMapper.SimpleMap> currentMaps = new ObservableCollection<SourcesMapper.SimpleMap>();
+        private readonly ObservableCollection<SimpleMap> currentMaps = new ObservableCollection<SimpleMap>();
 
         private readonly ObservableCollection<string> SourceAttributes = new ObservableCollection<string>();
 
@@ -48,10 +48,7 @@ namespace QuAnalyzer.UI.Popups
         }
 
 
-        private void btnAdd_Click(object sender, RoutedEventArgs e)
-        {
-            currentMaps.Add(new SourcesMapper.SimpleMap());
-        }
+        private void btnAdd_Click(object sender, RoutedEventArgs e) => currentMaps.Add(new SimpleMap());
 
         private void lstSrcRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -66,16 +63,9 @@ namespace QuAnalyzer.UI.Popups
             }
         }
 
-        private void btnRm_Click(object sender, RoutedEventArgs e)
-        {
-            SourcesMapper.SimpleMap sm = (SourcesMapper.SimpleMap)((Button)sender).Tag;
-            currentMaps.Remove(sm);
-        }
+        private void btnRm_Click(object sender, RoutedEventArgs e) => currentMaps.Remove((SimpleMap)((Button)sender).Tag);
 
-        private void btnRmAll_Click(object sender, RoutedEventArgs e)
-        {
-            currentMaps.Clear();
-        }
+        private void btnRmAll_Click(object sender, RoutedEventArgs e) => currentMaps.Clear();
 
         private void lstTrgRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -115,26 +105,18 @@ namespace QuAnalyzer.UI.Popups
             closeParent();
         }
 
-        private void closeParent()
-        {
-            Window.GetWindow(this).Close();
-        }
-
 
         private void btnMapName_Click(object sender, RoutedEventArgs e)
         {
-            currentMaps.ReplaceAll(SourceAttributes.Where(s => TargetAttributes.Contains(s)).Select(s => new SourcesMapper.SimpleMap(s, s)));
+            currentMaps.ReplaceAll(SourceAttributes.Where(s => TargetAttributes.Contains(s)).Select(s => new SimpleMap(s, s)));
         }
 
         private void btnMapPos_Click(object sender, RoutedEventArgs e)
         {
-            currentMaps.ReplaceAll(SourceAttributes.Take(TargetAttributes.Count).Select((s, i) => new SourcesMapper.SimpleMap(s, TargetAttributes[i])));
+            currentMaps.ReplaceAll(SourceAttributes.Take(TargetAttributes.Count).Select((s, i) => new SimpleMap(s, TargetAttributes[i])));
         }
 
-
-        private void btnCancel_Click(object sender, RoutedEventArgs e)
-        {
-            closeParent();
-        }
+        private void btnCancel_Click(object sender, RoutedEventArgs e) => closeParent();
+        private void closeParent() => Window.GetWindow(this).Close();
     }
 }

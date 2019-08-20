@@ -1,14 +1,11 @@
 ﻿using QuAnalyzer.Features.Performance;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net.NetworkInformation;
-using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.Features.Monitoring
 {
@@ -52,8 +49,16 @@ namespace QuAnalyzer.Features.Monitoring
                             item.raiseAdd(resstruct);
                         }
                     };
-                    Performance.Performance.Run(new TestCasesCollection() { TestCases = new[] { new TestCase() { Provider = item.Provider } } }, 10, 10, res);
-                    r.Data = item.Provider.GetQueryable(item.Repository, statisticsBag: r.Duration).Cast<dynamic>().ToList();
+                    Performance.Performance.Run(new TestCasesCollection()
+                    {
+                        TestCases = new[] { new TestCase() {
+                        GetData = (values, stats) => item.Provider.GetQueryable(item.Repository, values, stats)  } }
+                    }, 10, 10, res);
+                    r.Duration = new Dictionary<string, long> {
+                        ["Average"] = (long)res.Select(result => result.Duration.Sum(_=> _.Value)).Average(),
+                        ["Count"] = (long)res.Average(result => result.ResultCount)
+                    };
+                    r.Data = null;
                     break;
 
                 case MonitoringModes.CHECKVAL:

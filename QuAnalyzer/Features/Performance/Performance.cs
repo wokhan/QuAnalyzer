@@ -60,7 +60,7 @@ namespace QuAnalyzer.Features.Performance
                                          try
                                          {
                                              //TODO : Values override!!!
-                                             var data = a.test.Provider.GetQueryable(a.test.Repository, statisticsBag: result.Duration);
+                                             var data = a.test.GetData(values, result.Duration);
                                              result.Status = Status.Success;
                                              result.Data = data;
                                          }

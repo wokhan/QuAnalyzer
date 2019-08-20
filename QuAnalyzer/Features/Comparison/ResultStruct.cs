@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Wokhan.Collections.Extensions;
+using Wokhan.Core.ComponentModel;
 
 namespace QuAnalyzer.Features.Comparison
 {

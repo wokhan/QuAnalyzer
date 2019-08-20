@@ -3,7 +3,7 @@
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:Converters="clr-namespace:MahApps.Metro.Converters;assembly=MahApps.Metro"
              xmlns:local="clr-namespace:QuAnalyzer.UI.Controls"
-             xmlns:BindingConverters="clr-namespace:QuAnalyzer.Helpers.BindingConverters"
+             xmlns:BindingConverters="clr-namespace:Wokhan.Shared.UI.Converters;assembly=Wokhan.UI.WPF"
              xmlns:System="clr-namespace:System;assembly=System.Runtime"
              x:Class="QuAnalyzer.App"
              StartupUri="UI/Windows/ModernMain.xaml">
@@ -16,8 +16,8 @@
                 <!--<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />-->
                 <ResourceDictionary Source="/Resources/Icons.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <BindingConverters:BooleanNegator x:Key="booleanNegator" />
-            <BindingConverters:ObjectToBool x:Key="objectToBool" />
+            <BindingConverters:BooleanNegateConverter x:Key="booleanNegator" />
+            <BindingConverters:ObjectToBoolConverter x:Key="objectToBool" />
             <!--<Style TargetType="Button" BasedOn="{StaticResource MetroButton}"></Style>
             <Style TargetType="CheckBox" BasedOn="{StaticResource MetroCheckBox}"></Style>
             <Style TargetType="GroupBox" BasedOn="{StaticResource MetroGroupBox}"></Style>

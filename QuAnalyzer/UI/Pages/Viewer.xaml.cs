@@ -15,6 +15,7 @@ using System.Windows.Threading;
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
 using Wokhan.Linq.Extensions;
+using Wokhan.WPF.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {

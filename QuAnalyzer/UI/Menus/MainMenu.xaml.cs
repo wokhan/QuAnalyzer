@@ -106,19 +106,7 @@ namespace QuAnalyzer.UI.Menus
             ctxSaveAs.IsOpen = true;
         }
 
-        private void btnEditProvider_Click(object sender, RoutedEventArgs e)
-        {
-            OpenEditor((IDataProvider)((Button)sender).Tag);
-        }
-
-        public void OpenEditor(IDataProvider prv)
-        {
-            var editor = new Popup(new ProviderEditor(prv));
-            editor.Show();
-            editor.Activate();
-        }
-
-
+        
         private void btnDeleteProvider_Click(object sender, RoutedEventArgs e)
         {
             ((App)Application.Current).CurrentProject.CurrentProviders.Remove((IDataProvider)((Button)sender).Tag);
@@ -133,12 +121,9 @@ namespace QuAnalyzer.UI.Menus
                 ((App)Application.Current).ProvidersMan.AddProvider(dial.FileName);
             }
         }
+        private void btnEditProvider_Click(object sender, RoutedEventArgs e) => Popup.OpenNew(new ProviderEditor((IDataProvider)((Button)sender).Tag));
 
-        private void btnNewSource_Click(object sender, RoutedEventArgs e)
-        {
-            var editor = new Popup(new ProviderPicker());
-            editor.Show();
-            editor.Activate();
-        }
+        private void btnNewSource_Click(object sender, RoutedEventArgs e) => Popup.OpenNew(new ProviderPicker());
+            
     }
 }

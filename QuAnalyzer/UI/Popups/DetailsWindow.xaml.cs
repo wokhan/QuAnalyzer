@@ -279,7 +279,7 @@ namespace QuAnalyzer.UI.Popups
             if (grpAndCmpIx.Any())
             {
                 //multigroup = multigroup.Select(c => grpAndCmpIx.Select(k => c[k.Value]).ToArray());
-                var sc = new SequenceEqualityComparer();
+                var sc = new SequenceEqualityComparer<object>();
                 multigroup = multigroup.GroupBy(c => grpAttrs.Select(a => c[a.i]), sc)
                                        .Select(g => g.Key.Select(gg => gg)
                                                          .Concat(cmpAttrs.Select(h => h.f(g.Select(gg => gg[h.i]))))

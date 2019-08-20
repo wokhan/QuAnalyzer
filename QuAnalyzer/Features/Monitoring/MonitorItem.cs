@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.Features.Monitoring

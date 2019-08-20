@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 
 
-namespace QuAnalyzer.Helpers
+namespace QuAnalyzer.Core.Helpers
 {
     public static class MRUManager
     {

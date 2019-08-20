@@ -50,7 +50,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding ExpParameters}">
+                    <ItemsControl x:Name="itms"  ItemsSource="{Binding ExpParameters}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <GroupBox>

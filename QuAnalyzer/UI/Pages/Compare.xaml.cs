@@ -1,9 +1,9 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using OfficeOpenXml;
+using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Generic.Extensions;
-using QuAnalyzer.Helpers;
 using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
 using System;
@@ -21,6 +21,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Shell;
 using Wokhan.Collections.Extensions;
+using Wokhan.Core.Extensions;
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
 
@@ -95,14 +96,14 @@ namespace QuAnalyzer.UI.Pages
             if (tabMapping.IsSelected)
             {
                 var mappers = lstMappings.SelectedItems.Cast<SourcesMapper>().ToList();
-                return await Task.Run(() => mappers.Select(s => sourceMapperToCompStruct(s)).ToArray());
+                return await Task.Run(() => mappers.Select(s => new ComparerStruct<object[]>(s)).ToArray());
             }
 
             // Case 2: Custom mapping
             if (rdbCustomMapping.IsChecked.Value)
             {
                 var mapper = (SourcesMapper)lstCustMappings.SelectedItem;
-                return await Task.Run(() => new[] { sourceMapperToCompStruct(mapper) });
+                return await Task.Run(() => new[] { new ComparerStruct<object[]>(mapper) });
             }
 
             // Case 3: Automatic mapping (position)
@@ -113,121 +114,72 @@ namespace QuAnalyzer.UI.Pages
 
             if (rdbAutoMapping.IsChecked.Value)
             {
-                return await Task.Run(() =>
-                {
-                    IEnumerable<ColumnDescription> srcHeaders = srcPrv.GetColumns(srcRepo);
-                    IEnumerable<ColumnDescription> trgHeaders = trgPrv.GetColumns(trgRepo);
-
-                    if (trgHeaders.Count() > srcHeaders.Count())
-                    {
-                        trgHeaders = trgHeaders.Take(srcHeaders.Count());
-                    }
-                    else if (srcHeaders.Count() > trgHeaders.Count())
-                    {
-                        srcHeaders = srcHeaders.Take(trgHeaders.Count());
-                    }
-
-                    Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>> fnc = srcHeaders.Select(h => h.Type).SequenceEqual(trgHeaders.Select(h => h.Type)) ? new Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>(KeepSame) : new Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>(ConvertType);
-
-                    var srcKeys = srcHeaders.Select(h => h.Name).ToArray();
-                    var trgKeys = trgHeaders.Select(h => h.Name).ToArray();
-
-                    var srcDataGetter = srcPrv.GetQueryable(srcRepo).Select(String.Join(",", srcKeys));
-                    var trgDataGetter = srcPrv.GetQueryable(trgRepo).Select(String.Join(",", trgKeys));
-
-                    return new[] { new ComparerStruct<object[]>()
-                                        {
-                                            Name = "Automatic mapping (by position)",
-                                            SourceName = srcPrv.Name + " " + srcRepo,
-                                            TargetName = trgPrv.Name + " " + trgRepo,
-                                            SourceHeaders = srcKeys,
-                                            TargetHeaders = trgKeys,
-                                            Comparer = new SequenceEqualityComparer(),
-                                            GetSourceData = () => fnc(srcDataGetter.AsObjectCollection(srcKeys), trgHeaders.Select(h => h.Type).ToArray()),
-                                            GetTargetData = () => fnc(trgDataGetter.AsObjectCollection(trgKeys), trgHeaders.Select(h => h.Type).ToArray())
-                                        }
-                    };
-                });
+                return await Task.Run(() => new[] { GetMappingAutomatic(srcPrv, srcRepo, trgPrv, trgRepo) });
             }
 
             // Case 4: Automatic mapping (name)
-            return await Task.Run(() =>
-            {
-                var srcHeaders = srcPrv.GetColumns(srcRepo);
-                var trgHeaders = trgPrv.GetColumns(trgRepo);
-
-                var inter = srcHeaders.Select(h => h.Name).Intersect(trgHeaders.Select(h => h.Name), StringComparer.InvariantCultureIgnoreCase).ToList();
-
-                //TODO: yurk
-                var allTypesSrc = inter.Select(m => srcHeaders.First(h => h.Name == m).Type).ToArray();
-                var allTypesTrg = inter.Select(m => trgHeaders.First(h => h.Name == m).Type).ToArray();
-
-                Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>> fncx = allTypesSrc.SequenceEqual(allTypesTrg) ? new Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>(KeepSame) : new Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>(ConvertType);
-                return new[] { new ComparerStruct<object[]>()
-                                       {
-                                            Name = "Automatic mapping (by name)",
-                                            SourceName = srcPrv.Name + " " + srcRepo,
-                                            TargetName = trgPrv.Name + " " + trgRepo,
-                                            SourceHeaders = inter,
-                                            TargetHeaders = inter,
-                                            Comparer = new SequenceEqualityComparer(),
-                                            GetSourceData = () => fncx(srcPrv.GetQueryable(srcRepo).Select<dynamic>(inter).AsObjectCollection(srcHeaders.Select(h => h.Name).ToArray()), allTypesTrg),
-                                            GetTargetData = () => fncx(trgPrv.GetQueryable(trgRepo).Select<dynamic>(inter).AsObjectCollection(trgHeaders.Select(h => h.Name).ToArray()), allTypesTrg)
-                                        }
-                };
-            });
+            return await Task.Run(() => new[] { GetMapppingByName(srcPrv, srcRepo, trgPrv, trgRepo) });
         }
 
-        private static ComparerStruct<object[]> sourceMapperToCompStruct(SourcesMapper s)
+        private static ComparerStruct<object[]> GetMapppingByName(IDataProvider srcPrv, string srcRepo, IDataProvider trgPrv, string trgRepo)
         {
-            var fieldsSrc = s.AllMappings.Select(m => m.Source).ToList();
-            var fieldsTrg = s.AllMappings.Select(m => m.Target).ToList();
+            var srcHeaders = srcPrv.GetColumns(srcRepo);
+            var trgHeaders = trgPrv.GetColumns(trgRepo);
 
-            var srcHeaders = s.Source.GetColumns(s.SourceRepository);
-            var trgHeaders = s.Target.GetColumns(s.TargetRepository);
+            var inter = srcHeaders.Select(h => h.Name).Intersect(trgHeaders.Select(h => h.Name), StringComparer.InvariantCultureIgnoreCase).ToList();
 
-            var allTypesSrc = fieldsSrc.Select(m => srcHeaders.First(h => h.Name == m).Type).ToArray();
-            var allTypesTrg = fieldsTrg.Select(m => trgHeaders.First(h => h.Name == m).Type).ToArray();
+            //TODO: yurk
+            var allTypesSrc = inter.Select(m => srcHeaders.First(h => h.Name == m).Type).ToArray();
+            var allTypesTrg = inter.Select(m => trgHeaders.First(h => h.Name == m).Type).ToArray();
 
-            string[] srcKeys = null;
-            string[] trgKeys = null;
-            if (s.AllMappings.Any(a => a.IsKey))
-            {
-                srcKeys = s.AllMappings.Where(a => a.IsKey).Select(m => m.Source).ToArray();
-                trgKeys = s.AllMappings.Where(a => a.IsKey).Select(m => m.Target).ToArray();
-            }
-
-            Func<IEnumerable<IEnumerable<object>>, Type[], IEnumerable<object[]>> fnc = allTypesSrc.SequenceEqual(allTypesTrg) ? new Func<IEnumerable<IEnumerable<object>>, Type[], IEnumerable<object[]>>(KeepSame) : new Func<IEnumerable<IEnumerable<object>>, Type[], IEnumerable<object[]>>(ConvertType);
-
-            var srcDataGetter = s.Source.GetQueryable(s.SourceRepository).Select<dynamic>(fieldsSrc);//, srcKeys != null ? srcKeys.ToDictionary(sk => sk, sk => srcHeaders.First(h => h.Name == sk).Type) : null);
-            var trgDataGetter = s.Target.GetQueryable(s.TargetRepository).Select<dynamic>(fieldsTrg);//, trgKeys != null ? trgKeys.ToDictionary(sk => sk, sk => trgHeaders.First(h => h.Name == sk).Type) : null);
-            if (s.IsOrdered)
-            {
-                if (srcKeys != null && trgKeys != null)
-                {
-                    srcDataGetter = srcDataGetter.OrderByMany(srcHeaders.Join(srcKeys, h => h.Name, k => k, (h, k) => new { h, k }).ToDictionary(x => x.k, x => x.h.Type));
-                    trgDataGetter = trgDataGetter.OrderByMany(trgHeaders.Join(trgKeys, h => h.Name, k => k, (h, k) => new { h, k }).ToDictionary(x => x.k, x => x.h.Type));
-                }
-                else
-                {
-                    srcDataGetter = srcDataGetter.OrderByAll();
-                    trgDataGetter = trgDataGetter.OrderByAll();
-                }
-            }
+            Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>> normalizeTypes = allTypesSrc.SequenceEqual(allTypesTrg) ? (Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>)KeepSame : ConvertType;
             return new ComparerStruct<object[]>()
             {
-                Name = s.Name,
-                SourceName = s.Source.Name + " (" + s.SourceRepository + ")",
-                TargetName = s.Target.Name + " (" + s.TargetRepository + ")",
-                SourceHeaders = fieldsSrc,
-                TargetHeaders = fieldsTrg,
-                SourceKeys = srcKeys,
-                TargetKeys = trgKeys,
-                Comparer = new SequenceEqualityComparer(),
-                KeysComparer = (srcKeys != null ? new SequenceEqualityComparer(0, srcKeys.Length) : null),
-                GetSourceData = () => fnc(srcDataGetter.AsObjectCollection(fieldsSrc.ToArray()), allTypesTrg), //.Select(r => allIdxSr.Select(i => r[i]).ToArray()),
-                GetTargetData = () => fnc(trgDataGetter.AsObjectCollection(fieldsTrg.ToArray()), allTypesTrg),//.Select(r => allIdxTr.Select(i => r[i]).ToArray())
-                IsOrdered = s.IsOrdered
+                Name = "Automatic mapping (by name)",
+                SourceName = srcPrv.Name + " " + srcRepo,
+                TargetName = trgPrv.Name + " " + trgRepo,
+                SourceHeaders = inter,
+                TargetHeaders = inter,
+                Comparer = new SequenceEqualityComparer<object>(),
+                GetSourceData = () => normalizeTypes(srcPrv.GetQueryable(srcRepo).Select<dynamic>(inter).AsObjectCollection(srcHeaders.Select(h => h.Name).ToArray()), allTypesTrg),
+                GetTargetData = () => normalizeTypes(trgPrv.GetQueryable(trgRepo).Select<dynamic>(inter).AsObjectCollection(trgHeaders.Select(h => h.Name).ToArray()), allTypesTrg)
+            };
+        }
+
+        private static ComparerStruct<object[]> GetMappingAutomatic(IDataProvider srcPrv, string srcRepo, IDataProvider trgPrv, string trgRepo)
+        {
+            IEnumerable<ColumnDescription> srcHeaders = srcPrv.GetColumns(srcRepo);
+            IEnumerable<ColumnDescription> trgHeaders = trgPrv.GetColumns(trgRepo);
+
+            if (trgHeaders.Count() > srcHeaders.Count())
+            {
+                trgHeaders = trgHeaders.Take(srcHeaders.Count());
+            }
+            else if (srcHeaders.Count() > trgHeaders.Count())
+            {
+                srcHeaders = srcHeaders.Take(trgHeaders.Count());
+            }
+
+            var allTypesSrc = srcHeaders.Select(h => h.Type);
+            var allTypesTrg = trgHeaders.Select(h => h.Type);
+            Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>> fnc = allTypesSrc.SequenceEqual(allTypesTrg) ? (Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>)KeepSame : ConvertType;
+
+            var srcKeys = srcHeaders.Select(h => h.Name).ToArray();
+            var trgKeys = trgHeaders.Select(h => h.Name).ToArray();
+
+            var srcDataGetter = srcPrv.GetQueryable(srcRepo).Select(String.Join(",", srcKeys));
+            var trgDataGetter = srcPrv.GetQueryable(trgRepo).Select(String.Join(",", trgKeys));
+
+            return new ComparerStruct<object[]>()
+            {
+                Name = "Automatic mapping (by position)",
+                SourceName = srcPrv.Name + " " + srcRepo,
+                TargetName = trgPrv.Name + " " + trgRepo,
+                SourceHeaders = srcKeys,
+                TargetHeaders = trgKeys,
+                Comparer = new SequenceEqualityComparer<object>(),
+                GetSourceData = () => fnc(srcDataGetter.AsObjectCollection(srcKeys), trgHeaders.Select(h => h.Type).ToArray()),
+                GetTargetData = () => fnc(trgDataGetter.AsObjectCollection(trgKeys), trgHeaders.Select(h => h.Type).ToArray())
             };
         }
 
@@ -247,55 +199,9 @@ namespace QuAnalyzer.UI.Pages
 
         private static IEnumerable<object[]> ConvertType(IEnumerable<IEnumerable<object>> src, Type[] types)
         {
-            return src.Select(c => c.Select((a, i) => SafeConvert(a, types[i])).ToArray());
+            return src.Select(c => c.Select((a, i) => a.SafeConvert(types[i])).ToArray());
         }
 
-        private static object SafeConvert(object a, Type type)
-        {
-            if (a is DBNull || a == null || (a is string && String.IsNullOrEmpty((string)a)))
-            {
-                return null;
-            }
-            else
-            {
-                Type aType = a.GetType();
-                Type t = Nullable.GetUnderlyingType(aType);
-
-                object safeValue;
-                if (t != null)
-                {
-                    safeValue = (a == null || a == DBNull.Value) ? null : Convert.ChangeType(a, t);
-                }
-                else
-                {
-                    safeValue = a;
-                }
-
-                return ChangeType(safeValue, type);
-            }
-        }
-
-        public static object ChangeType(object value, Type conversionType)
-        {
-            if (conversionType == null)
-            {
-                throw new ArgumentNullException("conversionType");
-            }
-
-            if (conversionType.IsGenericType &&
-              conversionType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
-            {
-                if (value == null)
-                {
-                    return null;
-                }
-
-                NullableConverter nullableConverter = new NullableConverter(conversionType);
-                conversionType = nullableConverter.UnderlyingType;
-            }
-
-            return Convert.ChangeType(value, conversionType, CultureInfo.InvariantCulture);
-        }
 
         private void lstSrc_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -382,12 +288,12 @@ namespace QuAnalyzer.UI.Pages
             var cmp = (IDataComparer)src.Tag;
             if (!openWindows.ContainsKey(cmp))
             {
-                var dWin = new Popup(new DetailsWindow(cmp));
+                var dWin = Popup.OpenNew(new DetailsWindow(cmp));
                 dWin.Closed += dWin_Closed;
                 openWindows.Add(cmp, dWin);
             }
 
-            openWindows[cmp].Show();
+            //openWindows[cmp].Show();
             openWindows[cmp].Activate();
         }
 
@@ -527,13 +433,7 @@ namespace QuAnalyzer.UI.Pages
         }
 
 
-        private void btnNewPrv_Click(object sender, RoutedEventArgs e)
-        {
-            var editor = new Popup(new MappingsEditor());
-            editor.Show();
-            editor.Activate();
-        }
-
+        private void btnNewPrv_Click(object sender, RoutedEventArgs e) => Popup.OpenNew(new MappingsEditor());
 
         private void btnAuto_Click(object sender, RoutedEventArgs e)
         {
@@ -548,31 +448,35 @@ namespace QuAnalyzer.UI.Pages
             {
                 if (!done.Contains(pr))
                 {
-                    var map = allprv.Where(p => p != pr).Select(p => new { source = pr, target = p, matches = p.Repositories.Keys.Intersect(pr.Repositories.Keys).ToList() })
+                    var map = allprv.Where(p => p != pr)
+                                    .Select(p => new
+                                    {
+                                        source = pr,
+                                        target = p,
+                                        matches = p.Repositories.Keys.Intersect(pr.Repositories.Keys).ToList()
+                                    })
                                     .Where(rel => rel.matches.Count > 0)
                                     .SelectMany(rel => rel.matches.Select(m => new { source = rel.source, target = rel.target, repository = m, sourceheaders = rel.source.GetColumns(m).Select(h => h.Name), targetheaders = rel.target.GetColumns(m).Select(h => h.Name) }))
                                     .Select(m => new SourcesMapper()
                                     {
-                                        Name = String.Format("{0} ({1}) / {2} ({1})", m.source.Name, m.repository, m.target.Name),
+                                        Name = $"{m.source.Name} ({m.repository}) / {m.target.Name} ({m.repository})",
                                         Source = m.source,
                                         Target = m.target,
                                         SourceRepository = m.repository,
                                         TargetRepository = m.repository,
-                                        AllMappings = m.sourceheaders.Where(k => m.targetheaders.Contains(k)).Select(k => new SourcesMapper.SimpleMap() { Source = k, Target = k }).ToList()
+                                        AllMappings = m.sourceheaders.Where(k => m.targetheaders.Contains(k)).Select(k => new SimpleMap(k, k)).ToList()
                                     });
 
                     mapper.AddAll(map);
 
-                    done = done.Union(map.Select(m => m.Source)).Union(map.Select(m => m.Target));
+                    done = done.Union(map.Select(m => m.Source)).Union(map.Select(m => m.Target)).ToList();
                 }
             }
         }
 
         private void btnEditMapping_Click(object sender, RoutedEventArgs e)
         {
-            var editor = new Popup(new MappingsEditor((SourcesMapper)((Button)sender).Tag));
-            editor.Show();
-            editor.Activate();
+            Popup.OpenNew(new MappingsEditor((SourcesMapper)((Button)sender).Tag));
         }
 
         private void btnDeleteMapping_Click(object sender, RoutedEventArgs e)

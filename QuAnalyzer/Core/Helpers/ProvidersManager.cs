@@ -1,30 +1,24 @@
-﻿using NuGet.Configuration;
-using NuGet.DependencyResolver;
-using NuGet.Packaging;
-using NuGet.Packaging.Core;
-using NuGet.Packaging.Signing;
-using NuGet.Protocol.Core.Types;
-using QuAnalyzer.Generic;
+﻿using QuAnalyzer.Generic;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
+using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers;
 using Wokhan.Data.Providers.Bases;
 
-namespace QuAnalyzer.Helpers
+namespace QuAnalyzer.Core.Helpers
 {
     public class ProvidersManager : NotifierHelper
     {
-        public IEnumerable<DataProviderStruct> Providers => DataProviders.AllProviders;
+        public IEnumerable<DataProviderDefinition> Providers => DataProviders.AllProviders;
 
         public ProvidersManager()
         {
-            DataProviders.AddTypes(typeof(RandomDataProvider));
-            Directory.EnumerateDirectories(AppDomain.CurrentDomain.BaseDirectory + "\\providers").ToList().ForEach(d => DataProviders.AddPath(d));
+            Directory.EnumerateDirectories(AppDomain.CurrentDomain.BaseDirectory + "\\providers")
+                     .ToList()
+                     .ForEach(d => DataProviders.AddPath(d));
         }
 
         internal void TriggerUpdate()

@@ -6,7 +6,7 @@ namespace QuAnalyzer.Features.Comparison
 {
     public class SequenceComparer : IComparer<IEnumerable<object>>
     {
-        private static SequenceEqualityComparer sec = new SequenceEqualityComparer();
+        private static SequenceEqualityComparer<object> sec = new SequenceEqualityComparer<object>();
         private string[] keys;
 
         public SequenceComparer()

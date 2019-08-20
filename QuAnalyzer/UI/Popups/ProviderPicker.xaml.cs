@@ -18,7 +18,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnNewPrv_Click(object sender, RoutedEventArgs e)
         {
-            var providerName = ((DataProviderStruct)lstProvidersTypes.SelectedItem).Name;
+            var providerName = ((DataProviderDefinition)lstProvidersTypes.SelectedItem).Name;
             var newprv = DataProviders.CreateInstance(providerName, new Dictionary<string, object>());
             //((App)Application.Current).CurrentProject.CurrentProviders.Add(newprv);
 

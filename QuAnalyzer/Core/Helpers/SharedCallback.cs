@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace QuAnalyzer.Helpers
+namespace QuAnalyzer.Core.Helpers
 {
     public static class SharedCallback
     {

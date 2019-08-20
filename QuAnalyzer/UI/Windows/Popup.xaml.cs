@@ -1,4 +1,6 @@
 ﻿using MahApps.Metro.Controls;
+using QuAnalyzer.UI.Popups;
+using System;
 using System.Windows.Controls;
 
 namespace QuAnalyzer.UI.Windows
@@ -8,7 +10,7 @@ namespace QuAnalyzer.UI.Windows
     /// </summary>
     public partial class Popup : MetroWindow
     {
-        public Popup(Page content)
+        private Popup(Page content)
         {
             InitializeComponent();
 
@@ -23,6 +25,15 @@ namespace QuAnalyzer.UI.Windows
         public void GoToPage(Page content)
         {
             container.Navigate(content);
+        }
+
+        internal static Popup OpenNew(Page content)
+        {
+            var instance = new Popup(content);
+            instance.Show();
+            instance.Activate();
+
+            return instance;
         }
     }
 }

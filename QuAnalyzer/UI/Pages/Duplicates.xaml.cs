@@ -15,6 +15,7 @@ using System.Windows.Threading;
 using Wokhan.Collections.Extensions;
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
+using Wokhan.WPF.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -297,8 +298,8 @@ namespace QuAnalyzer.UI.Pages
 
                 LoadingProgress = 1;
                 
-                var keyComparer = new SequenceEqualityComparer(0, keys.Length);
-                var ret = Comparison.InitiateDuplicates(dataObjectArray.WithProgress(i => { Status = $"Checked {i} entries"; LoadingProgress = (int)(i * 100 / dataObjectArray.Count); }), keyComparer, new SequenceEqualityComparer()).Duplicates;
+                var keyComparer = new SequenceEqualityComparer<object>(0, keys.Length);
+                var ret = Comparison.InitiateDuplicates(dataObjectArray.WithProgress(i => { Status = $"Checked {i} entries"; LoadingProgress = (int)(i * 100 / dataObjectArray.Count); }), keyComparer, new SequenceEqualityComparer<object>()).Duplicates;
 
                 if (!KeepDuplicates)
                 {
