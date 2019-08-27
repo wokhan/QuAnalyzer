@@ -16,7 +16,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Border BorderBrush="Gray" BorderThickness="0,0,0,2" Background="WhiteSmoke" Padding="10">
+        <Border BorderBrush="LightGray" BorderThickness="0,0,0,2" Background="WhiteSmoke" Padding="10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -28,14 +28,14 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Border Grid.RowSpan="3" Height="40" MinWidth="40" Background="White" BorderBrush="Gray" BorderThickness="1">
-                    <Image Source="{Binding CurrentType.IconPath}" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Image Source="{Binding CurrentType.IconPath, Converter={StaticResource imageSourceConverter}}" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
                 <Label Grid.Column="1" Content="{Binding CurrentType.Name}" FontWeight="Bold" />
                 <Label Grid.Column="1" Grid.Row="1" Content="{Binding CurrentType.Copyright}" FontSize="10" />
                 <Label Grid.Column="1" Grid.Row="2" Content="{Binding CurrentType.Description}" />
             </Grid>
         </Border>
-        <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="0,0,0,1">
+        <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="0,0,0,1">
             <Grid Margin="10" Grid.Row="1">
                 <Label FontWeight="Bold" Content="Name:" HorizontalAlignment="Left" VerticalContentAlignment="Center" />
                 <TextBox VerticalAlignment="Top" Margin="50,5,5,5" x:Name="txtProviderName" Text="{Binding CurrentProvider.Name}" />
@@ -50,22 +50,12 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl x:Name="itms"  ItemsSource="{Binding ExpParameters}">
+                    <ItemsControl x:Name="itms" ItemsSource="{Binding ExpParameters}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <GroupBox>
                                     <GroupBox.Header>
-                                        <RadioButton x:Name="rdb" GroupName="optionsGroup" Background="LightGray" BorderBrush="LightGray" Content="{Binding Key}" Checked="rdb_Checked">
-                                            <RadioButton.Style>
-                                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding ItemsSource.Count, ElementName=itms}" Value="1">
-                                                            <Setter Property="IsChecked" Value="True" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </RadioButton.Style>
-                                        </RadioButton>
+                                        <RadioButton x:Name="rdb" IsChecked="{Binding ItemsSource.Count, ElementName=itms, Converter={StaticResource valueChecker}, ConverterParameter=1, Mode=OneWay}" GroupName="optionsGroup" Background="LightGray" BorderBrush="LightGray" Content="{Binding Key}" Checked="rdb_Checked" />
                                     </GroupBox.Header>
                                     <ItemsControl Grid.IsSharedSizeScope="True" IsEnabled="{Binding IsChecked, ElementName=rdb, Mode=OneWay}" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True" x:Name="itms">
                                         <ItemsControl.Resources>

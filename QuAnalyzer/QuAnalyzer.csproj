@@ -47,23 +47,16 @@
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.6.0-preview7.19362.9" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.18" />
     <PackageReference Include="System.Management" Version="4.6.0-preview7.19362.9" />
+    <PackageReference Include="VirtualizingObservableCollection" Version="1.2.0" />
+    <PackageReference Include="Wokhan.Core" Version="1.190826.10.123" />
+    <PackageReference Include="Wokhan.Data.Providers" Version="1.190826.1.117" />
+    <PackageReference Include="Wokhan.Data.Providers.ExcelDataProvider" Version="1.190826.1.117" />
+    <PackageReference Include="Wokhan.WPF" Version="1.190826.10.123" />
   </ItemGroup>
   <ItemGroup>
     <!--<Reference Include="AlphaChiTech.Virtualization, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL" /-->
     <Reference Include="De.TorstenMandelkow.MetroChart">
       <HintPath>Libs\De.TorstenMandelkow.MetroChart.dll</HintPath>
-    </Reference>
-    <Reference Include="Wokhan.Core">
-      <HintPath>..\..\Components\Wokhan.UI.WPF\bin\Debug\netcoreapp3.0\Wokhan.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Wokhan.Data.Providers">
-      <HintPath>..\..\DataProviders\DataProviders\bin\Debug\netcoreapp3.0\Wokhan.Data.Providers.dll</HintPath>
-    </Reference>
-    <Reference Include="Wokhan.Extensions">
-      <HintPath>..\..\Components\Wokhan.Extensions\bin\Debug\netstandard2.0\Wokhan.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Wokhan.UI.WPF">
-      <HintPath>..\..\Components\Wokhan.UI.WPF\bin\Debug\netcoreapp3.0\Wokhan.UI.WPF.dll</HintPath>
     </Reference>
     <!--<Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />

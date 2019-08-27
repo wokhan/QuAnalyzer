@@ -12,7 +12,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Wokhan.Collections.Extensions;
+using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
 using Wokhan.WPF.Extensions;

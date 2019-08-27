@@ -3,7 +3,7 @@
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:Converters="clr-namespace:MahApps.Metro.Converters;assembly=MahApps.Metro"
              xmlns:local="clr-namespace:QuAnalyzer.UI.Controls"
-             xmlns:BindingConverters="clr-namespace:Wokhan.Shared.UI.Converters;assembly=Wokhan.UI.WPF"
+             xmlns:BindingConverters="clr-namespace:Wokhan.Shared.UI.Converters;assembly=Wokhan.WPF"
              xmlns:System="clr-namespace:System;assembly=System.Runtime"
              x:Class="QuAnalyzer.App"
              StartupUri="UI/Windows/ModernMain.xaml">
@@ -18,6 +18,8 @@
             </ResourceDictionary.MergedDictionaries>
             <BindingConverters:BooleanNegateConverter x:Key="booleanNegator" />
             <BindingConverters:ObjectToBoolConverter x:Key="objectToBool" />
+            <BindingConverters:ImageSourceConverter x:Key="imageSourceConverter" />
+            <BindingConverters:ValueChecker x:Key="valueChecker" />
             <!--<Style TargetType="Button" BasedOn="{StaticResource MetroButton}"></Style>
             <Style TargetType="CheckBox" BasedOn="{StaticResource MetroCheckBox}"></Style>
             <Style TargetType="GroupBox" BasedOn="{StaticResource MetroGroupBox}"></Style>

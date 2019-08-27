@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Wokhan.Collections.Extensions;
+using Wokhan.UI.Extensions;
 
 namespace QuAnalyzer.Generic.Extensions
 {

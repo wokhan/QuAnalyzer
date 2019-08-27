@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Wokhan.Collections.Extensions;
 using Wokhan.Data.Providers.Contracts;
 using System.Linq.Dynamic.Core;
+using Wokhan.Collections.Generic.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {

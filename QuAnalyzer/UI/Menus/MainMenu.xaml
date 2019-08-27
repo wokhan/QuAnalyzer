@@ -179,7 +179,7 @@
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding ProviderTypeInfo.IconPath}" />
+                                <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding ProviderTypeInfo.IconPath, Converter={StaticResource imageSourceConverter}}" />
                                 <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Center" />
                                 <Button Grid.Column="2" Name="btnEditProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Tag="{Binding}" Click="btnEditProvider_Click">
                                     <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Blue" Data="{StaticResource appbar_edit}" Stretch="Uniform" />

@@ -5,6 +5,7 @@ using QuAnalyzer.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 
@@ -29,7 +30,7 @@ namespace QuAnalyzer
         public ProvidersManager ProvidersMan { get; private set; }
 
         //public string ApplicationInfo { get { return String.Format("{0} {1} v{2}", _appBase.Info.CompanyName, _appBase.Info.ProductName, _appBase.Info.Version); } }
-        public string ApplicationInfo { get; } = String.Format("{0} {1} v{2}", "", "", "");
+        public string ApplicationInfo { get; } = $"{Assembly.GetExecutingAssembly().GetName().Name} - v{Assembly.GetExecutingAssembly().GetName().Version}";
 
         //public string Copyright { get { return _appBase.Info.Copyright; } }
         public string Copyright { get; } = "";

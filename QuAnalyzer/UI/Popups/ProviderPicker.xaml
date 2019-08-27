@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:QuAnalyzer.UI.Pages"
+      x:Name="me"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Provider type">
@@ -14,16 +15,39 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Border BorderBrush="Gray" BorderThickness="0,0,0,2" Background="WhiteSmoke" Padding="10">
-                   <Label Content="Select a provider type below and press Next to continue." />
+        <Border BorderBrush="LightGray" BorderThickness="0,0,0,2" Background="WhiteSmoke" Padding="10">
+            <Label Content="Select a provider type below and press Next to continue." />
         </Border>
         <ScrollViewer x:Name="gridProviders" Grid.Row="2">
-            <ListView Margin="5" Name="lstProvidersTypes" ItemsSource="{Binding ProvidersMan.Providers, Source={x:Static Application.Current}, Mode=OneWay}">
-                <ItemsControl.ItemsPanel>
+            <ListView Margin="5" Name="lstProvidersTypes" ItemsSource="{Binding ProvidersView, Mode=OneWay}">
+                <ListView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Expander IsExpanded="False" Margin="10">
+                                                <Expander.Header>
+                                                    <TextBlock FontWeight="Bold" FontSize="14" VerticalAlignment="Bottom">
+                                                        <Run Text="{Binding Name, Mode=OneWay}" />
+                                                        <Run Text="{Binding ItemCount, StringFormat='(0 item(s))', Mode=OneWay}" FontSize="12" />
+                                                    </TextBlock>
+                                                </Expander.Header>
+                                                <ItemsPresenter />
+                                            </Expander>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </ListView.GroupStyle>
+                <!--<ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" IsItemsHost="True" />
+                        <UniformGrid ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" IsItemsHost="True" Columns="2" />
                     </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+                </ItemsControl.ItemsPanel>-->
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Grid ToolTip="{Binding Description}" Margin="1">
@@ -37,7 +61,7 @@
                                 <RowDefinition />
                             </Grid.RowDefinitions>
                             <Border Grid.RowSpan="2" BorderBrush="Gray" BorderThickness="1" Background="White" Margin="10">
-                                <Image HorizontalAlignment="Center" Height="28" VerticalAlignment="Center" Margin="2" Stretch="Uniform" MaxWidth="50" Source="{Binding IconPath}" />
+                                <Image HorizontalAlignment="Center" Height="28" VerticalAlignment="Center" Margin="2" Stretch="Uniform" MaxWidth="50" Source="{Binding IconPath,Converter={StaticResource imageSourceConverter}}" />
                             </Border>
                             <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" FontWeight="Bold" Text="{Binding Name}" VerticalAlignment="Center" />
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Copyright}" Margin="5,0" HorizontalAlignment="Left" TextWrapping="Wrap" FontSize="10" />
@@ -53,7 +77,7 @@
                     <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Next &gt;" Name="btnNext" HorizontalAlignment="Center" Click="btnNewPrv_Click" />
+                    <Button Content="Next &gt;" IsEnabled="{Binding SelectedValue,ElementName=lstProvidersTypes, Converter={StaticResource objectToBool}}" Name="btnNext" HorizontalAlignment="Center" Click="btnNewPrv_Click" />
                 </StackPanel>
             </Grid>
         </Border>
