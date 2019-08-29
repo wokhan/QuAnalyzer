@@ -10,7 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Threading;
-using Wokhan.Collections.Extensions;
+using Wokhan.Collections.Generic.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {

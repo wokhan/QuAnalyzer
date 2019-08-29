@@ -1,9 +1,7 @@
-﻿using QuAnalyzer.Generic;
-using QuAnalyzer.UI.Windows;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Wokhan.Collections.Extensions;
+using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Core.ComponentModel;
 
 namespace QuAnalyzer.Features.Comparison

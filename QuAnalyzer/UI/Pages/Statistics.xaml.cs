@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Controls;
 using Wokhan.Collections;
-using Wokhan.Collections.Extensions;
+using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Core.Extensions;
 using Wokhan.Data.Providers.Contracts;
 

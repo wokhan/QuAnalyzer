@@ -11,7 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using Wokhan.Collections.Extensions;
+using Wokhan.Collections.Generic.Extensions;
 using LinqExpressions = System.Linq.Expressions;
 
 namespace QuAnalyzer.UI.Popups

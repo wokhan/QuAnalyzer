@@ -48,10 +48,9 @@
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.18" />
     <PackageReference Include="System.Management" Version="4.6.0-preview7.19362.9" />
     <PackageReference Include="VirtualizingObservableCollection" Version="1.2.0" />
-    <PackageReference Include="Wokhan.Core" Version="1.190826.10.123" />
-    <PackageReference Include="Wokhan.Data.Providers" Version="1.190826.1.117" />
-    <PackageReference Include="Wokhan.Data.Providers.ExcelDataProvider" Version="1.190826.1.117" />
-    <PackageReference Include="Wokhan.WPF" Version="1.190826.10.123" />
+    <PackageReference Include="Wokhan.Core" Version="1.1908.2902.156" />
+    <PackageReference Include="Wokhan.Data.Providers.ExcelDataProvider" Version="1.1908.2901.157" />
+    <PackageReference Include="Wokhan.WPF" Version="1.1908.2902.156" />
   </ItemGroup>
   <ItemGroup>
     <!--<Reference Include="AlphaChiTech.Virtualization, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL" /-->
