@@ -7,213 +7,86 @@
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       mc:Ignorable="d" d:DesignHeight="460">
-    <UserControl.Resources>
-        <Style TargetType="Controls:Tile" BasedOn="{StaticResource {x:Type Controls:Tile}}">
-            <Setter Property="Margin" Value="10,10,10,0" />
-            <Setter Property="Height" Value="80" />
-            <Setter Property="Width" Value="80" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </Style>
-        <Style TargetType="TextBlock">
-            <Setter Property="Foreground" Value="Black" />
-        </Style>
-        <Style TargetType="Popup">
-            <Style.Resources>
-                <Style TargetType="{x:Type Button}">
-                    <Setter Property="Background" Value="White" />
-                    <Setter Property="Foreground" Value="Black" />
-                    <Setter Property="FontSize" Value="11" />
-                    <Setter Property="Padding" Value="10,2" />
-                    <Setter Property="BorderThickness" Value="0" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type Button}">
-                                <Border x:Name="Border" Margin="0" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" RecognizesAccessKey="True" />
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsPressed" Value="True">
-                                        <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" TargetName="Border" />
-                                        <Setter Property="Foreground" Value="White" />
-                                    </Trigger>
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Foreground" Value="Gray" />
-                                    </Trigger>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="LightGray" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </Style.Resources>
-        </Style>
-    </UserControl.Resources>
     <Grid Background="WhiteSmoke">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="500" />
-        </Grid.ColumnDefinitions>
-        <StackPanel Background="LightGray">
-            <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
-                <Controls:Tile x:Name="btnMenuOpen" Margin="0"  Click="btnMenuOpen_Click" Width="60" HorizontalAlignment="Left" VerticalAlignment="Top" Background="White" BorderBrush="Gray" BorderThickness="1,1,0,1">
-                    <Grid>
-                        <Path Fill="#CCBF4747" Width="32" Margin="0,-10,0,0" Data="{StaticResource appbar_folder_open}" Stretch="Uniform" />
-                        <TextBlock Margin="0,0,0,-10" HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="Open..." />
-                    </Grid>
-                </Controls:Tile>
-                <Controls:Tile x:Name="lstRecentFiles" Click="lstRecentFiles_Click" Margin="0" Width="22" BorderBrush="Gray" BorderThickness="0,1,1,1" Background="#FFF1F1F1">
-                    <Path Width="9" Data="{StaticResource appbar_chevron_down}" Fill="#CCBF4747" Stretch="Uniform"/>
-                </Controls:Tile>
-                <Popup x:Name="ctxRecentFiles" StaysOpen="False" AllowsTransparency="True">
-                    <Border Background="White" BorderBrush="#CCBF4747" BorderThickness="1" Margin="0,0,5,5">
-                        <Border.Effect>
-                            <DropShadowEffect ShadowDepth="1" />
-                        </Border.Effect>
-                        <ItemsControl ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Button FontSize="12" IsEnabled="{Binding Value}" Click="ctxRecentFiles_Click" CommandParameter="{Binding Key}" HorizontalContentAlignment="Left">
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                            <Path Fill="Black" Height="16" Data="{StaticResource appbar_page_xml}" Stretch="Uniform" />
-                                            <Label Foreground="{Binding Foreground,RelativeSource={RelativeSource AncestorType=Button}}" Content="{Binding Key}"/>
-                                        </StackPanel>
-                                    </Button>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Border>
-                </Popup>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
-                <Controls:Tile x:Name="btnMenuSave" Margin="0" Background="White" BorderThickness="1,1,0,1" BorderBrush="Gray"  Click="btnMenuSave_Click" Width="60">
-                    <Grid>
-                        <Path Fill="#CC4747BF" Width="26" Margin="0,-10,0,0" Data="{StaticResource appbar_disk}" Stretch="Uniform" />
-                        <TextBlock Margin="0,0,0,-10" HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="Save" />
-                    </Grid>
-                </Controls:Tile>
-                <Controls:Tile x:Name="btnSaveAs" Click="btnSaveAs_Click" Margin="0,0,0,0" Width="22" Background="#FFF1F1F1" BorderBrush="Gray" BorderThickness="0,1,1,1">
-                    <Path Width="9" Data="{StaticResource appbar_chevron_down}" Fill="#CC4747BF" Stretch="Uniform"/>
-                </Controls:Tile>
-                <Popup x:Name="ctxSaveAs" StaysOpen="False" AllowsTransparency="True">
-                    <Border BorderBrush="#CC4747BF" BorderThickness="1" Margin="0,0,5,5">
-                        <Border.Effect>
-                            <DropShadowEffect ShadowDepth="1" />
-                        </Border.Effect>
-                        <Button FontSize="12" Click="btnMenuSaveAs_Click">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource appbar_disk_download}" Stretch="Uniform" Fill="Black" Height="16" />
-                                <Label Foreground="{Binding Foreground,RelativeSource={RelativeSource AncestorType=Button}}" Content="Save as..."/>
-                            </StackPanel>
-                        </Button>
-                    </Border>
-                </Popup>
-            </StackPanel>
-            <Controls:Tile x:Name="btnMenuNew" Click="btnMenuNew_Click" Background="White" BorderBrush="Gray" BorderThickness="1">
-                <Grid>
-                    <Path Fill="#CC1DAE16" Width="32" Margin="0,-10,0,0" Data="{StaticResource appbar_folder_star}" Stretch="Uniform" />
-                    <TextBlock Margin="0,0,0,-10" HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="New project" />
-                </Grid>
-            </Controls:Tile>
-            <!--<Controls:Tile x:Name="btnMenuAbout" Click="btnMenuAbout_Click" Background="#CC1DAE16">
-                <Grid>
-                    <Path Fill="White" Width="32" Margin="0,-10,0,0" Data="{StaticResource appbar_information_circle}" Stretch="Uniform" />
-                    <TextBlock Margin="0,0,0,-10" HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="About" />
-                </Grid>
-            </Controls:Tile>-->
-        </StackPanel>
-        <Rectangle Grid.Column="1" Margin="0,0,10,0" StrokeDashArray="1,2,0" Stroke="Gray" Width="1" StrokeThickness="1" />
-        <Controls:Tile VerticalAlignment="Bottom" Margin="10" x:Name="btnMenuExit" Click="btnMenuExit_Click" BorderBrush="Gray" BorderThickness="1" Background="White">
-            <Grid>
-                <Path Fill="#FFDD0000" Width="30" Margin="0,-10,0,0" Data="{StaticResource appbar_door_leave}" Stretch="Uniform" />
-                <TextBlock Margin="0,0,0,-10" HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="Exit" />
-            </Grid>
-        </Controls:Tile>
-        <Grid Grid.Column="2" Margin="0,10,10,10" Background="White">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*"  />
-            </Grid.RowDefinitions>
-            <StackPanel Margin="0" Grid.Row="0">
-                <Label Content="Project name" Foreground="Black" Background="LightGray" FontWeight="Bold" />
-                <TextBox TextWrapping="Wrap" Background="White" Foreground="Black" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}" Margin="10,10" />
-                <Label Content="Sources" Foreground="Black" Background="LightGray" FontWeight="Bold" />
-                <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
-                    <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{StaticResource appbar_add}"/>
-                </WrapPanel>
-                <ListBox Height="200" Margin="5" Grid.Column="0" Grid.RowSpan="3" Name="lstProviders" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" VerticalAlignment="Stretch">
-                    <ListBox.Style>
-                        <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate>
-                                                <TextBlock Margin="10" TextWrapping="Wrap" Text="Please start by adding a new connector instance." FontStyle="Italic" />
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ListBox.Style>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Margin="0" Grid.Row="1">
+            <Label Content="Sources" Foreground="Black" Background="LightGray" FontWeight="Bold" />
+            <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
+                <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{StaticResource appbar_add}"/>
+            </WrapPanel>
+            <TreeView Height="200" Margin="5" Grid.Column="0" Grid.RowSpan="3" Name="lstProviders" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" VerticalAlignment="Stretch">
+                <TreeView.Style>
+                    <Style TargetType="TreeView" BasedOn="{StaticResource {x:Type TreeView}}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <TextBlock Margin="10" TextWrapping="Wrap" Text="Please start by adding a new connector instance." FontStyle="Italic" />
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TreeView.Style>
+                <TreeView.Resources>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="OverridesDefaultStyle" Value="True" />
+                        <Style.Triggers>
+                            <Trigger Property="Selector.IsSelected" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TreeView.Resources>
+                <TreeView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Height="Auto" Width="Auto">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="ImgCol" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding ProviderTypeInfo.IconPath, Converter={StaticResource imageSourceConverter}}" />
+                            <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Center" />
+                            <Button Grid.Column="2" Name="btnEditProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Tag="{Binding}" Click="btnEditProvider_Click">
+                                <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Blue" Data="{StaticResource appbar_edit}" Stretch="Uniform" />
+                            </Button>
+                            <Button Grid.Column="3" Name="btnDeleteProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteProvider_Click">
+                                <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+            <Label Content="Options" Foreground="Black" Background="LightGray" FontWeight="Bold" />
+            <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="5,0" Margin="5,10" Foreground="Black" Content="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static Application.Current}, FallbackValue=True}"  />
+            <StackPanel>
+                <Label Content="Project color" />
+                <ListBox ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}" SelectedItem="{Binding CurrentProject.AccentColor, Source={x:Static Application.Current}, FallbackValue=True}">
                     <ListBox.Resources>
                         <Style TargetType="ListItem">
                             <Setter Property="OverridesDefaultStyle" Value="True" />
-                            <Style.Triggers>
-                                <Trigger Property="Selector.IsSelected" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
-                                </Trigger>
-                            </Style.Triggers>
                         </Style>
                     </ListBox.Resources>
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel MinHeight="32" Margin="5" IsItemsHost="True" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Grid Height="Auto" Width="Auto">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" SharedSizeGroup="ImgCol" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding ProviderTypeInfo.IconPath, Converter={StaticResource imageSourceConverter}}" />
-                                <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Center" />
-                                <Button Grid.Column="2" Name="btnEditProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Tag="{Binding}" Click="btnEditProvider_Click">
-                                    <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Blue" Data="{StaticResource appbar_edit}" Stretch="Uniform" />
-                                </Button>
-                                <Button Grid.Column="3" Name="btnDeleteProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteProvider_Click">
-                                    <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
-                                </Button>
-                            </Grid>
+                            <Controls:Tile IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding}" Margin="2" Height="28" Width="28" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <Label Content="Options" Foreground="Black" Background="LightGray" FontWeight="Bold" />
-                <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="5,0" Margin="5,10" Foreground="Black" Content="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static Application.Current}, FallbackValue=True}"  />
-                <StackPanel>
-                    <Label Content="Project color" />
-                    <ListBox ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}" SelectedItem="{Binding CurrentProject.AccentColor, Source={x:Static Application.Current}, FallbackValue=True}">
-                        <ListBox.Resources>
-                            <Style TargetType="ListItem">
-                                <Setter Property="OverridesDefaultStyle" Value="True" />
-                            </Style>
-                        </ListBox.Resources>
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel MinHeight="32" Margin="5" IsItemsHost="True" />
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Controls:Tile IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding}" Margin="2" Height="28" Width="28" />
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </StackPanel>
             </StackPanel>
-        </Grid>
+        </StackPanel>
     </Grid>
 </UserControl>

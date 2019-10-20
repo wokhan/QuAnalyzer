@@ -90,7 +90,7 @@ namespace QuAnalyzer.UI.Pages
             public Type Type { get; set; }
             public string ComparerExpression { get; set; }
 
-            public object TargetValue { get; private set; }
+            public object TargetValue { get; set; }
             /*public string TargetValue
             {
                 get { return TargetValueAsObject != null ? TargetValueAsObject.ToString() : String.Empty; }

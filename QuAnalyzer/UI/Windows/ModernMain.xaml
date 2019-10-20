@@ -3,12 +3,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     x:Class="QuAnalyzer.UI.Windows.ModernMain"
+    xmlns:QuAnalyzerHelpers="clr-namespace:QuAnalyzer.Core.Helpers"
     xmlns:UserControls="clr-namespace:QuAnalyzer.UI.Menus"
     xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls" 
     Title="QuAnalyzer" ShowIconOnTitleBar="True" ShowTitleBar="True"
     ResizeMode="CanResizeWithGrip" TitleAlignment="Center"
     MinWidth="1000" MinHeight="600" Height="600"
-    
     Width="900" BorderThickness="1" UseLayoutRounding="True" SnapsToDevicePixels="True"
     BorderBrush="Gray" WindowTitleBrush="White" TitleForeground="Black">
     <Window.Resources>
@@ -23,6 +23,48 @@
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo />
     </Window.TaskbarItemInfo>
+    <Controls:MetroWindow.TitleTemplate>
+        <DataTemplate>
+            <Grid>
+            <StackPanel Background="LightGray" HorizontalAlignment="Left" Orientation="Horizontal">
+                <Controls:DropDownButton Content="Open..." ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}" x:Name="btnMenuOpen" Click="btnMenuOpen_Click">
+                    <Controls:DropDownButton.Icon>
+                        <Path Fill="#CCBF4747" Width="20" Margin="0,0,5,0" Data="{StaticResource appbar_folder_open}" Stretch="Uniform" />
+                    </Controls:DropDownButton.Icon>
+                </Controls:DropDownButton>
+                <Controls:DropDownButton Content="Save" x:Name="btnMenuSave" Click="btnMenuSave_Click">
+                    <Controls:DropDownButton.Icon>
+                        <Path Fill="#CC4747BF" Height="16" Margin="0,0,5,0" Data="{StaticResource appbar_disk}" Stretch="Uniform" />
+                    </Controls:DropDownButton.Icon>
+                    <Controls:DropDownButton.Items>
+                        <Button FontSize="12" Click="btnMenuSaveAs_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="{StaticResource appbar_disk_download}" Stretch="Uniform" Fill="Black" Height="16" />
+                                <Label Foreground="{Binding Foreground,RelativeSource={RelativeSource AncestorType=Button}}" Content="Save as..."/>
+                            </StackPanel>
+                        </Button>
+                    </Controls:DropDownButton.Items>
+                </Controls:DropDownButton>
+                <!--</StackPanel>-->
+                <Button x:Name="btnMenuNew" Click="btnMenuNew_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Path Fill="#CC1DAE16" Height="16" Margin="0,0,5,0" Data="{StaticResource appbar_folder_star}" Stretch="Uniform" />
+                        <TextBlock Text="New project" />
+                    </StackPanel>
+                </Button>
+                <!--<Controls:Tile x:Name="btnMenuAbout" Click="btnMenuAbout_Click" Background="#CC1DAE16">
+                <Grid>
+                    <Path Fill="White" Width="32" Margin="0,-10,0,0" Data="{StaticResource appbar_information_circle}" Stretch="Uniform" />
+                    <TextBlock Margin="0,0,0,-10" HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="About" />
+                </Grid>
+            </Controls:Tile>-->
+            </StackPanel>
+                <Grid HorizontalAlignment="Center">
+                    <TextBox TextWrapping="Wrap" Background="White" Width="Auto" Foreground="Black" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}" Margin="5" />
+                </Grid>
+            </Grid>
+        </DataTemplate>
+    </Controls:MetroWindow.TitleTemplate>
     <Controls:MetroWindow.Flyouts>
         <Controls:FlyoutsControl>
             <Controls:Flyout x:Name="flyAbout" Position="Right" Width="350" Background="{DynamicResource AccentColorBrush}" CloseButtonVisibility="Collapsed" IsOpen="{Binding IsChecked, Mode=TwoWay, ElementName=btnAbout}" IsPinned="False" Header="About" Margin="0,31,0,0">
@@ -36,15 +78,14 @@
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>
     <Grid Name="mainGrid">
+        <Controls:Flyout IsAutoCloseEnabled="False" Position="Left" IsOpen="True" Header="Sources" Margin="0,0,0,26" Foreground="Black" Background="WhiteSmoke" HorizontalAlignment="Left" Width="250">
+            <UserControls:MainMenu x:Name="mainMenu" Close="mainMenu_Close" />
+        </Controls:Flyout>
         <Controls:MetroAnimatedSingleRowTabControl Name="tabMenu" Margin="0,0,0,25" Padding="10">
             <TabControl.Resources>
                 <Style TargetType="Frame">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding CurrentProject.CurrentProviders.Count, Source={x:Static Application.Current}}" Value="0">
-                            <Setter Property="IsEnabled" Value="False" />
-                            <Setter Property="Opacity" Value="0.3" />
-                        </DataTrigger>
-                    </Style.Triggers>
+                    <Setter Property="Margin" Value="{Binding ActualWidth,ElementName=mainMenu,Converter={StaticResource thicknessConverter},ConverterParameter='LEFT'}" />
+                    <Setter Property="NavigationUIVisibility" Value="Hidden" />
                 </Style>
                 <Style TargetType="UC:DecoratedTabItem" BasedOn="{StaticResource {x:Type TabItem}}">
                     <Setter Property="Height" Value="32"/>
@@ -98,80 +139,26 @@
                     </Setter>
                 </Style>
             </TabControl.Resources>
-            <TabItem Width="{Binding ActualWidth, ElementName=btnMenu}" Visibility="Hidden" />
+            <TabItem Width="{Binding ActualWidth, ElementName=mainMenu}" Visibility="Hidden" />
             <UC:DecoratedTabItem IsSelected="True" Header="DISPLAY" Image="{StaticResource appbar_list}">
-                <Frame Margin="-10" Source="../Pages/Viewer.xaml" NavigationUIVisibility="Hidden"/>
+                <Frame Source="../Pages/Viewer.xaml" />
             </UC:DecoratedTabItem>
             <UC:DecoratedTabItem Header="DUPLICATES" Image="{StaticResource appbar_layer_delete}">
-                <Frame Margin="-10" Source="../Pages/Duplicates.xaml" NavigationUIVisibility="Hidden"/>
-            </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="COMPARISON" Image="{StaticResource appbar_arrow_left_right}">
-                <Frame Margin="-10" Source="../Pages/Compare.xaml" NavigationUIVisibility="Hidden" />
+                <Frame Source="../Pages/Duplicates.xaml" />
             </UC:DecoratedTabItem>
             <UC:DecoratedTabItem Header="PATTERNS" Image="{StaticResource appbar_draw_pixel_fill_grid}">
-                <Frame Margin="-10" Source="../Pages/Patterns.xaml" NavigationUIVisibility="Hidden"/>
-            </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="MONITORING" Image="{StaticResource appbar_image_redeye}">
-                <Frame Margin="-10" Source="../Pages/Monitor.xaml" NavigationUIVisibility="Hidden"/>
+                <Frame Source="../Pages/Patterns.xaml" />
             </UC:DecoratedTabItem>
             <UC:DecoratedTabItem Header="STATISTICS" Image="{StaticResource appbar_graph_bar}">
-                <Frame Margin="-10" Source="../Pages/Statistics.xaml" NavigationUIVisibility="Hidden"/>
+                <Frame Source="../Pages/Statistics.xaml" />
+            </UC:DecoratedTabItem>
+            <UC:DecoratedTabItem Header="COMPARISON" Image="{StaticResource appbar_arrow_left_right}">
+                <Frame Source="../Pages/Compare.xaml" />
+            </UC:DecoratedTabItem>
+            <UC:DecoratedTabItem Header="MONITORING" Image="{StaticResource appbar_image_redeye}">
+                <Frame Source="../Pages/Monitor.xaml" />
             </UC:DecoratedTabItem>
         </Controls:MetroAnimatedSingleRowTabControl>
-        <ToggleButton Name="btnMenu" IsChecked="True" HorizontalAlignment="Left" VerticalAlignment="Top" Height="32">
-            <ToggleButton.Style>
-                <Style TargetType="ToggleButton">
-                    <Setter Property="OverridesDefaultStyle" Value="True" />
-                    <Setter Property="Foreground" Value="Black" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ToggleButton">
-                                <Grid Background="{TemplateBinding Background}">
-                                    <ContentPresenter VerticalAlignment="Center" />
-                                </Grid>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                    <Style.Triggers>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsChecked" Value="False" />
-                                <Condition Property="IsMouseOver" Value="False" />
-                            </MultiTrigger.Conditions>
-                            <MultiTrigger.Setters>
-                                <Setter Property="Background" Value="LightGray" />
-                            </MultiTrigger.Setters>
-                        </MultiTrigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
-                            <Setter Property="Foreground" Value="White" />
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
-                            <Setter Property="Foreground" Value="White" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ToggleButton.Style>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <Path Margin="10,0" Width="17" HorizontalAlignment="Left" VerticalAlignment="Center" Data="{StaticResource appbar_tiles_nine}" Stretch="Uniform">
-                    <Path.Style>
-                        <Style TargetType="Path">
-                            <Setter Property="Fill" Value="Gray" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Path=IsChecked, ElementName=btnMenu}" Value="True">
-                                    <Setter Property="Fill" Value="White" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=IsMouseOver, ElementName=btnMenu}" Value="True">
-                                    <Setter Property="Fill" Value="White" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Path.Style>
-                </Path>
-                <TextBlock Margin="0,0,10,0" Text="PROJECT" />
-            </StackPanel>
-        </ToggleButton>
         <ToggleButton Name="btnTasks" IsChecked="False" BorderThickness="2,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Top" Height="32" Margin="0,0,40,0">
             <ToggleButton.Style>
                 <Style BasedOn="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" TargetType="ToggleButton">
@@ -252,24 +239,10 @@
                 </Path>
             </Grid>
         </ToggleButton>
-        <Grid HorizontalAlignment="Stretch" Margin="0,33,0,0" VerticalAlignment="Stretch">
-            <Grid.Style>
-                <Style TargetType="Grid">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding CurrentProject.CurrentProviders.Count, Source={x:Static Application.Current}}" Value="0">
-                            <Setter Property="Visibility" Value="Visible" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
-            <!--<Border Opacity="0.5" Background="LightGray" />-->
-            <Label BorderBrush="Gray" BorderThickness="1" Padding="30" Background="LightYellow" HorizontalAlignment="Center" VerticalAlignment="Center">Please add a provider or load an existing project through the Project menu first.</Label>
-        </Grid>
-        <Border BorderBrush="{DynamicResource AccentColorBrush}" Margin="0,30,0,25" BorderThickness="0,2,0,0">
-            <!--<Border.Effect>
+        <!--<Border BorderBrush="{DynamicResource AccentColorBrush}" Margin="0,30,0,25" BorderThickness="0,2,0,0">
+            --><!--<Border.Effect>
                 <DropShadowEffect Opacity="0.2"/>
-            </Border.Effect>-->
+            </Border.Effect>--><!--
             <Border.RenderTransform>
                 <TranslateTransform X="0" Y="0" />
             </Border.RenderTransform>
@@ -324,7 +297,7 @@
                 </Style>
             </Border.Style>
             <UserControls:MainMenu Close="mainMenu_Close" />
-        </Border>
+        </Border>-->
         <StatusBar Height="25" Background="{DynamicResource AccentColorBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
             <StatusBarItem>
                 <TextBlock Text="{Binding CurrentProject.FilePath, Source={x:Static Application.Current},FallbackValue='No project has been loaded nor saved.'}" Background="Transparent" HorizontalAlignment="Right" Margin="0,0,20,0" />

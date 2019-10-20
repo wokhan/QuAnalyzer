@@ -19,7 +19,7 @@
             <Label Content="Select a provider type below and press Next to continue." />
         </Border>
         <ScrollViewer x:Name="gridProviders" Grid.Row="2">
-            <ListView Margin="5" Name="lstProvidersTypes" ItemsSource="{Binding ProvidersView, Mode=OneWay}">
+            <ListView Margin="5" Name="lstProvidersTypes">
                 <ListView.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.ContainerStyle>
