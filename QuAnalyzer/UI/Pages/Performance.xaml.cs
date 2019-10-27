@@ -94,5 +94,9 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnGrCSV_Click(object sender, RoutedEventArgs e) => gridResults.ExportAsXLSX();
 
+        private void btnStopAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

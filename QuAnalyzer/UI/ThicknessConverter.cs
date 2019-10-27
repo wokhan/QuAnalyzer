@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace QuAnalyzer.UI.BindingConverters
 {
-    public sealed partial class ThicknessConverter : DependencyObject, IValueConverter
+    public sealed partial class ThicknessConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {

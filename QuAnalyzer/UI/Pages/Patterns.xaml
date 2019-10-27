@@ -11,19 +11,6 @@
       DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <DockPanel>
         <WrapPanel Style="{StaticResource ToolBar}">
-            <Label FontWeight="Bold" Content="Provider:" HorizontalAlignment="Left" VerticalAlignment="Center" />
-            <ComboBox Width="200" Name="lstDataProviders" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" VerticalAlignment="Center">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <WrapPanel>
-                            <Image HorizontalAlignment="Center" Grid.Column="0" Height="16" VerticalAlignment="Center" Margin="2" Source="{Binding ProviderTypeInfo.IconPath, Converter={StaticResource imageSourceConverter}}" />
-                            <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="2" Text="{Binding Name}" VerticalAlignment="Center" />
-                        </WrapPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-            <Label FontWeight="Bold" Content="Repository:" HorizontalAlignment="Left" VerticalAlignment="Center" />
-            <ComboBox Name="lstDataSources" Width="200" Grid.Row="1" ItemsSource="{Binding SelectedItem.Repositories.Keys, ElementName=lstDataProviders}" SelectionChanged="lstDataSources_SelectionChanged" VerticalAlignment="Center" />
             <Label FontWeight="Bold" Content="Attribute:" HorizontalAlignment="Left" VerticalAlignment="Center" />
             <ComboBox Name="lstAttributes" Width="200" Grid.Row="1" SelectionChanged="lstDataSources_SelectionChanged" VerticalAlignment="Center" />
         </WrapPanel>

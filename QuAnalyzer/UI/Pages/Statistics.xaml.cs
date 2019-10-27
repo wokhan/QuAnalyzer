@@ -1,4 +1,6 @@
 ﻿using QuAnalyzer.Features.Statistics;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Controls;
@@ -45,13 +47,15 @@ namespace QuAnalyzer.UI.Pages
             //ComputedStats = new Dictionary<string, ResultsStruct>();
 
             InitializeComponent();
+            ((App)App.Current).CurrentSelection.CollectionChanged += CurrentSelection_CollectionChanged;
         }
 
-        private void lstDataSources_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CurrentSelection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (lstDataSources.SelectedItem != null && btnAuto.IsChecked.Value)
+            var (prov, repo) = ((App)App.Current).CurrentSelection.FirstOrDefault();
+            if (prov != null && btnAuto.IsChecked.Value)
             {
-                Computedata();
+                Computedata(prov, repo);
             }
         }
 
@@ -75,16 +79,14 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnCompute_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            Computedata();
+            var (prov, repo) = ((App)App.Current).CurrentSelection.FirstOrDefault();
+            Computedata(prov, repo);
         }
 
-        private async void Computedata()
+        private async void Computedata(IDataProvider prv, string repo)
         {
             Progress = 0;
             ComputedStats.Clear();
-
-            var prv = (IDataProvider)lstDataProviders.SelectedItem;
-            var repo = (string)lstDataSources.SelectedItem;
 
             var headers = prv.GetColumns(repo);
 

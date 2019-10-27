@@ -6,87 +6,99 @@
       xmlns:QuAnalyzerHelpers="clr-namespace:QuAnalyzer.Core.Helpers"
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:ext="clr-namespace:Wokhan.Shared.UI.Xaml.Extensibility;assembly=Wokhan.WPF"
       mc:Ignorable="d" d:DesignHeight="460">
-    <Grid Background="WhiteSmoke">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel Margin="0" Grid.Row="1">
-            <Label Content="Sources" Foreground="Black" Background="LightGray" FontWeight="Bold" />
-            <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
-                <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{StaticResource appbar_add}"/>
-            </WrapPanel>
-            <TreeView Height="200" Margin="5" Grid.Column="0" Grid.RowSpan="3" Name="lstProviders" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" VerticalAlignment="Stretch">
-                <TreeView.Style>
-                    <Style TargetType="TreeView" BasedOn="{StaticResource {x:Type TreeView}}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate>
-                                            <TextBlock Margin="10" TextWrapping="Wrap" Text="Please start by adding a new connector instance." FontStyle="Italic" />
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TreeView.Style>
-                <TreeView.Resources>
-                    <Style TargetType="TreeViewItem">
-                        <Setter Property="OverridesDefaultStyle" Value="True" />
-                        <Style.Triggers>
-                            <Trigger Property="Selector.IsSelected" Value="True">
-                                <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </TreeView.Resources>
-                <TreeView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Height="Auto" Width="Auto">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="ImgCol" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding ProviderTypeInfo.IconPath, Converter={StaticResource imageSourceConverter}}" />
-                            <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Center" />
-                            <Button Grid.Column="2" Name="btnEditProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Tag="{Binding}" Click="btnEditProvider_Click">
-                                <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Blue" Data="{StaticResource appbar_edit}" Stretch="Uniform" />
-                            </Button>
-                            <Button Grid.Column="3" Name="btnDeleteProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteProvider_Click">
-                                <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
-                            </Button>
-                        </Grid>
-                    </DataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
-            <Label Content="Options" Foreground="Black" Background="LightGray" FontWeight="Bold" />
-            <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="5,0" Margin="5,10" Foreground="Black" Content="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static Application.Current}, FallbackValue=True}"  />
-            <StackPanel>
-                <Label Content="Project color" />
-                <ListBox ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}" SelectedItem="{Binding CurrentProject.AccentColor, Source={x:Static Application.Current}, FallbackValue=True}">
-                    <ListBox.Resources>
-                        <Style TargetType="ListItem">
-                            <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Label Content="Sources" Background="Gray" />
+        <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
+            <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{StaticResource appbar_add}"/>
+        </WrapPanel>
+        <ListView BorderThickness="0" SelectionMode="Multiple" Grid.Row="2" Name="lstProviders" ext:ItemsControlSelection.SelectedValues="{Binding CurrentSelection,Source={x:Static Application.Current}}" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
+            <ListView.Resources>
+                <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+            </ListView.Resources>
+            <ItemsControl.Style>
+                <Style TargetType="ItemsControl" BasedOn="{StaticResource {x:Type ItemsControl}}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <TextBlock Margin="10" TextWrapping="Wrap" Text="Please start by adding a new connector instance." FontStyle="Italic" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ItemsControl.Style>
+            <!--<ItemsControl.Resources>
+                <Style TargetType="ListItem" BasedOn="{StaticResource {x:Type ListItem}}">
+                    --><!--<Setter Property="OverridesDefaultStyle" Value="True" />--><!--
+                    <Style.Triggers>
+                        <Trigger Property="Selector.IsSelected" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ItemsControl.Resources>-->
+            <ItemsControl.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Expander BorderThickness="0">
+                                            <Expander.Header>
+                                                <Grid TextBlock.Foreground="Black" Background="Transparent">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="ImgCol" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
+                                                    <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name.Name}" VerticalAlignment="Center" />
+                                                    <Button Grid.Column="2" Name="btnEditProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Tag="{Binding}" Click="btnEditProvider_Click">
+                                                        <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Blue" Data="{StaticResource appbar_edit}" Stretch="Uniform" />
+                                                    </Button>
+                                                    <Button Grid.Column="3" Name="btnDeleteProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteProvider_Click">
+                                                        <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                                                    </Button>
+                                                </Grid>
+                                            </Expander.Header>
+                                            <ItemsPresenter />
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
                         </Style>
-                    </ListBox.Resources>
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel MinHeight="32" Margin="5" IsItemsHost="True" />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Controls:Tile IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding}" Margin="2" Height="28" Width="28" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
-        </StackPanel>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </ItemsControl.GroupStyle>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="10" TextBlock.Foreground="Black" Background="Transparent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="selCol" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox IsChecked="{Binding Selector.IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType=ListItem}}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Value}" />
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ListView>
     </Grid>
 </UserControl>

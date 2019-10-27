@@ -52,7 +52,7 @@ namespace QuAnalyzer.UI.Pages
 
             //ObservableCollection<object[]> real = new ObservableCollection<object[]>(cpd.Select(c => c.AsArray));
 
-            ListCollectionView cview = new ListCollectionView(real);
+            var cview = new ListCollectionView(real);
             cview.GroupDescriptions.Add(new PropertyGroupDescription("[0]"));
             allProgress.ItemsSource = cview;
         }

@@ -4,10 +4,13 @@ using QuAnalyzer.Generic.Diagnostics;
 using QuAnalyzer.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
+using Wokhan.Collections;
+using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer
 {
@@ -26,6 +29,7 @@ namespace QuAnalyzer
         };
 
         public Project CurrentProject { get; private set; }
+        public ObservableCollection<KeyValuePair<IDataProvider, string>> CurrentSelection { get; } = new ObservableCollection<KeyValuePair<IDataProvider, string>>();
         public ResourcesWatcher Performance { get; private set; }
         public ProvidersManager ProvidersMan { get; private set; }
 
@@ -40,8 +44,8 @@ namespace QuAnalyzer
         public App()
         {
             CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
-            
-            CurrentProject = new Project();
+
+            CurrentProject = new Project() { Name = "Unamed project" };
             Performance = new ResourcesWatcher();
             ProvidersMan = new ProvidersManager();
             

@@ -4,6 +4,8 @@ using System.Windows.Controls;
 using Wokhan.Data.Providers.Contracts;
 using System.Linq.Dynamic.Core;
 using Wokhan.Collections.Generic.Extensions;
+using System.Collections.Generic;
+using System;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -21,19 +23,12 @@ namespace QuAnalyzer.UI.Pages
         {
             InitializeComponent();
 
+            ((App)App.Current).CurrentSelection.CollectionChanged += CurrentSelection_CollectionChanged;
         }
 
-        /*Regex patRegChar = new Regex(@"[a-zA-Z]*");
-        Regex patRegNum = new Regex(@"\d*");
-        Regex patRegOther = new Regex(@"^\w*");
-
-        Regex reg = new Regex(@"^(?:(?:(?<a>[a-zA-Z]*?)|(?<nw>\W*?)|(?<d>\d*?))*?)$", RegexOptions.Multiline);
-        */
-
-        private async void lstDataSources_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void CurrentSelection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            var prov = (IDataProvider)lstDataProviders.SelectedItem;
-            var repo = (string)lstDataSources.SelectedValue;
+            var (prov, repo) = ((App)App.Current).CurrentSelection.FirstOrDefault();
             var attr = (string)lstAttributes.SelectedValue;
 
             if (repo != null && attr == null)
@@ -46,10 +41,15 @@ namespace QuAnalyzer.UI.Pages
             }
         }
 
+        private void lstDataSources_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            CurrentSelection_CollectionChanged(null, null);
+        }
+
         private async Task compute()
         {
-            var prov = (IDataProvider)lstDataProviders.SelectedItem;
-            var repo = (string)lstDataSources.SelectedValue;
+            var (prov, repo) = ((App)App.Current).CurrentSelection.FirstOrDefault();
+
             var attr = (string)lstAttributes.SelectedValue;
 
             if (repo != null && attr != null)
@@ -93,7 +93,7 @@ namespace QuAnalyzer.UI.Pages
             SimThreshold = (int)e.NewValue;
             if (gridPatterns != null)
             {
-                lstDataSources_SelectionChanged(null, null);
+                CurrentSelection_CollectionChanged(null, null);
             }
         }
 

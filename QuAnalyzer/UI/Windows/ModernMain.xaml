@@ -6,11 +6,11 @@
     xmlns:QuAnalyzerHelpers="clr-namespace:QuAnalyzer.Core.Helpers"
     xmlns:UserControls="clr-namespace:QuAnalyzer.UI.Menus"
     xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls" 
-    Title="QuAnalyzer" ShowIconOnTitleBar="True" ShowTitleBar="True"
-    ResizeMode="CanResizeWithGrip" TitleAlignment="Center"
-    MinWidth="1000" MinHeight="600" Height="600"
+    Title="QuAnalyzer" ShowIconOnTitleBar="False" TitleBarHeight="40" ShowTitleBar="True"
+    ResizeMode="CanResizeWithGrip" TitleAlignment="Stretch"
+    MinWidth="1030" MinHeight="600" Height="600"
     Width="900" BorderThickness="1" UseLayoutRounding="True" SnapsToDevicePixels="True"
-    BorderBrush="Gray" WindowTitleBrush="White" TitleForeground="Black">
+    BorderBrush="Gray" WindowTitleBrush="LightGray" TitleForeground="Black">
     <Window.Resources>
         <Style TargetType="{x:Type Controls:WindowButtonCommands}">
             <Style.Triggers>
@@ -25,43 +25,72 @@
     </Window.TaskbarItemInfo>
     <Controls:MetroWindow.TitleTemplate>
         <DataTemplate>
-            <Grid>
-            <StackPanel Background="LightGray" HorizontalAlignment="Left" Orientation="Horizontal">
-                <Controls:DropDownButton Content="Open..." ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}" x:Name="btnMenuOpen" Click="btnMenuOpen_Click">
-                    <Controls:DropDownButton.Icon>
-                        <Path Fill="#CCBF4747" Width="20" Margin="0,0,5,0" Data="{StaticResource appbar_folder_open}" Stretch="Uniform" />
-                    </Controls:DropDownButton.Icon>
-                </Controls:DropDownButton>
-                <Controls:DropDownButton Content="Save" x:Name="btnMenuSave" Click="btnMenuSave_Click">
-                    <Controls:DropDownButton.Icon>
-                        <Path Fill="#CC4747BF" Height="16" Margin="0,0,5,0" Data="{StaticResource appbar_disk}" Stretch="Uniform" />
-                    </Controls:DropDownButton.Icon>
-                    <Controls:DropDownButton.Items>
-                        <Button FontSize="12" Click="btnMenuSaveAs_Click">
-                            <StackPanel Orientation="Horizontal">
-                                <Path Data="{StaticResource appbar_disk_download}" Stretch="Uniform" Fill="Black" Height="16" />
-                                <Label Foreground="{Binding Foreground,RelativeSource={RelativeSource AncestorType=Button}}" Content="Save as..."/>
-                            </StackPanel>
-                        </Button>
-                    </Controls:DropDownButton.Items>
-                </Controls:DropDownButton>
-                <!--</StackPanel>-->
-                <Button x:Name="btnMenuNew" Click="btnMenuNew_Click">
-                    <StackPanel Orientation="Horizontal">
-                        <Path Fill="#CC1DAE16" Height="16" Margin="0,0,5,0" Data="{StaticResource appbar_folder_star}" Stretch="Uniform" />
-                        <TextBlock Text="New project" />
-                    </StackPanel>
-                </Button>
-                <!--<Controls:Tile x:Name="btnMenuAbout" Click="btnMenuAbout_Click" Background="#CC1DAE16">
-                <Grid>
-                    <Path Fill="White" Width="32" Margin="0,-10,0,0" Data="{StaticResource appbar_information_circle}" Stretch="Uniform" />
-                    <TextBlock Margin="0,0,0,-10" HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="About" />
-                </Grid>
-            </Controls:Tile>-->
-            </StackPanel>
-                <Grid HorizontalAlignment="Center">
-                    <TextBox TextWrapping="Wrap" Background="White" Width="Auto" Foreground="Black" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}" Margin="5" />
-                </Grid>
+            <Grid Margin="5">
+                <Menu x:Name="mainMenu" IsMainMenu="True" Background="Transparent">
+                    <Menu.Resources>
+                        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                            <Setter Property="Background" Value="Transparent" />
+                        </Style>
+                    </Menu.Resources>
+                    <MenuItem Header="_File">
+                        <MenuItem Header="Open..." x:Name="btnMenuOpen" Click="btnMenuOpen_Click" ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
+                            <MenuItem.Icon>
+                                <Path Fill="#CCBF4747" Width="20" Data="{StaticResource appbar_folder_open}" Stretch="Uniform" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Save" x:Name="btnMenuSave" Click="btnMenuSave_Click">
+                            <MenuItem.Icon>
+                                <Path Fill="#CC4747BF" Height="16" Data="{StaticResource appbar_disk}" Stretch="Uniform" />
+                            </MenuItem.Icon>
+                            <MenuItem Header="Save as..." Click="btnMenuSaveAs_Click">
+                                <MenuItem.Icon>
+                                    <Path Data="{StaticResource appbar_disk_download}" Stretch="Uniform" Fill="#CC4747BF" Height="16" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Header="New project" x:Name="btnMenuNew" Click="btnMenuNew_Click">
+                            <MenuItem.Icon>
+                                <Path Fill="#CC1DAE16" Height="16" Data="{StaticResource appbar_folder_star}" Stretch="Uniform" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Exit">
+                            <MenuItem.Icon>
+                                <Path Fill="OrangeRed" Height="16" Stretch="Uniform" Data="{StaticResource appbar_close}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="_Options">
+                        <CheckBox Content="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static Application.Current}, FallbackValue=True}"  />
+                        <MenuItem Header="Project color">
+                            <ListBox ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}" SelectedItem="{Binding CurrentProject.AccentColor, Source={x:Static Application.Current}, FallbackValue=True}">
+                                <ListBox.Resources>
+                                    <Style TargetType="ListItem">
+                                        <Setter Property="OverridesDefaultStyle" Value="True" />
+                                    </Style>
+                                </ListBox.Resources>
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel MinHeight="32" Margin="5" IsItemsHost="True" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Controls:Tile IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding}" Margin="2" Height="28" Width="28" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="_Help">
+                        <MenuItem Header="About" Name="btnAbout" IsChecked="False">
+                            <MenuItem.Icon>
+                                <Path Width="16" Stretch="Uniform" Data="{StaticResource appbar_information_circle}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </MenuItem>
+                </Menu>
+                <TextBox TextWrapping="Wrap" BorderBrush="Transparent" Background="Transparent" Width="Auto" Foreground="Black" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}" Margin="5" HorizontalAlignment="Center" />
             </Grid>
         </DataTemplate>
     </Controls:MetroWindow.TitleTemplate>
@@ -78,13 +107,16 @@
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>
     <Grid Name="mainGrid">
-        <Controls:Flyout IsAutoCloseEnabled="False" Position="Left" IsOpen="True" Header="Sources" Margin="0,0,0,26" Foreground="Black" Background="WhiteSmoke" HorizontalAlignment="Left" Width="250">
-            <UserControls:MainMenu x:Name="mainMenu" Close="mainMenu_Close" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Controls:Flyout TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" BorderBrush="{DynamicResource AccentColorBrush}" IsAutoCloseEnabled="False" Position="Left" IsOpen="True" Header="Sources" HorizontalAlignment="Left" Width="200" Background="Transparent">
+            <UserControls:MainMenu x:Name="mainMenu" />
         </Controls:Flyout>
-        <Controls:MetroAnimatedSingleRowTabControl Name="tabMenu" Margin="0,0,0,25" Padding="10">
+        <Controls:MetroAnimatedSingleRowTabControl Name="tabMenu" Margin="{Binding ActualWidth,ElementName=mainMenu,Converter={StaticResource thicknessConverter},ConverterParameter='LEFT'}">
             <TabControl.Resources>
                 <Style TargetType="Frame">
-                    <Setter Property="Margin" Value="{Binding ActualWidth,ElementName=mainMenu,Converter={StaticResource thicknessConverter},ConverterParameter='LEFT'}" />
                     <Setter Property="NavigationUIVisibility" Value="Hidden" />
                 </Style>
                 <Style TargetType="UC:DecoratedTabItem" BasedOn="{StaticResource {x:Type TabItem}}">
@@ -139,7 +171,6 @@
                     </Setter>
                 </Style>
             </TabControl.Resources>
-            <TabItem Width="{Binding ActualWidth, ElementName=mainMenu}" Visibility="Hidden" />
             <UC:DecoratedTabItem IsSelected="True" Header="DISPLAY" Image="{StaticResource appbar_list}">
                 <Frame Source="../Pages/Viewer.xaml" />
             </UC:DecoratedTabItem>
@@ -158,91 +189,18 @@
             <UC:DecoratedTabItem Header="MONITORING" Image="{StaticResource appbar_image_redeye}">
                 <Frame Source="../Pages/Monitor.xaml" />
             </UC:DecoratedTabItem>
+            <UC:DecoratedTabItem Header="PERFORMANCE" Image="{StaticResource appbar_image_redeye}">
+                <Frame Source="../Pages/Performance.xaml" />
+            </UC:DecoratedTabItem>
         </Controls:MetroAnimatedSingleRowTabControl>
-        <ToggleButton Name="btnTasks" IsChecked="False" BorderThickness="2,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Top" Height="32" Margin="0,0,40,0">
-            <ToggleButton.Style>
-                <Style BasedOn="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" TargetType="ToggleButton">
-                    <Style.Triggers>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsChecked" Value="False" />
-                                <Condition Property="IsMouseOver" Value="False" />
-                            </MultiTrigger.Conditions>
-                            <MultiTrigger.Setters>
-                                <Setter Property="Background" Value="LightGray" />
-                            </MultiTrigger.Setters>
-                        </MultiTrigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ToggleButton.Style>
-            <Grid>
-                <Path Width="32" Height="19" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Data="{StaticResource appbar_list_gear}">
-                    <Path.Style>
-                        <Style TargetType="Path">
-                            <Setter Property="Fill" Value="Gray" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Path=IsChecked, ElementName=btnTasks}" Value="True">
-                                    <Setter Property="Fill" Value="White" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=IsMouseOver, ElementName=btnTasks}" Value="True">
-                                    <Setter Property="Fill" Value="White" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Path.Style>
-                </Path>
-            </Grid>
-        </ToggleButton>
-        <ToggleButton Name="btnAbout" IsChecked="False" BorderThickness="2,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Top" Height="32">
-            <ToggleButton.Style>
-                <Style BasedOn="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" TargetType="ToggleButton">
-                    <Style.Triggers>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsChecked" Value="False" />
-                                <Condition Property="IsMouseOver" Value="False" />
-                            </MultiTrigger.Conditions>
-                            <MultiTrigger.Setters>
-                                <Setter Property="Background" Value="LightGray" />
-                            </MultiTrigger.Setters>
-                        </MultiTrigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ToggleButton.Style>
-            <Grid>
-                <Path Width="32" Height="19" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Data="{StaticResource appbar_information_circle}">
-                    <Path.Style>
-                        <Style TargetType="Path">
-                            <Setter Property="Fill" Value="Gray" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Path=IsChecked, ElementName=btnAbout}" Value="True">
-                                    <Setter Property="Fill" Value="White" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=IsMouseOver, ElementName=btnAbout}" Value="True">
-                                    <Setter Property="Fill" Value="White" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Path.Style>
-                </Path>
-            </Grid>
-        </ToggleButton>
+        
+        
         <!--<Border BorderBrush="{DynamicResource AccentColorBrush}" Margin="0,30,0,25" BorderThickness="0,2,0,0">
-            --><!--<Border.Effect>
+            -->
+        <!--<Border.Effect>
                 <DropShadowEffect Opacity="0.2"/>
-            </Border.Effect>--><!--
+            </Border.Effect>-->
+        <!--
             <Border.RenderTransform>
                 <TranslateTransform X="0" Y="0" />
             </Border.RenderTransform>
@@ -298,7 +256,7 @@
             </Border.Style>
             <UserControls:MainMenu Close="mainMenu_Close" />
         </Border>-->
-        <StatusBar Height="25" Background="{DynamicResource AccentColorBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+        <StatusBar Grid.Row="1" Height="25" Background="{DynamicResource AccentColorBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
             <StatusBarItem>
                 <TextBlock Text="{Binding CurrentProject.FilePath, Source={x:Static Application.Current},FallbackValue='No project has been loaded nor saved.'}" Background="Transparent" HorizontalAlignment="Right" Margin="0,0,20,0" />
             </StatusBarItem>
@@ -306,7 +264,34 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Width="90" Text="{Binding Performance.MemoryUseFormatted, Source={x:Static Application.Current}, StringFormat='Memory: {0}',FallbackValue='Memory: -KB'}" Margin="0,0,20,0" />
                     <TextBlock Width="60" Text="{Binding Performance.CPUUsage, Source={x:Static Application.Current}, StringFormat=CPU: {0}%,FallbackValue='CPU: -%'}" Margin="0,0,20,0" />
-                    <TextBlock Width="70" Text="{Binding Performance.ThreadsCount, Source={x:Static Application.Current}, StringFormat=Threads: {0},FallbackValue='Threads: -'}" Margin="0,0,30,0" />
+                    <TextBlock Width="70" Text="{Binding Performance.ThreadsCount, Source={x:Static Application.Current}, StringFormat=Threads: {0},FallbackValue='Threads: -'}" Margin="0,0,20,0" />
+                    <ToggleButton Name="btnTasks" IsChecked="False" BorderThickness="0" Margin="0,0,30,0">
+                        <ToggleButton.Style>
+                            <Style BasedOn="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" TargetType="ToggleButton">
+                                <Style.Triggers>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsChecked" Value="False" />
+                                            <Condition Property="IsMouseOver" Value="False" />
+                                        </MultiTrigger.Conditions>
+                                        <MultiTrigger.Setters>
+                                            <Setter Property="Background" Value="Transparent" />
+                                        </MultiTrigger.Setters>
+                                    </MultiTrigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="LightGray" />
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Background" Value="LightGray" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <Path Width="16" Margin="0,0,5,0" Fill="White" Stretch="Uniform" Data="{StaticResource appbar_list_gear}" />
+                            <TextBlock Text="Tasks" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </ToggleButton>
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>

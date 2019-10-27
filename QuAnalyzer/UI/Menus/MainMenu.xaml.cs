@@ -1,19 +1,13 @@
-﻿using MahApps.Metro;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using QuAnalyzer.UI.Pages;
 using QuAnalyzer.UI.Windows;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.IO.Compression;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using Wokhan.Data.Providers;
-using Wokhan.Data.Providers.Bases;
+using System.Windows.Data;
+using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Menus
@@ -23,26 +17,50 @@ namespace QuAnalyzer.UI.Menus
     /// </summary>
     public partial class MainMenu : UserControl
     {
-        public string ApplicationName { get; } = "QuAnalyzer v" + Assembly.GetExecutingAssembly().GetName().Version;
+        
+        //public string ApplicationName { get; } = "QuAnalyzer v" + Assembly.GetExecutingAssembly().GetName().Version;
 
-
-        [Category("Behavior")]
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public event RoutedEventHandler Close;
+        private readonly ObservableCollection<KeyValuePair<IDataProvider, string>> Providers = new ObservableCollection<KeyValuePair<IDataProvider, string>>();
+        
+        private CollectionViewSource GroupedProviders { get; set; }
 
         public MainMenu()
         {
+            Providers.AddAll(((App)Application.Current).CurrentProject.CurrentProviders.SelectMany(prov => prov.Repositories.Select(r => new KeyValuePair<IDataProvider, string>(prov, r.Key))));
+            ((App)Application.Current).CurrentProject.CurrentProviders.CollectionChanged += CurrentProviders_CollectionChanged;
+
+            GroupedProviders = new CollectionViewSource()
+            {
+                Source = Providers
+            };
+            GroupedProviders.GroupDescriptions.Add(new PropertyGroupDescription("Key"));
+
             InitializeComponent();
+
+            lstProviders.ItemsSource = GroupedProviders.View;
         }
 
-       
-        
+        private void CurrentProviders_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            using (GroupedProviders.DeferRefresh())
+            {
+                if (e.OldItems != null)
+                {
+                    e.OldItems.Cast<IDataProvider>().ToList().ForEach(x => Providers.Remove(Providers.First(prov => prov.Key == x)));
+                }
+                if (e.NewItems != null)
+                {
+                    Providers.AddAll((e.NewItems.Cast<IDataProvider>().SelectMany(prov => prov.Repositories.Select(r => new KeyValuePair<IDataProvider, string>(prov, r.Key)))));
+                }
+            }
+        }
+
         private void btnDeleteProvider_Click(object sender, RoutedEventArgs e)
         {
             ((App)Application.Current).CurrentProject.CurrentProviders.Remove((IDataProvider)((Button)sender).Tag);
+
         }
 
-       
         private void btnImportPrv_Click(object sender, RoutedEventArgs e)
         {
             var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = "QuAnalyzer Data Provider archive|*.qax" };

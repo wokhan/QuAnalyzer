@@ -14,20 +14,15 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
-                <!--<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />-->
                 <ResourceDictionary Source="/Resources/Icons.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BindingConverters:BooleanNegateConverter x:Key="booleanNegator" />
             <BindingConverters:ObjectToBoolConverter x:Key="objectToBool" />
             <BindingConverters:ImageSourceConverter x:Key="imageSourceConverter" />
             <BindingConverters:ValueChecker x:Key="valueChecker" />
+            <BindingConverters:ValueToVisibilityConverter x:Key="valueToVisibilityConverter" />
             <BindingConvertersEx:ThicknessConverter x:Key="thicknessConverter" />
-            <!--<Style TargetType="Button" BasedOn="{StaticResource MetroButton}"></Style>
-            <Style TargetType="CheckBox" BasedOn="{StaticResource MetroCheckBox}"></Style>
-            <Style TargetType="GroupBox" BasedOn="{StaticResource MetroGroupBox}"></Style>
-            <Style TargetType="ComboBox" BasedOn="{StaticResource MahApps.Styles.ComboBox}"></Style>
-            <Style TargetType="Expander" BasedOn="{StaticResource MetroExpander}"></Style>
-            <Style TargetType="DataGrid" BasedOn="{StaticResource MetroDataGrid}"></Style>-->
+            <!--<BindingConvertersEx:CollectionViewSourceCreator x:Key="collectionViewSourceCreator" />-->
             <Style TargetType="{x:Type DataGrid}" BasedOn="{StaticResource {x:Type DataGrid}}">
                 <Setter Property="AlternatingRowBackground" Value="WhiteSmoke" />
                 <Setter Property="HorizontalGridLinesBrush" Value="Transparent" />
@@ -112,7 +107,7 @@
                 <Setter Property="BorderThickness" Value="0,2,0,0" />
                 <Setter Property="BorderBrush" Value="LightGray" />
                 <Style.Resources>
-                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Flat}">
+                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
                         <Setter Property="Width" Value="75" />
                         <Setter Property="Margin" Value="10" />
                         <Setter Property="FontSize" Value="11" />
@@ -221,10 +216,10 @@
                                          Path="Background"
                                          RelativeSource="{RelativeSource FindAncestor,
                                                                          AncestorType={x:Type GroupBox}}" />
-                                        <Binding Mode="OneWay"
+                                        <!--<Binding Mode="OneWay"
                                          Path="(Controls:GroupBoxHelper.HeaderForeground)"
                                          RelativeSource="{RelativeSource FindAncestor,
-                                                                         AncestorType={x:Type GroupBox}}" />
+                                                                         AncestorType={x:Type GroupBox}}" />-->
                                     </MultiBinding>
                                 </TextElement.Foreground>
                             </ContentPresenter>
@@ -243,7 +238,7 @@
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
                                 <Border Grid.Row="1" BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="0,1,0,0">
-                                    <ContentPresenter ContentSource="SelectedContent"/>
+                                    <ContentPresenter ContentSource="SelectedContent" Margin="0" />
                                 </Border>
                                 <TabPanel Margin="10,0,0,-1" Grid.Row="0" IsItemsHost="True" />
                             </Grid>
