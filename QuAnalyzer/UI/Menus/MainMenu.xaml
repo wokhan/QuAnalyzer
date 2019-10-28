@@ -70,10 +70,10 @@
                                                     </Grid.ColumnDefinitions>
                                                     <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
                                                     <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name.Name}" VerticalAlignment="Center" />
-                                                    <Button Grid.Column="2" Name="btnEditProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Tag="{Binding}" Click="btnEditProvider_Click">
+                                                    <Button Grid.Column="2" Name="btnEditProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Tag="{Binding Name}" Click="btnEditProvider_Click">
                                                         <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Blue" Data="{StaticResource appbar_edit}" Stretch="Uniform" />
                                                     </Button>
-                                                    <Button Grid.Column="3" Name="btnDeleteProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteProvider_Click">
+                                                    <Button Grid.Column="3" Name="btnDeleteProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding Name}" Click="btnDeleteProvider_Click">
                                                         <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
                                                     </Button>
                                                 </Grid>

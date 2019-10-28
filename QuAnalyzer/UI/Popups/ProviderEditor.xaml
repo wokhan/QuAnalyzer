@@ -192,13 +192,13 @@
         <Border Grid.Row="3" Style="{StaticResource ButtonBar}">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Button Content="Cancel" Name="btnRevert" HorizontalAlignment="Center" Click="btnRevert_Click" />
-                    <Button Content="Test" Name="btnTest" HorizontalAlignment="Left" Click="btnTest_Click" />
+                    <Button Content="Cancel" BorderBrush="Red" Name="btnRevert" HorizontalAlignment="Center" Click="btnRevert_Click" />
+                    <Button Content="Test" BorderBrush="Blue" Name="btnTest" HorizontalAlignment="Left" Click="btnTest_Click" />
                     <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="&lt; Back" Name="btnBack" HorizontalAlignment="Center" Click="btnBack_Click" IsEnabled="False" />
-                    <Button Content="Next &gt;" Name="btnNext" HorizontalAlignment="Center" Click="btnNext_Click" />
+                    <Button Content="&lt; Back" BorderBrush="Orange" Name="btnBack" HorizontalAlignment="Center" Click="btnBack_Click" IsEnabled="False" />
+                    <Button Content="Next &gt;" BorderBrush="Green" Name="btnNext" HorizontalAlignment="Center" Click="btnNext_Click" />
                 </StackPanel>
             </Grid>
         </Border>
