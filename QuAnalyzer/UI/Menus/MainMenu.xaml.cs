@@ -21,13 +21,15 @@ namespace QuAnalyzer.UI.Menus
         //public string ApplicationName { get; } = "QuAnalyzer v" + Assembly.GetExecutingAssembly().GetName().Version;
 
         private readonly ObservableCollection<KeyValuePair<IDataProvider, string>> Providers = new ObservableCollection<KeyValuePair<IDataProvider, string>>();
-        
+        private bool preventUpdate;
+
         private CollectionViewSource GroupedProviders { get; set; }
 
         public MainMenu()
         {
-            Providers.AddAll(((App)Application.Current).CurrentProject.CurrentProviders.SelectMany(prov => prov.Repositories.Select(r => new KeyValuePair<IDataProvider, string>(prov, r.Key))));
-            ((App)Application.Current).CurrentProject.CurrentProviders.CollectionChanged += CurrentProviders_CollectionChanged;
+            var currentProviders = ((App)Application.Current).CurrentProject.CurrentProviders;
+            Providers.AddAll(currentProviders.SelectMany(prov => prov.Repositories.Select(r => new KeyValuePair<IDataProvider, string>(prov, r.Key))));
+            currentProviders.CollectionChanged += CurrentProviders_CollectionChanged;
 
             GroupedProviders = new CollectionViewSource()
             {
@@ -42,6 +44,11 @@ namespace QuAnalyzer.UI.Menus
 
         private void CurrentProviders_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            if (preventUpdate)
+            {
+                return;
+            }
+
             using (GroupedProviders.DeferRefresh())
             {
                 if (e.OldItems != null)
@@ -58,7 +65,6 @@ namespace QuAnalyzer.UI.Menus
         private void btnDeleteProvider_Click(object sender, RoutedEventArgs e)
         {
             ((App)Application.Current).CurrentProject.CurrentProviders.Remove((IDataProvider)((Button)sender).Tag);
-
         }
 
         private void btnImportPrv_Click(object sender, RoutedEventArgs e)
@@ -69,9 +75,20 @@ namespace QuAnalyzer.UI.Menus
                 ((App)Application.Current).ProvidersMan.AddProvider(dial.FileName);
             }
         }
+
         private void btnEditProvider_Click(object sender, RoutedEventArgs e) => Popup.OpenNew(new ProviderEditor((IDataProvider)((Button)sender).Tag));
 
         private void btnNewSource_Click(object sender, RoutedEventArgs e) => Popup.OpenNew(new ProviderPicker());
-            
+
+        private void lstProviders_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            preventUpdate = true;
+
+            var currentSelection = ((App)App.Current).CurrentSelection;
+            currentSelection.RemoveRange(e.RemovedItems.Cast<KeyValuePair<IDataProvider, string>>());
+            currentSelection.AddRange(e.AddedItems.Cast<KeyValuePair<IDataProvider, string>>());
+
+            preventUpdate = false;
+        }
     }
 }

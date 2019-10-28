@@ -183,12 +183,12 @@
             </DockPanel>
         </Border>
         <DataGrid Sorting="gridData_Sorting" x:Name="gridData" IsReadOnly="True" CanUserAddRows="False" CanUserSortColumns="True" CanUserReorderColumns="True" BorderThickness="0" ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto">
-            <!--<DataGrid.Resources>
+            <DataGrid.Resources>
                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                     <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGrid_PreviewMouseLeftButtonDown" />
                     <EventSetter Event="PreviewMouseMove" Handler="DataGrid_MouseMove" />
                 </Style>
-            </DataGrid.Resources>-->
+            </DataGrid.Resources>
         </DataGrid>
     </DockPanel>
 </UserControl>

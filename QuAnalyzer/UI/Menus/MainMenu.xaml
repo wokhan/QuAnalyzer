@@ -21,7 +21,7 @@
         <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
             <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{StaticResource appbar_add}"/>
         </WrapPanel>
-        <ListView BorderThickness="0" SelectionMode="Multiple" Grid.Row="2" Name="lstProviders" ext:ItemsControlSelection.SelectedValues="{Binding CurrentSelection,Source={x:Static Application.Current}}" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
+        <ListView BorderThickness="0" SelectionMode="Multiple" Grid.Row="2" Name="lstProviders" SelectionChanged="lstProviders_SelectionChanged" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
             <ListView.Resources>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
                     <Setter Property="Background" Value="Transparent" />

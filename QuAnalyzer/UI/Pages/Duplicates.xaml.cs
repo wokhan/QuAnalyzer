@@ -85,7 +85,7 @@ namespace QuAnalyzer.UI.Pages
                 gridData.LoadingProgress = -1;
                 gridData.Status = "Loading data...";
 
-                var data = prov.GetQueryable(repository).Select<dynamic>(headers);
+                var data = prov.GetQueryable(repository);//.Select<dynamic>(headers);
 
                 gridData.LoadingProgress = -1;
 
@@ -121,16 +121,12 @@ namespace QuAnalyzer.UI.Pages
 
             gridData.AutoGenerateColumns = false;
 
+            var count = (KeepColumns && KeepDuplicates ? headers.Length : keysCount);
+            gridData.CustomHeaders = headers.Take(count).Select(h => new ColumnDescription { Name = h, DisplayName = h }).ToList();
+
             if (data != null && data.Any())
             {
-                if (KeepColumns && KeepDuplicates)
-                {
-                    gridData.Columns.AddAll(headers.Select((h, i) => new DataGridTextColumn() { Header = h, Binding = new Binding("[" + i + "]") }));
-                }
-                else
-                {
-                    gridData.Columns.AddAll(headers.Take(keysCount).Select((h, i) => new DataGridTextColumn() { Header = h, Binding = new Binding("[" + i + "]") }));
-                }
+                gridData.Columns.AddAll(headers.Take(count).Select((h, i) => new DataGridTextColumn() { Header = h, Binding = new Binding("[" + i + "]") }));
                 gridData.Source = data.AsQueryable();
             }
             else

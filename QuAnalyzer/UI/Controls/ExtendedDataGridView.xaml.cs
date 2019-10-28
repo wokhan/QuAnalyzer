@@ -130,29 +130,10 @@ namespace QuAnalyzer.UI.Controls
             InitializeComponent();
 
             VirtualizedQueryableExtensions.Init(Dispatcher);
-
-            CurrentSelection_CollectionChanged(null, null);
         }
 
         private List<string> dispHeaders;
 
-        private void CurrentSelection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (Source != null)
-            {
-                gridData.IsEnabled = true;
-
-                ClearAll();
-
-                btnApply_Click(null, null);
-            }
-            else
-            {
-                gridData.ItemsSource = Enumerable.Range(0, 100);
-                gridData.Columns.Add(new DataGridTextColumn() { Header = "..." });
-                gridData.IsEnabled = false;
-            }
-        }
 
         private void ClearAll()
         {
@@ -223,8 +204,13 @@ namespace QuAnalyzer.UI.Controls
         {
             if (Source == null)
             {
+                gridData.ItemsSource = Enumerable.Range(0, 100);
+                gridData.Columns.Add(new DataGridTextColumn() { Header = "..." });
+                gridData.IsEnabled = false;
                 return;
             }
+
+            gridData.IsEnabled = true;
 
             await Task.Run(() =>
             {
