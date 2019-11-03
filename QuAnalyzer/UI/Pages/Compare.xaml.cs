@@ -35,6 +35,8 @@ namespace QuAnalyzer.UI.Pages
 
         private readonly List<CancellationTokenSource> tokensources = new List<CancellationTokenSource>();
 
+        public SourcesMapper SingleMap { get; } = new SourcesMapper();
+
         public class DiffClass
         {
             public object[] Values { get; set; }
@@ -91,125 +93,14 @@ namespace QuAnalyzer.UI.Pages
 
         private async Task<ComparerStruct<object[]>[]> GetComparerStruct()
         {
-            // Case 1: Mappings
-            if (tabMapping.IsSelected)
+            if ((bool)btnToggleMode.IsChecked)
             {
-                var mappers = lstMappings.SelectedItems.Cast<SourcesMapper>().ToList();
-                return await Task.Run(() => mappers.Select(s => new ComparerStruct<object[]>(s)).ToArray());
+                return await Task.Run(() => new[] { new ComparerStruct<object[]>(SingleMap) });
             }
 
-            // Case 2: Custom mapping
-            if (rdbCustomMapping.IsChecked.Value)
-            {
-                var mapper = (SourcesMapper)lstCustMappings.SelectedItem;
-                return await Task.Run(() => new[] { new ComparerStruct<object[]>(mapper) });
-            }
+            var mappers = lstMappings.SelectedItems.Cast<SourcesMapper>().ToList();
+            return await Task.Run(() => mappers.Select(s => new ComparerStruct<object[]>(s)).ToArray());
 
-            // Case 3: Automatic mapping (position)
-            var srcPrv = (IDataProvider)lstSrc.SelectedItem;
-            var srcRepo = (string)lstSrcRepo.SelectedItem;
-            var trgPrv = (IDataProvider)lstTrg.SelectedItem;
-            var trgRepo = (string)lstTrgRepo.SelectedItem;
-
-            if (rdbAutoMapping.IsChecked.Value)
-            {
-                return await Task.Run(() => new[] { GetMappingAutomatic(srcPrv, srcRepo, trgPrv, trgRepo) });
-            }
-
-            // Case 4: Automatic mapping (name)
-            return await Task.Run(() => new[] { GetMapppingByName(srcPrv, srcRepo, trgPrv, trgRepo) });
-        }
-
-        private static ComparerStruct<object[]> GetMapppingByName(IDataProvider srcPrv, string srcRepo, IDataProvider trgPrv, string trgRepo)
-        {
-            var srcHeaders = srcPrv.GetColumns(srcRepo);
-            var trgHeaders = trgPrv.GetColumns(trgRepo);
-
-            var inter = srcHeaders.Select(h => h.Name).Intersect(trgHeaders.Select(h => h.Name), StringComparer.InvariantCultureIgnoreCase).ToList();
-
-            //TODO: yurk
-            var allTypesSrc = inter.Select(m => srcHeaders.First(h => h.Name == m).Type).ToArray();
-            var allTypesTrg = inter.Select(m => trgHeaders.First(h => h.Name == m).Type).ToArray();
-
-            Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>> normalizeTypes = allTypesSrc.SequenceEqual(allTypesTrg) ? (Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>)KeepSame : ConvertType;
-            return new ComparerStruct<object[]>()
-            {
-                Name = "Automatic mapping (by name)",
-                SourceName = srcPrv.Name + " " + srcRepo,
-                TargetName = trgPrv.Name + " " + trgRepo,
-                SourceHeaders = inter,
-                TargetHeaders = inter,
-                Comparer = new SequenceEqualityComparer<object>(),
-                GetSourceData = () => normalizeTypes(srcPrv.GetQueryable(srcRepo).Select<dynamic>(inter).AsObjectCollection(srcHeaders.Select(h => h.Name).ToArray()), allTypesTrg),
-                GetTargetData = () => normalizeTypes(trgPrv.GetQueryable(trgRepo).Select<dynamic>(inter).AsObjectCollection(trgHeaders.Select(h => h.Name).ToArray()), allTypesTrg)
-            };
-        }
-
-        private static ComparerStruct<object[]> GetMappingAutomatic(IDataProvider srcPrv, string srcRepo, IDataProvider trgPrv, string trgRepo)
-        {
-            IEnumerable<ColumnDescription> srcHeaders = srcPrv.GetColumns(srcRepo);
-            IEnumerable<ColumnDescription> trgHeaders = trgPrv.GetColumns(trgRepo);
-
-            if (trgHeaders.Count() > srcHeaders.Count())
-            {
-                trgHeaders = trgHeaders.Take(srcHeaders.Count());
-            }
-            else if (srcHeaders.Count() > trgHeaders.Count())
-            {
-                srcHeaders = srcHeaders.Take(trgHeaders.Count());
-            }
-
-            var allTypesSrc = srcHeaders.Select(h => h.Type);
-            var allTypesTrg = trgHeaders.Select(h => h.Type);
-            Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>> fnc = allTypesSrc.SequenceEqual(allTypesTrg) ? (Func<IEnumerable<object[]>, Type[], IEnumerable<object[]>>)KeepSame : ConvertType;
-
-            var srcKeys = srcHeaders.Select(h => h.Name).ToArray();
-            var trgKeys = trgHeaders.Select(h => h.Name).ToArray();
-
-            var srcDataGetter = srcPrv.GetQueryable(srcRepo).Select(String.Join(",", srcKeys));
-            var trgDataGetter = srcPrv.GetQueryable(trgRepo).Select(String.Join(",", trgKeys));
-
-            return new ComparerStruct<object[]>()
-            {
-                Name = "Automatic mapping (by position)",
-                SourceName = srcPrv.Name + " " + srcRepo,
-                TargetName = trgPrv.Name + " " + trgRepo,
-                SourceHeaders = srcKeys,
-                TargetHeaders = trgKeys,
-                Comparer = new SequenceEqualityComparer<object>(),
-                GetSourceData = () => fnc(srcDataGetter.AsObjectCollection(srcKeys), trgHeaders.Select(h => h.Type).ToArray()),
-                GetTargetData = () => fnc(trgDataGetter.AsObjectCollection(trgKeys), trgHeaders.Select(h => h.Type).ToArray())
-            };
-        }
-
-        private static IEnumerable<object[]> KeepSame(IEnumerable<IEnumerable<object>> src, Type[] types)
-        {
-            if (false)
-            {
-#pragma warning disable CS0162 // Code inaccessible détecté
-                return src.Select(c => c.Select(a => a is DBNull ? null : a is DateTime ? ((DateTime)a).Date : a).ToArray());
-#pragma warning restore CS0162 // Code inaccessible détecté
-            }
-            else
-            {
-                return src.Select(c => c.ToArray());
-            }
-        }
-
-        private static IEnumerable<object[]> ConvertType(IEnumerable<IEnumerable<object>> src, Type[] types)
-        {
-            return src.Select(c => c.Select((a, i) => a.SafeConvert(types[i])).ToArray());
-        }
-
-
-        private void lstSrc_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //lstSrcRepo.DataContext = lstSrc.SelectedItem;
-
-            if (lstSrcRepo.Items.Count < 2)
-            {
-                lstSrcTrgRepo_SelectionChanged(null, null);
-            }
         }
 
         private int globalCount;
@@ -301,22 +192,22 @@ namespace QuAnalyzer.UI.Pages
             openWindows.Remove(openWindows.Single(o => o.Value == sender).Key);
         }
 
-        private void lstTrg_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (lstTrgRepo.Items.Count < 2)
-            {
-                lstSrcTrgRepo_SelectionChanged(null, null);
-            }
-        }
+        //private void lstTrg_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    if (lstTrgRepo.Items.Count < 2)
+        //    {
+        //        lstSrcTrgRepo_SelectionChanged(null, null);
+        //    }
+        //}
 
-        private void lstSrcTrgRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (lstTrgRepo.SelectedItem != null && lstSrcRepo.SelectedItem != null)
-            {
-                lstCustMappings.ItemsSource = ((App)App.Current).CurrentProject.SourceMapper.Where(c => c.Source == lstSrc.SelectedItem && c.SourceRepository == (string)lstSrcRepo.SelectedItem
-                                                                                        && c.Target == lstTrg.SelectedItem && c.TargetRepository == (string)lstTrgRepo.SelectedItem);
-            }
-        }
+        //private void lstSrcTrgRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    if (lstTrgRepo.SelectedItem != null && lstSrcRepo.SelectedItem != null)
+        //    {
+        //        lstCustMappings.ItemsSource = ((App)App.Current).CurrentProject.SourceMapper.Where(c => c.Source == lstSrc.SelectedItem && c.SourceRepository == (string)lstSrcRepo.SelectedItem
+        //                                                                                && c.Target == lstTrg.SelectedItem && c.TargetRepository == (string)lstTrgRepo.SelectedItem);
+        //    }
+        //}
 
         //private void spltResults_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         //{

@@ -210,6 +210,7 @@ namespace QuAnalyzer.UI.Controls
                 return;
             }
 
+            gridData.Columns.Clear();
             gridData.IsEnabled = true;
 
             await Task.Run(() =>

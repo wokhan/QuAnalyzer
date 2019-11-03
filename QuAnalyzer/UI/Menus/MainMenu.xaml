@@ -10,18 +10,25 @@
       mc:Ignorable="d" d:DesignHeight="460">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="32" />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Label Content="Sources" Background="Gray" />
+        <Grid Background="Gray">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Path Fill="WhiteSmoke" Margin="10,0" Height="19" Data="{StaticResource appbar_list}" Stretch="Uniform" />
+            <Label Grid.Column="1" VerticalAlignment="Center" Foreground="WhiteSmoke" Content="SOURCES" FontSize="12" />
+        </Grid>
         <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
             <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{StaticResource appbar_add}"/>
         </WrapPanel>
-        <ListView BorderThickness="0" SelectionMode="Multiple" Grid.Row="2" Name="lstProviders" SelectionChanged="lstProviders_SelectionChanged" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
+        <ListView BorderThickness="0" Grid.Row="2" Name="lstProviders" SelectionChanged="lstProviders_SelectionChanged" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
             <ListView.Resources>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
                     <Setter Property="Background" Value="Transparent" />
@@ -34,7 +41,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
-                                        <TextBlock Margin="10" TextWrapping="Wrap" Text="Please start by adding a new connector instance." FontStyle="Italic" />
+                                        <TextBlock Margin="10" TextWrapping="Wrap" Text="Please start by adding a new source." FontStyle="Italic" />
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
@@ -44,7 +51,9 @@
             </ItemsControl.Style>
             <!--<ItemsControl.Resources>
                 <Style TargetType="ListItem" BasedOn="{StaticResource {x:Type ListItem}}">
-                    --><!--<Setter Property="OverridesDefaultStyle" Value="True" />--><!--
+                    -->
+            <!--<Setter Property="OverridesDefaultStyle" Value="True" />-->
+            <!--
                     <Style.Triggers>
                         <Trigger Property="Selector.IsSelected" Value="True">
                             <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
@@ -59,9 +68,9 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
-                                        <Expander BorderThickness="0">
+                                        <Expander BorderThickness="0" IsExpanded="True">
                                             <Expander.Header>
-                                                <Grid TextBlock.Foreground="Black" Background="Transparent">
+                                                <Grid Background="Transparent">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto" SharedSizeGroup="ImgCol" />
                                                         <ColumnDefinition Width="*" />
@@ -89,14 +98,7 @@
             </ItemsControl.GroupStyle>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="10" TextBlock.Foreground="Black" Background="Transparent">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="selCol" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <CheckBox IsChecked="{Binding Selector.IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType=ListItem}}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Value}" />
-                    </Grid>
+                    <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding Value}" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ListView>

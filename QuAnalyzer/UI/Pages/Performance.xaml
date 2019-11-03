@@ -24,7 +24,7 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.RowSpan="3" Width="300">
             <WrapPanel Style="{StaticResource ToolBar}">
-                <UC:ToolBarButton Text="Run" ToolTip="Start monitoring the selected items" BorderBrush="Green" Image="{StaticResource appbar_control_play}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnStart_Click" />
+                <UC:ToolBarButton Text="Run" ToolTip="Start monitoring the selected items" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStart_Click" />
                 <UC:ToolBarButton Text="Stop" ToolTip="Stop monitoring" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Red" Image="{StaticResource appbar_arrow_collapsed}" Click="btnStopAll_Click" />
             </WrapPanel>
             <DataGrid SelectionMode="Extended" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" x:Name="gridSteps" AutoGenerateColumns="False" IsReadOnly="True">

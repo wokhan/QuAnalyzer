@@ -4,7 +4,9 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace QuAnalyzer.UI.Windows
 {
@@ -106,25 +108,14 @@ namespace QuAnalyzer.UI.Windows
         //    }
         //}
 
-        private void lstRecentFiles_Click(object sender, RoutedEventArgs e)
+        private void btnMenuRecent_Click(object sender, RoutedEventArgs e)
         {
-            //ctxRecentFiles.IsOpen = true;
+            ((App)App.Current).CurrentProject.Open((string)((MenuItem)sender).CommandParameter);
         }
 
-        public void ctxRecentFiles_Click(object sender, RoutedEventArgs e)
+        private void btnAccentColor_Click(object sender, RoutedEventArgs e)
         {
-            //ctxRecentFiles.IsOpen = false;
-            ((App)App.Current).CurrentProject.Open((string)((ICommandSource)e.Source).CommandParameter);
-        }
-
-        private void btnSaveAs_Click(object sender, RoutedEventArgs e)
-        {
-            //ctxSaveAs.IsOpen = true;
-        }
-
-        private void mainMenu_Close(object sender, RoutedEventArgs e)
-        {
-
+            ((App)Application.Current).CurrentProject.AccentColor = (SolidColorBrush)((MenuItem)sender).Tag;
         }
     }
 }

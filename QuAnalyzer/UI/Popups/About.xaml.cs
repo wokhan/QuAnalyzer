@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace QuAnalyzer.UI.Menus
+namespace QuAnalyzer.UI.Popups
 {
     /// <summary>
     /// Interaction logic for About.xaml

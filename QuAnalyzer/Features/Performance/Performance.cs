@@ -74,6 +74,11 @@ namespace QuAnalyzer.Features.Performance
                                              sw.Stop();
                                          }
 
+                                         if (result.Duration == null) {
+                                             result.Duration = new Dictionary<string, long>();
+
+                                         }
+                                         result.Duration.Add("_TOTAL_DEFAULT", sw.ElapsedMilliseconds);
                                          result.End = result.LastCheck.AddMilliseconds(sw.ElapsedMilliseconds);
 
                                          callback?.Invoke(result, values);

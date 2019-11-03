@@ -5,50 +5,50 @@
     x:Class="QuAnalyzer.UI.Windows.ModernMain"
     xmlns:QuAnalyzerHelpers="clr-namespace:QuAnalyzer.Core.Helpers"
     xmlns:UserControls="clr-namespace:QuAnalyzer.UI.Menus"
-    xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls" 
-    Title="QuAnalyzer" ShowIconOnTitleBar="True" TitleBarHeight="40" ShowTitleBar="True"
+    xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+    xmlns:popups="clr-namespace:QuAnalyzer.UI.Popups"
+    Title="QuAnalyzer v1.0beta" ShowIconOnTitleBar="False" TitleBarHeight="40" ShowTitleBar="True"
     ResizeMode="CanResizeWithGrip" TitleAlignment="Right"
     MinWidth="1030" MinHeight="600" Height="600"
-    Width="900" BorderThickness="1" UseLayoutRounding="True" SnapsToDevicePixels="True"
-    BorderBrush="Gray" WindowTitleBrush="LightGray" TitleForeground="Black">
-    <Window.Resources>
+    Width="900" BorderThickness="0" GlowBrush="Black" 
+    WindowTitleBrush="#555555" TitleForeground="WhiteSmoke">
+    <!--<Window.Resources>
         <Style TargetType="{x:Type Controls:WindowButtonCommands}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding ShowTitleBar, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}}" Value="True">
-                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="Foreground" Value="WhiteSmoke" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-    </Window.Resources>
+    </Window.Resources>-->
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo />
     </Window.TaskbarItemInfo>
     <Controls:MetroWindow.LeftWindowCommands>
-        <Controls:WindowCommands>
+        <Controls:WindowCommands ShowSeparators="False">
             <Grid Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Menu IsMainMenu="True" FontSize="14" Background="Transparent">
-                    <Menu.BitmapEffect>
-                        <DropShadowBitmapEffect ShadowDepth="5" Softness="0.8" />
-                    </Menu.BitmapEffect>
-                    <Menu.Resources>
-                        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
-                            <Setter Property="Background" Value="Transparent" />
-                        </Style>
-                    </Menu.Resources>
+                <Menu IsMainMenu="True" TextElement.FontSize="14" Background="Transparent" TextElement.Foreground="WhiteSmoke" >
                     <MenuItem Header="_File">
                         <MenuItem Header="Open..." x:Name="btnMenuOpen" Click="btnMenuOpen_Click">
                             <MenuItem.Icon>
                                 <Path Fill="#CCBF4747" Width="20" Data="{StaticResource appbar_folder_open}" Stretch="Uniform" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="Recent" ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
+                        <MenuItem Header="Recent" x:Name="btnMenuRecent" ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
                             <MenuItem.Icon>
                                 <Path Fill="#CCBF4747" Width="20" Data="{StaticResource appbar_folder_open}" Stretch="Uniform" />
                             </MenuItem.Icon>
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="Header" Value="{Binding Key}"/>
+                                    <Setter Property="CommandParameter" Value="{Binding Key}"/>
+                                    <EventSetter Event="Click" Handler="btnMenuRecent_Click" />
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
                         </MenuItem>
                         <Separator />
                         <MenuItem Header="Save" x:Name="btnMenuSave" Click="btnMenuSave_Click">
@@ -75,36 +75,33 @@
                         </MenuItem>
                     </MenuItem>
                     <MenuItem Header="_Options">
-                        <CheckBox Content="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static Application.Current}, FallbackValue=True}"  />
-                        <MenuItem Header="Project color">
-                            <ListBox ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}" SelectedItem="{Binding CurrentProject.AccentColor, Source={x:Static Application.Current}, FallbackValue=True}">
-                                <ListBox.Resources>
-                                    <Style TargetType="ListItem">
-                                        <Setter Property="OverridesDefaultStyle" Value="True" />
-                                    </Style>
-                                </ListBox.Resources>
-                                <ListBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel MinHeight="32" Margin="5" IsItemsHost="True" />
-                                    </ItemsPanelTemplate>
-                                </ListBox.ItemsPanel>
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Controls:Tile IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{Binding}" Margin="2" Height="28" Width="28" />
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                        <MenuItem IsCheckable="True" Header="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static Application.Current}, FallbackValue=True}"  />
+                        <MenuItem Header="Project color" ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="HeaderTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <Rectangle Fill="{Binding}" Width="50" VerticalAlignment="Stretch" />
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="CommandParameter" Value="{Binding}"/>
+                                    <Setter Property="IsCheckable" Value="True" />
+                                    <EventSetter Event="Click" Handler="btnAccentColor_Click" />
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
                         </MenuItem>
                     </MenuItem>
                     <MenuItem Header="_Help">
-                        <MenuItem Header="About" Name="btnAbout" IsChecked="False">
+                        <MenuItem Header="About" x:Name="btnAbout" IsCheckable="True">
                             <MenuItem.Icon>
                                 <Path Width="16" Stretch="Uniform" Data="{StaticResource appbar_information_circle}" />
                             </MenuItem.Icon>
                         </MenuItem>
                     </MenuItem>
                 </Menu>
-                <TextBox Grid.Column="1" FontSize="14" BorderThickness="0" VerticalContentAlignment="Center" Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Foreground="Black" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}" Margin="100,0,0,0">
+                <TextBox Grid.Column="1" FontSize="14" Foreground="WhiteSmoke" BorderThickness="0" VerticalContentAlignment="Center" Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}" Margin="100,0,0,0">
                     <TextBox.FocusVisualStyle>
                         <Style TargetType="TextBox">
                             <Setter Property="Background" Value="White" />
@@ -117,13 +114,30 @@
     </Controls:MetroWindow.LeftWindowCommands>
     <Controls:MetroWindow.Flyouts>
         <Controls:FlyoutsControl>
-            <Controls:Flyout x:Name="flyAbout" Position="Right" Width="350" Background="{DynamicResource AccentColorBrush}" CloseButtonVisibility="Collapsed" IsOpen="{Binding IsChecked, Mode=TwoWay, ElementName=btnAbout}" IsPinned="False" Header="About" Margin="0,31,0,0">
-                <UserControls:About />
+            <Controls:Flyout x:Name="flyAbout" Position="Top" Width="350" Background="{DynamicResource AccentColorBrush}" CloseButtonVisibility="Collapsed" IsOpen="{Binding IsChecked, Mode=TwoWay, ElementName=btnAbout}" IsPinned="False" Header="About" Margin="0,31,0,0">
+                <popups:About />
             </Controls:Flyout>
-            <Controls:Flyout x:Name="flyExports" Position="Right" Width="350" Background="{DynamicResource AccentColorBrush}" CloseButtonVisibility="Collapsed" IsOpen="{Binding IsChecked, Mode=TwoWay, ElementName=btnTasks}" IsPinned="False" Margin="0,31,0,0" Foreground="Black" Header="Tasks">
-                <ScrollViewer Background="LightGray" HorizontalScrollBarVisibility="Hidden">
-                    <StackPanel x:Name="stackExports" />
-                </ScrollViewer>
+            <Controls:Flyout x:Name="flyExports" TitleVisibility="Collapsed" Position="Right" Width="350" Background="{DynamicResource AccentColorBrush}" CloseButtonVisibility="Collapsed" IsOpen="{Binding IsChecked, Mode=TwoWay, ElementName=btnTasks}" IsPinned="False" Margin="0,40,0,26" Foreground="Black">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Rectangle Grid.RowSpan="2" Width="2" VerticalAlignment="Stretch" Fill="White" HorizontalAlignment="Left">
+                        <Rectangle.Effect>
+                            <DropShadowEffect Direction="180" BlurRadius="15" />
+                        </Rectangle.Effect>
+                    </Rectangle>
+                    <StackPanel Orientation="Horizontal" Background="Gray">
+                        <Path Fill="WhiteSmoke" Margin="10,0" Height="19" Data="{StaticResource appbar_list_gear}" Stretch="Uniform" />
+                        <Label Grid.Column="1" VerticalAlignment="Center" Foreground="WhiteSmoke" Content="TASKS" FontSize="12" />
+                    </StackPanel>
+                    <Border Background="LightGray" Grid.Row="2">
+                        <ScrollViewer HorizontalScrollBarVisibility="Hidden">
+                            <StackPanel x:Name="stackExports" />
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
             </Controls:Flyout>
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>
@@ -132,64 +146,20 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Controls:Flyout TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" BorderBrush="{DynamicResource AccentColorBrush}" IsAutoCloseEnabled="False" Position="Left" IsOpen="True" Header="Sources" HorizontalAlignment="Left" Width="200" Background="Transparent">
-            <UserControls:MainMenu x:Name="mainMenu" />
+        <Controls:Flyout TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" BorderBrush="{DynamicResource AccentColorBrush}" IsAutoCloseEnabled="False" Position="Left" IsOpen="True" Header="Sources" HorizontalAlignment="Left" Width="200" Background="LightGray">
+            <Grid>
+                <UserControls:MainMenu x:Name="mainMenu" />
+                <Rectangle Width="1" VerticalAlignment="Stretch" Fill="White" HorizontalAlignment="Right">
+                    <Rectangle.Effect>
+                        <DropShadowEffect Direction="180" BlurRadius="15" />
+                    </Rectangle.Effect>
+                </Rectangle>
+            </Grid>
         </Controls:Flyout>
         <Controls:MetroAnimatedSingleRowTabControl Name="tabMenu" Margin="{Binding ActualWidth,ElementName=mainMenu,Converter={StaticResource thicknessConverter},ConverterParameter='LEFT'}">
             <TabControl.Resources>
                 <Style TargetType="Frame">
                     <Setter Property="NavigationUIVisibility" Value="Hidden" />
-                </Style>
-                <Style TargetType="UC:DecoratedTabItem" BasedOn="{StaticResource {x:Type TabItem}}">
-                    <Setter Property="Height" Value="32"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="UC:DecoratedTabItem">
-                                <Border BorderThickness="0,0,0,2">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
-                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Path Margin="10,0" Height="19" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Uniform" Data="{Binding Path=Image, RelativeSource={RelativeSource TemplatedParent}}">
-                                            <Path.Style>
-                                                <Style TargetType="Path">
-                                                    <Setter Property="Fill" Value="Gray" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
-                                                            <Setter Property="Fill" Value="{DynamicResource AccentColorBrush}" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
-                                                            <Setter Property="Fill" Value="{DynamicResource AccentColorBrush}" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Path.Style>
-                                        </Path>
-                                        <TextBlock Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Path=Header, RelativeSource={RelativeSource TemplatedParent}}">
-                                            <TextBlock.Style>
-                                                <Style>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
-                                                            <Setter Property="TextBlock.Foreground" Value="{DynamicResource AccentColorBrush}" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
-                                                            <Setter Property="TextBlock.Foreground" Value="{DynamicResource AccentColorBrush}" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                    </StackPanel>
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
                 </Style>
             </TabControl.Resources>
             <UC:DecoratedTabItem IsSelected="True" Header="DISPLAY" Image="{StaticResource appbar_list}">
@@ -214,69 +184,6 @@
                 <Frame Source="../Pages/Performance.xaml" />
             </UC:DecoratedTabItem>
         </Controls:MetroAnimatedSingleRowTabControl>
-        
-        
-        <!--<Border BorderBrush="{DynamicResource AccentColorBrush}" Margin="0,30,0,25" BorderThickness="0,2,0,0">
-            -->
-        <!--<Border.Effect>
-                <DropShadowEffect Opacity="0.2"/>
-            </Border.Effect>-->
-        <!--
-            <Border.RenderTransform>
-                <TranslateTransform X="0" Y="0" />
-            </Border.RenderTransform>
-            <Border.Style>
-                <Style TargetType="Border">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsChecked, ElementName=btnMenu}" Value="true">
-                            <Setter Property="Visibility" Value="Visible" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding IsChecked,ElementName=btnMenu}" Value="True">
-                            <DataTrigger.EnterActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" From="-400" Duration="0:0:0.5">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut"/>
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1"  Duration="0:0:0.5">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseIn" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </DataTrigger.EnterActions>
-                            <DataTrigger.ExitActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.X)" From="-200" To="-600"  Duration="0:0:0.5">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut"/>
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0"  Duration="0:0:0.5">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0.3" Value="{x:Static Visibility.Collapsed}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </DataTrigger.ExitActions>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-            <UserControls:MainMenu Close="mainMenu_Close" />
-        </Border>-->
         <StatusBar Grid.Row="1" Height="25" Background="{DynamicResource AccentColorBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
             <StatusBarItem>
                 <TextBlock Text="{Binding CurrentProject.FilePath, Source={x:Static Application.Current},FallbackValue='No project has been loaded nor saved.'}" Background="Transparent" HorizontalAlignment="Right" Margin="0,0,20,0" />

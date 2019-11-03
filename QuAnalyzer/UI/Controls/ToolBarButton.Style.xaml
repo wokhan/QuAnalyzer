@@ -1,0 +1,33 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:QuAnalyzer.UI.Controls">
+    <Style TargetType="{x:Type local:ToolBarButton}">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.6" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ToolBarButton}">
+                    <Border Margin="2" Padding="5" BorderThickness="{TemplateBinding BorderThickness}" ToolTip="{TemplateBinding ToolTip}" BorderBrush="{TemplateBinding BorderBrush}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{Binding Background,RelativeSource={RelativeSource TemplatedParent}}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMouseOver,RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+                                        <Setter Property="Background" Value="LightBlue" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <Path Fill="{TemplateBinding BorderBrush}" Width="14" Height="14" Data="{Binding Image, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform" />
+                            <Label Foreground="Black" FontSize="11" Padding="5,0,0,0" VerticalAlignment="Center" Content="{TemplateBinding Text}" />
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

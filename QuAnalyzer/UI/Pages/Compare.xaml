@@ -94,35 +94,7 @@
                     </DataGrid>
                 </TabItem>
                 <TabItem IsSelected="{Binding IsChecked, ElementName=btnToggleMode}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <GroupBox Header="Source" Grid.Row="0" Grid.Column="0" Height="97" VerticalAlignment="Top" Background="{StaticResource SourceColorBrush}" BorderBrush="{StaticResource SourceColorBrush}">
-                            <Grid>
-                                <Label Content="Provider:" HorizontalAlignment="Left" Margin="0,3,0,0" VerticalAlignment="Top"/>
-                                <ComboBox x:Name="lstSrc" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" DisplayMemberPath="Name" HorizontalAlignment="Left" Margin="82,0,0,0" VerticalAlignment="Top" Width="200" SelectionChanged="lstSrc_SelectionChanged"/>
-                                <Label Content="Repository:" HorizontalAlignment="Left" Margin="0,30,0,0" VerticalAlignment="Top"/>
-                                <ComboBox x:Name="lstSrcRepo" ItemsSource="{Binding SelectedItem.Repositories.Keys, ElementName=lstSrc}" HorizontalAlignment="Left" Margin="82,27,0,0" VerticalAlignment="Top" Width="200" SelectionChanged="lstSrcTrgRepo_SelectionChanged" />
-                            </Grid>
-                        </GroupBox>
-                        <Path Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,40,0,0" Data="{StaticResource appbar_arrow_left_right}" Fill="Gray" Stretch="Uniform" Width="32" />
-                        <GroupBox Header="Target" Grid.Row="0" Grid.Column="2" Height="97" VerticalAlignment="Top" Background="{StaticResource TargetColorBrush}" BorderBrush="{StaticResource TargetColorBrush}">
-                            <Grid>
-                                <Label Content="Provider:" HorizontalAlignment="Left" Margin="0,3,0,0" VerticalAlignment="Top"/>
-                                <ComboBox x:Name="lstTrg" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" DisplayMemberPath="Name" HorizontalAlignment="Left" Margin="86,0,0,0" VerticalAlignment="Top" Width="200" SelectionChanged="lstTrg_SelectionChanged"/>
-                                <Label Content="Repository:" HorizontalAlignment="Left" Margin="0,30,0,0" VerticalAlignment="Top"/>
-                                <ComboBox x:Name="lstTrgRepo" ItemsSource="{Binding SelectedItem.Repositories.Keys, ElementName=lstTrg}" HorizontalAlignment="Left" Margin="86,27,0,0" VerticalAlignment="Top" Width="200" SelectionChanged="lstSrcTrgRepo_SelectionChanged" />
-                            </Grid>
-                        </GroupBox>
-                        <Label FontWeight="Bold" Content="Comparison mapping" HorizontalAlignment="Left" Margin="0,101,0,0" VerticalAlignment="Top" />
-                        <RadioButton x:Name="rdbAutoMapping" IsChecked="True" Content="Use a field position based mapping" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top"/>
-                        <RadioButton x:Name="rdbAutoMappingName" Content="Use a field name based mapping" HorizontalAlignment="Left" Margin="10,150,0,0" VerticalAlignment="Top"/>
-                        <RadioButton x:Name="rdbCustomMapping" Content="Use an existing mapping" Margin="10,173,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <ComboBox IsEnabled="{Binding IsChecked, ElementName=rdbCustomMapping}" DisplayMemberPath="Name" x:Name="lstCustMappings" Margin="176,170,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="209" Grid.ColumnSpan="2"/>
-                    </Grid>
+                    <UC:MappingsEdit Mapping="{Binding SingleMap,Mode=OneWay}" />
                 </TabItem>
             </TabControl>
         </DockPanel>

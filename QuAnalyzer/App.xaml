@@ -15,6 +15,9 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
                 <ResourceDictionary Source="/Resources/Icons.xaml" />
+                <ResourceDictionary Source="/UI/Controls/DecoratedTabItem.Style.xaml" />
+                <ResourceDictionary Source="/UI/Controls/ToolBarButton.Style.xaml" />
+                <ResourceDictionary Source="/UI/Controls/ToolBarToggleButton.Style.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BindingConverters:BooleanNegateConverter x:Key="booleanNegator" />
             <BindingConverters:ObjectToBoolConverter x:Key="objectToBool" />
@@ -24,6 +27,7 @@
             <BindingConvertersEx:ThicknessConverter x:Key="thicknessConverter" />
             <!--<BindingConvertersEx:CollectionViewSourceCreator x:Key="collectionViewSourceCreator" />-->
             <Style TargetType="{x:Type DataGrid}" BasedOn="{StaticResource {x:Type DataGrid}}">
+                <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="AlternatingRowBackground" Value="WhiteSmoke" />
                 <Setter Property="HorizontalGridLinesBrush" Value="Transparent" />
                 <Setter Property="VerticalGridLinesBrush" Value="Transparent" />
@@ -38,6 +42,10 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+            </Style>
+            <Style TargetType="{x:Type DataGridRowHeader}">
+                <Setter Property="Background" Value="WhiteSmoke" />
+                <Setter Property="MinWidth" Value="10" />
             </Style>
             <Style TargetType="{x:Type DataGridColumnHeader}">
                 <Setter Property="Background" Value="White" />
@@ -107,74 +115,12 @@
                 <Setter Property="BorderThickness" Value="0,2,0,0" />
                 <Setter Property="BorderBrush" Value="LightGray" />
                 <Style.Resources>
-                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Flat}">
                         <Setter Property="Width" Value="75" />
                         <Setter Property="Margin" Value="10" />
                         <Setter Property="FontSize" Value="11" />
                     </Style>
                 </Style.Resources>
-            </Style>
-            <Style TargetType="{x:Type local:ToolBarButton}">
-                <Style.Triggers>
-                    <Trigger Property="IsEnabled" Value="False">
-                        <Setter Property="Opacity" Value="0.6" />
-                    </Trigger>
-                </Style.Triggers>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type local:ToolBarButton}">
-                            <Border Margin="2" Padding="5" BorderThickness="{TemplateBinding BorderThickness}" ToolTip="{TemplateBinding ToolTip}" BorderBrush="{TemplateBinding BorderBrush}">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Setter Property="Background" Value="{Binding Background,RelativeSource={RelativeSource TemplatedParent}}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsMouseOver,RelativeSource={RelativeSource TemplatedParent}}" Value="True">
-                                                <Setter Property="Background" Value="LightBlue" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
-                                <StackPanel Orientation="Horizontal">
-                                    <Path Fill="{TemplateBinding BorderBrush}" Width="14" Height="14" Data="{Binding Image, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform" />
-                                    <Label Foreground="Black" FontSize="11" Padding="5,0,0,0" VerticalAlignment="Center" Content="{TemplateBinding Text}" />
-                                </StackPanel>
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            <Style TargetType="{x:Type local:ToolBarToggleButton}">
-                <Style.Triggers>
-                    <Trigger Property="IsEnabled" Value="False">
-                        <Setter Property="Opacity" Value="0.6" />
-                    </Trigger>
-                </Style.Triggers>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type local:ToolBarToggleButton}">
-                            <Border Margin="2" Padding="5" BorderThickness="{TemplateBinding BorderThickness}" ToolTip="{TemplateBinding ToolTip}" BorderBrush="{TemplateBinding BorderBrush}">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Setter Property="Background" Value="{Binding Background,RelativeSource={RelativeSource TemplatedParent}}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsChecked,RelativeSource={RelativeSource TemplatedParent}}" Value="True">
-                                                <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
-                                                <Setter Property="BorderBrush" Value="White" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsMouseOver,RelativeSource={RelativeSource TemplatedParent}}" Value="True">
-                                                <Setter Property="Background" Value="LightBlue" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
-                                <StackPanel Orientation="Horizontal">
-                                    <Path Fill="{TemplateBinding BorderBrush}" Width="16" Height="16" Data="{Binding Image, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform" />
-                                    <Label FontSize="11" Padding="5,0,0,0" VerticalAlignment="Center" Content="{TemplateBinding Text}" />
-                                </StackPanel>
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
             </Style>
             <Style x:Key="ToolBar" TargetType="WrapPanel">
                 <Setter Property="Background" Value="WhiteSmoke" />
@@ -227,7 +173,7 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <Style x:Key="CustomTab" TargetType="TabControl">
+            <!--<Style x:Key="CustomTab" TargetType="TabControl">
                 <Setter Property="OverridesDefaultStyle" Value="True"/>
                 <Setter Property="Template">
                     <Setter.Value>
@@ -289,7 +235,7 @@
                                                 </Label.Style>
                                             </Label>
                                         </Border>
-                                        <!--<Border Height="1" BorderBrush="{DynamicResource AccentColorBrush}">
+                                        --><!--<Border Height="1" BorderBrush="{DynamicResource AccentColorBrush}">
                                                 <Border.Style>
                                                     <Style TargetType="Border">
                                                         <Setter Property="BorderThickness" Value="1" />
@@ -300,14 +246,14 @@
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
-                                            </Border>-->
+                                            </Border>--><!--
                                     </Border>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
                     </Style>
                 </Style.Resources>
-            </Style>
+            </Style>-->
             <Style TargetType="ToggleButton" x:Key="ToggleSwitch">
                 <Setter Property="OverridesDefaultStyle" Value="True"/>
                 <Setter Property="Background" Value="White"/>
@@ -376,6 +322,119 @@
             <SolidColorBrush x:Key="AccentColorBrush" Color="#FF41B1E1" />
             <System:Double x:Key="DialogTitleFontSize">14</System:Double>
             <System:Double x:Key="DialogMessageFontSize">12</System:Double>
+
+
+            <Style TargetType="{x:Type MenuItem}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type MenuItem}">
+                            <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <Grid>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition MinWidth="17" Width="Auto" SharedSizeGroup="MenuItemIconColumnGroup" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="MenuItemIGTColumnGroup" />
+                                        <ColumnDefinition Width="14" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ContentPresenter Margin="5,0,10,0" x:Name="Icon" VerticalAlignment="Center" ContentSource="Icon" />
+
+                                    <Grid Visibility="Hidden" Margin="4,0,6,0" x:Name="GlyphPanel" VerticalAlignment="Center">
+                                        <Path x:Name="GlyphPanelpath" VerticalAlignment="Center" Fill="{TemplateBinding Foreground}" Data="M0,2 L0,4.8 L2.5,7.4 L7.1,2.8 L7.1,0 L2.5,4.6 z" FlowDirection="LeftToRight" />
+                                    </Grid>
+                                    <Rectangle Grid.Column="0" Grid.ColumnSpan="4" x:Name="BackgroundGradientOver" Stroke="#FFDBCE99" Opacity="0" Fill="{DynamicResource MouseOverBrush}"/>
+
+                                    <ContentPresenter Grid.Column="1" Margin="{TemplateBinding Padding}" x:Name="HeaderHost" RecognizesAccessKey="True" ContentSource="Header" />
+
+                                    <Grid Grid.Column="3" Margin="5" x:Name="ArrowPanel" VerticalAlignment="Center">
+                                        <Path x:Name="ArrowPanelPath" VerticalAlignment="Center" Fill="{TemplateBinding Foreground}" Data="M0,0 L0,8 L4,4 z" />
+                                    </Grid>
+
+                                    <Popup IsOpen="{Binding Path=IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" Placement="Bottom" x:Name="SubMenuPopup" Focusable="false" AllowsTransparency="true" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}" VerticalOffset="-3">
+                                        <Grid x:Name="SubMenu" Margin="10">
+                                            <Border x:Name="SubMenuBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                                <!--<Border.Effect>
+                                                    <DropShadowEffect BlurRadius="15" />
+                                                </Border.Effect>-->
+                                            </Border>
+                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                        </Grid>
+                                    </Popup>
+
+                                </Grid>
+                            </Border>
+
+                            <ControlTemplate.Triggers>
+
+                                <Trigger Property="Role" Value="TopLevelHeader">
+                                    <Setter Property="Margin" Value="0,1,0,1" />
+                                    <Setter Property="Padding" Value="6,3,6,3" />
+                                    <Setter Property="Grid.IsSharedSizeScope" Value="true" />
+                                    <Setter Property="Placement" Value="Bottom" TargetName="SubMenuPopup" />
+                                    <Setter Property="Visibility" Value="Collapsed" TargetName="ArrowPanel" />
+                                </Trigger>
+
+                                <Trigger Property="Role" Value="TopLevelItem">
+                                    <Setter Property="Margin" Value="0,1,0,1" />
+                                    <Setter Property="Padding" Value="6,3,6,3" />
+                                    <Setter Property="Visibility" Value="Collapsed" TargetName="ArrowPanel" />
+                                </Trigger>
+
+                                <Trigger Property="Role" Value="SubmenuHeader">
+                                    <Setter Property="DockPanel.Dock" Value="Top" />
+                                    <Setter Property="Padding" Value="0,2,0,2" />
+                                    <Setter Property="Placement" Value="Right" TargetName="SubMenuPopup" />
+                                    <Setter Property="Grid.IsSharedSizeScope" Value="true" />
+                                </Trigger>
+
+                                <Trigger Property="Role" Value="SubmenuItem">
+                                    <Setter Property="DockPanel.Dock" Value="Top" />
+                                    <Setter Property="Padding" Value="0,2,0,2" />
+                                    <Setter Property="Visibility" Value="Collapsed" TargetName="ArrowPanel" />
+                                </Trigger>
+                                <Trigger Property="IsSuspendingPopupAnimation" Value="true">
+                                    <Setter Property="PopupAnimation" Value="None" TargetName="SubMenuPopup" />
+                                </Trigger>
+
+                                <Trigger Property="Icon" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" TargetName="Icon" />
+                                </Trigger>
+
+                                <Trigger Property="IsChecked" Value="true">
+                                    <Setter Property="Visibility" Value="Visible" TargetName="GlyphPanel" />
+                                    <Setter Property="Visibility" Value="Collapsed" TargetName="Icon" />
+                                </Trigger>
+
+                                <Trigger Property="AllowsTransparency" SourceName="SubMenuPopup" Value="True">
+                                    <Setter Property="Margin" Value="0,0,3,3" TargetName="SubMenu" />
+                                    <Setter Property="SnapsToDevicePixels" Value="true" TargetName="SubMenu" />
+                                </Trigger>
+
+                                <Trigger Property="IsHighlighted" Value="true">
+                                    <Setter Property="Background" Value="Gray" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Foreground" Value="Gray" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="{x:Type Separator}">
+                <Setter Property="Height" Value="1" />
+                <Setter Property="Margin" Value="0,2,0,2" />
+                <Setter Property="Focusable" Value="false" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Separator}">
+                            <Border BorderBrush="#FFB1703C" BorderThickness="10" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,7 +1,12 @@
-﻿using System;
+﻿using Microsoft.CSharp.RuntimeBinder;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Core.Extensions;
@@ -44,7 +49,60 @@ namespace QuAnalyzer.Features.Comparison
             TokenSource = new CancellationTokenSource();
         }
 
-        public ComparerStruct(SourcesMapper s)//, IEqualityComparer<T> comparer, Func<string[], IEqualityComparer<T>> getComparerForKeys, Func<IQueryable<dynamic>, List<string>, IEnumerable<object[]>> transform)
+        public static IEnumerable<object[]> ToObjectArrays(IEnumerable src, params string[] attributes)
+        {
+            var innertype = src.GetInnerType();
+            if (innertype.IsArray)
+            {
+                return ((IEnumerable<object[]>)src);
+            }
+            else
+            {
+
+                if (attributes == null)
+                {
+                    attributes = innertype.GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(a => a.Name).ToArray();
+                }
+
+                var param = Expression.Parameter(typeof(object));
+                var expa = Expression.Parameter(typeof(Exception));
+                var ide_cstr = typeof(InvalidDataException).GetConstructor(new[] { typeof(string), typeof(Exception) });
+
+                var casted = Expression.Convert(param, innertype);
+
+                Func<string, Expression> propertyGet;
+                // Assuming dynamic...
+                if (innertype == typeof(object))
+                {
+                    propertyGet = a =>
+                    {
+                        var binder = Microsoft.CSharp.RuntimeBinder.Binder.GetMember(CSharpBinderFlags.None, a, innertype, new[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null) });
+                        return Expression.Dynamic(binder, innertype, casted);
+                    };
+                }
+                else
+                {
+                    propertyGet = a => Expression.Property(casted, a);
+                }
+                var atrs = attributes.Select(a =>
+                    Expression.TryCatch(
+                        Expression.Block(
+                            Expression.Convert(propertyGet(a), typeof(object))
+                        ),
+                    Expression.Catch(expa,
+                        Expression.Block(
+                            Expression.Throw(Expression.New(ide_cstr, Expression.Constant(a), expa)),
+                            Expression.Constant(null))))
+                ).ToList();
+
+                var attrExpr = Expression.Lambda<Func<dynamic, object[]>>(Expression.NewArrayInit(typeof(object), atrs), param).Compile();
+
+                return src.Cast<dynamic>().Select(attrExpr);
+            }
+        }
+
+
+        public ComparerStruct(SourcesMapper s) : this()//, IEqualityComparer<T> comparer, Func<string[], IEqualityComparer<T>> getComparerForKeys, Func<IQueryable<dynamic>, List<string>, IEnumerable<object[]>> transform)
         {
             var fieldsSrc = s.AllMappings.Select(m => m.Source).ToList();
             var fieldsTrg = s.AllMappings.Select(m => m.Target).ToList();
@@ -66,25 +124,25 @@ namespace QuAnalyzer.Features.Comparison
             }
 
 
-            var srcDataGetter = s.Source.GetQueryable(s.SourceRepository).Select<dynamic>(fieldsSrc);//, srcKeys != null ? srcKeys.ToDictionary(sk => sk, sk => srcHeaders.First(h => h.Name == sk).Type) : null);
-            var trgDataGetter = s.Target.GetQueryable(s.TargetRepository).Select<dynamic>(fieldsTrg);//, trgKeys != null ? trgKeys.ToDictionary(sk => sk, sk => trgHeaders.First(h => h.Name == sk).Type) : null);
+            var srcDataGetter = s.Source.GetQueryable(s.SourceRepository);//, srcKeys != null ? srcKeys.ToDictionary(sk => sk, sk => srcHeaders.First(h => h.Name == sk).Type) : null);
+            var trgDataGetter = s.Target.GetQueryable(s.TargetRepository);//, trgKeys != null ? trgKeys.ToDictionary(sk => sk, sk => trgHeaders.First(h => h.Name == sk).Type) : null);
             if (s.IsOrdered)
             {
                 if (srcKeys != null && trgKeys != null)
                 {
-                    srcDataGetter = srcDataGetter.OrderByMany(srcHeaders.Join(srcKeys, h => h.Name, k => k, (h, k) => new { h, k }).ToDictionary(x => x.k, x => x.h.Type));
-                    trgDataGetter = trgDataGetter.OrderByMany(trgHeaders.Join(trgKeys, h => h.Name, k => k, (h, k) => new { h, k }).ToDictionary(x => x.k, x => x.h.Type));
+                    srcDataGetter = srcDataGetter.OrderBy(String.Join(",", srcHeaders.Select(h => h.Name).Intersect(srcKeys)));
+                    trgDataGetter = trgDataGetter.OrderBy(String.Join(",", trgHeaders.Select(h => h.Name).Intersect(trgKeys)));
                 }
                 else
                 {
-                    srcDataGetter = srcDataGetter.OrderByAll();
-                    trgDataGetter = trgDataGetter.OrderByAll();
+                    srcDataGetter = srcDataGetter.OrderBy(String.Join(",", srcHeaders.Select(h => h.Name)));
+                    trgDataGetter = trgDataGetter.OrderBy(String.Join(",", trgHeaders.Select(h => h.Name)));
                 }
             }
 
             Name = s.Name;
-            SourceName = s.Source.Name + " (" + s.SourceRepository + ")";
-            TargetName = s.Target.Name + " (" + s.TargetRepository + ")";
+            SourceName = $"{s.Source.Name} ({s.SourceRepository})";
+            TargetName = $"{s.Target.Name} ({s.TargetRepository})";
             SourceHeaders = fieldsSrc;
             TargetHeaders = fieldsTrg;
             SourceKeys = srcKeys;
@@ -106,9 +164,10 @@ namespace QuAnalyzer.Features.Comparison
             return new SequenceEqualityComparer<IEnumerable<T>>();
         }*/
 
-        private static IEnumerable<object[]> Transform(IQueryable<dynamic> sourceQuery, List<string> fields)
+        private static IEnumerable<object[]> Transform(IQueryable sourceQuery, List<string> fields)
         {
-            return sourceQuery.AsObjectCollection(fields.ToArray());
+            //return sourceQuery.Select($"new({string.Join(",", fields)})");
+            return ToObjectArrays(sourceQuery, fields.ToArray());
         }
 
         //TODO: MOVE !

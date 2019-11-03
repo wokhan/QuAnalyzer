@@ -49,8 +49,9 @@
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.19" />
     <PackageReference Include="System.Management" Version="4.7.0-preview1.19504.10" />
     <PackageReference Include="VirtualizingObservableCollection" Version="1.2.0" />
-    <PackageReference Include="Wokhan.Core" Version="1.1909.2101.163" />
-    <PackageReference Include="Wokhan.Data.Providers.ExcelDataProvider" Version="1.1908.2901.157" />
+    <PackageReference Include="Wokhan.Core" Version="1.1911.201.175" />
+    <PackageReference Include="Wokhan.Data.Providers" Version="1.1911.305.180" />
+    <PackageReference Include="Wokhan.Data.Providers.ExcelDataProvider" Version="1.1911.305.180" />
     <PackageReference Include="System.Windows.Forms.DataVisualization" Version="1.0.0-prerelease.19218.1" />
     <PackageReference Include="Wokhan.WPF" Version="1.1909.2101.163" />
   </ItemGroup>

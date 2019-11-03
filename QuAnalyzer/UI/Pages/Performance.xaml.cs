@@ -10,10 +10,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Forms.DataVisualization.Charting;
-using System.Windows.Threading;
-using Wokhan.Collections.Generic.Extensions;
 using static QuAnalyzer.Features.Performance.Performance;
 
 namespace QuAnalyzer.UI.Pages
@@ -39,7 +36,7 @@ namespace QuAnalyzer.UI.Pages
 
             var dx = MonitorResultsView.Where(d => d.Data != null).OrderBy(r => r.Index).ToList();
             var s1 = dx.ToMultiSeries(t => t.Name + " (Freq)", "X", t => t.Index, new[] { "Start", "End" }, t => new[] { (double)t.LastCheck.Ticks + 1, Math.Max(t.End.Ticks, 1) }, SeriesChartType.RangeColumn, true, true);
-            var s2 = dx.ToMultiSeries(t => t.Name + " (Duration)", "X", t => t.Index, new[] { "Duration" }, t => new[] { (double)t.Duration.Values.Sum() }, SeriesChartType.Line);
+            var s2 = dx.ToMultiSeries(t => t.Name + " (Duration)", "X", t => t.Index, new[] { "Duration" }, t => new[] { (double)t.Duration["_TOTAL_DEFAULT"] }, SeriesChartType.Line);
 
             graph.AddSeries(s1.Values.Concat(s2.Values).ToArray());
         }
@@ -70,9 +67,11 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            //var tests = lst{ new TestCase() { GetData = (values, stats) => item.Provider.GetQueryable(item.Repository, values, stats)  } };
-            //var tc = new TestCasesCollection() { TestCases = tests };
-            //run(10, tc, 10);
+            var (prov, repository) = ((App)App.Current).CurrentSelection.FirstOrDefault();
+            
+            var tests = new[] { new TestCase() { GetData = (values, stats) => prov.GetQueryable(repository, values, stats) } };
+            var tc = new TestCasesCollection() { TestCases = tests };
+            run(10, tc, 10);
         }
 
         private void btnCopy_Click(object sender, RoutedEventArgs e)

@@ -2,14 +2,9 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-        Title="{Binding Name, StringFormat='Comparison details - {0}'}" Height="500" Width="700"
-        MinWidth="700" MinHeight="500">
+        Title="{Binding CurrentMap.Name,ElementName=me,StringFormat='Comparison details - {0}'}" Height="500" Width="700"
+        MinWidth="700" MinHeight="500" x:Name="me">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="399*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="401*"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -17,82 +12,8 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Label Content="Mapping name:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26" />
-        <TextBox Name="lstMappings" Text="{Binding Name}" Margin="108,10,11,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Height="26"/>
-        <GroupBox Header="Source" Grid.Row="1" Height="97" VerticalAlignment="Top" Background="{StaticResource SourceColorBrush}" BorderBrush="{StaticResource SourceColorBrush}">
-            <Grid>
-                <Label Content="Provider:" HorizontalAlignment="Left" Margin="0,3,0,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="lstSrc" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" Margin="96,0,5,0" VerticalAlignment="Top" SelectedItem="{Binding Source}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <WrapPanel>
-                                <Image HorizontalAlignment="Center" Grid.Column="0" Height="16" VerticalAlignment="Center" Margin="2" Source="{Binding ProviderTypeInfo.IconPath, Converter={StaticResource imageSourceConverter}}" />
-                                <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="2" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Center" />
-                            </WrapPanel>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <Label Content="Repository:" HorizontalAlignment="Left" Margin="0,30,0,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="lstSrcRepo" Margin="96,27,5,0" VerticalAlignment="Top" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding DataContext.SourceRepository, ElementName=lstMappings}" SelectionChanged="lstSrcRepo_SelectionChanged" DataContext="{Binding SelectedItem, ElementName=lstSrc}"/>
-            </Grid>
-        </GroupBox>
-        <Path Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Data="{StaticResource appbar_arrow_left_right}" Fill="Gray" Stretch="Uniform" Width="32" />
-        <GroupBox Header="Target" Grid.Row="1" Height="97" VerticalAlignment="Top" Grid.Column="2" Background="{StaticResource TargetColorBrush}" BorderBrush="{StaticResource TargetColorBrush}">
-            <Grid>
-                <Label Content="Provider:" HorizontalAlignment="Left" Margin="0,3,0,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="lstTrg" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" Margin="86,0,5,0" VerticalAlignment="Top" SelectedItem="{Binding Target}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <WrapPanel>
-                                <Image HorizontalAlignment="Center" Grid.Column="0" Height="16" VerticalAlignment="Center" Margin="2" Source="{Binding ProviderTypeInfo.IconPath, Converter={StaticResource imageSourceConverter}}" />
-                                <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="2" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Center" />
-                            </WrapPanel>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <Label Content="Repository:" HorizontalAlignment="Left" Margin="0,30,0,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="lstTrgRepo" Margin="86,27,5,0" VerticalAlignment="Top" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding DataContext.TargetRepository, ElementName=lstMappings}" SelectionChanged="lstTrgRepo_SelectionChanged" DataContext="{Binding SelectedItem, ElementName=lstTrg}"/>
-            </Grid>
-        </GroupBox>
-        <GroupBox Style="{StaticResource NoMarginGroupBox}" Header="Mappings" Grid.Row="2" Grid.ColumnSpan="3" >
-            <DockPanel>
-                <WrapPanel Style="{StaticResource ToolBar}">
-                    <UC:ToolBarButton Text="Add" ToolTip="Add a mapping" BorderBrush="Green" Image="{StaticResource appbar_add}" Click="btnAdd_Click" />
-                    <UC:ToolBarButton Margin="5,0" Text="By position" ToolTip="Map by position" BorderBrush="Blue" Image="{StaticResource appbar_dimension_line_width_thick}" Click="btnMapPos_Click" />
-                    <UC:ToolBarButton Margin="5,0" Text="By name" ToolTip="Map by name" BorderBrush="Blue" Image="{StaticResource appbar_dimension_line_width_thick}" Click="btnMapName_Click" />
-                    <UC:ToolBarButton Margin="5,0" Text="Clear" ToolTip="Clear all" IsEnabled="{Binding Items.IsEmpty,ElementName=gridMappings,Converter={StaticResource booleanNegator}}" BorderBrush="OrangeRed" Image="{StaticResource appbar_clean}" Click="btnRmAll_Click" />
-                </WrapPanel>
-                <DataGrid Name="gridMappings" HorizontalAlignment="Stretch" CanUserAddRows="False" BorderThickness="1" BorderBrush="LightGray" VerticalAlignment="Stretch" AutoGenerateColumns="False">
-                    <DataGrid.Columns>
-                        <DataGridComboBoxColumn Width="*" Header="Source field" TextBinding="{Binding Source, Mode=TwoWay}">
-                            <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
-                            </DataGridComboBoxColumn.EditingElementStyle>
-                        </DataGridComboBoxColumn>
-                        <DataGridComboBoxColumn Width="*" Header="Target field" TextBinding="{Binding Target, Mode=TwoWay}">
-                            <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
-                            </DataGridComboBoxColumn.EditingElementStyle>
-                        </DataGridComboBoxColumn>
-                        <DataGridTemplateColumn Width="80" Header="Use as keys">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="5,0" Foreground="Black" IsChecked="{Binding IsKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Width="Auto" IsReadOnly="True" CanUserResize="False">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Name="btnDelete" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnRm_Click">
-                                        <Path Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
-                                    </Button>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </DockPanel>
-        </GroupBox>
+        <TextBox Name="lstMappings" Text="{Binding CurrentMap.Name}" Margin="108,10,11,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Height="26"/>
+        <UC:MappingsEdit Grid.Row="2" Mapping="{Binding CurrentMap,ElementName=me,Mode=OneWay}" />
         <Border Style="{StaticResource ButtonBar}" Grid.Row="3" Grid.ColumnSpan="3">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Content="Save" Name="btnSave" Click="btnSave_Click" HorizontalAlignment="Right"  />

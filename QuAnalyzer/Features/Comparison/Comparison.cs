@@ -31,35 +31,8 @@ namespace QuAnalyzer.Features.Comparison
 
                         setProgress(f, ProgressType.LoadingData, 0, progressCallback);
 
-                        var t1 = Task.Run(() =>
-                        {
-                            var start = Stopwatch.StartNew();
-                            var item = r.Source;
-                            f.Results.Source.StartTime = DateTime.Now;
-                            var res = f.GetSourceData().Select((a, i) => { token.ThrowIfCancellationRequested(); item.Count = i + 1; return a; }); //.ToList();
-                            if (!f.IsOrdered)
-                            {
-                                res = res.ToList();
-                            }
-                            start.Stop();
-                            f.Results.Source.LoadingTime = start.ElapsedMilliseconds;
-                            return res;
-                        });
-
-                        var t2 = Task.Run(() =>
-                        {
-                            var start = Stopwatch.StartNew();
-                            var item = r.Target;
-                            f.Results.Target.StartTime = DateTime.Now;
-                            var res = f.GetTargetData().Select((a, i) => { token.ThrowIfCancellationRequested(); item.Count = i + 1; return a; });//.ToList();
-                            if (!f.IsOrdered)
-                            {
-                                res = res.ToList();
-                            }
-                            start.Stop();
-                            f.Results.Target.LoadingTime = start.ElapsedMilliseconds;
-                            return res;
-                        });
+                        var t1 = LoadData(f, f.Results.Source, f.GetSourceData(), token);
+                        var t2 = LoadData(f, f.Results.Target, f.GetTargetData(), token);
 
                         IEnumerable<T> srcData = await t1;
                         IEnumerable<T> trgData = await t2;
@@ -133,10 +106,26 @@ namespace QuAnalyzer.Features.Comparison
             }
             else
             {
-                Parallel.ForEach(comparerData, runForOne);
+                comparerData.AsParallel().ForAll(runForOne);
             }
         }
 
+        private static Task<IEnumerable<T>> LoadData<T>(ComparerStruct<T> f, ItemResult<T> item, IEnumerable<T> tr, CancellationToken token) where T : class
+        {
+            return Task.Run(() =>
+            {
+                var start = Stopwatch.StartNew();
+                item.StartTime = DateTime.Now;
+                var res = tr.Select((a, i) => { token.ThrowIfCancellationRequested(); item.Count = i + 1; return a; }); //.ToList();
+                if (!f.IsOrdered)
+                {
+                    res = res.ToList();
+                }
+                start.Stop();
+                item.LoadingTime = start.ElapsedMilliseconds;
+                return res;
+            });
+        }
 
         private static void setProgress<T>(ComparerStruct<T> f, ProgressType progressType, int p, Action<ComparerStruct<T>> progressCallback)
         {

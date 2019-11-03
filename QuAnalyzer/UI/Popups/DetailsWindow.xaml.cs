@@ -104,7 +104,7 @@ namespace QuAnalyzer.UI.Popups
             InitializeComponent();
 
             this.DataContext = r;
-            mainGrid.DataContext = r;
+            //mainGrid.DataContext = r;
 
             InitGrids(r);
             this.Loaded += DetailsWindow_Loaded;
