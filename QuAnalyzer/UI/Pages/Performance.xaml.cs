@@ -1,4 +1,7 @@
-﻿using QuAnalyzer.Core.Extensions;
+﻿using LiveCharts;
+using LiveCharts.Configurations;
+using LiveCharts.Defaults;
+using LiveCharts.Wpf;
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Features.Performance;
 using QuAnalyzer.Generic.Extensions;
@@ -7,11 +10,11 @@ using QuAnalyzer.UI.Windows;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms.DataVisualization.Charting;
-using static QuAnalyzer.Features.Performance.Performance;
+using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -20,58 +23,73 @@ namespace QuAnalyzer.UI.Pages
     /// </summary>
     public partial class Performance : Page
     {
-        Dictionary<string, ContentControl> dcDic;
-        ObservableCollection<ResultsClass> MonitorResultsView = new ObservableCollection<ResultsClass>();
+        private long startDate;
+
+        public ObservableCollection<ResultsClass> MonitorResultsView { get; } = new ObservableCollection<ResultsClass>();
+
+        public TestCasesCollection SelectedTestsCollection { get; set; }
+
+        public SeriesCollection ResultSeries { get; } = new SeriesCollection(Mappers.Xy<DateTimePoint>().X(d => d.DateTime.Ticks).Y(d => d.Value));
 
         public Performance()
         {
             this.DataContext = this;
 
+            //MonitorResultsView.CollectionChanged += MonitorResultsView_CollectionChanged;
+
             InitializeComponent();
         }
 
-        public void run(int ntests, TestCasesCollection ts, int parallel)
+        private void MonitorResultsView_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Run(ts, ntests, parallel, MonitorResultsView);
+            var results = e.NewItems.Cast<ResultsClass>().ToList();
+            results.ForEach(t =>
+            {
+                var serie = ResultSeries.Cast<Series>().First(r => r.Title == t.Name + " (Freq)");
+                serie.Values.Add(new DateTimePoint(t.LastCheck.DateTime, (double)t.LastCheck.Ticks - startDate + 1));
 
-            var dx = MonitorResultsView.Where(d => d.Data != null).OrderBy(r => r.Index).ToList();
-            var s1 = dx.ToMultiSeries(t => t.Name + " (Freq)", "X", t => t.Index, new[] { "Start", "End" }, t => new[] { (double)t.LastCheck.Ticks + 1, Math.Max(t.End.Ticks, 1) }, SeriesChartType.RangeColumn, true, true);
-            var s2 = dx.ToMultiSeries(t => t.Name + " (Duration)", "X", t => t.Index, new[] { "Duration" }, t => new[] { (double)t.Duration["_TOTAL_DEFAULT"] }, SeriesChartType.Line);
-
-            graph.AddSeries(s1.Values.Concat(s2.Values).ToArray());
+                if (t.Duration.ContainsKey("_TOTAL_DEFAULT"))
+                {
+                    var serie2 = ResultSeries.Cast<Series>().First(r => r.Title == t.Name + " (Duration)");
+                    serie2.Values.Add(new DateTimePoint(t.LastCheck.DateTime, t.Duration["_TOTAL_DEFAULT"]));
+                }
+            });
         }
 
-        /*void runcallback(ResultsClass res, IList<Dictionary<string, string>> values)
+        public void run()
         {
-            switch (res.Status)
+            var ntests = int.Parse(txtNbOccur.Text);
+            var parallel = int.Parse(txtNbPara.Text);
+
+            ResultSeries.Clear();
+
+            ResultSeries.AddRange(SelectedTestsCollection.TestCases.SelectMany(t => new Series[] {
+                new LineSeries() { Title = t.Name + " (Freq)", Values = new ChartValues<DateTimePoint>() },
+                new StepLineSeries() { Title = t.Name + " (Duration)", Values = new ChartValues<DateTimePoint>() }
+            }));
+
+            startDate = DateTimeOffset.Now.Ticks;
+            Features.Performance.Performance.Run(SelectedTestsCollection, ntests, parallel, MonitorResultsView, addRes);
+        }
+
+        private void addRes(ResultsClass t, IList<Dictionary<string, string>> values)
+        {
+            Dispatcher.Invoke(() =>
             {
-                case Status.Loading:
-                    dcDic[res.Id].Style = "color: black;";
-                    dcDic[res.Id].Content = $"[{res.Id}::{res.Name}] [{DateTime.Now}] Loading...";
-                    break;
+                if (t.Status != Status.Loading)
+                {
+                    var serie = ResultSeries.Cast<Series>().First(r => r.Title == t.Name + " (Freq)");
+                    serie.Values.Add(new DateTimePoint(t.LastCheck.DateTime, (double)t.LastCheck.Ticks + 1));
 
-                case Status.Success:
-                    dcDic[res.Id].Content = Util.HorizontalRun(true, Util.RawHtml($"<span style='color:green'>[{res.Id}::{res.Name}]</span> [{DateTime.Now}] Done in {res.Duration}ms (status: {res.Status}, values: {values})"), Util.OnDemand("[details]", () => res.Data));
-                    break;
-
-                case Status.Failure:
-                    dcDic[res.Id].Content = Util.HorizontalRun(true, Util.RawHtml($"<span style='color:red'>[{res.Id}::{res.Name}]</span> [{DateTime.Now}] Done in {res.Duration}ms (status: {res.Status}, values: {values})"), Util.OnDemand("[details]", () => res.Data));
-                    break;
-
-                case Status.Error:
-                    dcDic[res.Id].Content = Util.HorizontalRun(true, Util.RawHtml($"<span style='color:orangered'>[{res.Id}::{res.Name}]</span> [{DateTime.Now}] Done in {res.Duration}ms (status: {res.Status}, values: {values})"), Util.OnDemand("[details]", () => res.Data));
-                    break;
-
-            }
-        }*/
+                    var serie2 = ResultSeries.Cast<Series>().First(r => r.Title == t.Name + " (Duration)");
+                    serie2.Values.Add(new DateTimePoint(t.LastCheck.DateTime, t.Duration["_TOTAL_DEFAULT"]));
+                }
+            });
+        }
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            var (prov, repository) = ((App)App.Current).CurrentSelection.FirstOrDefault();
-            
-            var tests = new[] { new TestCase() { GetData = (values, stats) => prov.GetQueryable(repository, values, stats) } };
-            var tc = new TestCasesCollection() { TestCases = tests };
-            run(10, tc, 10);
+            run();
         }
 
         private void btnCopy_Click(object sender, RoutedEventArgs e)
@@ -83,10 +101,11 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
+            var selection = (KeyValuePair<IDataProvider, string>)((Button)sender).Tag;
             
         }
 
-       
+
         private void btnGrHTML_Click(object sender, RoutedEventArgs e) => gridResults.ExportAsHTML();
 
         private void btnGrCopy_Click(object sender, RoutedEventArgs e) => gridResults.CopyToClipboard();
@@ -96,6 +115,30 @@ namespace QuAnalyzer.UI.Pages
         private void btnStopAll_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void btnStartAll_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnAdd_Click(object sender, RoutedEventArgs e)
+        {
+            var perfItems = ((App)App.Current).CurrentProject.PerformanceItems;
+            perfItems.Add(new TestCasesCollection() { Name = "Tests collection #" + (perfItems.Count + 1), TestCases = new ObservableCollection<TestCase>() });
+        }
+
+        private void btnClear_Click(object sender, RoutedEventArgs e)
+        {
+            ((App)App.Current).CurrentProject.PerformanceItems.Clear();
+        }
+
+        private void lstTestCases_Drop(object sender, DragEventArgs e)
+        {
+            var collection = (TestCasesCollection)((ListView)sender).Tag;
+            var (prov, repo) = (KeyValuePair<IDataProvider, string>)e.Data.GetData(typeof(KeyValuePair<IDataProvider, string>));
+
+            collection.TestCases.Add(new TestCase() { Name = prov.Name, Repository = repo, GetData = (values, stats) => prov.GetQueryable(repo, values, stats) });
         }
     }
 }

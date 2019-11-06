@@ -12,23 +12,28 @@
 	Title="DataMonitor">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition MinWidth="300" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="5" />
-            <ColumnDefinition />
+            <ColumnDefinition MinWidth="300" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition MinHeight="100" />
-            <RowDefinition Height="5" />
-            <RowDefinition MinHeight="100" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
         </Grid.RowDefinitions>
-        <DockPanel Grid.RowSpan="3" Width="300">
+        <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
+            <UC:ToolBarButton Text="Run" ToolTip="Start monitoring the selected items" BorderBrush="Green" Image="{StaticResource appbar_control_play}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnStart_Click" />
+            <UC:ToolBarButton Text="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />
+            <UC:ToolBarButton Text="Stop" ToolTip="Stop monitoring" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Red" Image="{StaticResource appbar_arrow_collapsed}" Click="btnStopAll_Click" />
+            <Rectangle />
+            <UC:ToolBarToggleButton Text="Enable chart" ToolTip="Enable charting" IsChecked="False" BorderBrush="Green" Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />
+        </WrapPanel>
+        <DockPanel Grid.Row="1" Grid.RowSpan="3">
+            <TextBlock DockPanel.Dock="Top" Background="LightGray" Padding="5" Text="Configuration" />
             <WrapPanel Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton Text="Add" ToolTip="Add a step" BorderBrush="Green" Image="{StaticResource appbar_add}" Click="btnAdd_Click" />
                 <UC:ToolBarButton Text="Clear" ToolTip="Remove all" BorderBrush="OrangeRed" Image="{StaticResource appbar_clean}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnClear_Click" />
-                <Rectangle />
-                <UC:ToolBarButton Text="Run" ToolTip="Start monitoring the selected items" BorderBrush="Green" Image="{StaticResource appbar_control_play}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnStart_Click" />
-                <UC:ToolBarButton Text="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />
-                <UC:ToolBarButton Text="Stop" ToolTip="Stop monitoring" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Red" Image="{StaticResource appbar_arrow_collapsed}" Click="btnStopAll_Click" />
             </WrapPanel>
             <DataGrid ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" x:Name="gridSteps" AutoGenerateColumns="False" IsReadOnly="True">
                 <DataGrid.Columns>
@@ -51,8 +56,8 @@
                 </DataGrid.Columns>
             </DataGrid>
         </DockPanel>
-        <Rectangle Grid.Column="1" Grid.RowSpan="3" Width="4" Fill="LightGray" />
-        <DockPanel Grid.Column="2">
+        <GridSplitter Grid.Row="1" Grid.Column="1" Grid.RowSpan="3" Width="2" Background="LightGray" />
+        <DockPanel Grid.Row="1" Grid.Column="2">
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton x:Name="btnGrCopy" Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" Click="btnGrCopy_Click" />
                 <Rectangle />
@@ -152,11 +157,9 @@
                 </DataGrid.GroupStyle>-->
             </DataGrid>
         </DockPanel>
-        <GridSplitter Grid.Row="1" Grid.Column="2" Height="4" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" />
-        <DockPanel Grid.Column="2" Grid.Row="2">
+        <GridSplitter Grid.Row="2" Grid.Column="2" Height="2" Background="LightGray" HorizontalAlignment="Stretch" />
+        <DockPanel Grid.Column="2" Grid.Row="3" Visibility="{Binding IsChecked,ElementName=btnEnableChart,Converter={StaticResource valueToVisibilityConverter}}">
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
-                <UC:ToolBarToggleButton Text="Enable" ToolTip="Enable charting (you will have to restart tracking)" IsChecked="False" BorderBrush="Green" Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />
-                <Rectangle />
                 <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" IsEnabled="False" x:Name="btnCopy" Click="btnCopy_Click" />
             </WrapPanel>
             <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Visible">

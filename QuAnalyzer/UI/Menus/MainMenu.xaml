@@ -98,7 +98,7 @@
             </ItemsControl.GroupStyle>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding Value}" />
+                    <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding Value}" Tag="{Binding}" PreviewMouseLeftButtonDown="Repository_PreviewMouseLeftButtonDown" PreviewMouseMove="Repository_DataGrid_MouseMove" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ListView>

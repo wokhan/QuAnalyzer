@@ -23,8 +23,8 @@
                 <UC:ToolBarButton Text="Add" ToolTip="Add a mapping" BorderBrush="Green" Image="{StaticResource appbar_add}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnNewPrv_Click" />
                 <UC:ToolBarButton Text="Automap" ToolTip="Automap" BorderBrush="Green" Image="{StaticResource appbar_add_multiple}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnAuto_Click" />
                 <Rectangle />
-                <UC:ToolBarButton Text="Sel. all" ToolTip="Select all" BorderBrush="Blue" Image="{StaticResource material_select}" Click="btnSelectAll_Click" />
-                <UC:ToolBarButton Text="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" Image="{StaticResource material_unselect}" Click="btnUnSel_Click" />
+                <UC:ToolBarButton Text="Sel. all" ToolTip="Select all" BorderBrush="Blue" Image="{StaticResource material_select}" Click="btnSelectAll_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
+                <UC:ToolBarButton Text="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" Image="{StaticResource material_unselect}" Click="btnUnSel_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
             </WrapPanel>
             <TabControl Grid.Row="0" VerticalAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch" Padding="0">
                 <TabControl.Style>

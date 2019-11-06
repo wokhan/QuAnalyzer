@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using Wokhan.Collections;
 using Wokhan.Collections.Extensions;
 
 namespace QuAnalyzer.Features.Performance
@@ -48,7 +49,15 @@ namespace QuAnalyzer.Features.Performance
                                      .Select((test, ix) => new { test, ix })
                                      .ForAll(a =>
                                      {
-                                         var result = new ResultsClass() { Id = $"{x}.{a.ix}", Name = a.test.Name, Index = x, Status = Status.Loading };
+                                         var result = new ResultsClass()
+                                         {
+                                             Id = $"{x}.{a.ix}",
+                                             Name = a.test.Name,
+                                             Index = x,
+                                             Status = Status.Loading,
+                                             Duration = new ObservableDictionary<string, long>()
+                                         };
+                                         
                                          callback?.Invoke(result, null);
 
                                          lock (results)
@@ -61,6 +70,8 @@ namespace QuAnalyzer.Features.Performance
                                          {
                                              //TODO : Values override!!!
                                              var data = a.test.GetData(values, result.Duration);
+                                             // TODO: remove, just for test :-O
+                                             Thread.Sleep(new Random().Next(0, 100));
                                              result.Status = Status.Success;
                                              result.Data = data;
                                          }
@@ -74,10 +85,6 @@ namespace QuAnalyzer.Features.Performance
                                              sw.Stop();
                                          }
 
-                                         if (result.Duration == null) {
-                                             result.Duration = new Dictionary<string, long>();
-
-                                         }
                                          result.Duration.Add("_TOTAL_DEFAULT", sw.ElapsedMilliseconds);
                                          result.End = result.LastCheck.AddMilliseconds(sw.ElapsedMilliseconds);
 

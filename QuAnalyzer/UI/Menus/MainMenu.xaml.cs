@@ -1,12 +1,14 @@
 ﻿using Microsoft.Win32;
 using QuAnalyzer.UI.Pages;
 using QuAnalyzer.UI.Windows;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Contracts;
 
@@ -18,10 +20,8 @@ namespace QuAnalyzer.UI.Menus
     public partial class MainMenu : UserControl
     {
         
-        //public string ApplicationName { get; } = "QuAnalyzer v" + Assembly.GetExecutingAssembly().GetName().Version;
-
         private readonly ObservableCollection<KeyValuePair<IDataProvider, string>> Providers = new ObservableCollection<KeyValuePair<IDataProvider, string>>();
-        private bool preventUpdate;
+        private Point startPoint;
 
         private CollectionViewSource GroupedProviders { get; set; }
 
@@ -44,11 +44,6 @@ namespace QuAnalyzer.UI.Menus
 
         private void CurrentProviders_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (preventUpdate)
-            {
-                return;
-            }
-
             using (GroupedProviders.DeferRefresh())
             {
                 if (e.OldItems != null)
@@ -82,13 +77,25 @@ namespace QuAnalyzer.UI.Menus
 
         private void lstProviders_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            preventUpdate = true;
-
             var currentSelection = ((App)App.Current).CurrentSelection;
             currentSelection.RemoveRange(e.RemovedItems.Cast<KeyValuePair<IDataProvider, string>>());
             currentSelection.AddRange(e.AddedItems.Cast<KeyValuePair<IDataProvider, string>>());
+        }
 
-            preventUpdate = false;
+        private void Repository_DataGrid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            Vector diff = startPoint - e.GetPosition(null);
+            if (e.LeftButton == MouseButtonState.Pressed && (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
+            {
+                var src = (FrameworkElement)sender;
+                DragDrop.DoDragDrop(src, new DataObject(src.Tag), DragDropEffects.Link);
+                e.Handled = true;
+            }
+        }
+
+        private void Repository_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            startPoint = e.GetPosition(null);
         }
     }
 }
