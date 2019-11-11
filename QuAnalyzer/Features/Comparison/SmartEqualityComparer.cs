@@ -5,7 +5,7 @@ namespace QuAnalyzer.Features.Comparison
 {
     public class SmartEqualityComparer<T> : IEqualityComparer<T>
     {
-        public bool Equals(T x,T y)
+        public bool Equals(T x, T y)
         {
             return x is DBNull && y == null || y is DBNull && x == null || object.Equals(x, y);
         }

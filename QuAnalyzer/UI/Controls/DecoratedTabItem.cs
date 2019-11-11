@@ -18,6 +18,5 @@ namespace QuAnalyzer.UI.Controls
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(DecoratedTabItem), new FrameworkPropertyMetadata(typeof(DecoratedTabItem)));
         }
-
     }
 }

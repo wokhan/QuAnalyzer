@@ -6,12 +6,15 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Border BorderThickness="0,0,0,2">
+                    <Border BorderThickness="0" CornerRadius="5,5,0,0">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="LightGray" />
+                                    </Trigger>
                                     <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
-                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}" />
+                                        <Setter Property="Background" Value="WhiteSmoke" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -20,7 +23,7 @@
                             <Path Margin="10,0" Height="19" HorizontalAlignment="Left" VerticalAlignment="Center" Stretch="Uniform" Data="{Binding Path=Image, RelativeSource={RelativeSource TemplatedParent}}">
                                 <Path.Style>
                                     <Style TargetType="Path">
-                                        <Setter Property="Fill" Value="Gray" />
+                                        <Setter Property="Fill" Value="DimGray" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
                                                 <Setter Property="Fill" Value="{DynamicResource AccentColorBrush}" />

@@ -1,6 +1,4 @@
 ﻿using MahApps.Metro.Controls;
-using QuAnalyzer.UI.Popups;
-using System;
 using System.Windows.Controls;
 
 namespace QuAnalyzer.UI.Windows

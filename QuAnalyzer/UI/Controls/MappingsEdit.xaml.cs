@@ -1,11 +1,10 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using QuAnalyzer.Features.Comparison;
+﻿using QuAnalyzer.Features.Comparison;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
 using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Contracts;
-using System;
 
 namespace QuAnalyzer.UI.Controls
 {

@@ -1,7 +1,7 @@
 ﻿using QuAnalyzer.Features.Performance;
-using QuAnalyzer.Generic;
 using System;
 using System.Collections.Generic;
+using Wokhan.Collections;
 using Wokhan.Core.ComponentModel;
 
 namespace QuAnalyzer.Features.Monitoring
@@ -29,12 +29,7 @@ namespace QuAnalyzer.Features.Monitoring
             set { _resultCount = value; NotifyPropertyChanged(); }
         }
 
-        private Dictionary<string, long> _duration;
-        public Dictionary<string, long> Duration
-        {
-            get { return _duration; }
-            set { _duration = value; NotifyPropertyChanged(); }
-        }
+        public ObservableDictionary<string, long> Duration { get; } = new ObservableDictionary<string, long>();
 
         public int Occurence { get; set; }
 

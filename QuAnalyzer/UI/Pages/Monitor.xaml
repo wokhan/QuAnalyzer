@@ -12,13 +12,13 @@
 	Title="DataMonitor">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition MinWidth="300" />
+            <ColumnDefinition Width="250" MinWidth="250" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition MinWidth="300" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition MinHeight="100" />
+            <RowDefinition MinHeight="100" Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
@@ -27,7 +27,7 @@
             <UC:ToolBarButton Text="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />
             <UC:ToolBarButton Text="Stop" ToolTip="Stop monitoring" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Red" Image="{StaticResource appbar_arrow_collapsed}" Click="btnStopAll_Click" />
             <Rectangle />
-            <UC:ToolBarToggleButton Text="Enable chart" ToolTip="Enable charting" IsChecked="False" BorderBrush="Green" Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />
+            <UC:ToolBarToggleButton Text="Enable chart" ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />
         </WrapPanel>
         <DockPanel Grid.Row="1" Grid.RowSpan="3">
             <TextBlock DockPanel.Dock="Top" Background="LightGray" Padding="5" Text="Configuration" />

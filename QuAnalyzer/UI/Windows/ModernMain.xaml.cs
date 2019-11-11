@@ -5,7 +5,6 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 
 namespace QuAnalyzer.UI.Windows
@@ -33,7 +32,7 @@ namespace QuAnalyzer.UI.Windows
 
         private async void ForceDialog(string p1, string p2)
         {
-            var dial = await this.GetCurrentDialogAsync<BaseMetroDialog>();
+            var dial = await this.GetCurrentDialogAsync<BaseMetroDialog>().ConfigureAwait(true);
             if (dial != null)
             {
                 dial.Title = p2;
@@ -42,7 +41,7 @@ namespace QuAnalyzer.UI.Windows
             }
             else
             {
-                await this.ShowMessageAsync(p2, p1, MessageDialogStyle.Affirmative);
+                await this.ShowMessageAsync(p2, p1, MessageDialogStyle.Affirmative).ConfigureAwait(false);
             }
         }
 
@@ -116,6 +115,17 @@ namespace QuAnalyzer.UI.Windows
         private void btnAccentColor_Click(object sender, RoutedEventArgs e)
         {
             ((App)Application.Current).CurrentProject.AccentColor = (SolidColorBrush)((MenuItem)sender).Tag;
+        }
+
+        private void btnEditTitle_Click(object sender, RoutedEventArgs e)
+        {
+            txtProjectTitle.Focus();
+        }
+
+        private void tabMenu_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var useBouba = tabMenu.SelectedIndex < 4;
+            ((App)Application.Current).CurrentSelectionLinked = useBouba;
         }
     }
 }

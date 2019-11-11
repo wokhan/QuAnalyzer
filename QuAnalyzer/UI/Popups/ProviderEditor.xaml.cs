@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
-using Wokhan.Data.Providers.Bases;
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using Wokhan.Data.Providers;
+using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages
@@ -53,7 +53,7 @@ namespace QuAnalyzer.UI.Pages
             Repositories.CollectionChanged += Repositories_CollectionChanged;
 
             CurrentProvider = currentProvider;
-            
+
             InitializeComponent();
         }
 

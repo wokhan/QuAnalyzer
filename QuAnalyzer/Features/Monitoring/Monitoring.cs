@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net.NetworkInformation;
+using Wokhan.Collections.Generic.Extensions;
 
 namespace QuAnalyzer.Features.Monitoring
 {
@@ -36,7 +37,7 @@ namespace QuAnalyzer.Features.Monitoring
             {
                 case MonitoringModes.PING:
                     r.Data = null;
-                    r.Duration = new Dictionary<string, long> { [nameof(MonitoringModes.PING)] = Ping(item.Provider.Host) };
+                    r.Duration.Add(nameof(MonitoringModes.PING), Ping(item.Provider.Host));
                     break;
 
                 case MonitoringModes.PERF:
@@ -53,18 +54,16 @@ namespace QuAnalyzer.Features.Monitoring
                     {
                         TestCases = new[] { new TestCase() {
                         GetData = (values, stats) => item.Provider.GetQueryable(item.Repository, values, stats)  } }
-                    }, 10, 10, res);
-                    r.Duration = new Dictionary<string, long> {
-                        ["Average"] = (long)res.Select(result => result.Duration.Sum(_=> _.Value)).Average(),
-                        ["Count"] = (long)res.Average(result => result.ResultCount)
-                    };
+                    }, 1, 1, res);
+                    r.Duration.AddAll(res.FirstOrDefault()?.Duration);
+                    r.ResultCount = (long)res.FirstOrDefault()?.ResultCount;
                     r.Data = null;
                     break;
 
                 case MonitoringModes.CHECKVAL:
                     if (string.IsNullOrEmpty(item.Attributes))
                     {
-                        throw new ArgumentNullException("attribute");
+                        throw new NullReferenceException($"The {nameof(item.Attributes)} attribute must not be null.");
                     }
                     var q = item.Provider.GetQueryable(item.Repository, statisticsBag: r.Duration);
                     if (!string.IsNullOrEmpty(item.Filter))
@@ -100,41 +99,45 @@ namespace QuAnalyzer.Features.Monitoring
 
         public static long GetMTU(string host)
         {
-            var pong = new Ping();
             var startsize = 2000;
             var smaller = 0;
             var higher = 4000;
 
             var keepgoing = true;
-            while (keepgoing)
+            using (var pong = new Ping())
             {
-                PingReply ret = pong.Send(host, 5000, new byte[startsize], new PingOptions() { DontFragment = true });
-                if (ret.Status == IPStatus.PacketTooBig)
+                while (keepgoing)
                 {
-                    higher = startsize;
-                    startsize = higher - (higher - smaller) / 2;
-                }
+                    PingReply ret = pong.Send(host, 5000, new byte[startsize], new PingOptions() { DontFragment = true });
+                    if (ret.Status == IPStatus.PacketTooBig)
+                    {
+                        higher = startsize;
+                        startsize = higher - (higher - smaller) / 2;
+                    }
 
-                if (ret.Status == IPStatus.Success)
-                {
-                    smaller = startsize;
-                    startsize = smaller + (higher - smaller) / 2;
-                }
+                    if (ret.Status == IPStatus.Success)
+                    {
+                        smaller = startsize;
+                        startsize = smaller + (higher - smaller) / 2;
+                    }
 
 
-                if (smaller == higher - 1)
-                {
-                    keepgoing = false;
-                    startsize = smaller;
+                    if (smaller == higher - 1)
+                    {
+                        keepgoing = false;
+                        startsize = smaller;
+                    }
                 }
             }
-
             return startsize;
         }
 
         public static long Ping(string host)
         {
-            return new Ping().Send(host).RoundtripTime;
+            using (var pong = new Ping())
+            {
+                return pong.Send(host).RoundtripTime;
+            }
         }
 
 
@@ -142,16 +145,18 @@ namespace QuAnalyzer.Features.Monitoring
         {
             var optsize = GetMTU(host);
 
-            var pong = new Ping();
-            PingReply ret = pong.Send(host, 5000, new byte[optsize * 10], new PingOptions() { DontFragment = false });
+            using (var pong = new Ping())
+            {
+                PingReply ret = pong.Send(host, 5000, new byte[optsize * 10], new PingOptions() { DontFragment = false });
 
-            if (ret.Status == IPStatus.Success)
-            {
-                return optsize / ret.RoundtripTime / 10 * 1000;
-            }
-            else
-            {
-                return 0;
+                if (ret.Status == IPStatus.Success)
+                {
+                    return optsize / ret.RoundtripTime / 10 * 1000;
+                }
+                else
+                {
+                    return 0;
+                }
             }
         }
 

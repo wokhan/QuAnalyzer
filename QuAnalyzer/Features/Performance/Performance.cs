@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Wokhan.Collections;
-using Wokhan.Collections.Extensions;
 
 namespace QuAnalyzer.Features.Performance
 {
@@ -35,7 +34,7 @@ namespace QuAnalyzer.Features.Performance
                           //.ToList()
                           .AsParallel()
                           //.WithExecutionMode(ParallelExecutionMode.ForceParallelism)
-                          .WithDegreeOfParallelism(nbThreads / tests.TestCases.Count())
+                          .WithDegreeOfParallelism(nbThreads / tests.TestCases.Count)
                           //.WithMergeOptions(ParallelMergeOptions.NotBuffered)
                           .ForAll(x =>
                           {
@@ -45,7 +44,7 @@ namespace QuAnalyzer.Features.Performance
                                   values = (tests.Selector ?? ValueSelectors.SequentialSelector).Invoke(tests.ValuesSet, x);
                               }
                               tests.TestCases.AsParallel()
-                                     .WithDegreeOfParallelism(tests.TestCases.Count())
+                                     .WithDegreeOfParallelism(tests.TestCases.Count)
                                      .Select((test, ix) => new { test, ix })
                                      .ForAll(a =>
                                      {
@@ -55,9 +54,8 @@ namespace QuAnalyzer.Features.Performance
                                              Name = a.test.Name,
                                              Index = x,
                                              Status = Status.Loading,
-                                             Duration = new ObservableDictionary<string, long>()
                                          };
-                                         
+
                                          callback?.Invoke(result, null);
 
                                          lock (results)

@@ -10,7 +10,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ToolBarButton}">
-                    <Border Margin="2" Padding="5" BorderThickness="{TemplateBinding BorderThickness}" ToolTip="{TemplateBinding ToolTip}" BorderBrush="{TemplateBinding BorderBrush}">
+                    <Border Margin="5" Padding="10,5" BorderThickness="1" ToolTip="{TemplateBinding ToolTip}" CornerRadius="3" BorderBrush="LightGray">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Background" Value="{Binding Background,RelativeSource={RelativeSource TemplatedParent}}" />

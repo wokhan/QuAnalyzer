@@ -1,6 +1,4 @@
 ﻿using QuAnalyzer.Features.Statistics;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Controls;
@@ -14,7 +12,7 @@ namespace QuAnalyzer.UI.Pages
     /// <summary>
     /// Interaction logic for Statistics.xaml
     /// </summary>
-    public partial class Statistics : Page, INotifyPropertyChanged
+    public partial class StatisticsPage : Page, INotifyPropertyChanged
     {
         public string[] ChartTypes { get { return new[] { "Pie", "Bar", "Doughnut" }; } }
 
@@ -42,24 +40,24 @@ namespace QuAnalyzer.UI.Pages
         }
 
 
-        public Statistics()
+        public StatisticsPage()
         {
             //ComputedStats = new Dictionary<string, ResultsStruct>();
 
             InitializeComponent();
-            ((App)App.Current).CurrentSelection.CollectionChanged += CurrentSelection_CollectionChanged;
+            ((App)App.Current).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
         }
 
-        private void CurrentSelection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void UpdateSelection()
         {
-            var (prov, repo) = ((App)App.Current).CurrentSelection.FirstOrDefault();
+            var (prov, repo) = ((App)App.Current).CurrentSelection;
             if (prov != null && btnAuto.IsChecked.Value)
             {
                 Computedata(prov, repo);
             }
         }
 
-        
+
         private async void UpdateMinMaxAvg(string h, ResultsStruct.Stats stats)
         {
             await Dispatcher.InvokeAsync(() =>
@@ -79,7 +77,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnCompute_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var (prov, repo) = ((App)App.Current).CurrentSelection.FirstOrDefault();
+            var (prov, repo) = ((App)App.Current).CurrentSelection;
             Computedata(prov, repo);
         }
 
@@ -115,7 +113,7 @@ namespace QuAnalyzer.UI.Pages
 
                     UpdateMinMaxAvg(h.Name, bobby);
                 });
-            });
+            }).ConfigureAwait(false);
         }
         //private async void UpdateResults(string key, string itkey, int itcnt)
         //{

@@ -1,4 +1,4 @@
-﻿<Page x:Class="QuAnalyzer.UI.Pages.Statistics"
+﻿<Page x:Class="QuAnalyzer.UI.Pages.StatisticsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"

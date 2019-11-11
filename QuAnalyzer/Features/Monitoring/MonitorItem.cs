@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using QuAnalyzer.Generic;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

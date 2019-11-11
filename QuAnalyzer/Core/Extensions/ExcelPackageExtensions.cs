@@ -445,7 +445,7 @@ namespace QuAnalyzer.Generic.Extensions
         //        //host.Children.Remove(gridClone);
         //    }
         //}
-        
+
         public static void DoEvents()
         {
             if (Application.Current == null)

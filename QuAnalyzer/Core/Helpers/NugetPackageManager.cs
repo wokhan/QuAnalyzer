@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace QuAnalyzer.Helpers
+﻿namespace QuAnalyzer.Helpers
 {
     class NugetPackageManager
     {
-        
+
     }
 }

@@ -15,7 +15,7 @@ using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.Core.Project
 {
-    public class Project : NotifierHelper
+    public class ProjectSettings : NotifierHelper
     {
         private string _name;
         public string Name
@@ -66,7 +66,7 @@ namespace QuAnalyzer.Core.Project
 
                 using var stream = new JsonTextReader(new StreamReader(p));
 
-                var restProject = ser.Deserialize<Project>(stream);
+                var restProject = ser.Deserialize<ProjectSettings>(stream);
 
                 this.Name = restProject.Name;
                 this.CurrentProviders.ReplaceAll(restProject.CurrentProviders);

@@ -19,7 +19,7 @@ namespace QuAnalyzer.UI.Menus
     /// </summary>
     public partial class MainMenu : UserControl
     {
-        
+
         private readonly ObservableCollection<KeyValuePair<IDataProvider, string>> Providers = new ObservableCollection<KeyValuePair<IDataProvider, string>>();
         private Point startPoint;
 
@@ -75,12 +75,12 @@ namespace QuAnalyzer.UI.Menus
 
         private void btnNewSource_Click(object sender, RoutedEventArgs e) => Popup.OpenNew(new ProviderPicker());
 
-        private void lstProviders_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        /*private void lstProviders_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var currentSelection = ((App)App.Current).CurrentSelection;
             currentSelection.RemoveRange(e.RemovedItems.Cast<KeyValuePair<IDataProvider, string>>());
             currentSelection.AddRange(e.AddedItems.Cast<KeyValuePair<IDataProvider, string>>());
-        }
+        }*/
 
         private void Repository_DataGrid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {

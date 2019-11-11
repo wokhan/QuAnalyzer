@@ -1,15 +1,13 @@
 ﻿using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Core.Project;
 using QuAnalyzer.Generic.Diagnostics;
-using QuAnalyzer.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
-using Wokhan.Collections;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer
@@ -17,8 +15,9 @@ namespace QuAnalyzer
     /// <summary>
     /// 
     /// </summary>
-    public partial class App
+    public partial class App : INotifyPropertyChanged
     {
+
         public List<SolidColorBrush> AvailableColors { get; } = new List<SolidColorBrush> {
             new SolidColorBrush(Color.FromRgb(0x41, 0xB1, 0xE1)),
             new SolidColorBrush(Colors.LightCoral),
@@ -28,8 +27,24 @@ namespace QuAnalyzer
             new SolidColorBrush(Colors.PaleVioletRed)
         };
 
-        public Project CurrentProject { get; private set; }
-        public ObservableCollection<KeyValuePair<IDataProvider, string>> CurrentSelection { get; } = new ObservableCollection<KeyValuePair<IDataProvider, string>>();
+        public ProjectSettings CurrentProject { get; private set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private KeyValuePair<IDataProvider, string> _currentSelection;
+        public KeyValuePair<IDataProvider, string> CurrentSelection
+        {
+            get => _currentSelection;
+            set { _currentSelection = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentSelection))); }
+        }
+
+        private bool _currentSelectionLinked;
+        public bool CurrentSelectionLinked
+        {
+            get => _currentSelectionLinked;
+            set { _currentSelectionLinked = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentSelectionLinked))); }
+        }
+
         public ResourcesWatcher Performance { get; private set; }
         public ProvidersManager ProvidersMan { get; private set; }
 
@@ -45,10 +60,10 @@ namespace QuAnalyzer
         {
             CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
 
-            CurrentProject = new Project() { Name = "Unamed project" };
+            CurrentProject = new ProjectSettings() { Name = "Unamed project" };
             Performance = new ResourcesWatcher();
             ProvidersMan = new ProvidersManager();
-            
+
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             this.Exit += App_Exit;
         }

@@ -11,9 +11,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages
@@ -21,7 +24,7 @@ namespace QuAnalyzer.UI.Pages
     /// <summary>
     /// Interaction logic for DataMonitor.xaml
     /// </summary>
-    public partial class Performance : Page
+    public partial class PerformancePage : Page
     {
         private long startDate;
 
@@ -30,61 +33,53 @@ namespace QuAnalyzer.UI.Pages
         public TestCasesCollection SelectedTestsCollection { get; set; }
 
         public SeriesCollection ResultSeries { get; } = new SeriesCollection(Mappers.Xy<DateTimePoint>().X(d => d.DateTime.Ticks).Y(d => d.Value));
+        public Dictionary<string, Series[]> ResultSeriesMappings { get; private set; }
 
-        public Performance()
+        public PerformancePage()
         {
             this.DataContext = this;
 
-            //MonitorResultsView.CollectionChanged += MonitorResultsView_CollectionChanged;
+            MonitorResultsView.CollectionChanged += MonitorResultsView_CollectionChanged;
 
             InitializeComponent();
         }
 
         private void MonitorResultsView_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var results = e.NewItems.Cast<ResultsClass>().ToList();
-            results.ForEach(t =>
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                var serie = ResultSeries.Cast<Series>().First(r => r.Title == t.Name + " (Freq)");
-                serie.Values.Add(new DateTimePoint(t.LastCheck.DateTime, (double)t.LastCheck.Ticks - startDate + 1));
-
-                if (t.Duration.ContainsKey("_TOTAL_DEFAULT"))
+                var results = e.NewItems.Cast<ResultsClass>().ToList();
+                results.ForEach(t =>
                 {
-                    var serie2 = ResultSeries.Cast<Series>().First(r => r.Title == t.Name + " (Duration)");
-                    serie2.Values.Add(new DateTimePoint(t.LastCheck.DateTime, t.Duration["_TOTAL_DEFAULT"]));
-                }
-            });
+                    var serie = ResultSeriesMappings[t.Name][0];
+                    var serie2 = ResultSeriesMappings[t.Name][1];
+
+                    serie.Values.Add(new DateTimePoint(t.LastCheck.DateTime, (double)t.LastCheck.Ticks - startDate + 1));
+                    var d = new DateTimePoint(t.LastCheck.DateTime, 0);
+                    serie2.Values.Add(d);
+                    t.Duration.CollectionChanged += (s, e) => { if (t.Duration.ContainsKey("_TOTAL_DEFAULT")) { d.Value = t.Duration["_TOTAL_DEFAULT"]; } };
+                });
+            }
         }
 
         public void run()
         {
-            var ntests = int.Parse(txtNbOccur.Text);
-            var parallel = int.Parse(txtNbPara.Text);
+            var ntests = int.Parse(txtNbOccur.Text, NumberFormatInfo.CurrentInfo);
+            var parallel = int.Parse(txtNbPara.Text, NumberFormatInfo.CurrentInfo);
 
+            MonitorResultsView.Clear();
             ResultSeries.Clear();
 
-            ResultSeries.AddRange(SelectedTestsCollection.TestCases.SelectMany(t => new Series[] {
-                new LineSeries() { Title = t.Name + " (Freq)", Values = new ChartValues<DateTimePoint>() },
-                new StepLineSeries() { Title = t.Name + " (Duration)", Values = new ChartValues<DateTimePoint>() }
-            }));
+            ResultSeriesMappings = SelectedTestsCollection.TestCases.ToDictionary(t => t.Name, t => new Series[] {
+                new StepLineSeries() { ScalesYAt = 1, Title = t.Name + " (Freq)", Values = new ChartValues<DateTimePoint>() },
+                new LineSeries() { Title = t.Name + " (Duration)", Values = new ChartValues<DateTimePoint>() }
+            });
+            ResultSeries.AddRange(ResultSeriesMappings.SelectMany(_ => _.Value));
 
             startDate = DateTimeOffset.Now.Ticks;
-            Features.Performance.Performance.Run(SelectedTestsCollection, ntests, parallel, MonitorResultsView, addRes);
-        }
+            BindingOperations.EnableCollectionSynchronization(MonitorResultsView, MonitorResultsView);
 
-        private void addRes(ResultsClass t, IList<Dictionary<string, string>> values)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                if (t.Status != Status.Loading)
-                {
-                    var serie = ResultSeries.Cast<Series>().First(r => r.Title == t.Name + " (Freq)");
-                    serie.Values.Add(new DateTimePoint(t.LastCheck.DateTime, (double)t.LastCheck.Ticks + 1));
-
-                    var serie2 = ResultSeries.Cast<Series>().First(r => r.Title == t.Name + " (Duration)");
-                    serie2.Values.Add(new DateTimePoint(t.LastCheck.DateTime, t.Duration["_TOTAL_DEFAULT"]));
-                }
-            });
+            Task.Run(() => Performance.Run(SelectedTestsCollection, ntests, parallel, MonitorResultsView));
         }
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
@@ -102,7 +97,7 @@ namespace QuAnalyzer.UI.Pages
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
             var selection = (KeyValuePair<IDataProvider, string>)((Button)sender).Tag;
-            
+
         }
 
 

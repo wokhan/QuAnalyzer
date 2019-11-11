@@ -1,9 +1,10 @@
-﻿<Page x:Class="QuAnalyzer.UI.Pages.Performance"
+﻿<Page x:Class="QuAnalyzer.UI.Pages.PerformancePage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+      xmlns:test="QuAnalyzer.Features.Performance"
       xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
       mc:Ignorable="d" 
       d:DesignHeight="700" d:DesignWidth="800"
@@ -12,7 +13,7 @@
 	Title="DataMonitor">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition MinWidth="300" />
+            <ColumnDefinition Width="250" MinWidth="250" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition MinWidth="300" />
         </Grid.ColumnDefinitions>
@@ -33,7 +34,7 @@
             </StackPanel>
             <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
                 <TextBlock Text="Parralelism: " VerticalAlignment="Center" />
-                <TextBox x:Name="txtNbPara" Text="10" Width="40" Padding="0" Margin="2" />
+                <TextBox x:Name="txtNbPara" Text="1" Width="40" Padding="0" Margin="2" />
             </StackPanel>
             <Rectangle />
             <UC:ToolBarToggleButton Text="Enable chart" ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnableChart" />
@@ -45,7 +46,7 @@
                 <UC:ToolBarButton Text="Clear" ToolTip="Remove all" BorderBrush="OrangeRed" Image="{StaticResource appbar_clean}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnClear_Click" />
             </WrapPanel>
             <StackPanel>
-                <ListView x:Name="gridSteps" SelectedItem="{Binding SelectedTestsCollection}"  ItemsSource="{Binding CurrentProject.PerformanceItems,Source={x:Static Application.Current}}">
+                <ListView x:Name="gridSteps" SelectedItem="{Binding SelectedTestsCollection}" ItemsSource="{Binding CurrentProject.PerformanceItems,Source={x:Static Application.Current}}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Expander Header="{Binding Name}">
@@ -208,12 +209,13 @@
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" IsEnabled="False" x:Name="btnCopy" Click="btnCopy_Click" />
             </WrapPanel>
-            <wpf:CartesianChart Series="{Binding ResultSeries}" DisableAnimations="True" Margin="0" DataTooltip="{x:Null}" Hoverable="False">
+            <wpf:CartesianChart Series="{Binding ResultSeries}" ScrollMode="X" DisableAnimations="True" Margin="0" DataTooltip="{x:Null}" Hoverable="False">
                 <wpf:CartesianChart.AxisX>
                     <wpf:Axis></wpf:Axis>
                 </wpf:CartesianChart.AxisX>
                 <wpf:CartesianChart.AxisY>
                     <wpf:LogarithmicAxis></wpf:LogarithmicAxis>
+                    <wpf:LogarithmicAxis Position="RightTop"></wpf:LogarithmicAxis>
                 </wpf:CartesianChart.AxisY>
             </wpf:CartesianChart>
         </DockPanel>

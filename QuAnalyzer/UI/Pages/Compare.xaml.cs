@@ -20,8 +20,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Shell;
 using Wokhan.Collections.Generic.Extensions;
-using Wokhan.Core.Extensions;
-using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages
@@ -67,13 +65,13 @@ namespace QuAnalyzer.UI.Pages
 
             var localcpd = new List<ComparerStruct<object[]>>();
 
-            var x = await GetComparerStruct();
+            var x = await GetComparerStruct().ConfigureAwait(false);
             foreach (var cp in x)
             {
                 /*var idx = real.Count(r => Regex.IsMatch((string)r[0], Regex.Escape(cp.Name) + @"(?:\s\(\d+\))?$")) / 2;
                 if (idx > 0)
                 {*/
-                cp.Name = String.Format("[{0}] {1}", cpdCount++, cp.Name);// (" + (idx + 1) + ")";
+                cp.Name = $"[{cpdCount++}] {cp.Name}";
                 //}
 
                 localcpd.Add(cp);
@@ -88,18 +86,18 @@ namespace QuAnalyzer.UI.Pages
             await Task.Run(() =>
             {
                 Comparison.Run(localcpd, 0, 0, Progress, ((App)App.Current).CurrentProject.UseParallelism);
-            });
+            }).ConfigureAwait(false);
         }
 
         private async Task<ComparerStruct<object[]>[]> GetComparerStruct()
         {
             if ((bool)btnToggleMode.IsChecked)
             {
-                return await Task.Run(() => new[] { new ComparerStruct<object[]>(SingleMap) });
+                return await Task.Run(() => new[] { new ComparerStruct<object[]>(SingleMap) }).ConfigureAwait(false);
             }
 
             var mappers = lstMappings.SelectedItems.Cast<SourcesMapper>().ToList();
-            return await Task.Run(() => mappers.Select(s => new ComparerStruct<object[]>(s)).ToArray());
+            return await Task.Run(() => mappers.Select(s => new ComparerStruct<object[]>(s)).ToArray()).ConfigureAwait(false);
 
         }
 

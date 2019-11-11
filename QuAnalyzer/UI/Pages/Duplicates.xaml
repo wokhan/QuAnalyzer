@@ -20,13 +20,20 @@
                 </WrapPanel>
             </WrapPanel>
         </StackPanel>
-        <ListBox BorderThickness="0,0,2,0" BorderBrush="LightGray" DockPanel.Dock="Left" VerticalAlignment="Stretch" x:Name="lstColumns" SelectionMode="Extended" MinWidth="200" Padding="5">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Background="LightGray" Padding="5" Text="Attributes" />
+            <ListBox Grid.Row="1"  BorderThickness="0,0,2,0" BorderBrush="LightGray" DockPanel.Dock="Left" VerticalAlignment="Stretch" x:Name="lstColumns" SelectionMode="Extended" MinWidth="200" Padding="5">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
         <UC:ExtendedDataGridView x:Name="gridData" />
     </DockPanel>
 </Page>

@@ -1,4 +1,4 @@
-﻿<Page x:Class="QuAnalyzer.UI.Pages.Viewer"
+﻿<Page x:Class="QuAnalyzer.UI.Pages.ViewerPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 

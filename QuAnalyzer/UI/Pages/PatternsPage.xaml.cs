@@ -1,11 +1,8 @@
 ﻿using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Wokhan.Data.Providers.Contracts;
-using System.Linq.Dynamic.Core;
 using Wokhan.Collections.Generic.Extensions;
-using System.Collections.Generic;
-using System;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -13,22 +10,21 @@ namespace QuAnalyzer.UI.Pages
     /// <summary>
     /// Interaction logic for Patterns.xaml
     /// </summary>
-    public partial class Patterns : Page
+    public partial class PatternsPage : Page
     {
         public int SimThreshold { get; set; }
         public bool AutoUpdate { get; set; }
 
-
-        public Patterns()
+        public PatternsPage()
         {
             InitializeComponent();
 
-            ((App)App.Current).CurrentSelection.CollectionChanged += CurrentSelection_CollectionChanged;
+            ((App)App.Current).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } }; 
         }
 
-        private async void CurrentSelection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private async void UpdateSelection()
         {
-            var (prov, repo) = ((App)App.Current).CurrentSelection.FirstOrDefault();
+            var (prov, repo) = ((App)App.Current).CurrentSelection;
             var attr = (string)lstAttributes.SelectedValue;
 
             if (repo != null && attr == null)
@@ -37,18 +33,13 @@ namespace QuAnalyzer.UI.Pages
             }
             else if (AutoUpdate)
             {
-                await compute();
+                await Compute().ConfigureAwait(false);
             }
         }
 
-        private void lstDataSources_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async Task Compute()
         {
-            CurrentSelection_CollectionChanged(null, null);
-        }
-
-        private async Task compute()
-        {
-            var (prov, repo) = ((App)App.Current).CurrentSelection.FirstOrDefault();
+            var (prov, repo) = ((App)App.Current).CurrentSelection;
 
             var attr = (string)lstAttributes.SelectedValue;
 
@@ -77,7 +68,7 @@ namespace QuAnalyzer.UI.Pages
                                .GroupBy(s => s.reg)
                                .Select(g => new { Pattern = g.Key, Count = g.Count(), Sample = g.First().val })
                                .OrderByDescending(g => g.Count);
-                });
+                }).ConfigureAwait(true);
 
                 gridPatterns.ItemsSource = res;
             }
@@ -87,19 +78,23 @@ namespace QuAnalyzer.UI.Pages
             }
         }
 
+        private void lstDataSources_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateSelection();
+        }
 
         private void slideSim_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
             SimThreshold = (int)e.NewValue;
             if (gridPatterns != null)
             {
-                CurrentSelection_CollectionChanged(null, null);
+                UpdateSelection();
             }
         }
 
         private async void btnUpdate_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            await compute();
+            await Compute().ConfigureAwait(false);
         }
     }
 }

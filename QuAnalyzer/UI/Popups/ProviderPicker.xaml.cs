@@ -1,5 +1,4 @@
 ﻿using QuAnalyzer.Core.Helpers;
-using QuAnalyzer.UI.Windows;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;

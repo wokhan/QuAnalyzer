@@ -1,22 +1,16 @@
 ﻿using QuAnalyzer.Features.Comparison;
-using QuAnalyzer.Generic.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Threading;
 using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Bases;
-using Wokhan.Data.Providers.Contracts;
-using Wokhan.WPF.Extensions;
 
 namespace QuAnalyzer.UI.Pages
 {
@@ -44,15 +38,18 @@ namespace QuAnalyzer.UI.Pages
         {
             InitializeComponent();
 
-            ((App)App.Current).CurrentSelection.CollectionChanged += CurrentSelection_CollectionChanged;
+            ((App)App.Current).PropertyChanged += App_PropertyChanged;
         }
 
-        private void CurrentSelection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void App_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            var (prov, repo) = ((App)App.Current).CurrentSelection.FirstOrDefault();
-            if (prov != null)
+            if (e.PropertyName == nameof(App.CurrentSelection))
             {
-                lstColumns.ItemsSource = prov.GetColumns(repo);
+                var (prov, repo) = ((App)App.Current).CurrentSelection;
+                if (prov != null)
+                {
+                    lstColumns.ItemsSource = prov.GetColumns(repo);
+                }
             }
         }
 
@@ -64,7 +61,7 @@ namespace QuAnalyzer.UI.Pages
 
         private async void btnRun_Click(object sender, RoutedEventArgs e)
         {
-            var (prov, repository) = ((App)App.Current).CurrentSelection.FirstOrDefault();
+            var (prov, repository) = ((App)App.Current).CurrentSelection;
 
             var allHeadersFu = prov.GetColumns(repository);
             string[] keys;
@@ -111,7 +108,7 @@ namespace QuAnalyzer.UI.Pages
                 });
 
                 gridData.LoadingProgress = 100;
-            });
+            }).ConfigureAwait(false);
         }
 
 

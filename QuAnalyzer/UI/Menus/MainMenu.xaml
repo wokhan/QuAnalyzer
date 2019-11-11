@@ -1,13 +1,10 @@
 ﻿<UserControl x:Class="QuAnalyzer.UI.Menus.MainMenu"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:QuAnalyzerHelpers="clr-namespace:QuAnalyzer.Core.Helpers"
-      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:ext="clr-namespace:Wokhan.Shared.UI.Xaml.Extensibility;assembly=Wokhan.WPF"
-      mc:Ignorable="d" d:DesignHeight="460">
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" d:DesignHeight="460">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
@@ -28,7 +25,7 @@
         <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
             <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{StaticResource appbar_add}"/>
         </WrapPanel>
-        <ListView BorderThickness="0" Grid.Row="2" Name="lstProviders" SelectionChanged="lstProviders_SelectionChanged" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
+        <ListView BorderThickness="0" Grid.Row="2" Name="lstProviders" SelectedItem="{Binding CurrentSelection,Source={x:Static Application.Current}}" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
             <ListView.Resources>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
                     <Setter Property="Background" Value="Transparent" />
@@ -98,7 +95,19 @@
             </ItemsControl.GroupStyle>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding Value}" Tag="{Binding}" PreviewMouseLeftButtonDown="Repository_PreviewMouseLeftButtonDown" PreviewMouseMove="Repository_DataGrid_MouseMove" />
+                    <Border BorderThickness="5" Margin="5">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentSelectionLinked,Source={x:Static Application.Current}}" Value="True">
+                                        <Setter Property="CornerRadius" Value="10,0,0,10" />
+                                        <Setter Property="Margin" Value="5,0,5,5" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding Value}" Tag="{Binding}" PreviewMouseLeftButtonDown="Repository_PreviewMouseLeftButtonDown" PreviewMouseMove="Repository_DataGrid_MouseMove" />
+                    </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ListView>

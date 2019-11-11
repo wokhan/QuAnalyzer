@@ -1,5 +1,4 @@
-﻿using QuAnalyzer.Generic;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Wokhan.Core.ComponentModel;
 

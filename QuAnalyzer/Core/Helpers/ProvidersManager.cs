@@ -1,5 +1,4 @@
-﻿using QuAnalyzer.Generic;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -42,7 +41,7 @@ namespace QuAnalyzer.Core.Helpers
 
     */
             var path = @$"{AppDomain.CurrentDomain.BaseDirectory}\providers\{new FileInfo(zipPath).Name}";
-            
+
             using (var fileStream = new FileStream(zipPath, FileMode.Open))
             {
                 new ZipArchive(fileStream, ZipArchiveMode.Read, false).ExtractToDirectory(path);

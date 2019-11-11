@@ -8,6 +8,11 @@ namespace QuAnalyzer.Core.Helpers
     {
         public static Action<double> GetCallBackForExport(Panel innerhost, string worksheetName, string fileName)
         {
+            if (innerhost is null)
+            {
+                throw new ArgumentNullException(nameof(innerhost));
+            }
+
             var txtb = new TextBlock();
             if (worksheetName != null)
             {

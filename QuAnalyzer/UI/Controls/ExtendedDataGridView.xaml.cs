@@ -219,7 +219,7 @@ namespace QuAnalyzer.UI.Controls
                 Status = "Initializing...";
 
                 IQueryable query = Source;
-                
+
                 if (Filters.Any())
                 {
                     var values = Filters.Select(f => f.TargetValue).ToArray();

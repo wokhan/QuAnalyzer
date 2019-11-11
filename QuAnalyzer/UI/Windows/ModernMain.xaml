@@ -9,9 +9,15 @@
     xmlns:popups="clr-namespace:QuAnalyzer.UI.Popups"
     Title="QuAnalyzer v1.0beta" ShowIconOnTitleBar="False" TitleBarHeight="40" ShowTitleBar="True"
     ResizeMode="CanResizeWithGrip" TitleAlignment="Right"
-    MinWidth="1030" MinHeight="600" Height="600"
+    MinWidth="1030" MinHeight="600" Height="600" 
     Width="900" BorderThickness="0" GlowBrush="Black" 
-    WindowTitleBrush="#555555" TitleForeground="WhiteSmoke">
+    TitleForeground="WhiteSmoke" AllowsTransparency="True" WindowTitleBrush="Transparent">
+    <Controls:MetroWindow.Background>
+        <RadialGradientBrush GradientOrigin="1,0" Opacity="0.95">
+            <GradientStop Color="Gray" Offset="0" />
+            <GradientStop Color="LightGray" Offset="1" />
+        </RadialGradientBrush>
+    </Controls:MetroWindow.Background>
     <!--<Window.Resources>
         <Style TargetType="{x:Type Controls:WindowButtonCommands}">
             <Style.Triggers>
@@ -31,7 +37,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Menu IsMainMenu="True" TextElement.FontSize="14" Background="Transparent" TextElement.Foreground="WhiteSmoke" >
+                <Menu IsMainMenu="True" TextElement.FontSize="14" Background="Transparent" TextElement.Foreground="Black" >
                     <MenuItem Header="_File">
                         <MenuItem Header="Open..." x:Name="btnMenuOpen" Click="btnMenuOpen_Click">
                             <MenuItem.Icon>
@@ -101,14 +107,27 @@
                         </MenuItem>
                     </MenuItem>
                 </Menu>
-                <TextBox Grid.Column="1" FontSize="14" Foreground="WhiteSmoke" BorderThickness="0" VerticalContentAlignment="Center" Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}" Margin="100,0,0,0">
-                    <TextBox.FocusVisualStyle>
-                        <Style TargetType="TextBox">
-                            <Setter Property="Background" Value="White" />
-                            <Setter Property="BorderBrush" Value="Gray" />
-                        </Style>
-                    </TextBox.FocusVisualStyle>
-                </TextBox>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="100,0,0,0">
+                    <TextBox x:Name="txtProjectTitle" FontSize="14" Foreground="Black" BorderThickness="1" BorderBrush="Transparent" VerticalContentAlignment="Center" Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="LightGray" />
+                                        <Setter Property="BorderBrush" Value="DimGray" />
+                                    </Trigger>
+                                    <Trigger Property="IsFocused" Value="True">
+                                        <Setter Property="Background" Value="WhiteSmoke" />
+                                        <Setter Property="BorderBrush" Value="Gray" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <Button Click="btnEditTitle_Click">
+                        <Path Data="{StaticResource appbar_edit}" Height="16" Stretch="Uniform" Fill="Black"/>
+                    </Button>
+                </StackPanel>
             </Grid>
         </Controls:WindowCommands>
     </Controls:MetroWindow.LeftWindowCommands>
@@ -156,23 +175,24 @@
                 </Rectangle>
             </Grid>
         </Controls:Flyout>
-        <Controls:MetroAnimatedSingleRowTabControl Name="tabMenu" Margin="{Binding ActualWidth,ElementName=mainMenu,Converter={StaticResource thicknessConverter},ConverterParameter='LEFT'}">
+        <Controls:MetroAnimatedSingleRowTabControl Name="tabMenu" SelectionChanged="tabMenu_SelectionChanged" Margin="{Binding ActualWidth,ElementName=mainMenu,Converter={StaticResource thicknessConverter},ConverterParameter='LEFT'}">
             <TabControl.Resources>
                 <Style TargetType="Frame">
                     <Setter Property="NavigationUIVisibility" Value="Hidden" />
+                    <Setter Property="Background" Value="White" />
                 </Style>
             </TabControl.Resources>
-            <UC:DecoratedTabItem IsSelected="True" Header="DISPLAY" Image="{StaticResource appbar_list}">
-                <Frame Source="../Pages/Viewer.xaml" />
+            <UC:DecoratedTabItem IsSelected="True" Header="DISPLAY" Image="{StaticResource appbar_list}" Tag="true">
+                <Frame Source="../Pages/ViewerPage.xaml" />
             </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="DUPLICATES" Image="{StaticResource appbar_layer_delete}">
+            <UC:DecoratedTabItem Header="DUPLICATES" Image="{StaticResource appbar_layer_delete}" Tag="true">
                 <Frame Source="../Pages/Duplicates.xaml" />
             </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="PATTERNS" Image="{StaticResource appbar_draw_pixel_fill_grid}">
-                <Frame Source="../Pages/Patterns.xaml" />
+            <UC:DecoratedTabItem Header="PATTERNS" Image="{StaticResource appbar_draw_pixel_fill_grid}" Tag="true">
+                <Frame Source="../Pages/PatternsPage.xaml" />
             </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="STATISTICS" Image="{StaticResource appbar_graph_bar}">
-                <Frame Source="../Pages/Statistics.xaml" />
+            <UC:DecoratedTabItem Header="STATISTICS" Image="{StaticResource appbar_graph_bar}" Tag="true">
+                <Frame Source="../Pages/StatisticsPage.xaml" />
             </UC:DecoratedTabItem>
             <UC:DecoratedTabItem Header="COMPARISON" Image="{StaticResource appbar_arrow_left_right}">
                 <Frame Source="../Pages/Compare.xaml" />
@@ -181,7 +201,7 @@
                 <Frame Source="../Pages/Monitor.xaml" />
             </UC:DecoratedTabItem>
             <UC:DecoratedTabItem Header="PERFORMANCE" Image="{StaticResource appbar_image_redeye}">
-                <Frame Source="../Pages/Performance.xaml" />
+                <Frame Source="../Pages/PerformancePage.xaml" />
             </UC:DecoratedTabItem>
         </Controls:MetroAnimatedSingleRowTabControl>
         <StatusBar Grid.Row="1" Height="25" Background="{DynamicResource AccentColorBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">

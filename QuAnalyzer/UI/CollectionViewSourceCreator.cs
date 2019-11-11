@@ -15,7 +15,7 @@ namespace QuAnalyzer.UI.BindingConverters
                 Source = source
             };
             cvs.GroupDescriptions.Add(new PropertyGroupDescription((string)parameter));
-            
+
             return cvs;
         }
 
