@@ -11,7 +11,7 @@
     ResizeMode="CanResizeWithGrip" TitleAlignment="Right"
     MinWidth="1030" MinHeight="600" Height="600" 
     Width="900" BorderThickness="0" GlowBrush="Black" 
-    TitleForeground="WhiteSmoke" AllowsTransparency="True" WindowTitleBrush="Transparent">
+    TitleForeground="WhiteSmoke" AllowsTransparency="False" WindowTitleBrush="Transparent">
     <Controls:MetroWindow.Background>
         <RadialGradientBrush GradientOrigin="1,0" Opacity="0.95">
             <GradientStop Color="Gray" Offset="0" />

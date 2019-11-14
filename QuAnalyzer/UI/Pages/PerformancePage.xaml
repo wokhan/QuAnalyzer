@@ -14,7 +14,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="150" MinHeight="150" />
+            <RowDefinition Height="150" MinHeight="180" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" MinHeight="150" />
             <RowDefinition Height="Auto" />
@@ -27,11 +27,11 @@
             <Rectangle />
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Occurences: " VerticalAlignment="Center" />
-                <TextBox x:Name="txtNbOccur" Text="10" Width="40" Padding="0" Margin="2" />
+                <TextBox x:Name="txtNbOccur" Text="10" Width="40" Padding="0" Margin="2" VerticalAlignment="Center" />
             </StackPanel>
             <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
-                <TextBlock Text="Parralelism: " VerticalAlignment="Center" />
-                <TextBox x:Name="txtNbPara" Text="1" Width="40" Padding="0" Margin="2" />
+                <TextBlock Text="Parallelism: " VerticalAlignment="Center" />
+                <TextBox x:Name="txtNbPara" Text="1" Width="40" VerticalAlignment="Center" Padding="0" Margin="2" />
             </StackPanel>
         </WrapPanel>
         <Grid Grid.Row="1">
@@ -44,7 +44,7 @@
                 <UC:ToolBarButton Text="Add" ToolTip="Add a step" BorderBrush="Green" Image="{StaticResource appbar_add}" Click="btnAdd_Click" />
                 <UC:ToolBarButton Text="Clear" ToolTip="Remove all" BorderBrush="OrangeRed" Image="{StaticResource appbar_clean}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnClear_Click" />
             </WrapPanel>
-            <DataGrid Grid.Row="1" x:Name="gridSteps" AutoGenerateColumns="False" SelectionMode="Extended" SelectedItem="{Binding SelectedTestsCollection}" ItemsSource="{Binding CurrentProject.PerformanceItems,Source={x:Static Application.Current}}">
+            <DataGrid Grid.Row="1" x:Name="gridSteps" VirtualizingPanel.ScrollUnit="Pixel" CanUserAddRows="False" AutoGenerateColumns="False" SelectionMode="Extended" SelectedItem="{Binding SelectedTestsCollection}" ItemsSource="{Binding CurrentProject.PerformanceItems,Source={x:Static Application.Current}}">
                 <DataGrid.Columns>
                     <DataGridCheckBoxColumn Header="" Width="Auto" />
                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" />

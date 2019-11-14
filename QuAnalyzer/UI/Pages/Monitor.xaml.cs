@@ -83,7 +83,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
-            Popup.OpenNew(new MonitoringDetails(new MonitorItem() { Name = "Monitor #" + (((App)Application.Current).CurrentProject.MonitorItems.Count + 1) }));
+            ((App)Application.Current).CurrentProject.MonitorItems.Add(new MonitorItem() { Name = "Monitor #" + (((App)Application.Current).CurrentProject.MonitorItems.Count + 1) });
         }
 
         private void btnClear_Click(object sender, RoutedEventArgs e)

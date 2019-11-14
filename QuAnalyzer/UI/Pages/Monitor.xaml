@@ -11,16 +11,13 @@
       x:Name="myself"
 	Title="DataMonitor">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250" MinWidth="250" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition MinWidth="300" />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition MinHeight="100" Height="Auto" />
+            <RowDefinition MinHeight="170" Height="*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition />
+            <RowDefinition MinHeight="150" Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition MinHeight="150" Height="*" />
         </Grid.RowDefinitions>
         <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
             <UC:ToolBarButton Text="Run" ToolTip="Start monitoring the selected items" BorderBrush="Green" Image="{StaticResource appbar_control_play}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnStart_Click" />
@@ -29,23 +26,25 @@
             <Rectangle />
             <UC:ToolBarToggleButton Text="Enable chart" ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />
         </WrapPanel>
-        <DockPanel Grid.Row="1" Grid.RowSpan="3">
+        <DockPanel Grid.Row="1">
             <TextBlock DockPanel.Dock="Top" Background="LightGray" Padding="5" Text="Configuration" />
             <WrapPanel Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton Text="Add" ToolTip="Add a step" BorderBrush="Green" Image="{StaticResource appbar_add}" Click="btnAdd_Click" />
                 <UC:ToolBarButton Text="Clear" ToolTip="Remove all" BorderBrush="OrangeRed" Image="{StaticResource appbar_clean}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnClear_Click" />
             </WrapPanel>
-            <DataGrid ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" x:Name="gridSteps" AutoGenerateColumns="False" IsReadOnly="True">
+            <DataGrid SelectionMode="Extended" VirtualizingPanel.ScrollUnit="Pixel" RowDetailsVisibilityMode="VisibleWhenSelected" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" x:Name="gridSteps" AutoGenerateColumns="False" IsReadOnly="True">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                    <DataGridCheckBoxColumn Binding="{Binding Selector.IsSelected}" Width="Auto" />
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                    <DataGridTemplateColumn Header="Source" Width="*"></DataGridTemplateColumn>
+                    <DataGridComboBoxColumn SelectedValueBinding="{Binding Type}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding SelectedItem.MonitoringTypes, ElementName=lstSrc}" />
+                    <DataGridTextColumn Header="Interval" Binding="{Binding Interval}" />
+                    <DataGridCheckBoxColumn Header="Run when started" Binding="{Binding RunWhenStarted}" />
                     <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto" />
                     <DataGridTemplateColumn Width="70" >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <Button Click="btnEdit_Click" Style="{StaticResource MetroCircleButtonStyle}" BorderBrush="Blue" Tag="{Binding}">
-                                        <Path Height="12" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{StaticResource appbar_edit}" Stretch="Uniform" />
-                                    </Button>
                                     <Button Name="btnDelete" Click="btnDelete_Click" Style="{StaticResource MetroCircleButtonStyle}" BorderBrush="OrangeRed" Tag="{Binding}">
                                         <Path Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
                                     </Button>
@@ -54,10 +53,64 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
+                <DataGrid.RowDetailsTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Label Content="Attributes:" />
+                            <ListBox Grid.Row="2" x:Name="lstAttributes" SelectionMode="Multiple">
+                                <ListBox.Resources>
+                                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                        <Setter Property="IsSelected" Value="{Binding Value, Mode=OneWay}" />
+                                    </Style>
+                                </ListBox.Resources>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox IsChecked="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+                                            <Label Content="{Binding Key}" Grid.Column="1" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <StackPanel Grid.Row="3" Orientation="Horizontal">
+                                <Label Content="Filter:" />
+                                <TextBox x:Name="txtFilter" Text="{Binding Filter}" />
+                            </StackPanel>
+                            <Label Grid.Column="1" Content="Preceding steps:" />
+                            <ListBox Grid.Row="2" Grid.Column="1" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" SelectionMode="Multiple">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox IsChecked="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+                                            <Label Content="{Binding Name}" Grid.Column="1" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </DataTemplate>
+                </DataGrid.RowDetailsTemplate>
             </DataGrid>
         </DockPanel>
-        <GridSplitter Grid.Row="1" Grid.Column="1" Grid.RowSpan="3" Width="2" Background="LightGray" />
-        <DockPanel Grid.Row="1" Grid.Column="2">
+        <GridSplitter Grid.Row="2" Height="2" Background="LightGray" />
+        <DockPanel Grid.Row="3">
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton x:Name="btnGrCopy" Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" Click="btnGrCopy_Click" />
                 <Rectangle />
@@ -157,8 +210,8 @@
                 </DataGrid.GroupStyle>-->
             </DataGrid>
         </DockPanel>
-        <GridSplitter Grid.Row="2" Grid.Column="2" Height="2" Background="LightGray" HorizontalAlignment="Stretch" />
-        <DockPanel Grid.Column="2" Grid.Row="3" Visibility="{Binding IsChecked,ElementName=btnEnableChart,Converter={StaticResource valueToVisibilityConverter}}">
+        <GridSplitter Grid.Row="4" Height="2" Background="LightGray" />
+        <DockPanel Grid.Row="5" Visibility="{Binding IsChecked,ElementName=btnEnableChart,Converter={StaticResource valueToVisibilityConverter}}">
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" IsEnabled="False" x:Name="btnCopy" Click="btnCopy_Click" />
             </WrapPanel>
