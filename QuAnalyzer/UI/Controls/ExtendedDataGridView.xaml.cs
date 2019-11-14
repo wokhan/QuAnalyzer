@@ -33,6 +33,8 @@ namespace QuAnalyzer.UI.Controls
             set { _source = value; ClearAll(); btnApply_Click(null, null); }
         }
 
+        public bool EnableAdvancedFilters { get; set; }
+
         public List<ColumnDescription> CustomHeaders { get; set; }
 
 
@@ -262,7 +264,7 @@ namespace QuAnalyzer.UI.Controls
 
                 Status = "Done.";
 
-            });
+            }).ConfigureAwait(false);
         }
 
         private void btnDeleteAggreg_Click(object sender, RoutedEventArgs e) => Compute.Remove((ComputeStruct)((Button)sender).Tag);

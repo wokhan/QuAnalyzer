@@ -25,8 +25,10 @@
             <Rectangle />
             <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{StaticResource appbar_page_excel}" Click="GlobalExportCSV_Click" />
             <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{StaticResource appbar_page_xml}" Click="GlobalExportHTML_Click" />
-            <Rectangle />
-            <UC:ToolBarToggleButton x:Name="btnAggregate" IsChecked="False" Text="Group/Filter" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" Image="{StaticResource appbar_tiles_nine}" />
+            <StackPanel Orientation="Horizontal" Visibility="{Binding EnableAdvancedFilters,Converter={StaticResource valueToVisibilityConverter}}">
+                <Rectangle />
+                <UC:ToolBarToggleButton x:Name="btnAggregate" IsChecked="False" Text="Group/Filter" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" Image="{StaticResource appbar_tiles_nine}" />
+            </StackPanel>
         </WrapPanel>
         <WrapPanel Grid.Row="2" Height="25" Style="{StaticResource ToolBar}">
             <TextBlock Margin="20,4">

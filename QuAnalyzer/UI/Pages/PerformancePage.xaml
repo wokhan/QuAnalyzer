@@ -12,18 +12,15 @@
       x:Name="myself"
 	Title="DataMonitor">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250" MinWidth="250" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition MinWidth="300" />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition MinHeight="100" />
+            <RowDefinition Height="150" MinHeight="150" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="*" MinHeight="150" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" MinHeight="150" />
         </Grid.RowDefinitions>
-        <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
+        <WrapPanel Style="{StaticResource ToolBar}">
             <UC:ToolBarButton Text="Run" ToolTip="Start monitoring the selected items" BorderBrush="Green" Image="{StaticResource appbar_control_play}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnStart_Click" />
             <UC:ToolBarButton Text="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />
             <UC:ToolBarButton Text="Stop" ToolTip="Stop monitoring" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Red" Image="{StaticResource appbar_arrow_collapsed}" Click="btnStopAll_Click" />
@@ -36,86 +33,79 @@
                 <TextBlock Text="Parralelism: " VerticalAlignment="Center" />
                 <TextBox x:Name="txtNbPara" Text="1" Width="40" Padding="0" Margin="2" />
             </StackPanel>
-            <Rectangle />
-            <UC:ToolBarToggleButton Text="Enable chart" ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnableChart" />
         </WrapPanel>
-        <DockPanel Grid.Row="1" Grid.RowSpan="3">
-            <TextBlock DockPanel.Dock="Top" Background="LightGray" Padding="5" Text="Tests definitions" />
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Background="LightGray" Padding="5" Text="Tests definitions" />
             <WrapPanel Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton Text="Add" ToolTip="Add a step" BorderBrush="Green" Image="{StaticResource appbar_add}" Click="btnAdd_Click" />
                 <UC:ToolBarButton Text="Clear" ToolTip="Remove all" BorderBrush="OrangeRed" Image="{StaticResource appbar_clean}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnClear_Click" />
             </WrapPanel>
-            <StackPanel>
-                <ListView x:Name="gridSteps" SelectedItem="{Binding SelectedTestsCollection}" ItemsSource="{Binding CurrentProject.PerformanceItems,Source={x:Static Application.Current}}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <Expander Header="{Binding Name}">
-                                <Expander.HeaderTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <CheckBox />
-                                            <TextBlock Text="{Binding}" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </Expander.HeaderTemplate>
-                                <StackPanel>
-                                    <TextBlock Text="Sources" />
-                                    <ListView ItemsSource="{Binding TestCases}" AllowDrop="True" Drop="lstTestCases_Drop" Tag="{Binding}">
-                                        <ListView.Style>
-                                            <Style TargetType="ListView" BasedOn="{StaticResource {x:Type ListView}}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate>
-                                                                    <Grid>
-                                                                        <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition Width="Auto" />
-                                                                            <ColumnDefinition Width="*" />
-                                                                        </Grid.ColumnDefinitions>
-                                                                        <Path Data="{StaticResource appbar_add}" Stretch="Uniform" Width="20" Margin="10" Fill="Gray" />
-                                                                        <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drop a repository here to create a new test case source." FontStyle="Italic" />
-                                                                    </Grid>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ListView.Style>
-                                        <ListView.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock><Run Text="{Binding Name}" /> - <Run Text="{Binding Repository}" /></TextBlock>
-                                                    <Button Grid.Column="1" Name="btnDelete" Click="btnDelete_Click" Style="{StaticResource MetroCircleButtonStyle}" BorderBrush="OrangeRed" Tag="{Binding}">
-                                                        <Path Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
-                                                    </Button>
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ListView.ItemTemplate>
-                                    </ListView>
-                                    <TextBlock Text="Values selector" />
-                                    <ComboBox IsEditable="False" SelectedItem="{Binding Selector}">
-                                        <ComboBoxItem/>
-                                    </ComboBox>
-                                    <TextBlock Text="Values set" />
-                                    <ComboBox IsEditable="False" SelectedItem="{Binding ValuesSet}">
-                                        <ComboBoxItem />
-                                    </ComboBox>
-                                    <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="10,2" Content="Use distinct parallel values" IsChecked="{Binding DistinctParallelValues}" />
-                                </StackPanel>
-                            </Expander>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </StackPanel>
-        </DockPanel>
-        <GridSplitter Grid.Row="1" Grid.Column="1" Grid.RowSpan="3" Width="2" Background="LightGray" />
-        <DockPanel Grid.Row="1" Grid.Column="2">
+            <DataGrid Grid.Row="1" x:Name="gridSteps" AutoGenerateColumns="False" SelectionMode="Extended" SelectedItem="{Binding SelectedTestsCollection}" ItemsSource="{Binding CurrentProject.PerformanceItems,Source={x:Static Application.Current}}">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="" Width="Auto" />
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                    <DataGridTemplateColumn Header="Sources">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ListView ItemsSource="{Binding TestCases}" AllowDrop="True" Drop="lstTestCases_Drop" Tag="{Binding}">
+                                    <ListView.Style>
+                                        <Style TargetType="ListView" BasedOn="{StaticResource {x:Type ListView}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate>
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                        <ColumnDefinition Width="*" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <Path Data="{StaticResource appbar_add}" Stretch="Uniform" Width="20" Margin="10" Fill="Gray" />
+                                                                    <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drop at least one repository here to create a new test case source. Multiple sources can be used." FontStyle="Italic" />
+                                                                </Grid>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ListView.Style>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock><Run Text="{Binding Name}" /> - <Run Text="{Binding Repository}" /></TextBlock>
+                                                <Button Grid.Column="1" Name="btnDelete" Click="btnDelete_Click" Style="{StaticResource MetroCircleButtonStyle}" BorderBrush="OrangeRed" Tag="{Binding}">
+                                                    <Path Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Value set">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridComboBoxColumn Header="Value selector" SelectedItemBinding="{Binding Selector}" />
+                    <DataGridCheckBoxColumn Header="Use distinct parallel values" Binding="{Binding DistinctParallelValues}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+        <GridSplitter Grid.Row="2" Height="2" Background="LightGray" HorizontalAlignment="Stretch" />
+        <DockPanel Grid.Row="3">
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton x:Name="btnGrCopy" Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" Click="btnGrCopy_Click" />
                 <Rectangle />
@@ -204,8 +194,8 @@
                 </DataGrid.GroupStyle>-->
             </DataGrid>
         </DockPanel>
-        <GridSplitter Grid.Row="2" Grid.Column="2" Height="2" Background="LightGray" HorizontalAlignment="Stretch" />
-        <DockPanel Grid.Column="2" Grid.Row="3" Visibility="{Binding IsChecked,ElementName=btnEnableChart,Converter={StaticResource valueToVisibilityConverter}}">
+        <GridSplitter Grid.Row="4" Height="2" Background="LightGray" HorizontalAlignment="Stretch" />
+        <DockPanel Grid.Row="5">
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" IsEnabled="False" x:Name="btnCopy" Click="btnCopy_Click" />
             </WrapPanel>
