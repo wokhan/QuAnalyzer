@@ -1,11 +1,20 @@
 ﻿using De.TorstenMandelkow.MetroChart;
+using LiveCharts;
+using LiveCharts.Configurations;
+using LiveCharts.Defaults;
+using LiveCharts.Wpf;
 using QuAnalyzer.Features.Monitoring;
+using QuAnalyzer.Features.Performance;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,65 +29,96 @@ namespace QuAnalyzer.UI.Pages
     public partial class Monitor : Page
     {
         private static DateTime firstStart;
+        private long startDate;
+        private int cnt;
+
         readonly DispatcherTimer timer = new DispatcherTimer();
 
-        public static ObservableCollection<ResultsClass> MonitorResults { get; } = new ObservableCollection<ResultsClass>();
-        public ListCollectionView MonitorResultsView { get; } = new ListCollectionView(MonitorResults);
+        //TODO: use a static reference instead
+        public Dictionary<string, string> MonitoringTypes { get; } = Monitoring.MonitoringTypes;
+        public static ObservableCollection<ResultsClass> MonitorResultsView { get; } = new ObservableCollection<ResultsClass>();
+        //public ListCollectionView MonitorResultsView { get; } = new ListCollectionView(MonitorResults);
+        public SeriesCollection ResultSeries { get; } = new SeriesCollection(Mappers.Xy<DateTimePoint>().X(d => d.DateTime.Ticks).Y(d => d.Value));
+        public Dictionary<string, Series[]> ResultSeriesMappings { get; private set; }
 
         public Monitor()
         {
             this.DataContext = this;
+
+            MonitorResultsView.CollectionChanged += MonitorResultsView_CollectionChanged;
 
             //_monitorResultsView.GroupDescriptions.Add(new PropertyGroupDescription("Step"));
 
             InitializeComponent();
         }
 
+        private void MonitorResultsView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                var results = e.NewItems.Cast<ResultsClass>().ToList();
+                results.ForEach(t =>
+                {
+                    var serie = ResultSeriesMappings[t.Name][0];
+                    var serie2 = ResultSeriesMappings[t.Name][1];
+
+                    serie.Values.Add(new DateTimePoint(t.LastCheck.DateTime, (double)t.LastCheck.Ticks - startDate + 1));
+                    var d = new DateTimePoint(t.LastCheck.DateTime, 0);
+                    serie2.Values.Add(d);
+                    t.Duration.CollectionChanged += (s, e) => { if (t.Duration.ContainsKey("_TOTAL_DEFAULT")) { d.Value = t.Duration["_TOTAL_DEFAULT"]; } };
+                });
+            }
+        }
+
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            graph.Series.Clear();
+            var ntests = int.Parse(txtNbOccur.Text, NumberFormatInfo.CurrentInfo);
+            var parallel = int.Parse(txtNbPara.Text, NumberFormatInfo.CurrentInfo);
 
-            if (btnEnable.IsChecked.Value)
+            MonitorResultsView.Clear();
+            ResultSeries.Clear();
+
+            var mitems = gridSteps.SelectedItems.Cast<MonitorItem>();
+
+            if ((bool)btnBurstMode.IsChecked)
             {
-                var gcd = gridSteps.SelectedItems.Cast<MonitorItem>().Select(m => m.Interval).GreatestCommonDiv();
+                var tests = mitems.Select(mitem => new TestCase() { Name = mitem.Name, GetData = (values, statsBag) => mitem.Provider.GetQueryable(mitem.Repository, values, statsBag), Repository = mitem.Repository }).ToList();
+                ResultSeriesMappings = tests.ToDictionary(t => t.Name, t => new Series[] {
+                    new StepLineSeries() { ScalesYAt = 1, Title = t.Name + " (Freq)", Values = new ChartValues<DateTimePoint>() },
+                    new LineSeries() { Title = t.Name + " (Duration)", Values = new ChartValues<DateTimePoint>() }
+                });
+                ResultSeries.AddRange(ResultSeriesMappings.SelectMany(_ => _.Value));
+
+                startDate = DateTimeOffset.Now.Ticks;
+                BindingOperations.EnableCollectionSynchronization(MonitorResultsView, MonitorResultsView);
+
+                var tc = new TestCasesCollection() { TestCases = tests };
+                Task.Run(() => Performance.Run(tc, ntests, parallel, MonitorResultsView));
+            }
+            else
+            {
+                var gcd = mitems.Select(m => m.Interval).GreatestCommonDiv();
                 // TODO: * 30 ??? Why?
                 timer.Interval = TimeSpan.FromSeconds(gcd * 30);
                 timer.Tick += timer_Tick;
                 timer.Start();
 
                 timer_Tick(null, null);
-            }
-            else
-            {
-                btnEnable.IsEnabled = false;
-            }
 
-            firstStart = DateTime.Now;
+                firstStart = DateTime.Now;
 
-            foreach (var monitor in gridSteps.SelectedItems.Cast<MonitorItem>())
-            {
-                monitor.AttachEvent(monitor_OnAdd, monitor_OnResult);
-                monitor.Start();
+                foreach (var monitor in gridSteps.SelectedItems.Cast<MonitorItem>())
+                {
+                    monitor.OnAdd += monitor_OnAdd;
+                    monitor.Start();
+                }
             }
         }
 
         void monitor_OnAdd(ResultsClass results)
         {
-            MonitorResults.Add(results);
+            MonitorResultsView.Add(results);
             gridResults.ScrollIntoView(results);
-        }
-
-        void monitor_OnResult(ResultsClass results)
-        {
-            if (btnEnable.IsChecked.Value)
-            {
-                var series = graph.Series.OrderByDescending(s => (DateTime)s.Tag).First(s => results.LastCheck >= ((DateTime)s.Tag));
-                var p = series.Items.Cast<MultiValueDatePoint>().First(i => i.Name == results.Step.Name);
-                p.Values = results.Duration;
-                p.Y = results.ResultCount;
-
-                series.BringIntoView();
-            }
         }
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
@@ -108,77 +148,33 @@ namespace QuAnalyzer.UI.Pages
             ((App)Application.Current).CurrentProject.MonitorItems.Remove(mtoremove);
         }
 
-        private void btnStartAll_Click(object sender, RoutedEventArgs e)
+        /*private void btnStartAll_Click(object sender, RoutedEventArgs e)
         {
-            graph.Series.Clear();
-
             var gcd = ((App)Application.Current).CurrentProject.MonitorItems.Select(m => m.Interval).GreatestCommonDiv();
 
-            if (btnEnable.IsChecked.Value)
-            {
-                timer.Interval = TimeSpan.FromSeconds(gcd * 30);
-                timer.Tick += timer_Tick;
-                timer.Start();
+            timer.Interval = TimeSpan.FromSeconds(gcd * 30);
+            timer.Tick += timer_Tick;
+            timer.Start();
 
-                timer_Tick(null, null);
-            }
-            else
-            {
-                btnEnable.IsEnabled = false;
-            }
+            timer_Tick(null, null);
 
             firstStart = DateTime.Now;
 
-            foreach (var monitor in ((App)Application.Current).CurrentProject.MonitorItems)
+            /*foreach (var monitor in ((App)Application.Current).CurrentProject.MonitorItems)
             {
                 monitor.AttachEvent(monitor_OnAdd, monitor_OnResult);
                 monitor.Start();
             }
-        }
+        }*/
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            var now = DateTime.Now;
-
-            var timeslice = timer.Interval.TotalSeconds / 30;
-            var mis = ((App)Application.Current).CurrentProject.MonitorItems.ToList();
-            for (int i = 0; i < 35; i++)
-            {
-                var x = now.AddSeconds(timeslice * i);
-                var xname = x.ToString("dd/mm/yyyy HH:mm:ss");
-                var uname = "Series_" + ((uint)xname.GetHashCode()).ToString();
-                if (!graph.Series.Any(s => s.Name == uname))
-                {
-                    var series = new ChartSeries()
-                    {
-                        Name = uname,
-                        SeriesTitle = xname,
-                        ValueMember = nameof(MultiValueDatePoint.Y),
-                        DisplayMember = nameof(MultiValueDatePoint.Name),
-                        Tag = x
-                    };
-
-                    graph.Series.Add(series);
-
-                    mis.ForEach(m => series.Items.Add(new MultiValueDatePoint() { Name = m.Name }));
-                }
-            }
-            /*
-            graph.Series.Add(new ChartSeries()
-            {
-                Name = "Duration_" + ((uint)xname.GetHashCode()).ToString(),
-                SeriesTitle = xname,
-                ValueMember = "Duration",
-                DisplayMember = "Name",
-                Tag = x
-            });*/
+            //TODO: Add global time evolution (see file history...)
         }
 
         private void btnStopAll_Click(object sender, RoutedEventArgs e)
         {
             timer.Stop();
-
-            btnEnable.IsEnabled = true;
 
             foreach (var monitor in ((App)Application.Current).CurrentProject.MonitorItems)
             {

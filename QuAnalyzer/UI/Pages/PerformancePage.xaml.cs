@@ -29,9 +29,7 @@ namespace QuAnalyzer.UI.Pages
         private long startDate;
 
         public ObservableCollection<ResultsClass> MonitorResultsView { get; } = new ObservableCollection<ResultsClass>();
-
         public TestCasesCollection SelectedTestsCollection { get; set; }
-
         public SeriesCollection ResultSeries { get; } = new SeriesCollection(Mappers.Xy<DateTimePoint>().X(d => d.DateTime.Ticks).Y(d => d.Value));
         public Dictionary<string, Series[]> ResultSeriesMappings { get; private set; }
 

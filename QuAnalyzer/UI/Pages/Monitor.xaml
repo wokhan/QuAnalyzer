@@ -4,7 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-      xmlns:chart="clr-namespace:De.TorstenMandelkow.MetroChart;assembly=De.TorstenMandelkow.MetroChart"
+      xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
       mc:Ignorable="d" 
       d:DesignHeight="700" d:DesignWidth="800"
       DataContext="{Binding RelativeSource={RelativeSource Self}}"
@@ -21,10 +21,21 @@
         </Grid.RowDefinitions>
         <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
             <UC:ToolBarButton Text="Run" ToolTip="Start monitoring the selected items" BorderBrush="Green" Image="{StaticResource appbar_control_play}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnStart_Click" />
-            <UC:ToolBarButton Text="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />
+            <!--<UC:ToolBarButton Text="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />-->
             <UC:ToolBarButton Text="Stop" ToolTip="Stop monitoring" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Red" Image="{StaticResource appbar_arrow_collapsed}" Click="btnStopAll_Click" />
             <Rectangle />
-            <UC:ToolBarToggleButton Text="Enable chart" ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />
+            <UC:ToolBarToggleButton Text="Burst mode" x:Name="btnBurstMode" Image="{StaticResource appbar_list}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Occurences: " VerticalAlignment="Center" />
+                <TextBox x:Name="txtNbOccur" IsEnabled="{Binding IsChecked,ElementName=btnBurstMode}"  Text="10" Width="40" Padding="0" Margin="2" VerticalAlignment="Center" />
+            </StackPanel>
+            <Rectangle />
+            <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
+                <TextBlock Text="Parallelism: " VerticalAlignment="Center" />
+                <TextBox x:Name="txtNbPara" Text="1" Width="40" VerticalAlignment="Center" Padding="0" Margin="2" />
+            </StackPanel>
+            <!--<Rectangle />
+            <UC:ToolBarToggleButton Text="Enable chart" ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />-->
         </WrapPanel>
         <DockPanel Grid.Row="1">
             <TextBlock DockPanel.Dock="Top" Background="LightGray" Padding="5" Text="Configuration" />
@@ -36,8 +47,9 @@
                 <DataGrid.Columns>
                     <DataGridCheckBoxColumn Binding="{Binding Selector.IsSelected}" Width="Auto" />
                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-                    <DataGridTemplateColumn Header="Source" Width="*"></DataGridTemplateColumn>
-                    <DataGridComboBoxColumn SelectedValueBinding="{Binding Type}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding SelectedItem.MonitoringTypes, ElementName=lstSrc}" />
+                    <DataGridComboBoxColumn Header="Provider" x:Name="lstDataProviders" MinWidth="150" ItemsSource="{Binding CurrentProject.Providers,Source={x:Static Application.Current}}" DisplayMemberPath="Name" SelectedValueBinding="{Binding Provider}" />
+                    <DataGridComboBoxColumn Header="Repository" MinWidth="150" ItemsSource="{Binding Repository.Repositories.Keys}" />
+                    <DataGridComboBoxColumn Header="Type" SelectedValueBinding="{Binding Type}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding MonitoringTypes, ElementName=me}" />
                     <DataGridTextColumn Header="Interval" Binding="{Binding Interval}" />
                     <DataGridCheckBoxColumn Header="Run when started" Binding="{Binding RunWhenStarted}" />
                     <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto" />
@@ -90,20 +102,18 @@
                                 <TextBox x:Name="txtFilter" Text="{Binding Filter}" />
                             </StackPanel>
                             <Label Grid.Column="1" Content="Preceding steps:" />
-                            <ListBox Grid.Row="2" Grid.Column="1" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" SelectionMode="Multiple">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-                                            <CheckBox IsChecked="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
-                                            <Label Content="{Binding Name}" Grid.Column="1" />
-                                        </Grid>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                            <DataGrid Grid.Row="2" Grid.Column="1" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" SelectionMode="Multiple">
+                                <DataGridCheckBoxColumn Header="Select" Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=DataGridRow}}" />
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding UseData}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridComboBoxColumn Header="Attributes mapping" />
+                            </DataGrid>
                         </Grid>
                     </DataTemplate>
                 </DataGrid.RowDetailsTemplate>
@@ -140,7 +150,8 @@
                     <DataGridTextColumn Header="Step" Binding="{Binding Step.Name}" Width="Auto" />
                     <DataGridTextColumn Header="#" Binding="{Binding Occurence}" Width="Auto" />
                     <DataGridTextColumn Header="Last check" Binding="{Binding LastCheck}" Width="Auto" />
-                    <DataGridTextColumn Header="Duration" Binding="{Binding Duration}" Width="Auto" />
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto" />
+                    <DataGridTextColumn Header="Duration" Binding="{Binding Duration[_TOTAL_DEFAULT]}" Width="Auto" />
                     <DataGridTemplateColumn Header="Result" Width="*">
                         <DataGridTemplateColumn.CellStyle>
                             <Style TargetType="DataGridCell">
@@ -211,13 +222,20 @@
             </DataGrid>
         </DockPanel>
         <GridSplitter Grid.Row="4" Height="2" Background="LightGray" />
-        <DockPanel Grid.Row="5" Visibility="{Binding IsChecked,ElementName=btnEnableChart,Converter={StaticResource valueToVisibilityConverter}}">
+        <DockPanel Grid.Row="5">
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" IsEnabled="False" x:Name="btnCopy" Click="btnCopy_Click" />
             </WrapPanel>
-            <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Visible">
-                <chart:ClusteredColumnChart x:Name="graph" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True" HorizontalContentAlignment="Stretch" ChartTitleVisibility="Collapsed" />
-            </ScrollViewer>
+            <wpf:CartesianChart Series="{Binding ResultSeries}" ScrollMode="X" DisableAnimations="True" Margin="0" DataTooltip="{x:Null}" Hoverable="False">
+                <wpf:CartesianChart.AxisX>
+                    <wpf:Axis></wpf:Axis>
+                </wpf:CartesianChart.AxisX>
+                <wpf:CartesianChart.AxisY>
+                    <wpf:LogarithmicAxis></wpf:LogarithmicAxis>
+                    <wpf:LogarithmicAxis Position="RightTop"></wpf:LogarithmicAxis>
+                </wpf:CartesianChart.AxisY>
+            </wpf:CartesianChart>
+
         </DockPanel>
     </Grid>
 </Page>

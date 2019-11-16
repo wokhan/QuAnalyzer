@@ -1,8 +1,5 @@
-﻿using QuAnalyzer.Features.Performance;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net.NetworkInformation;
@@ -22,6 +19,8 @@ namespace QuAnalyzer.Features.Monitoring
 
         public static ResultsClass Monitor(MonitorItem item, int occurence)
         {
+            item.Running = true;
+            
             var r = new ResultsClass();
             r.Step = item;
             r.Occurence = occurence;
@@ -30,7 +29,7 @@ namespace QuAnalyzer.Features.Monitoring
 
             if (!MonitoringTypes.ContainsKey(item.Type))
             {
-                throw new ArgumentException("The specified monitoring type does not exist for the current provider.");
+                throw new ArgumentException("The specified monitoring type is not supported.");
             }
 
             switch (item.Type)
@@ -40,7 +39,7 @@ namespace QuAnalyzer.Features.Monitoring
                     r.Duration.Add(nameof(MonitoringModes.PING), Ping(item.Provider.Host));
                     break;
 
-                case MonitoringModes.PERF:
+                /*case MonitoringModes.PERF:
                     var res = new ObservableCollection<ResultsClass>();
                     res.CollectionChanged += (o, e) =>
                     {
@@ -58,7 +57,7 @@ namespace QuAnalyzer.Features.Monitoring
                     r.Duration.AddAll(res.FirstOrDefault()?.Duration);
                     r.ResultCount = (long)res.FirstOrDefault()?.ResultCount;
                     r.Data = null;
-                    break;
+                    break;*/
 
                 case MonitoringModes.CHECKVAL:
                     if (string.IsNullOrEmpty(item.Attributes))
@@ -88,8 +87,9 @@ namespace QuAnalyzer.Features.Monitoring
                     break;
             }
 
-            return r;
+            item.Running = true;
 
+            return r;
         }
 
         private static void Res_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

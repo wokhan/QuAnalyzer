@@ -35,16 +35,20 @@
             </StackPanel>
         </WrapPanel>
         <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="277*"/>
+                <ColumnDefinition Width="523*"/>
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <TextBlock Background="LightGray" Padding="5" Text="Tests definitions" />
-            <WrapPanel Style="{StaticResource ToolBar}">
+            <TextBlock Background="LightGray" Padding="5" Text="Tests definitions" Grid.ColumnSpan="2" Margin="0,0,0,143" Grid.RowSpan="2" />
+            <WrapPanel Style="{StaticResource ToolBar}" Grid.ColumnSpan="2" Margin="0,0,0,143" Grid.RowSpan="2">
                 <UC:ToolBarButton Text="Add" ToolTip="Add a step" BorderBrush="Green" Image="{StaticResource appbar_add}" Click="btnAdd_Click" />
                 <UC:ToolBarButton Text="Clear" ToolTip="Remove all" BorderBrush="OrangeRed" Image="{StaticResource appbar_clean}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnClear_Click" />
             </WrapPanel>
-            <DataGrid Grid.Row="1" x:Name="gridSteps" VirtualizingPanel.ScrollUnit="Pixel" CanUserAddRows="False" AutoGenerateColumns="False" SelectionMode="Extended" SelectedItem="{Binding SelectedTestsCollection}" ItemsSource="{Binding CurrentProject.PerformanceItems,Source={x:Static Application.Current}}">
+            <DataGrid Grid.Row="1" x:Name="gridSteps" VirtualizingPanel.ScrollUnit="Pixel" CanUserAddRows="False" AutoGenerateColumns="False" SelectionMode="Extended" SelectedItem="{Binding SelectedTestsCollection}" ItemsSource="{Binding CurrentProject.PerformanceItems,Source={x:Static Application.Current}}" Grid.ColumnSpan="2">
                 <DataGrid.Columns>
                     <DataGridCheckBoxColumn Header="" Width="Auto" />
                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" />

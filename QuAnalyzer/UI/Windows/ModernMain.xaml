@@ -200,9 +200,6 @@
             <UC:DecoratedTabItem Header="MONITORING" Image="{StaticResource appbar_image_redeye}">
                 <Frame Source="../Pages/Monitor.xaml" />
             </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="PERFORMANCE" Image="{StaticResource appbar_image_redeye}">
-                <Frame Source="../Pages/PerformancePage.xaml" />
-            </UC:DecoratedTabItem>
         </Controls:MetroAnimatedSingleRowTabControl>
         <StatusBar Grid.Row="1" Height="25" Background="{DynamicResource AccentColorBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
             <StatusBarItem>

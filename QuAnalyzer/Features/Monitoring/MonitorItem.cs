@@ -129,21 +129,16 @@ namespace QuAnalyzer.Features.Monitoring
             OnAdd?.Invoke(r);
         }
 
-        public void raiseResult(ResultsClass r)
-        {
-            OnResult?.Invoke(r);
-        }
-
-        public ObservableCollection<MultiValueDatePoint> Points { get; } = new ObservableCollection<MultiValueDatePoint>();
-
-        public void AttachEvent(Action<ResultsClass> monitor_OnAdd, Action<ResultsClass> monitor_OnResult)
-        {
-            OnAdd -= monitor_OnAdd;
-            OnAdd += monitor_OnAdd;
-            OnResult -= monitor_OnResult;
-            OnResult += monitor_OnResult;
-        }
+        
+        //public void AttachEvent(Action<ResultsClass> monitor_OnAdd, Action<ResultsClass> monitor_OnResult)
+        //{
+        //    OnAdd -= monitor_OnAdd;
+        //    OnAdd += monitor_OnAdd;
+        //    OnResult -= monitor_OnResult;
+        //    OnResult += monitor_OnResult;
+        //}
 
         public string Attributes { get; set; } = "";
+        public bool Running { get; internal set; }
     }
 }
