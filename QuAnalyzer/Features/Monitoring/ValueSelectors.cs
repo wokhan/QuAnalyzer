@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace QuAnalyzer.Features.Performance
+namespace QuAnalyzer.Features.Monitoring
 {
     public static class ValueSelectors
     {

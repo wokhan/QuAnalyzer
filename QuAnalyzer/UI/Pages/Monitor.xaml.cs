@@ -1,5 +1,4 @@
-﻿using De.TorstenMandelkow.MetroChart;
-using LiveCharts;
+﻿using LiveCharts;
 using LiveCharts.Configurations;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
@@ -14,7 +13,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -35,7 +33,7 @@ namespace QuAnalyzer.UI.Pages
         readonly DispatcherTimer timer = new DispatcherTimer();
 
         //TODO: use a static reference instead
-        public Dictionary<string, string> MonitoringTypes { get; } = Monitoring.MonitoringTypes;
+        public Dictionary<string, string> MonitoringTypes { get; } = MonitoringModes.MonitoringTypes;
         public static ObservableCollection<ResultsClass> MonitorResultsView { get; } = new ObservableCollection<ResultsClass>();
         //public ListCollectionView MonitorResultsView { get; } = new ListCollectionView(MonitorResults);
         public SeriesCollection ResultSeries { get; } = new SeriesCollection(Mappers.Xy<DateTimePoint>().X(d => d.DateTime.Ticks).Y(d => d.Value));
@@ -76,43 +74,48 @@ namespace QuAnalyzer.UI.Pages
             var parallel = int.Parse(txtNbPara.Text, NumberFormatInfo.CurrentInfo);
 
             MonitorResultsView.Clear();
-            ResultSeries.Clear();
 
             var mitems = gridSteps.SelectedItems.Cast<MonitorItem>();
 
+            InitChart(mitems);
+
+            startDate = DateTimeOffset.Now.Ticks;
+            BindingOperations.EnableCollectionSynchronization(MonitorResultsView, MonitorResultsView);
+
+            var gcd = mitems.Select(m => m.Interval).GreatestCommonDiv();
+            // TODO: * 30 ??? Why?
+            timer.Interval = TimeSpan.FromSeconds(gcd * 30);
+            timer.Tick += timer_Tick;
+            timer.Start();
+
+            timer_Tick(null, null);
+
+            firstStart = DateTime.Now;
+
             if ((bool)btnBurstMode.IsChecked)
             {
-                var tests = mitems.Select(mitem => new TestCase() { Name = mitem.Name, GetData = (values, statsBag) => mitem.Provider.GetQueryable(mitem.Repository, values, statsBag), Repository = mitem.Repository }).ToList();
-                ResultSeriesMappings = tests.ToDictionary(t => t.Name, t => new Series[] {
-                    new StepLineSeries() { ScalesYAt = 1, Title = t.Name + " (Freq)", Values = new ChartValues<DateTimePoint>() },
-                    new LineSeries() { Title = t.Name + " (Duration)", Values = new ChartValues<DateTimePoint>() }
-                });
-                ResultSeries.AddRange(ResultSeriesMappings.SelectMany(_ => _.Value));
-
-                startDate = DateTimeOffset.Now.Ticks;
-                BindingOperations.EnableCollectionSynchronization(MonitorResultsView, MonitorResultsView);
-
-                var tc = new TestCasesCollection() { TestCases = tests };
-                Task.Run(() => Performance.Run(tc, ntests, parallel, MonitorResultsView));
+                
             }
             else
             {
-                var gcd = mitems.Select(m => m.Interval).GreatestCommonDiv();
-                // TODO: * 30 ??? Why?
-                timer.Interval = TimeSpan.FromSeconds(gcd * 30);
-                timer.Tick += timer_Tick;
-                timer.Start();
-
-                timer_Tick(null, null);
-
-                firstStart = DateTime.Now;
-
                 foreach (var monitor in gridSteps.SelectedItems.Cast<MonitorItem>())
                 {
                     monitor.OnAdd += monitor_OnAdd;
                     monitor.Start();
                 }
             }
+        }
+
+        private void InitChart(IEnumerable<MonitorItem> mitems)
+        {
+            ResultSeries.Clear();
+
+            var tests = mitems.Select(mitem => new TestCase() { Name = mitem.Name, GetData = (values, statsBag) => mitem.Provider.GetQueryable(mitem.Repository, values, statsBag), Repository = mitem.Repository }).ToList();
+            ResultSeriesMappings = tests.ToDictionary(t => t.Name, t => new Series[] {
+                    new StepLineSeries() { ScalesYAt = 1, Title = t.Name + " (Freq)", Values = new ChartValues<DateTimePoint>() },
+                    new LineSeries() { Title = t.Name + " (Duration)", Values = new ChartValues<DateTimePoint>() }
+                });
+            ResultSeries.AddRange(ResultSeriesMappings.SelectMany(_ => _.Value));
         }
 
         void monitor_OnAdd(ResultsClass results)
@@ -169,7 +172,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            //TODO: Add global time evolution (see file history...)
+            
         }
 
         private void btnStopAll_Click(object sender, RoutedEventArgs e)

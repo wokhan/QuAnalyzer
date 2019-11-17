@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Popups
@@ -37,7 +38,7 @@ namespace QuAnalyzer.UI.Popups
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            CurrentItem.PrecedingSteps = lstPrec.SelectedItems.Cast<MonitorItem>().ToList();
+            CurrentItem.PrecedingSteps.AddRange(lstPrec.SelectedItems.Cast<MonitorItem>());
             CurrentItem.Attributes = String.Join(",", lstAttributes.SelectedItems.Cast<KeyValuePair<string, bool>>().Select(s => s.Key));
 
             if (!((App)App.Current).CurrentProject.MonitorItems.Contains(CurrentItem))

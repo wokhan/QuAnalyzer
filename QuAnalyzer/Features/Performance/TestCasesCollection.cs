@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
+using QuAnalyzer.Features.Monitoring;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace QuAnalyzer.Features.Performance
         }
 
         public ValueSelectors.Selector Selector { get; set; }
-        public IList<TestCase> TestCases { get; set; }
+        public IList<MonitorItem> TestCases { get; set; }
         public bool DistinctParallelValues { get; set; }
 
         public TestCasesCollection this[string n]

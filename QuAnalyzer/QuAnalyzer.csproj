@@ -28,6 +28,7 @@
     <Compile Remove="Logic\Comparison - Copy.cs" />
     <Compile Remove="Logic\ContractResolver.cs" />
     <Compile Remove="UI\Controls\DataCompareDetail.xaml.cs" />
+    <Compile Remove="UI\Pages\PerformancePage.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="UI\Pages\ProviderEditor.xaml" />
@@ -36,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Page Remove="UI\Controls\DataCompareDetail.xaml" />
+    <Page Remove="UI\Pages\PerformancePage.xaml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="4.5.3.2" />

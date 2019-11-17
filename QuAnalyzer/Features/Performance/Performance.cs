@@ -1,40 +1,40 @@
-﻿using QuAnalyzer.Features.Monitoring;
+﻿using QuAnalyzer.Core.Helpers;
+using QuAnalyzer.Features.Monitoring;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading;
-using Wokhan.Collections;
 
 namespace QuAnalyzer.Features.Performance
 {
     public static class Performance
     {
-        public static void Run(TestCasesCollection tests, int nbSamples, int nbThreads, ObservableCollection<ResultsClass> results, Action<ResultsClass, IList<Dictionary<string, string>>> callback = null)
+        public static void Run(TestCasesCollection tests, int occurence, int burstOccurences, int threads, Action<ResultsClass> callback = null)
         {
-            if (nbSamples <= 0)
+            if (burstOccurences <= 0)
             {
-                nbSamples = 1;
+                burstOccurences = 1;
             }
-            if (nbThreads <= 0)
+            if (threads <= 0)
             {
-                nbThreads = 1;
+                threads = 1;
             }
             int prevThreads, prevPorts;
             ThreadPool.GetMinThreads(out prevThreads, out prevPorts);
-            ThreadPool.SetMinThreads(nbThreads, prevPorts);
+            ThreadPool.SetMinThreads(threads, prevPorts);
 
             try
             {
                 var dtRun = DateTime.Now;
 
-                Enumerable.Range(0, nbSamples)
+                Enumerable.Range(0, burstOccurences)
                           //.Select(x => new { x, valueset = (tests.ValuesSet != null && !tests.DistinctParallelValues ? (tests.Selector ?? ValueSelectors.SequentialSelector).Invoke(tests.ValuesSet, x).Dump() : null) })
                           //.ToList()
                           .AsParallel()
                           //.WithExecutionMode(ParallelExecutionMode.ForceParallelism)
-                          .WithDegreeOfParallelism(nbThreads / tests.TestCases.Count)
+                          .WithDegreeOfParallelism(threads / tests.TestCases.Count)
                           //.WithMergeOptions(ParallelMergeOptions.NotBuffered)
                           .ForAll(x =>
                           {
@@ -48,45 +48,72 @@ namespace QuAnalyzer.Features.Performance
                                      .Select((test, ix) => new { test, ix })
                                      .ForAll(a =>
                                      {
-                                         var result = new ResultsClass()
+                                         var r = new ResultsClass()
                                          {
-                                             Id = $"{x}.{a.ix}",
+                                             Id = $"{occurence}.{x}.{a.ix}",
                                              Name = a.test.Name,
-                                             Index = x,
+                                             //Index = x,
                                              Status = Status.Loading,
+                                             Values = values
                                          };
 
-                                         callback?.Invoke(result, null);
-
-                                         lock (results)
-                                         {
-                                             results.Add(result);
-                                         }
+                                         callback?.Invoke(r);
 
                                          var sw = Stopwatch.StartNew();
                                          try
                                          {
-                                             //TODO : Values override!!!
-                                             var data = a.test.GetData(values, result.Duration);
+                                             switch (a.test.Type)
+                                             {
+                                                 case MonitoringModes.PING:
+                                                     r.Data = null;
+                                                     r.Duration.Add(nameof(MonitoringModes.PING), SimpleNetworkTests.Ping(a.test.Provider.Host));
+                                                     break;
+
+                                                 case MonitoringModes.CHECKVAL:
+                                                     if (string.IsNullOrEmpty(a.test.Attributes))
+                                                     {
+                                                         throw new NullReferenceException($"The {nameof(a.test.Attributes)} attribute must not be null.");
+                                                     }
+                                                     var q = a.test.GetData(values, r.Duration);
+                                                     if (!string.IsNullOrEmpty(a.test.Filter))
+                                                     {
+                                                         q = q.Where(a.test.Filter);
+                                                     }
+                                                     // Removed new(attribute)
+                                                     r.Data = q.Select(a.test.Attributes).AsEnumerable().ToList();
+                                                     break;
+
+                                                 case MonitoringModes.COUNTALL:
+                                                     var qc = a.test.GetData(values, r.Duration);
+                                                     if (!string.IsNullOrEmpty(a.test.Filter))
+                                                     {
+                                                         qc = qc.Where(a.test.Filter);
+                                                     }
+                                                     r.Data = new { Count = qc.Count() };
+                                                     break;
+
+                                                 default:
+                                                     r.Data = null;
+                                                     break;
+                                             }
+
                                              // TODO: remove, just for test :-O
                                              Thread.Sleep(new Random().Next(0, 100));
-                                             result.Status = Status.Success;
-                                             result.Data = data;
+                                             r.Status = Status.Success;
                                          }
                                          catch (Exception e)
                                          {
-                                             result.Data = e;
-                                             result.Status = Status.Error;
+                                             r.Data = e;
+                                             r.Status = Status.Error;
                                          }
                                          finally
                                          {
                                              sw.Stop();
                                          }
 
-                                         result.Duration.Add("_TOTAL_DEFAULT", sw.ElapsedMilliseconds);
-                                         result.End = result.LastCheck.AddMilliseconds(sw.ElapsedMilliseconds);
+                                         r.Duration.Add("_TOTAL_DEFAULT", sw.ElapsedMilliseconds);
+                                         r.End = r.LastCheck.AddMilliseconds(sw.ElapsedMilliseconds);
 
-                                         callback?.Invoke(result, values);
                                      });
                           });
             }

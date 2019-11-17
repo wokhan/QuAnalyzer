@@ -1,5 +1,4 @@
-﻿using QuAnalyzer.Features.Performance;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Wokhan.Collections;
 using Wokhan.Core.ComponentModel;
@@ -49,6 +48,7 @@ namespace QuAnalyzer.Features.Monitoring
 
         public string Name { get; internal set; }
         public string Id { get; internal set; }
-        public int Index { get; internal set; }
+        //public int Index { get; internal set; }
+        public IList<Dictionary<string, string>> Values { get; internal set; }
     }
 }

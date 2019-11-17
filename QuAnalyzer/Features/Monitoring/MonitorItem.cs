@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using QuAnalyzer.Features.Performance;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +18,7 @@ namespace QuAnalyzer.Features.Monitoring
 
         public bool RunWhenStarted { get; set; }
 
-        public List<MonitorItem> PrecedingSteps { get; set; }
+        public ObservableCollection<MonitorItem> PrecedingSteps { get; } = new ObservableCollection<MonitorItem>();
 
         public List<string> AttributesList => Attributes.Split(',').ToList();
 
@@ -28,16 +29,22 @@ namespace QuAnalyzer.Features.Monitoring
             set { _name = value; NotifyPropertyChanged(); }
         }
 
+        public ValueSelectors.Selector Selector { get; set; }
+
         public string ProviderName { get; set; }
 
+        private IDataProvider provider;
         [JsonIgnore]
         public IDataProvider Provider
         {
-            get { return ((App)System.Windows.Application.Current).CurrentProject.CurrentProviders.SingleOrDefault(c => c.Name == ProviderName); }
+            get { return provider ??= ((App)System.Windows.Application.Current).CurrentProject.CurrentProviders.SingleOrDefault(c => c.Name == ProviderName); }
             set { ProviderName = value != null ? value.Name : string.Empty; }
         }
 
         public string Repository { get; set; }
+
+        public Func<IList<Dictionary<string, string>>, Dictionary<string, long>, IQueryable> GetData => (values, statsBag) => Provider.GetQueryable(Repository, values, statsBag);
+
         public string Filter { get; set; }
 
         private int _interval;
@@ -119,8 +126,8 @@ namespace QuAnalyzer.Features.Monitoring
 
             _isChecking = true;
 
-            await Task.Run(() => Monitoring.Monitor(this, cnt++));
-
+            await Task.Run(() => Performance.Performance.Run(new TestCasesCollection() { TestCases = new[] { this } }, cnt++, 1, 1, raiseAdd)).ConfigureAwait(false);
+            
             _isChecking = false;
         }
 
@@ -139,6 +146,5 @@ namespace QuAnalyzer.Features.Monitoring
         //}
 
         public string Attributes { get; set; } = "";
-        public bool Running { get; internal set; }
     }
 }
