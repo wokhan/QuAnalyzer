@@ -20,9 +20,9 @@
             <RowDefinition MinHeight="150" Height="*" />
         </Grid.RowDefinitions>
         <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
-            <UC:ToolBarButton Text="Run" ToolTip="Start monitoring the selected items" BorderBrush="Green" Image="{StaticResource appbar_control_play}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnStart_Click" />
+            <UC:ToolBarButton x:Name="btnStart" Text="Run" ToolTip="Start monitoring the selected items" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStart_Click" />
             <!--<UC:ToolBarButton Text="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />-->
-            <UC:ToolBarButton Text="Stop" ToolTip="Stop monitoring" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Red" Image="{StaticResource appbar_arrow_collapsed}" Click="btnStopAll_Click" />
+            <UC:ToolBarButton x:Name="btnStop" IsEnabled="False" Text="Stop" ToolTip="Stop monitoring" BorderBrush="Red" Image="{StaticResource appbar_arrow_collapsed}" Click="btnStopAll_Click" />
             <Rectangle />
             <UC:ToolBarToggleButton Text="Burst mode" x:Name="btnBurstMode" Image="{StaticResource appbar_list}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" />
             <StackPanel Orientation="Horizontal">
@@ -226,7 +226,7 @@
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" IsEnabled="False" x:Name="btnCopy" Click="btnCopy_Click" />
             </WrapPanel>
-            <wpf:CartesianChart Series="{Binding ResultSeries}" ScrollMode="X" DisableAnimations="True" Margin="0" DataTooltip="{x:Null}" Hoverable="False">
+            <wpf:CartesianChart x:Name="chart" Series="{Binding ResultSeries}" ScrollMode="X" DisableAnimations="True" Margin="0" DataTooltip="{x:Null}" Hoverable="False">
                 <wpf:CartesianChart.AxisX>
                     <wpf:Axis></wpf:Axis>
                 </wpf:CartesianChart.AxisX>

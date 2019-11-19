@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -26,11 +27,13 @@ namespace QuAnalyzer.UI.Pages
     /// </summary>
     public partial class Monitor : Page
     {
-        private static DateTime firstStart;
+        private const int chartTimeSpanMinutes = 1;
         private long startDate;
-        private int cnt;
 
-        readonly DispatcherTimer timer = new DispatcherTimer();
+        readonly DispatcherTimer globalTimer = new DispatcherTimer();
+
+        Dictionary<MonitorItem, DispatcherTimer> timers = new Dictionary<MonitorItem, DispatcherTimer>();
+        Dictionary<MonitorItem, (MonitoringItemInstance, int)> instances;
 
         //TODO: use a static reference instead
         public Dictionary<string, string> MonitoringTypes { get; } = MonitoringModes.MonitoringTypes;
@@ -70,6 +73,9 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
+            btnStart.IsEnabled = false;
+            btnStop.IsEnabled = true;
+
             var ntests = int.Parse(txtNbOccur.Text, NumberFormatInfo.CurrentInfo);
             var parallel = int.Parse(txtNbPara.Text, NumberFormatInfo.CurrentInfo);
 
@@ -82,28 +88,71 @@ namespace QuAnalyzer.UI.Pages
             startDate = DateTimeOffset.Now.Ticks;
             BindingOperations.EnableCollectionSynchronization(MonitorResultsView, MonitorResultsView);
 
-            var gcd = mitems.Select(m => m.Interval).GreatestCommonDiv();
-            // TODO: * 30 ??? Why?
-            timer.Interval = TimeSpan.FromSeconds(gcd * 30);
-            timer.Tick += timer_Tick;
-            timer.Start();
-
-            timer_Tick(null, null);
-
-            firstStart = DateTime.Now;
-
             if ((bool)btnBurstMode.IsChecked)
             {
-                
+
             }
             else
             {
-                foreach (var monitor in gridSteps.SelectedItems.Cast<MonitorItem>())
+                var gcd = mitems.Select(m => m.Interval).GreatestCommonDiv();
+                // TODO: Used to be * 30... Why?
+                globalTimer.Interval = TimeSpan.FromSeconds(gcd);
+                globalTimer.Tick += globalTimer_Tick;
+                globalTimer.Start();
+
+                globalTimer_Tick(null, null);
+
+                instances = mitems.ToDictionary(m => m, m => (m.GetInstance(), 1));
+                instances.ToList().ForEach(i => i.Value.Item1.AttachPrecedingStepInstances(i.Key.PrecedingSteps.Select(step => instances[step.Key].Item1)));
+
+                timers = mitems.ToDictionary(m => m, m =>
                 {
-                    monitor.OnAdd += monitor_OnAdd;
-                    monitor.Start();
-                }
+                    var timer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(m.Interval), Tag = m };
+                    timer.Tick += Timer_Tick;
+                    timer.Start();
+                    if (m.RunWhenStarted)
+                    {
+                        Timer_Tick(timer, null);
+                    }
+                    return timer;
+                });
             }
+
+            btnStart.IsEnabled = true;
+            btnStop.IsEnabled = false;
+        }
+
+        private async void Timer_Tick(object sender, EventArgs e)
+        {
+            var timer = (DispatcherTimer)sender;
+            var monitor = (MonitorItem)timer.Tag;
+
+            var monitorInstance = instances[monitor].Item1;
+            var cnt = instances[monitor].Item2;
+            if (monitorInstance.Status == MonitoringStatus.DONE)
+            {
+                monitorInstance = monitor.GetInstance();
+                instances[monitor] = (monitorInstance, cnt++);
+                monitorInstance.AttachPrecedingStepInstances(monitor.PrecedingSteps.Select(step => instances[step.Key].Item1));
+            }
+            else if (monitorInstance.Status == MonitoringStatus.RUNNING)
+            {
+                return;
+            }
+
+            if (!monitorInstance.AllPrecedingStepsDone)
+            {
+                monitorInstance.Status = MonitoringStatus.WAITING;
+                return;
+            }
+
+            monitorInstance.Status = MonitoringStatus.RUNNING;
+
+            List<Dictionary<string, string>> values = null;
+
+            await Task.Run(() => Performance.Run(new TestCasesCollection() { TestCases = new[] { monitorInstance }, ValuesSet = values }, cnt++, 1, 1, monitor_OnAdd)).ConfigureAwait(false);
+
+            monitorInstance.Status = MonitoringStatus.DONE;
         }
 
         private void InitChart(IEnumerable<MonitorItem> mitems)
@@ -151,38 +200,22 @@ namespace QuAnalyzer.UI.Pages
             ((App)Application.Current).CurrentProject.MonitorItems.Remove(mtoremove);
         }
 
-        /*private void btnStartAll_Click(object sender, RoutedEventArgs e)
+        private void globalTimer_Tick(object sender, EventArgs e)
         {
-            var gcd = ((App)Application.Current).CurrentProject.MonitorItems.Select(m => m.Interval).GreatestCommonDiv();
-
-            timer.Interval = TimeSpan.FromSeconds(gcd * 30);
-            timer.Tick += timer_Tick;
-            timer.Start();
-
-            timer_Tick(null, null);
-
-            firstStart = DateTime.Now;
-
-            /*foreach (var monitor in ((App)Application.Current).CurrentProject.MonitorItems)
-            {
-                monitor.AttachEvent(monitor_OnAdd, monitor_OnResult);
-                monitor.Start();
-            }
-        }*/
-
-        private void timer_Tick(object sender, EventArgs e)
-        {
-            
+            chart.ScrollHorizontalFrom = DateTime.Now.Ticks;
+            chart.ScrollHorizontalTo = DateTime.Now.AddMinutes(chartTimeSpanMinutes).Ticks;
         }
 
         private void btnStopAll_Click(object sender, RoutedEventArgs e)
         {
-            timer.Stop();
+            globalTimer.Stop();
 
-            foreach (var monitor in ((App)Application.Current).CurrentProject.MonitorItems)
+            foreach (var timer in timers)
             {
-                monitor.Stop();
+                timer.Value.Stop();
             }
+
+            timers.Clear();
         }
 
         private void btnGrHTML_Click(object sender, RoutedEventArgs e) => gridResults.ExportAsHTML();

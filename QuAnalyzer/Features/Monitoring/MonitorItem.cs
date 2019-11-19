@@ -2,10 +2,10 @@
 using QuAnalyzer.Features.Performance;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using Wokhan.Collections;
 using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers.Contracts;
 
@@ -13,12 +13,10 @@ namespace QuAnalyzer.Features.Monitoring
 {
     public class MonitorItem : NotifierHelper
     {
-        public event Action<ResultsClass> OnResult;
-        public event Action<ResultsClass> OnAdd;
-
+       
         public bool RunWhenStarted { get; set; }
 
-        public ObservableCollection<MonitorItem> PrecedingSteps { get; } = new ObservableCollection<MonitorItem>();
+        public ObservableDictionary<MonitorItem, bool> PrecedingSteps { get; } = new ObservableDictionary<MonitorItem, bool>();
 
         public List<string> AttributesList => Attributes.Split(',').ToList();
 
@@ -54,13 +52,6 @@ namespace QuAnalyzer.Features.Monitoring
             set { _interval = value; NotifyPropertyChanged(); }
         }
 
-        private string _status;
-        public string Status
-        {
-            get { return _status; }
-            set { _status = value; NotifyPropertyChanged(); }
-        }
-
         private string _type;
 
         public string Type
@@ -69,74 +60,6 @@ namespace QuAnalyzer.Features.Monitoring
             set { _type = value; NotifyPropertyChanged(); }
         }
 
-        private DispatcherTimer timer = new DispatcherTimer();
-
-        public void Start()
-        {
-            if (PrecedingSteps.Any())
-            {
-                Status = "Waiting";
-                foreach (var m in PrecedingSteps)
-                {
-                    m.OnResult -= preceding_Done;
-                    m.OnResult += preceding_Done;
-                }
-            }
-            else
-            {
-                setRunning();
-            }
-        }
-
-        private void setRunning()
-        {
-            Status = "Running";
-
-            timer.Interval = TimeSpan.FromSeconds(Interval);
-            timer.Tick += timer_Tick;
-            timer.Start();
-
-            if (RunWhenStarted)
-            {
-                timer_Tick(null, null);
-            }
-        }
-
-        private void preceding_Done(ResultsClass obj)
-        {
-            setRunning();
-        }
-
-        public void Stop()
-        {
-            timer.Stop();
-
-            Status = "Stopped";
-        }
-
-        private bool _isChecking = false;
-        private int cnt = 0;
-
-        private async void timer_Tick(object sender, EventArgs e)
-        {
-            if (_isChecking)
-            {
-                return;
-            }
-
-            _isChecking = true;
-
-            await Task.Run(() => Performance.Performance.Run(new TestCasesCollection() { TestCases = new[] { this } }, cnt++, 1, 1, raiseAdd)).ConfigureAwait(false);
-            
-            _isChecking = false;
-        }
-
-        public void raiseAdd(ResultsClass r)
-        {
-            OnAdd?.Invoke(r);
-        }
-
-        
         //public void AttachEvent(Action<ResultsClass> monitor_OnAdd, Action<ResultsClass> monitor_OnResult)
         //{
         //    OnAdd -= monitor_OnAdd;
@@ -146,5 +69,10 @@ namespace QuAnalyzer.Features.Monitoring
         //}
 
         public string Attributes { get; set; } = "";
+
+        internal MonitoringItemInstance GetInstance()
+        {
+            return new MonitoringItemInstance(this);
+        }
     }
 }

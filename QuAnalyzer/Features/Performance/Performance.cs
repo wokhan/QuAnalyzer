@@ -11,7 +11,7 @@ namespace QuAnalyzer.Features.Performance
 {
     public static class Performance
     {
-        public static void Run(TestCasesCollection tests, int occurence, int burstOccurences, int threads, Action<ResultsClass> callback = null)
+        public static void Run(TestCasesCollection testsCollection, int occurence, int burstOccurences, int threads, Action<ResultsClass> callback = null)
         {
             if (burstOccurences <= 0)
             {
@@ -34,17 +34,17 @@ namespace QuAnalyzer.Features.Performance
                           //.ToList()
                           .AsParallel()
                           //.WithExecutionMode(ParallelExecutionMode.ForceParallelism)
-                          .WithDegreeOfParallelism(threads / tests.TestCases.Count)
+                          .WithDegreeOfParallelism(threads / testsCollection.TestCases.Count)
                           //.WithMergeOptions(ParallelMergeOptions.NotBuffered)
                           .ForAll(x =>
                           {
                               IList<Dictionary<string, string>> values = null;
-                              if (tests.ValuesSet != null)// && tests.DistinctParallelValues)
+                              if (testsCollection.ValuesSet != null)// && tests.DistinctParallelValues)
                               {
-                                  values = (tests.Selector ?? ValueSelectors.SequentialSelector).Invoke(tests.ValuesSet, x);
+                                  values = (testsCollection.Selector ?? ValueSelectors.SequentialSelector).Invoke(testsCollection.ValuesSet, x);
                               }
-                              tests.TestCases.AsParallel()
-                                     .WithDegreeOfParallelism(tests.TestCases.Count)
+                              testsCollection.TestCases.AsParallel()
+                                     .WithDegreeOfParallelism(testsCollection.TestCases.Count)
                                      .Select((test, ix) => new { test, ix })
                                      .ForAll(a =>
                                      {
@@ -62,32 +62,33 @@ namespace QuAnalyzer.Features.Performance
                                          var sw = Stopwatch.StartNew();
                                          try
                                          {
-                                             switch (a.test.Type)
+                                             var monitorItem = a.test.monitorItem;
+                                             switch (monitorItem.Type)
                                              {
                                                  case MonitoringModes.PING:
                                                      r.Data = null;
-                                                     r.Duration.Add(nameof(MonitoringModes.PING), SimpleNetworkTests.Ping(a.test.Provider.Host));
+                                                     r.Duration.Add(nameof(MonitoringModes.PING), SimpleNetworkTests.Ping(monitorItem.Provider.Host));
                                                      break;
 
                                                  case MonitoringModes.CHECKVAL:
-                                                     if (string.IsNullOrEmpty(a.test.Attributes))
+                                                     if (string.IsNullOrEmpty(monitorItem.Attributes))
                                                      {
-                                                         throw new NullReferenceException($"The {nameof(a.test.Attributes)} attribute must not be null.");
+                                                         throw new NullReferenceException($"The {nameof(monitorItem.Attributes)} attribute must not be null.");
                                                      }
-                                                     var q = a.test.GetData(values, r.Duration);
-                                                     if (!string.IsNullOrEmpty(a.test.Filter))
+                                                     var q = monitorItem.GetData(values, r.Duration);
+                                                     if (!string.IsNullOrEmpty(monitorItem.Filter))
                                                      {
-                                                         q = q.Where(a.test.Filter);
+                                                         q = q.Where(monitorItem.Filter);
                                                      }
                                                      // Removed new(attribute)
-                                                     r.Data = q.Select(a.test.Attributes).AsEnumerable().ToList();
+                                                     r.Data = q.Select(monitorItem.Attributes).AsEnumerable().ToList();
                                                      break;
 
                                                  case MonitoringModes.COUNTALL:
-                                                     var qc = a.test.GetData(values, r.Duration);
-                                                     if (!string.IsNullOrEmpty(a.test.Filter))
+                                                     var qc = monitorItem.GetData(values, r.Duration);
+                                                     if (!string.IsNullOrEmpty(monitorItem.Filter))
                                                      {
-                                                         qc = qc.Where(a.test.Filter);
+                                                         qc = qc.Where(monitorItem.Filter);
                                                      }
                                                      r.Data = new { Count = qc.Count() };
                                                      break;

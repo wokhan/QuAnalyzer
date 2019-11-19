@@ -14,11 +14,11 @@ namespace QuAnalyzer.Features.Performance
 
         public async void Init(string expr)
         {
-            this.ValuesSet = (List<Dictionary<string, string>>)await CSharpScript.EvaluateAsync(expr);
+            this.ValuesSet = (List<Dictionary<string, string>>)await CSharpScript.EvaluateAsync(expr).ConfigureAwait(false);
         }
 
         public ValueSelectors.Selector Selector { get; set; }
-        public IList<MonitorItem> TestCases { get; set; }
+        public IList<MonitoringItemInstance> TestCases { get; set; }
         public bool DistinctParallelValues { get; set; }
 
         public TestCasesCollection this[string n]

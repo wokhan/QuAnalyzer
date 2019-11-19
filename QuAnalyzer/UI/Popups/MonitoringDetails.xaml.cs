@@ -38,7 +38,7 @@ namespace QuAnalyzer.UI.Popups
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            CurrentItem.PrecedingSteps.AddRange(lstPrec.SelectedItems.Cast<MonitorItem>());
+            CurrentItem.PrecedingSteps.AddAll(lstPrec.SelectedItems.Cast<MonitorItem>().Select(_ => KeyValuePair.Create(_, false)));
             CurrentItem.Attributes = String.Join(",", lstAttributes.SelectedItems.Cast<KeyValuePair<string, bool>>().Select(s => s.Key));
 
             if (!((App)App.Current).CurrentProject.MonitorItems.Contains(CurrentItem))
