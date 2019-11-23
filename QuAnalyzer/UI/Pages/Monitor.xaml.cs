@@ -30,7 +30,7 @@ namespace QuAnalyzer.UI.Pages
         private const int chartTimeSpanMinutes = 1;
         private long startDate;
 
-        readonly DispatcherTimer globalTimer = new DispatcherTimer();
+        DispatcherTimer globalTimer;
 
         Dictionary<MonitorItem, DispatcherTimer> timers = new Dictionary<MonitorItem, DispatcherTimer>();
         Dictionary<MonitorItem, (MonitoringItemInstance, int)> instances;
@@ -47,8 +47,6 @@ namespace QuAnalyzer.UI.Pages
             this.DataContext = this;
 
             MonitorResultsView.CollectionChanged += MonitorResultsView_CollectionChanged;
-
-            //_monitorResultsView.GroupDescriptions.Add(new PropertyGroupDescription("Step"));
 
             InitializeComponent();
         }
@@ -88,15 +86,17 @@ namespace QuAnalyzer.UI.Pages
             startDate = DateTimeOffset.Now.Ticks;
             BindingOperations.EnableCollectionSynchronization(MonitorResultsView, MonitorResultsView);
 
-            if ((bool)btnBurstMode.IsChecked)
+            if ((bool)btnCompareMode.IsChecked)
             {
-
+                globalTimer = new DispatcherTimer() { IsEnabled = true, Interval = TimeSpan.FromSeconds(mitems.Max(m => m.Interval)), Tag = mitems };
+                globalTimer.Tick += globalCompTimer_Tick;
+                globalTimer.Start();
             }
             else
             {
                 var gcd = mitems.Select(m => m.Interval).GreatestCommonDiv();
                 // TODO: Used to be * 30... Why?
-                globalTimer.Interval = TimeSpan.FromSeconds(gcd);
+                globalTimer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(gcd) };
                 globalTimer.Tick += globalTimer_Tick;
                 globalTimer.Start();
 
@@ -109,17 +109,39 @@ namespace QuAnalyzer.UI.Pages
                 {
                     var timer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(m.Interval), Tag = m };
                     timer.Tick += Timer_Tick;
-                    timer.Start();
-                    if (m.RunWhenStarted)
-                    {
-                        Timer_Tick(timer, null);
-                    }
                     return timer;
+                });
+
+                //TODO: ..... not sure this is really useful
+                timers.AsParallel().ForAll(mt =>
+                {
+                    mt.Value.Start();
+                    if (mt.Key.RunWhenStarted)
+                    {
+                        Timer_Tick(mt.Value, null);
+                    }
                 });
             }
 
             btnStart.IsEnabled = true;
             btnStop.IsEnabled = false;
+        }
+
+        int globalPerfCounter ;
+        private async void globalCompTimer_Tick(object sender, EventArgs e)
+        {
+            var timer = (DispatcherTimer)sender;
+            var monitors = (MonitorItem[])timer.Tag;
+
+            var nbOccur = int.Parse(txtNbOccur.Text, CultureInfo.CurrentCulture);
+            var nbTreads = int.Parse(txtNbPara.Text, CultureInfo.CurrentCulture);
+
+            var monitorInstances = monitors.Select(m => m.GetInstance()).ToList();
+
+
+            //TODO : Values !!!!
+            await Task.Run(() => Performance.Run(new TestCasesCollection() { TestCases = monitorInstances }, globalPerfCounter++, nbOccur, nbTreads, monitor_OnAdd)).ConfigureAwait(false);
+
         }
 
         private async void Timer_Tick(object sender, EventArgs e)
@@ -150,6 +172,7 @@ namespace QuAnalyzer.UI.Pages
 
             List<Dictionary<string, string>> values = null;
 
+            //TODO : Values !!!!
             await Task.Run(() => Performance.Run(new TestCasesCollection() { TestCases = new[] { monitorInstance }, ValuesSet = values }, cnt++, 1, 1, monitor_OnAdd)).ConfigureAwait(false);
 
             monitorInstance.Status = MonitoringStatus.DONE;

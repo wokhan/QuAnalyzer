@@ -24,7 +24,7 @@
             <!--<UC:ToolBarButton Text="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />-->
             <UC:ToolBarButton x:Name="btnStop" IsEnabled="False" Text="Stop" ToolTip="Stop monitoring" BorderBrush="Red" Image="{StaticResource appbar_arrow_collapsed}" Click="btnStopAll_Click" />
             <Rectangle />
-            <UC:ToolBarToggleButton Text="Burst mode" x:Name="btnBurstMode" Image="{StaticResource appbar_list}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" />
+            <UC:ToolBarToggleButton Text="Comparison mode" x:Name="btnCompareMode" Image="{StaticResource appbar_list}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" />
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Occurences: " VerticalAlignment="Center" />
                 <TextBox x:Name="txtNbOccur" IsEnabled="{Binding IsChecked,ElementName=btnBurstMode}"  Text="10" Width="40" Padding="0" Margin="2" VerticalAlignment="Center" />
@@ -102,7 +102,7 @@
                                 <TextBox x:Name="txtFilter" Text="{Binding Filter}" />
                             </StackPanel>
                             <Label Grid.Column="1" Content="Preceding steps:" />
-                            <DataGrid Grid.Row="2" Grid.Column="1" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" SelectionMode="Multiple">
+                            <DataGrid Grid.Row="2" Grid.Column="1" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}">
                                 <DataGridCheckBoxColumn Header="Select" Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=DataGridRow}}" />
                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                                 <DataGridTemplateColumn>
@@ -112,7 +112,6 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridComboBoxColumn Header="Attributes mapping" />
                             </DataGrid>
                         </Grid>
                     </DataTemplate>

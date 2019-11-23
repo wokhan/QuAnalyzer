@@ -1,10 +1,7 @@
 ﻿using Newtonsoft.Json;
-using QuAnalyzer.Features.Performance;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Threading;
 using Wokhan.Collections;
 using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers.Contracts;

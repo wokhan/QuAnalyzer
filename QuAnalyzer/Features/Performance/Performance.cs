@@ -43,9 +43,10 @@ namespace QuAnalyzer.Features.Performance
                               {
                                   values = (testsCollection.Selector ?? ValueSelectors.SequentialSelector).Invoke(testsCollection.ValuesSet, x);
                               }
-                              testsCollection.TestCases.AsParallel()
+                              testsCollection.TestCases
+                                     .Select((test, ix) => (test, ix))
+                                     .AsParallel()
                                      .WithDegreeOfParallelism(testsCollection.TestCases.Count)
-                                     .Select((test, ix) => new { test, ix })
                                      .ForAll(a =>
                                      {
                                          var r = new ResultsClass()
