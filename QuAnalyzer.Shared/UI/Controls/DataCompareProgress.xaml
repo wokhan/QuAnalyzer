@@ -1,0 +1,79 @@
+﻿<UserControl x:Class="QuAnalyzer.UI.Controls.DataCompareProgress"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d"  d:DesignWidth="800">
+    <Grid VerticalAlignment="Top" Height="Auto" Margin="0,0,0,0">
+        <TextBlock FontWeight="Bold" Text="{Binding Name, Mode=OneWay, FallbackValue='Mapping title'}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,5" />
+        <TextBlock Text="{Binding Results.Progress, Mode=OneWay, FallbackValue='Current step'}" TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,100,0" />
+        <Grid Margin="10,34,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="373">
+            <Grid.Background>
+                <SolidColorBrush Opacity="0.3" Color="{StaticResource AccentColor}" />
+            </Grid.Background>
+            <TextBlock FontWeight="Bold" Text="Source" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="2" />
+            <TextBlock Text="{Binding Results.Source.Count, FallbackValue=Count: 1000, Mode=OneWay, StringFormat=Count: \{0\}}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="70,2,0,0" Width="110" />
+            <TextBlock Text="{Binding Results.Source.Missing.Count, FallbackValue=Missing: 1000, Mode=OneWay, StringFormat=Missing: \{0\}}" HorizontalAlignment="Right" Width="110" VerticalAlignment="Top" Margin="0,2,83,0" />
+            <TextBlock Text="{Binding Results.Source.Duplicates.Count, FallbackValue=Dups: 1000, Mode=OneWay, StringFormat=Dups: \{0\}}" HorizontalAlignment="Right" Width="96" VerticalAlignment="Top" Margin="0,2,0,0" />
+        </Grid>
+        <Grid Margin="10,54,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="373">
+            <Grid.Background>
+                <SolidColorBrush Opacity="0.3" Color="#CC0EA25F" />
+            </Grid.Background>
+            <TextBlock FontWeight="Bold" Text="Target" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="2" />
+            <TextBlock Text="{Binding Results.Target.Count, FallbackValue=Count: 1000, Mode=OneWay, StringFormat=Count: \{0\}}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="70,2,0,0" Width="110" />
+            <TextBlock Text="{Binding Results.Target.Missing.Count, FallbackValue=Missing: 1000, Mode=OneWay, StringFormat=Missing: \{0\}}" HorizontalAlignment="Right" VerticalAlignment="Top" Width="110" Margin="0,2,83,0" />
+            <TextBlock Text="{Binding Results.Target.Duplicates.Count, FallbackValue=Dups: 1000, Mode=OneWay, StringFormat=Dups: \{0\}}" HorizontalAlignment="Right" VerticalAlignment="Top" Width="97" Margin="0,2,0,0" />
+        </Grid>
+        <TextBlock FontWeight="Bold" Margin="0,34,100,0" Text="{Binding Results.MatchingCount, FallbackValue='Matches: 1000', Mode=OneWay, StringFormat=Matches: \{0\}}" TextAlignment="Center" Padding="0,10" HorizontalAlignment="Right" Width="138">
+            <TextBlock.Background>
+                <SolidColorBrush Opacity="0.3" Color="#CC0EA25F" />
+            </TextBlock.Background>
+        </TextBlock>
+        <ProgressBar Name="prg" Value="{Binding Results.LocalProgress, Mode=OneWay, FallbackValue=50}" Maximum="100" Height="4" HorizontalAlignment="Stretch" Margin="10,25,100,0" VerticalAlignment="Top">
+            <ProgressBar.Style>
+                <Style TargetType="{x:Type ProgressBar}" BasedOn="{StaticResource {x:Type ProgressBar}}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Value, ElementName=prg}" Value="0" >
+                            <Setter Property="IsIndeterminate" Value="True" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ProgressBar.Style>
+        </ProgressBar>
+        <Button Content="Cancel" Tag="{Binding}" VerticalAlignment="Top" FontSize="8" Height="10" HorizontalAlignment="Right" Width="75" Click="Button_Click" Margin="0,10,10,0">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                    <Setter Property="IsEnabled" Value="True" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Value, ElementName=prg}" Value="100" >
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+        <Button Name="btnDetails" Content="View details" Tag="{Binding}" Margin="0,44,10,0" VerticalAlignment="Top" FontSize="8" Height="20" Click="btnDetails_Click" HorizontalAlignment="Right" Width="75">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                    <Setter Property="IsEnabled" Value="False" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Value, ElementName=prg}" Value="100" >
+                            <Setter Property="IsEnabled" Value="True" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+        <TextBlock FontWeight="Bold" Margin="388,34,243,0" Text="{Binding Results.Source.Differences.Count, FallbackValue=Differences: 1000, Mode=OneWay, StringFormat=DifferencesA: \{0\}}" TextAlignment="Center" Padding="0,10">
+            <TextBlock.Background>
+                <SolidColorBrush Opacity="0.3" Color="#FFFFA25F" />
+            </TextBlock.Background>
+        </TextBlock>
+        <TextBlock FontWeight="Bold" Margin="388,34,243,0" Text="{Binding Results.Target.Differences.Count, FallbackValue=Differences: 1000, Mode=OneWay, StringFormat=DifferencesD: \{0\}}" TextAlignment="Center" Padding="0">
+            <TextBlock.Background>
+                <SolidColorBrush Opacity="0.3" Color="#FFFFA25F" />
+            </TextBlock.Background>
+        </TextBlock>
+    </Grid>
+</UserControl>

@@ -1,0 +1,39 @@
+﻿<Page x:Class="QuAnalyzer.UI.Pages.Duplicates"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+      mc:Ignorable="d" 
+      xmlns:myself="clr-namespace:QuAnalyzer.UI.Pages"
+      d:DesignHeight="600" d:DesignWidth="850"
+      x:Name="thisWindow"
+	  Title="DataViewer"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top">
+            <WrapPanel Style="{StaticResource ToolBar}">
+                <UC:ToolBarButton x:Name="btnRun" Click="btnRun_Click" Text="Run" BorderBrush="Green" Image="{StaticResource appbar_control_play}" />
+                <WrapPanel HorizontalAlignment="Right">
+                    <CheckBox Style="{StaticResource ToggleSwitch}" Content=" Keep all duplicates" IsChecked="{Binding KeepDuplicates,Mode=TwoWay}" Margin="7" />
+                    <CheckBox Style="{StaticResource ToggleSwitch}" Content=" Show other columns" IsChecked="{Binding KeepColumns,Mode=TwoWay}" IsEnabled="{Binding KeepDuplicates,Mode=OneWay}" Margin="7" />
+                </WrapPanel>
+            </WrapPanel>
+        </StackPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Background="LightGray" Padding="5" Text="Attributes" />
+            <ListBox Grid.Row="1"  BorderThickness="0,0,2,0" BorderBrush="LightGray" DockPanel.Dock="Left" VerticalAlignment="Stretch" x:Name="lstColumns" SelectionMode="Extended" MinWidth="200" Padding="5">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+        <UC:ExtendedDataGridView x:Name="gridData" />
+    </DockPanel>
+</Page>

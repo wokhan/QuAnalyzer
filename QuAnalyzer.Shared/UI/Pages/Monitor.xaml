@@ -1,0 +1,239 @@
+﻿<Page x:Class="QuAnalyzer.UI.Pages.Monitor"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+      xmlns:charts="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+      mc:Ignorable="d"
+      d:DesignHeight="700" d:DesignWidth="800"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}"
+      x:Name="myself"
+	Title="DataMonitor">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition MinHeight="170" Height="*" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition MinHeight="150" Height="*" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition MinHeight="150" Height="*" />
+    </Grid.RowDefinitions>
+    <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
+      <UC:ToolBarButton x:Name="btnStart" Text="Run" ToolTip="Start monitoring the selected items" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStart_Click" />
+      <!--<UC:ToolBarButton Text="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />-->
+      <UC:ToolBarButton x:Name="btnStop" IsEnabled="False" Text="Stop" ToolTip="Stop monitoring" BorderBrush="Red" Image="{StaticResource appbar_arrow_collapsed}" Click="btnStopAll_Click" />
+      <Rectangle />
+      <UC:ToolBarToggleButton Text="Comparison mode" x:Name="btnCompareMode" Image="{StaticResource appbar_list}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" />
+      <StackPanel Orientation="Horizontal">
+        <TextBlock Text="Occurences: " VerticalAlignment="Center" />
+        <TextBox x:Name="txtNbOccur" IsEnabled="{Binding IsChecked,ElementName=btnBurstMode}"  Text="10" Width="40" Padding="0" Margin="2" VerticalAlignment="Center" />
+      </StackPanel>
+      <Rectangle />
+      <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
+        <TextBlock Text="Parallelism: " VerticalAlignment="Center" />
+        <TextBox x:Name="txtNbPara" Text="1" Width="40" VerticalAlignment="Center" Padding="0" Margin="2" />
+      </StackPanel>
+      <!--<Rectangle />
+            <UC:ToolBarToggleButton Text="Enable chart" ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />-->
+    </WrapPanel>
+    <DockPanel Grid.Row="1">
+      <TextBlock DockPanel.Dock="Top" Background="LightGray" Padding="5" Text="Configuration" />
+      <WrapPanel Style="{StaticResource ToolBar}">
+        <UC:ToolBarButton Text="Add" ToolTip="Add a step" BorderBrush="Green" Image="{StaticResource appbar_add}" Click="btnAdd_Click" />
+        <UC:ToolBarButton Text="Clear" ToolTip="Remove all" BorderBrush="OrangeRed" Image="{StaticResource appbar_clean}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnClear_Click" />
+      </WrapPanel>
+      <DataGrid SelectionMode="Extended" VirtualizingPanel.ScrollUnit="Pixel" RowDetailsVisibilityMode="VisibleWhenSelected" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" x:Name="gridSteps" AutoGenerateColumns="False" IsReadOnly="True">
+        <DataGrid.Columns>
+          <DataGridCheckBoxColumn Binding="{Binding Selector.IsSelected}" Width="Auto" />
+          <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+          <DataGridComboBoxColumn Header="Provider" x:Name="lstDataProviders" MinWidth="150" ItemsSource="{Binding CurrentProject.Providers,Source={x:Static Application.Current}}" DisplayMemberPath="Name" SelectedValueBinding="{Binding Provider}" />
+          <DataGridComboBoxColumn Header="Repository" MinWidth="150" ItemsSource="{Binding Repository.Repositories.Keys}" />
+          <DataGridComboBoxColumn Header="Type" SelectedValueBinding="{Binding Type}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding MonitoringTypes, ElementName=me}" />
+          <DataGridTextColumn Header="Interval" Binding="{Binding Interval}" />
+          <DataGridCheckBoxColumn Header="Run when started" Binding="{Binding RunWhenStarted}" />
+          <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto" />
+          <DataGridTemplateColumn Width="70" >
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                  <Button Name="btnDelete" Click="btnDelete_Click" Style="{StaticResource MetroCircleButtonStyle}" BorderBrush="OrangeRed" Tag="{Binding}">
+                    <Path Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                  </Button>
+                </StackPanel>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+        </DataGrid.Columns>
+        <DataGrid.RowDetailsTemplate>
+          <DataTemplate>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+              </Grid.RowDefinitions>
+              <Label Content="Attributes:" />
+              <ListBox Grid.Row="2" x:Name="lstAttributes" SelectionMode="Multiple">
+                <ListBox.Resources>
+                  <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                    <Setter Property="IsSelected" Value="{Binding Value, Mode=OneWay}" />
+                  </Style>
+                </ListBox.Resources>
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                      </Grid.ColumnDefinitions>
+                      <CheckBox IsChecked="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+                      <Label Content="{Binding Key}" Grid.Column="1" />
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+              <StackPanel Grid.Row="3" Orientation="Horizontal">
+                <Label Content="Filter:" />
+                <TextBox x:Name="txtFilter" Text="{Binding Filter}" />
+              </StackPanel>
+              <Label Grid.Column="1" Content="Preceding steps:" />
+              <DataGrid Grid.Row="2" Grid.Column="1" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}">
+                <DataGridCheckBoxColumn Header="Select" Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=DataGridRow}}" />
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                <DataGridTemplateColumn>
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding UseData}" />
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+              </DataGrid>
+            </Grid>
+          </DataTemplate>
+        </DataGrid.RowDetailsTemplate>
+      </DataGrid>
+    </DockPanel>
+    <GridSplitter Grid.Row="2" Height="2" Background="LightGray" />
+    <DockPanel Grid.Row="3">
+      <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
+        <UC:ToolBarButton x:Name="btnGrCopy" Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" Click="btnGrCopy_Click" />
+        <Rectangle />
+        <UC:ToolBarButton x:Name="btnGrCSV" Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{StaticResource appbar_page_excel}" Click="btnGrCSV_Click" />
+        <UC:ToolBarButton x:Name="btnGrHTML" Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{StaticResource appbar_page_excel}" Click="btnGrHTML_Click" />
+      </WrapPanel>
+      <!--<CheckBox Content="Group by step name" Name="chkGroup" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-25" Checked="chkGroup_Checked" IsChecked="True" />-->
+      <DataGrid x:Name="gridResults" ItemsSource="{Binding MonitorResultsView}" VirtualizingPanel.ScrollUnit="Pixel" RowDetailsVisibilityMode="VisibleWhenSelected" IsReadOnly="True" AutoGenerateColumns="False">
+        <DataGrid.RowDetailsTemplate>
+          <DataTemplate>
+            <DataGrid Margin="10,0,0,0" BorderThickness="1,0,0,0" BorderBrush="{DynamicResource AccentColorBrush}" IsReadOnly="True">
+              <DataGrid.Style>
+                <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+                  <Setter Property="Visibility" Value="Collapsed" />
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding Step.Type}" Value="CHECKVAL">
+                      <Setter Property="ItemsSource" Value="{Binding Data}" />
+                      <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </DataGrid.Style>
+            </DataGrid>
+          </DataTemplate>
+        </DataGrid.RowDetailsTemplate>
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Step" Binding="{Binding Step.Name}" Width="Auto" />
+          <DataGridTextColumn Header="#" Binding="{Binding Occurence}" Width="Auto" />
+          <DataGridTextColumn Header="Last check" Binding="{Binding LastCheck}" Width="Auto" />
+          <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto" />
+          <DataGridTextColumn Header="Duration" Binding="{Binding Duration[_TOTAL_DEFAULT]}" Width="Auto" />
+          <DataGridTemplateColumn Header="Result" Width="*">
+            <DataGridTemplateColumn.CellStyle>
+              <Style TargetType="DataGridCell">
+                <Setter Property="Template">
+                  <Setter.Value>
+                    <ControlTemplate>
+                      <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ResultCount}" />
+                    </ControlTemplate>
+                  </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding ResultCount}" Value="-1">
+                    <Setter Property="Template">
+                      <Setter.Value>
+                        <ControlTemplate>
+                          <ProgressBar IsIndeterminate="True" />
+                        </ControlTemplate>
+                      </Setter.Value>
+                    </Setter>
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </DataGridTemplateColumn.CellStyle>
+          </DataGridTemplateColumn>
+        </DataGrid.Columns>
+        <!--<DataGrid.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type GroupItem}">
+                                            <StackPanel>
+                                                <DataGridCell BorderThickness="0" Grid.ColumnSpan="2" Margin="0" Background="LightGray" Padding="0">
+                                                    <Grid DataContext="{Binding Items[0]}" Height="Auto">
+                                                        <TextBlock FontWeight="Bold" Text="{Binding Step.Name, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,3,0,0" />
+                                                        <TextBlock Text="{Binding Step.Type, Mode=OneWay}" HorizontalAlignment="Right" TextAlignment="Right" VerticalAlignment="Top" Margin="0,0,40,0"/>
+                                                        <Button Name="btnCancel" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding [4]}" VerticalAlignment="Top" BorderThickness="1" Height="40" HorizontalAlignment="Right" Width="40">
+                                                            <Path Width="16" Height="16" Fill="OrangeRed" Stretch="Uniform">
+                                                                <Path.Style>
+                                                                    <Style TargetType="Path">
+                                                                        <Setter Property="Data" Value="{StaticResource appbar_delete}" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Result}" Value="Checking..." >
+                                                                                <Setter Property="Data" Value="{StaticResource appbar_close}" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Path.Style>
+                                                            </Path>
+                                                        </Button>
+                                                    </Grid>
+                                                </DataGridCell>
+                                                <ItemsPresenter />
+                                            </StackPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                        <GroupStyle.Panel>
+                            <ItemsPanelTemplate>
+                                <DataGridRowsPresenter/>
+                            </ItemsPanelTemplate>
+                        </GroupStyle.Panel>
+                    </GroupStyle>
+                </DataGrid.GroupStyle>-->
+      </DataGrid>
+    </DockPanel>
+    <GridSplitter Grid.Row="4" Height="2" Background="LightGray" />
+    <DockPanel Grid.Row="5">
+      <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
+        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" IsEnabled="False" x:Name="btnCopy" Click="btnCopy_Click" />
+      </WrapPanel>
+      <charts:CartesianChart x:Name="chart" Series="{Binding ResultSeries}" ScrollMode="X" DisableAnimations="True" Margin="0" DataTooltip="{x:Null}" Hoverable="False">
+        <charts:CartesianChart.AxisX>
+          <charts:Axis></charts:Axis>
+        </charts:CartesianChart.AxisX>
+        <charts:CartesianChart.AxisY>
+          <charts:LogarithmicAxis></charts:LogarithmicAxis>
+          <charts:LogarithmicAxis Position="RightTop"></charts:LogarithmicAxis>
+        </charts:CartesianChart.AxisY>
+      </charts:CartesianChart>
+    </DockPanel>
+  </Grid>
+</Page>

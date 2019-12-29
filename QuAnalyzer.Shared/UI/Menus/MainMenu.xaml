@@ -1,0 +1,115 @@
+﻿<UserControl x:Class="QuAnalyzer.UI.Menus.MainMenu"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" d:DesignHeight="460">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Background="Gray">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Path Fill="WhiteSmoke" Margin="10,0" Height="19" Data="{StaticResource appbar_list}" Stretch="Uniform" />
+            <Label Grid.Column="1" VerticalAlignment="Center" Foreground="WhiteSmoke" Content="SOURCES" FontSize="12" />
+        </Grid>
+        <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
+            <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{StaticResource appbar_add}"/>
+        </WrapPanel>
+        <ListView BorderThickness="0" Grid.Row="2" Name="lstProviders" SelectedItem="{Binding CurrentSelection,Source={x:Static Application.Current}}" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
+            <ListView.Resources>
+                <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+            </ListView.Resources>
+            <ItemsControl.Style>
+                <Style TargetType="ItemsControl" BasedOn="{StaticResource {x:Type ItemsControl}}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <TextBlock Margin="10" TextWrapping="Wrap" Text="Please start by adding a new source." FontStyle="Italic" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ItemsControl.Style>
+            <!--<ItemsControl.Resources>
+                <Style TargetType="ListItem" BasedOn="{StaticResource {x:Type ListItem}}">
+                    -->
+            <!--<Setter Property="OverridesDefaultStyle" Value="True" />-->
+            <!--
+                    <Style.Triggers>
+                        <Trigger Property="Selector.IsSelected" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ItemsControl.Resources>-->
+            <ItemsControl.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Expander BorderThickness="0" IsExpanded="True">
+                                            <Expander.Header>
+                                                <Grid Background="Transparent">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="ImgCol" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
+                                                    <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name.Name}" VerticalAlignment="Center" />
+                                                    <Button Grid.Column="2" Name="btnEditProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Tag="{Binding Name}" Click="btnEditProvider_Click">
+                                                        <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Blue" Data="{StaticResource appbar_edit}" Stretch="Uniform" />
+                                                    </Button>
+                                                    <Button Grid.Column="3" Name="btnDeleteProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding Name}" Click="btnDeleteProvider_Click">
+                                                        <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                                                    </Button>
+                                                </Grid>
+                                            </Expander.Header>
+                                            <ItemsPresenter />
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </ItemsControl.GroupStyle>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderThickness="5" Margin="5">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentSelectionLinked,Source={x:Static Application.Current}}" Value="True">
+                                        <Setter Property="CornerRadius" Value="10,0,0,10" />
+                                        <Setter Property="Margin" Value="5,0,5,5" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding Value}" Tag="{Binding}" PreviewMouseLeftButtonDown="Repository_PreviewMouseLeftButtonDown" PreviewMouseMove="Repository_DataGrid_MouseMove" />
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ListView>
+    </Grid>
+</UserControl>

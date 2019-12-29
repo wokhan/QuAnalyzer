@@ -1,0 +1,39 @@
+﻿<Page x:Class="QuAnalyzer.UI.Pages.PatternsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignWidth="820"
+	d:DesignHeight="610"
+	Title="Patterns"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    <DockPanel>
+        <WrapPanel Style="{StaticResource ToolBar}">
+            <UC:ToolBarButton Click="btnUpdate_Click" Text="Update" ToolTip="Update now" BorderBrush="Green" Image="{StaticResource appbar_control_play}" />
+            <UC:ToolBarToggleButton x:Name="btnAuto" IsChecked="{Binding AutoUpdate}" Text="Auto update" ToolTip="Analyze automatically" BorderBrush="Blue" Image="{StaticResource appbar_calculator}" />
+            <Rectangle />
+            <Label Content="Similarity threshold" VerticalAlignment="Center" />
+            <Slider x:Name="slideSim" ValueChanged="slideSim_ValueChanged" VerticalAlignment="Center" Minimum="1" TickFrequency="1" IsSnapToTickEnabled="True" LargeChange="1" SmallChange="1" Maximum="3" TickPlacement="BottomRight" Width="100" />
+            <Rectangle />
+            <TextBlock x:Name="txtStatus" Margin="5,0,10,0" />
+            <ProgressBar x:Name="prg" Maximum="100" Minimum="0" Width="200" Height="20" BorderThickness="0" />
+        </WrapPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Background="LightGray" Padding="5" Text="Attributes" />
+            <ListBox Grid.Row="1" BorderThickness="0,0,2,0" BorderBrush="LightGray" DockPanel.Dock="Left" VerticalAlignment="Stretch" SelectionChanged="lstDataSources_SelectionChanged" x:Name="lstAttributes" SelectionMode="Extended" MinWidth="200" Padding="5">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding}" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+        <DataGrid x:Name="gridPatterns" />
+    </DockPanel>
+</Page>

@@ -1,0 +1,24 @@
+﻿<Page x:Class="QuAnalyzer.UI.Popups.MappingsEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+        Title="{Binding CurrentMap.Name,ElementName=me,StringFormat='Comparison details - {0}'}" Height="500" Width="700"
+        MinWidth="700" MinHeight="500" x:Name="me">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Label Content="Mapping name:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26" />
+        <TextBox Name="lstMappings" Text="{Binding CurrentMap.Name}" Margin="108,10,11,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Height="26"/>
+        <UC:MappingsEdit Grid.Row="2" Mapping="{Binding CurrentMap,ElementName=me,Mode=OneWay}" />
+        <Border Style="{StaticResource ButtonBar}" Grid.Row="3" Grid.ColumnSpan="3">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="Save" Name="btnSave" Click="btnSave_Click" HorizontalAlignment="Right"  />
+                <Button Content="Cancel" Name="btnCancel" IsCancel="True" HorizontalAlignment="Right" Click="btnCancel_Click"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>
