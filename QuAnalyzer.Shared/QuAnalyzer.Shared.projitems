@@ -95,9 +95,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\DataGridExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ExcelPackageExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\MRUManager.cs" />
@@ -197,12 +194,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)UI\Windows\Popup.xaml.cs">
       <DependentUpon>Popup.xaml</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ApplicationDefinition Include="$(MSBuildThisFileDirectory)App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Libs\De.TorstenMandelkow.MetroChart.dll" />

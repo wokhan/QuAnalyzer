@@ -19,10 +19,10 @@ namespace QuAnalyzer.UI.Pages
         {
             InitializeComponent();
 
-            var providersLst = (CollectionView)CollectionViewSource.GetDefaultView(((App)App.Current).ProvidersMan.Providers);
+            var providersLst = new CollectionViewSource() { Source = ((App)App.Current).ProvidersMan.Providers };
             providersLst.GroupDescriptions.Add(new PropertyGroupDescription(nameof(DataProviderDefinition.Category)));
             ((App)Application.Current).ProvidersMan.PropertyChanged += ProvidersMan_PropertyChanged;
-            lstProvidersTypes.ItemsSource = providersLst;
+            lstProvidersTypes.ItemsSource = providersLst.View;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

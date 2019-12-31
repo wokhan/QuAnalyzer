@@ -16,7 +16,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Linq.Extensions;
-#if __WPF__ 
+#if _WPF_ 
 using Wokhan.WPF.Extensions;
 #else
 using Wokhan.UWP.Extensions;

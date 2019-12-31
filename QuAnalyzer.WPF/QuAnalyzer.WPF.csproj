@@ -11,7 +11,7 @@
   </PropertyGroup>
   
   <Import Project="..\QuAnalyzer.Shared\QuAnalyzer.Shared.projitems" Label="Shared" />
-
+  
   <ItemGroup>
     <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
     <PackageReference Include="MahApps.Metro" Version="2.0.0-alpha0605" />
@@ -27,9 +27,18 @@
     <PackageReference Include="System.Management" Version="4.7.0-preview3.19551.4" />
     <PackageReference Include="VirtualizingObservableCollection" Version="1.2.0" />
     <PackageReference Include="Wokhan.Core" Version="1.1912.2202.206" />
-    <PackageReference Include="Wokhan.Data.Providers" Version="1.1912.1402.204" />
+    <PackageReference Include="Wokhan.Data.Providers" Version="1.1912.3101.207" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ApplicationDefinition Update="App.xaml">
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

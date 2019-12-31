@@ -1,7 +1,7 @@
 ﻿using LiveCharts;
 using LiveCharts.Configurations;
 using LiveCharts.Defaults;
-#if __WPF__
+#if _WPF_
 using LiveCharts.Wpf;
 #else 
 using LiveCharts.Uwp;
