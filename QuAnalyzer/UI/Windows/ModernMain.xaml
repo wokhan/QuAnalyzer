@@ -6,45 +6,43 @@
     xmlns:QuAnalyzerHelpers="clr-namespace:QuAnalyzer.Core.Helpers"
     xmlns:UserControls="clr-namespace:QuAnalyzer.UI.Menus"
     xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:popups="clr-namespace:QuAnalyzer.UI.Popups"
+    xmlns:fa="http://schemas.fontawesome.io/icons/"
     Title="QuAnalyzer v1.0beta" ShowIconOnTitleBar="False" TitleBarHeight="40" ShowTitleBar="True"
     ResizeMode="CanResizeWithGrip" TitleAlignment="Right"
     MinWidth="1030" MinHeight="600" Height="600" 
-    Width="900" BorderThickness="0" GlowBrush="Black" 
-    TitleForeground="WhiteSmoke" AllowsTransparency="False" WindowTitleBrush="Transparent">
-    <Controls:MetroWindow.Background>
-        <RadialGradientBrush GradientOrigin="1,0" Opacity="0.95">
-            <GradientStop Color="Gray" Offset="0" />
-            <GradientStop Color="LightGray" Offset="1" />
-        </RadialGradientBrush>
-    </Controls:MetroWindow.Background>
-    <!--<Window.Resources>
+    Width="900" BorderThickness="0" GlowBrush="Black" WindowTitleBrush="Transparent">
+    <Window.Resources>
         <Style TargetType="{x:Type Controls:WindowButtonCommands}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding ShowTitleBar, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}}" Value="True">
-                    <Setter Property="Foreground" Value="WhiteSmoke" />
+                    <Setter Property="Foreground" Value="Black" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-    </Window.Resources>-->
+    </Window.Resources>
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo />
     </Window.TaskbarItemInfo>
     <Controls:MetroWindow.LeftWindowCommands>
         <Controls:WindowCommands ShowSeparators="False">
-            <Grid Margin="5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Menu IsMainMenu="True" TextElement.FontSize="14" Background="Transparent" TextElement.Foreground="Black" >
-                    <MenuItem Header="_File">
-                        <MenuItem Header="Open..." x:Name="btnMenuOpen" Click="btnMenuOpen_Click">
-                            <MenuItem.Icon>
-                                <Path Fill="#CCBF4747" Width="20" Data="{StaticResource appbar_folder_open}" Stretch="Uniform" />
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Recent" x:Name="btnMenuRecent" ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <Button Foreground="#1DAE16" FontSize="20" ToolTip="New project" x:Name="btnMenuNew" Click="btnMenuNew_Click" Content="{iconPacks:Material Kind=FileDocumentOutline}" />
+                <Controls:DropDownButton Foreground="Black" Width="32" ToolTip="Open..." Icon="{iconPacks:Material Kind=FolderOpenOutline}" x:Name="btnMenuOpen" Click="btnMenuOpen_Click" ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
+                    <Controls:DropDownButton.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Header" Value="{Binding Key}"/>
+                            <Setter Property="CommandParameter" Value="{Binding Key}"/>
+                            <EventSetter Event="Click" Handler="btnMenuRecent_Click" />
+                        </Style>
+                    </Controls:DropDownButton.ItemContainerStyle>
+                </Controls:DropDownButton>
+                <Controls:DropDownButton ToolTip="Save" Icon="{iconPacks:Material Kind=ContentSave}" x:Name="btnMenuSave" Click="btnMenuSave_Click" Width="32">
+
+                </Controls:DropDownButton>
+                <ToggleButton ToolTip="About..." x:Name="btnAbout" Content="{iconPacks:Material Kind=InformationOutline}" Foreground="#CC1DAE16" FontSize="26" />
+                <!--<MenuItem Header="Recent" x:Name="btnMenuRecent" ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
                             <MenuItem.Icon>
                                 <Path Fill="#CCBF4747" Width="20" Data="{StaticResource appbar_folder_open}" Stretch="Uniform" />
                             </MenuItem.Icon>
@@ -56,59 +54,55 @@
                                 </Style>
                             </MenuItem.ItemContainerStyle>
                         </MenuItem>
-                        <Separator />
-                        <MenuItem Header="Save" x:Name="btnMenuSave" Click="btnMenuSave_Click">
-                            <MenuItem.Icon>
-                                <Path Fill="#CC4747BF" Height="16" Data="{StaticResource appbar_disk}" Stretch="Uniform" />
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Save as..." Click="btnMenuSaveAs_Click">
-                            <MenuItem.Icon>
-                                <Path Data="{StaticResource appbar_disk_download}" Stretch="Uniform" Fill="#CC4747BF" Height="16" />
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <Separator />
-                        <MenuItem Header="New project" x:Name="btnMenuNew" Click="btnMenuNew_Click">
-                            <MenuItem.Icon>
-                                <Path Fill="#CC1DAE16" Height="16" Data="{StaticResource appbar_folder_star}" Stretch="Uniform" />
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <Separator />
-                        <MenuItem Header="Exit">
-                            <MenuItem.Icon>
-                                <Path Fill="OrangeRed" Height="16" Stretch="Uniform" Data="{StaticResource appbar_close}" />
-                            </MenuItem.Icon>
-                        </MenuItem>
+                        <Separator /-->
+                <!--<MenuItem Header="Save as..." Click="btnMenuSaveAs_Click">
+                    <MenuItem.Icon>
+                        <Path Data="{StaticResource appbar_disk_download}" Stretch="Uniform" Fill="#CC4747BF" Height="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="New project" x:Name="btnMenuNew" Click="btnMenuNew_Click">
+                    <MenuItem.Icon>
+                        <Path Fill="#CC1DAE16" Height="16" Data="{StaticResource appbar_folder_star}" Stretch="Uniform" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Exit">
+                    <MenuItem.Icon>
+                        <Path Fill="OrangeRed" Height="16" Stretch="Uniform" Data="{StaticResource appbar_close}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+
+                <MenuItem Header="_Options">
+                    <MenuItem IsCheckable="True" Header="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static Application.Current}, FallbackValue=True}"  />
+                </MenuItem>
+
+                <MenuItem Header="_Help">
+                    <MenuItem Header="About" x:Name="btnAbout" IsCheckable="True">
+                        <MenuItem.Icon>
+                            <Path Width="16" Stretch="Uniform" Data="{StaticResource appbar_information_circle}" />
+                        </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="_Options">
-                        <MenuItem IsCheckable="True" Header="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static Application.Current}, FallbackValue=True}"  />
-                        <MenuItem Header="Project color" ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}">
-                            <MenuItem.ItemContainerStyle>
-                                <Style TargetType="MenuItem">
-                                    <Setter Property="HeaderTemplate">
-                                        <Setter.Value>
-                                            <DataTemplate>
-                                                <Rectangle Fill="{Binding}" Width="50" VerticalAlignment="Stretch" />
-                                            </DataTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Setter Property="CommandParameter" Value="{Binding}"/>
-                                    <Setter Property="IsCheckable" Value="True" />
-                                    <EventSetter Event="Click" Handler="btnAccentColor_Click" />
-                                </Style>
-                            </MenuItem.ItemContainerStyle>
-                        </MenuItem>
-                    </MenuItem>
-                    <MenuItem Header="_Help">
-                        <MenuItem Header="About" x:Name="btnAbout" IsCheckable="True">
-                            <MenuItem.Icon>
-                                <Path Width="16" Stretch="Uniform" Data="{StaticResource appbar_information_circle}" />
-                            </MenuItem.Icon>
-                        </MenuItem>
-                    </MenuItem>
-                </Menu>
+                </MenuItem>-->
+
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="100,0,0,0">
-                    <TextBox x:Name="txtProjectTitle" FontSize="14" Foreground="Black" BorderThickness="1" BorderBrush="Transparent" VerticalContentAlignment="Center" Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}">
+                    <Controls:SplitButton ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}" SelectedItem="{Binding CurrentProject.AccentColor,Source={x:Static Application.Current},Mode=TwoWay}" Width="50">
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="ComboBoxItem">
+                                <Setter Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <Ellipse  Fill="{Binding}" Width="16" Height="16" VerticalAlignment="Stretch" />
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <!--<Setter Property="CommandParameter" Value="{Binding}"/>
+                                <Setter Property="IsCheckable" Value="True" />
+                                <EventSetter Event="Click" Handler="btnAccentColor_Click" />-->
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+                    </Controls:SplitButton>
+                    <TextBox x:Name="txtProjectTitle" MinWidth="200" FontSize="14" Foreground="Black" BorderThickness="1" BorderBrush="Transparent" VerticalContentAlignment="Center" Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}">
                         <TextBox.Style>
                             <Style TargetType="TextBox">
                                 <Style.Triggers>
@@ -124,17 +118,18 @@
                             </Style>
                         </TextBox.Style>
                     </TextBox>
-                    <Button Click="btnEditTitle_Click">
-                        <Path Data="{StaticResource appbar_edit}" Height="16" Stretch="Uniform" Fill="Black"/>
-                    </Button>
+                    <Button Click="btnEditTitle_Click" Foreground="Gray" Content="{iconPacks:Material Kind=Pencil}" />
                 </StackPanel>
-            </Grid>
+            </StackPanel>
         </Controls:WindowCommands>
     </Controls:MetroWindow.LeftWindowCommands>
     <Controls:MetroWindow.Flyouts>
         <Controls:FlyoutsControl>
-            <Controls:Flyout x:Name="flyAbout" Position="Top" Width="350" Background="{DynamicResource AccentColorBrush}" CloseButtonVisibility="Collapsed" IsOpen="{Binding IsChecked, Mode=TwoWay, ElementName=btnAbout}" IsPinned="False" Header="About" Margin="0,31,0,0">
-                <popups:About />
+            <Controls:Flyout x:Name="flyAbout" Position="Top" Margin="0,100,0,0" Width="500" TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" IsOpen="{Binding IsChecked, Mode=TwoWay, ElementName=btnAbout}" IsPinned="False">
+                <Controls:Flyout.Effect>
+                    <DropShadowEffect Opacity="0.1" />
+                </Controls:Flyout.Effect>
+                <popups:About BorderBrush="LightGray" BorderThickness="1"/>
             </Controls:Flyout>
             <Controls:Flyout x:Name="flyExports" TitleVisibility="Collapsed" Position="Right" Width="350" Background="{DynamicResource AccentColorBrush}" CloseButtonVisibility="Collapsed" IsOpen="{Binding IsChecked, Mode=TwoWay, ElementName=btnTasks}" IsPinned="False" Margin="0,40,0,26" Foreground="Black">
                 <Grid>
@@ -148,7 +143,7 @@
                         </Rectangle.Effect>
                     </Rectangle>
                     <StackPanel Orientation="Horizontal" Background="Gray">
-                        <Path Fill="WhiteSmoke" Margin="10,0" Height="19" Data="{StaticResource appbar_list_gear}" Stretch="Uniform" />
+                        <ContentControl Foreground="WhiteSmoke" Margin="10,0" Height="19" Content="{iconPacks:Material Kind=Worker}" />
                         <Label Grid.Column="1" VerticalAlignment="Center" Foreground="WhiteSmoke" Content="TASKS" FontSize="12" />
                     </StackPanel>
                     <Border Background="LightGray" Grid.Row="2">
@@ -182,22 +177,22 @@
                     <Setter Property="Background" Value="White" />
                 </Style>
             </TabControl.Resources>
-            <UC:DecoratedTabItem IsSelected="True" Header="DISPLAY" Image="{StaticResource appbar_list}" Tag="true">
+            <UC:DecoratedTabItem IsSelected="True" Header="DISPLAY" Image="{iconPacks:Material Kind=DatabaseSearch}" Tag="true">
                 <Frame Source="../Pages/ViewerPage.xaml" />
             </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="DUPLICATES" Image="{StaticResource appbar_layer_delete}" Tag="true">
+            <UC:DecoratedTabItem Header="DUPLICATES" Image="{iconPacks:Material Kind=ContentDuplicate}" Tag="true">
                 <Frame Source="../Pages/Duplicates.xaml" />
             </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="PATTERNS" Image="{StaticResource appbar_draw_pixel_fill_grid}" Tag="true">
+            <UC:DecoratedTabItem Header="PATTERNS" Image="{iconPacks:Material Kind=LockPattern}" Tag="true">
                 <Frame Source="../Pages/PatternsPage.xaml" />
             </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="STATISTICS" Image="{StaticResource appbar_graph_bar}" Tag="true">
+            <UC:DecoratedTabItem Header="STATISTICS" Image="{iconPacks:Material Kind=ChartBar}" Tag="true">
                 <Frame Source="../Pages/StatisticsPage.xaml" />
             </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="COMPARISON" Image="{StaticResource appbar_arrow_left_right}">
+            <UC:DecoratedTabItem Header="COMPARISON" Image="{iconPacks:Material Kind=Compare}">
                 <Frame Source="../Pages/Compare.xaml" />
             </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="MONITORING" Image="{StaticResource appbar_image_redeye}">
+            <UC:DecoratedTabItem Header="MONITORING" Image="{iconPacks:Material Kind=ChartAreaspline}">
                 <Frame Source="../Pages/Monitor.xaml" />
             </UC:DecoratedTabItem>
         </Controls:MetroAnimatedSingleRowTabControl>
@@ -233,7 +228,7 @@
                             </Style>
                         </ToggleButton.Style>
                         <StackPanel Orientation="Horizontal">
-                            <Path Width="16" Margin="0,0,5,0" Fill="White" Stretch="Uniform" Data="{StaticResource appbar_list_gear}" />
+                            <ContentControl Width="16" Margin="0,0,5,0" Foreground="White" Content="{iconPacks:Material Kind=Worker}" />
                             <TextBlock Text="Tasks" VerticalAlignment="Center" />
                         </StackPanel>
                     </ToggleButton>

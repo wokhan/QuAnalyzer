@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
              mc:Ignorable="d"  x:Name="me"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -18,7 +19,7 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <GroupBox Header="Source" Grid.Row="1" Height="97" VerticalAlignment="Top" Background="{StaticResource SourceColorBrush}" BorderBrush="{StaticResource SourceColorBrush}">
+        <GroupBox Header="Source" Grid.Row="1" Height="97" VerticalAlignment="Top" Background="WhiteSmoke">
             <Grid>
                 <Label Content="Provider:" HorizontalAlignment="Left" Margin="0,3,0,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="lstSrc" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" Margin="96,0,5,0" VerticalAlignment="Top" SelectedItem="{Binding Source}">
@@ -35,8 +36,8 @@
                 <ComboBox x:Name="lstSrcRepo" Margin="96,27,5,0" VerticalAlignment="Top" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding DataContext.SourceRepository, ElementName=lstMappings}" SelectionChanged="lstSrcRepo_SelectionChanged" DataContext="{Binding SelectedItem, ElementName=lstSrc}"/>
             </Grid>
         </GroupBox>
-        <Path Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Data="{StaticResource appbar_arrow_left_right}" Fill="Gray" Stretch="Uniform" Width="32" />
-        <GroupBox Header="Target" Grid.Row="1" Height="97" VerticalAlignment="Top" Grid.Column="2" Background="{StaticResource TargetColorBrush}" BorderBrush="{StaticResource TargetColorBrush}">
+        <ContentControl Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{iconPacks:Material Kind=ArrowSplitVertical,Width=32,Height=32}" Foreground="Gray" Margin="10" />
+        <GroupBox Header="Target" Grid.Row="1" Height="97" VerticalAlignment="Top" Grid.Column="2" Background="WhiteSmoke">
             <Grid>
                 <Label Content="Provider:" HorizontalAlignment="Left" Margin="0,3,0,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="lstTrg" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" Margin="86,0,5,0" VerticalAlignment="Top" SelectedItem="{Binding Target}">
@@ -56,10 +57,10 @@
         <GroupBox Style="{StaticResource NoMarginGroupBox}" Header="Mappings" Grid.Row="2" Grid.ColumnSpan="3" >
             <DockPanel>
                 <WrapPanel Style="{StaticResource ToolBar}">
-                    <UC:ToolBarButton Text="Add" ToolTip="Add a mapping" BorderBrush="Green" Image="{StaticResource appbar_add}" Click="btnAdd_Click" />
-                    <UC:ToolBarButton Margin="5,0" Text="By position" ToolTip="Map by position" BorderBrush="Blue" Image="{StaticResource appbar_dimension_line_width_thick}" Click="btnMapPos_Click" />
-                    <UC:ToolBarButton Margin="5,0" Text="By name" ToolTip="Map by name" BorderBrush="Blue" Image="{StaticResource appbar_dimension_line_width_thick}" Click="btnMapName_Click" />
-                    <UC:ToolBarButton Margin="5,0" Text="Clear" ToolTip="Clear all" IsEnabled="{Binding Items.IsEmpty,ElementName=gridMappings,Converter={StaticResource booleanNegator}}" BorderBrush="OrangeRed" Image="{StaticResource appbar_clean}" Click="btnRmAll_Click" />
+                    <UC:ToolBarButton Text="Add" ToolTip="Add a mapping" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnAdd_Click" />
+                    <UC:ToolBarButton Margin="5,0" Text="By position" ToolTip="Map by position" BorderBrush="Blue" Image="{iconPacks:Material Kind=ShuffleVariant}" Click="btnMapPos_Click" />
+                    <UC:ToolBarButton Margin="5,0" Text="By name" ToolTip="Map by name" BorderBrush="Blue" Image="{iconPacks:Material Kind=ShuffleVariant}" Click="btnMapName_Click" />
+                    <UC:ToolBarButton Margin="5,0" Text="Clear" ToolTip="Clear all" IsEnabled="{Binding Items.IsEmpty,ElementName=gridMappings,Converter={StaticResource booleanNegator}}" BorderBrush="OrangeRed" Image="{iconPacks:Material Kind=BorderNoneVariant}" Click="btnRmAll_Click" />
                 </WrapPanel>
                 <DataGrid Name="gridMappings" ItemsSource="{Binding CurrentMaps,ElementName=me}" HorizontalAlignment="Stretch" CanUserAddRows="False" BorderThickness="1" BorderBrush="LightGray" VerticalAlignment="Stretch" AutoGenerateColumns="False">
                     <DataGrid.Columns>
@@ -84,7 +85,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button Name="btnDelete" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnRm_Click">
-                                        <Path Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                                        <Path Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{iconPacks:Material Kind=DeleteOutline}" Stretch="Uniform" />
                                     </Button>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

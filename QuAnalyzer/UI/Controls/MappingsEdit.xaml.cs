@@ -1,4 +1,5 @@
 ﻿using QuAnalyzer.Features.Comparison;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -19,7 +20,7 @@ namespace QuAnalyzer.UI.Controls
             set => SetValue(MappingNameProperty, value);
         }
 
-        public static DependencyProperty MappingNameProperty = DependencyProperty.Register(nameof(MappingName), typeof(string), typeof(MappingsEdit), new PropertyMetadata());
+        public static DependencyProperty MappingNameProperty = DependencyProperty.Register(nameof(MappingName), typeof(string), typeof(MappingsEdit), new PropertyMetadata(null));
 
         public SourcesMapper Mapping
         {

@@ -2,7 +2,8 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+    xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"      
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" d:DesignHeight="460">
     <Grid>
@@ -19,11 +20,11 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Path Fill="WhiteSmoke" Margin="10,0" Height="19" Data="{StaticResource appbar_list}" Stretch="Uniform" />
+            <ContentControl Foreground="WhiteSmoke" Margin="10,0" Height="19" Content="{iconPacks:Material Kind=DatabaseExport}" />
             <Label Grid.Column="1" VerticalAlignment="Center" Foreground="WhiteSmoke" Content="SOURCES" FontSize="12" />
         </Grid>
         <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
-            <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{StaticResource appbar_add}"/>
+            <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}"/>
         </WrapPanel>
         <ListView BorderThickness="0" Grid.Row="2" Name="lstProviders" SelectedItem="{Binding CurrentSelection,Source={x:Static Application.Current}}" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
             <ListView.Resources>
@@ -76,12 +77,8 @@
                                                     </Grid.ColumnDefinitions>
                                                     <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
                                                     <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name.Name}" VerticalAlignment="Center" />
-                                                    <Button Grid.Column="2" Name="btnEditProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Tag="{Binding Name}" Click="btnEditProvider_Click">
-                                                        <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Blue" Data="{StaticResource appbar_edit}" Stretch="Uniform" />
-                                                    </Button>
-                                                    <Button Grid.Column="3" Name="btnDeleteProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding Name}" Click="btnDeleteProvider_Click">
-                                                        <Path Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
-                                                    </Button>
+                                                    <Button Grid.Column="2" Name="btnEditProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Foreground="Blue" Tag="{Binding Name}" Click="btnEditProvider_Click" Content="{iconPacks:Material Kind=Pencil}" />
+                                                    <Button Grid.Column="3" Name="btnDeleteProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Foreground="OrangeRed" Tag="{Binding Name}" Click="btnDeleteProvider_Click" Content="{iconPacks:Material Kind=DeleteOutline}" />
                                                 </Grid>
                                             </Expander.Header>
                                             <ItemsPresenter />

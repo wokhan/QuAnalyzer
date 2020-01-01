@@ -13,16 +13,16 @@
                     <Border Margin="5" Padding="10,5" BorderThickness="1" ToolTip="{TemplateBinding ToolTip}" CornerRadius="3" BorderBrush="LightGray">
                         <Border.Style>
                             <Style TargetType="Border">
-                                <Setter Property="Background" Value="{Binding Background,RelativeSource={RelativeSource TemplatedParent}}" />
+                                <Setter Property="Background" Value="{Binding Background,RelativeSource={x:Static RelativeSource.TemplatedParent}}" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsMouseOver,RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+                                    <DataTrigger Binding="{Binding IsMouseOver,RelativeSource={x:Static RelativeSource.TemplatedParent}}" Value="True">
                                         <Setter Property="Background" Value="LightBlue" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
                         <StackPanel Orientation="Horizontal">
-                            <Path Fill="{TemplateBinding BorderBrush}" Width="14" Height="14" Data="{Binding Image, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform" />
+                            <ContentControl Foreground="{TemplateBinding BorderBrush}" Height="Auto" Content="{TemplateBinding Image}" />
                             <Label Foreground="Black" FontSize="11" Padding="5,0,0,0" VerticalAlignment="Center" Content="{TemplateBinding Text}" />
                         </StackPanel>
                     </Border>

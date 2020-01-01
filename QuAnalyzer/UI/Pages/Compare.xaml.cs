@@ -65,7 +65,7 @@ namespace QuAnalyzer.UI.Pages
 
             var localcpd = new List<ComparerStruct<object[]>>();
 
-            var x = await GetComparerStruct().ConfigureAwait(false);
+            var x = await GetComparerStruct().ConfigureAwait(true);
             foreach (var cp in x)
             {
                 /*var idx = real.Count(r => Regex.IsMatch((string)r[0], Regex.Escape(cp.Name) + @"(?:\s\(\d+\))?$")) / 2;

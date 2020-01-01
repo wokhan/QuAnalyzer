@@ -41,10 +41,7 @@ namespace QuAnalyzer.Generic.Extensions
             foreach (var x in src)
             {
                 j++;
-                if (callback != null)
-                {
-                    callback((double)(j - 2) / cnt);
-                }
+                callback?.Invoke((double)(j - 2) / cnt);
 
                 for (var k = 1; k <= headers.Count; k++)
                 {
@@ -52,10 +49,7 @@ namespace QuAnalyzer.Generic.Extensions
                 }
             }
 
-            if (callback != null)
-            {
-                callback(1);
-            }
+            callback?.Invoke(1);
         }
 
 
@@ -136,10 +130,7 @@ namespace QuAnalyzer.Generic.Extensions
                     row = (DataGridRow)gridClone.ItemContainerGenerator.ContainerFromIndex(j - 2);
                 }
 
-                if (callback != null)
-                {
-                    callback(j - 1 / gridClone.Items.Count);
-                }
+                callback?.Invoke((j - 1.0) / gridClone.Items.Count);
 
                 DoEvents();
 
@@ -174,15 +165,16 @@ namespace QuAnalyzer.Generic.Extensions
                     }
                 }
 
-                if (callback != null)
-                {
-                    callback(1);
-                    DoEvents();
-                }
-
-                // Free up some objects
-                //host.Children.Remove(gridClone);
             }
+
+            if (callback != null)
+            {
+                callback(1);
+                DoEvents();
+            }
+
+            // Free up some objects
+            host.Children.Remove(gridClone);
         }
 
         /*public static void ExportAsHTML(this DataGrid grid, string path = null)

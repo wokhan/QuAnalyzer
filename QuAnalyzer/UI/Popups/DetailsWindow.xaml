@@ -1,6 +1,7 @@
 ﻿<Page x:Class="QuAnalyzer.UI.Popups.DetailsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
         Title="{Binding Name, StringFormat='Comparison details - {0}'}" Height="600" Width="800"
         MinWidth="800" MinHeight="500" xmlns:myself="clr-namespace:QuAnalyzer.UI.Popups" x:Name="me">
@@ -15,9 +16,9 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <WrapPanel Grid.ColumnSpan="3" HorizontalAlignment="Right">
-            <!--UC:ToolBarButton Orientation="Horizontal" Text="Create report" ToolTip="Not available yet" HorizontalAlignment="Right" BorderBrush="BlueViolet" Image="{StaticResource appbar_cabinet_files}" Click="ExportAllAuto_Click" />
+            <!--UC:ToolBarButton Orientation="Horizontal" Text="Create report" ToolTip="Not available yet" HorizontalAlignment="Right" BorderBrush="BlueViolet" Image="{iconPacks:Material Kind=Export}" Click="ExportAllAuto_Click" />
             <Rectangle /-->
-            <UC:ToolBarToggleButton IsEnabled="False" x:Name="btnAggregate" Orientation="Horizontal" Text="Filter/Group" IsChecked="True" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" Image="{StaticResource appbar_page_copy}" />
+            <UC:ToolBarToggleButton IsEnabled="False" x:Name="btnAggregate" Orientation="Horizontal" Text="Filter/Group" IsChecked="True" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" Image="{iconPacks:Material Kind=ContentCopy}" />
         </WrapPanel>
         <TabControl Grid.RowSpan="2" Name="tabs" Padding="0">
             <TabControl.Resources>
@@ -25,13 +26,13 @@
                     <Setter Property="Height" Value="32"/>
                 </Style>
             </TabControl.Resources>
-            <UC:DecoratedTabItem x:Name="tabDiff" Image="{StaticResource appbar_draw_pixel_fill_grid}" Header="DIFFERENCES">
+            <UC:DecoratedTabItem x:Name="tabDiff" Image="{iconPacks:Material Kind=ViewGrid}" Header="DIFFERENCES">
                 <DockPanel DataContext="{Binding DataContext,ElementName=me}">
                     <WrapPanel Style="{StaticResource ToolBar}">
-                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgDiff,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{iconPacks:Material Kind=ContentCopy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgDiff,Mode=OneTime}" />
                         <Rectangle />
-                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{StaticResource appbar_page_excel}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgDiff,Mode=OneTime}" />
-                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{StaticResource appbar_page_xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgDiff,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgDiff,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgDiff,Mode=OneTime}" />
                         <Rectangle />
                         <TextBlock Margin="10,0" VerticalAlignment="Center">
                             <Run Text="{Binding Items.Count,Mode=OneWay,ElementName=dgDiff}" />
@@ -55,7 +56,7 @@
                     </DataGrid>
                 </DockPanel>
             </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem x:Name="tabMissingSrc" Image="{StaticResource appbar_draw_pixel_grid}" Header="MISSING ENTRIES">
+            <UC:DecoratedTabItem x:Name="tabMissingSrc" Image="{iconPacks:Material Kind=SelectionSearch}" Header="MISSING ENTRIES">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -72,10 +73,10 @@
                             <Run Text=" item(s) found" />
                     </TextBlock>
                     <WrapPanel Style="{StaticResource ToolBar}" Grid.Row="1">
-                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgMissingSource,Mode=OneTime}"/>
+                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{iconPacks:Material Kind=ContentCopy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgMissingSource,Mode=OneTime}"/>
                         <Rectangle />
-                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{StaticResource appbar_page_excel}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgMissingSource,Mode=OneTime}"/>
-                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{StaticResource appbar_page_xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgMissingSource,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgMissingSource,Mode=OneTime}"/>
+                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgMissingSource,Mode=OneTime}" />
                     </WrapPanel>
                     <DataGrid Grid.Row="2" x:Name="dgMissingSource" IsReadOnly="True" FrozenColumnCount="1" />
                     <GridSplitter Grid.Row="3" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
@@ -85,15 +86,15 @@
                             <Run Text=" item(s) found" />
                     </TextBlock>
                     <WrapPanel Grid.Row="5" Style="{StaticResource ToolBar}">
-                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgMissingTarget,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{iconPacks:Material Kind=ContentCopy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgMissingTarget,Mode=OneTime}" />
                         <Rectangle />
-                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{StaticResource appbar_page_xml}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgMissingTarget,Mode=OneTime}" />
-                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{StaticResource appbar_page_xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgMissingTarget,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=Xml}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgMissingTarget,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgMissingTarget,Mode=OneTime}" />
                     </WrapPanel>
                     <DataGrid Grid.Row="6" x:Name="dgMissingTarget" IsReadOnly="True" FrozenColumnCount="1" />
                 </Grid>
             </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem x:Name="tabDupTrg" Image="{StaticResource appbar_draw_pixel_fill_grid}" Header="SIMILAR ENTRIES">
+            <UC:DecoratedTabItem x:Name="tabDupTrg" Image="{iconPacks:Material Kind=TableSearch}" Header="SIMILAR ENTRIES">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -110,10 +111,10 @@
                             <Run Text=" item(s) found" />
                     </TextBlock>
                     <WrapPanel Style="{StaticResource ToolBar}" Grid.Row="1">
-                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgSourceDups,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{iconPacks:Material Kind=ContentCopy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgSourceDups,Mode=OneTime}" />
                         <Rectangle />
-                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{StaticResource appbar_page_excel}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgSourceDups,Mode=OneTime}" />
-                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{StaticResource appbar_page_xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgSourceDups,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgSourceDups,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgSourceDups,Mode=OneTime}" />
                     </WrapPanel>
                     <DataGrid Grid.Row="2" x:Name="dgSourceDups" IsReadOnly="True" FrozenColumnCount="1" />
                     <GridSplitter Grid.Row="3" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
@@ -123,10 +124,10 @@
                             <Run Text=" item(s) found" />
                     </TextBlock>
                     <WrapPanel Grid.Row="5" Style="{StaticResource ToolBar}">
-                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgTargetDups,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{iconPacks:Material Kind=ContentCopy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgTargetDups,Mode=OneTime}" />
                         <Rectangle />
-                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{StaticResource appbar_page_excel}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgTargetDups,Mode=OneTime}" />
-                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{StaticResource appbar_page_xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgTargetDups,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgTargetDups,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgTargetDups,Mode=OneTime}" />
                     </WrapPanel>
                     <DataGrid Grid.Row="6" x:Name="dgTargetDups" IsReadOnly="True" FrozenColumnCount="1" />
                 </Grid>
@@ -148,10 +149,10 @@
                             <Run Text=" item(s) found" />
                     </TextBlock>
                     <WrapPanel DockPanel.Dock="Top" Style="{StaticResource ToolBar}" Grid.Row="1">
-                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgSourcePerfectDups,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{iconPacks:Material Kind=ContentCopy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgSourcePerfectDups,Mode=OneTime}" />
                         <Rectangle />
-                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{StaticResource appbar_page_excel}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgSourcePerfectDups,Mode=OneTime}" />
-                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{StaticResource appbar_page_xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgSourcePerfectDups,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgSourcePerfectDups,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgSourcePerfectDups,Mode=OneTime}" />
                     </WrapPanel>
                     <DataGrid Grid.Row="2" x:Name="dgSourcePerfectDups" IsReadOnly="True" FrozenColumnCount="1" />
                     <GridSplitter Grid.Row="3" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
@@ -161,10 +162,10 @@
                             <Run Text=" item(s) found" />
                     </TextBlock>
                     <WrapPanel Grid.Row="5" DockPanel.Dock="Top" Style="{StaticResource ToolBar}">
-                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{StaticResource appbar_page_copy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgTargetPerfectDups,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{iconPacks:Material Kind=ContentCopy}" Click="DGCopy_Click" CommandParameter="{Binding ElementName=dgTargetPerfectDups,Mode=OneTime}" />
                         <Rectangle />
-                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{StaticResource appbar_page_excel}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgTargetPerfectDups,Mode=OneTime}" />
-                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{StaticResource appbar_page_xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgTargetPerfectDups,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="ExportCSV_Click" CommandParameter="{Binding ElementName=dgTargetPerfectDups,Mode=OneTime}" />
+                        <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="ExportHTML_Click" CommandParameter="{Binding ElementName=dgTargetPerfectDups,Mode=OneTime}" />
                     </WrapPanel>
                     <DataGrid Grid.Row="6" x:Name="dgTargetPerfectDups" IsReadOnly="True" FrozenColumnCount="1" />
                 </Grid>
@@ -216,9 +217,7 @@
                                 <DataGridTemplateColumn CanUserSort="False">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Button Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteFilter_Click">
-                                                <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
-                                            </Button>
+                                            <Button Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteFilter_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -253,7 +252,7 @@
                                             </Grid.ColumnDefinitions>
                                             <Label Content="{Binding}" />
                                             <Button Grid.Column="1" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteGrp_Click">
-                                                <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                                                <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{iconPacks:Material Kind=DeleteOutline}" Stretch="Uniform" />
                                             </Button>
                                         </Grid>
                                     </DataTemplate>
@@ -287,7 +286,7 @@
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Button Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteAggreg_Click">
-                                                    <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                                                    <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{iconPacks:Material Kind=DeleteOutline}" Stretch="Uniform" />
                                                 </Button>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>

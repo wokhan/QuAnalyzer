@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:sys="clr-namespace:System;assembly=System.Runtime"
       DataContext="{Binding RelativeSource={RelativeSource Self}}"
       mc:Ignorable="d" 
@@ -151,12 +152,12 @@
         </ScrollViewer>
         <DockPanel x:Name="dockRepositories" Grid.Row="2" Visibility="Hidden">
             <WrapPanel Style="{StaticResource ToolBar}">
-                <UC:ToolBarButton Text="Add" ToolTip="Add a repository" BorderBrush="Green" Image="{StaticResource appbar_add}" Click="btnRepoAdd_Click" />
-                <UC:ToolBarButton Text="Retrieve" ToolTip="Add a repository" BorderBrush="Green" Image="{StaticResource appbar_add_multiple}" Click="btnRepoRetr_Click" />
-                <UC:ToolBarButton Text="Clear" ToolTip="Clear" BorderBrush="OrangeRed" Image="{StaticResource appbar_clean}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}" Click="btnRepoClear_Click" />
+                <UC:ToolBarButton Text="Add" ToolTip="Add a repository" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnRepoAdd_Click" />
+                <UC:ToolBarButton Text="Retrieve" ToolTip="Add a repository" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleMultipleOutline}" Click="btnRepoRetr_Click" />
+                <UC:ToolBarButton Text="Clear" ToolTip="Clear" BorderBrush="OrangeRed" Image="{iconPacks:Material Kind=SelectionOff}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}" Click="btnRepoClear_Click" />
                 <Rectangle />
-                <UC:ToolBarButton Text="Sel. all" ToolTip="Select all" BorderBrush="Blue" Image="{StaticResource material_select}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}"  Click="btnRepoSel_Click" />
-                <UC:ToolBarButton Text="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" Image="{StaticResource material_unselect}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}" Click="btnRepoUnSel_Click" />
+                <UC:ToolBarButton Text="Sel. all" ToolTip="Select all" BorderBrush="Blue" Image="{iconPacks:Material Kind=SelectAll}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}"  Click="btnRepoSel_Click" />
+                <UC:ToolBarButton Text="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" Image="{iconPacks:Material Kind=Select}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}" Click="btnRepoUnSel_Click" />
             </WrapPanel>
             <DataGrid Name="gridRepositories" BorderBrush="LightGray" BorderThickness="1,0,1,1" CanUserAddRows="False" AutoGenerateColumns="False" ItemsSource="{Binding Repositories}" SelectionMode="Single" CanUserReorderColumns="False">
                 <DataGrid.Columns>
@@ -180,9 +181,7 @@
                     <DataGridTemplateColumn Width="40" IsReadOnly="True" CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Name="btnDeleteRepo" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteRepo_Click">
-                                    <Path Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center"  Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
-                                </Button>
+                                <Button Name="btnDeleteRepo" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteRepo_Click" Foreground="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Content="{iconPacks:Material Kind=DeleteOutline}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

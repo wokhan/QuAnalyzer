@@ -87,7 +87,7 @@ namespace QuAnalyzer.UI.Pages
                 gridData.LoadingProgress = -1;
 
                 var dataObjectArray = data.AsObjectCollection(KeepDuplicates && KeepDuplicates ? headers : keys)
-                                          .WithProgress(i => gridData.Status = $"Parsed {i} entries")
+                                          //.WithProgress(i => gridData.Status = $"Parsed {i} entries")
                                           .ToList();
 
                 gridData.LoadingProgress = 1;

@@ -1,4 +1,8 @@
-﻿using QuAnalyzer.Features.Statistics;
+﻿using LiveCharts;
+using LiveCharts.Configurations;
+using LiveCharts.Wpf;
+using QuAnalyzer.Features.Statistics;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Controls;
@@ -16,6 +20,8 @@ namespace QuAnalyzer.UI.Pages
     {
         public string[] ChartTypes { get { return new[] { "Pie", "Bar", "Doughnut" }; } }
 
+        public Func<ChartPoint, string> LabelGetter { get; } = p => ((Values)p.Instance).Category;
+        
         private string _chartType = "Bar";
         public string ChartType
         {
@@ -30,6 +36,8 @@ namespace QuAnalyzer.UI.Pages
             set { _progress = value; NotifyPropertyChanged(nameof(Progress)); }
         }
 
+
+  //      public ObservableDictionary<string, Series> ComputedStatsForGraph { get; } = new ObservableDictionary<string, Series>();
         public ObservableDictionary<string, ResultsStruct> ComputedStats { get; } = new ObservableDictionary<string, ResultsStruct>();
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -45,7 +53,15 @@ namespace QuAnalyzer.UI.Pages
             //ComputedStats = new Dictionary<string, ResultsStruct>();
 
             InitializeComponent();
+
+            //ComputedStats.CollectionChanged += ComputedStats_CollectionChanged;
             ((App)App.Current).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
+        }
+
+        private void ComputedStats_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            ((ResultsStruct)e.NewItems[0]).Frequencies.CollectionChanged += null;
+//            ComputedStatsForGraph.AddAll(e.NewItems.Cast<ResultsStruct>().Select(x => new PieSeries(Mappers.Pie<ResultsStruct>().Value(data => data))));
         }
 
         private void UpdateSelection()

@@ -4,80 +4,67 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWPF>true</UseWPF>
-    <UseWindowsForms>true</UseWindowsForms>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <ApplicationIcon>Resources\IconNew.ico</ApplicationIcon>
+    <DefineConstants>_WPF_</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>E2A919426F8AC015D40EBC055A40C9FA2D102359</ManifestCertificateThumbprint>
+    <ApplicationIcon>IconNew.ico</ApplicationIcon>
   </PropertyGroup>
-  <PropertyGroup>
-    <ManifestKeyFile>QuAnalyzer_TemporaryKey.pfx</ManifestKeyFile>
-  </PropertyGroup>
-  <!--<PropertyGroup>
-    <GenerateManifests>true</GenerateManifests>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignManifests>false</SignManifests>
-  </PropertyGroup>-->
+  
+  <Import Project="..\QuAnalyzer.Shared\QuAnalyzer.Shared.projitems" Label="Shared" />
+  
   <ItemGroup>
     <Compile Remove="Features\Comparison - Copy.cs" />
     <Compile Remove="Features\ContractResolver.cs" />
-    <Compile Remove="Logic\Comparison - Copy.cs" />
-    <Compile Remove="Logic\ContractResolver.cs" />
     <Compile Remove="UI\Controls\DataCompareDetail.xaml.cs" />
     <Compile Remove="UI\Pages\PerformancePage.xaml.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Remove="UI\Pages\ProviderEditor.xaml" />
-    <None Remove="UI\Pages\ProviderPicker.xaml" />
-    <None Remove="UI\Windows\Popup.xaml" />
-  </ItemGroup>
+  
   <ItemGroup>
     <Page Remove="UI\Controls\DataCompareDetail.xaml" />
     <Page Remove="UI\Pages\PerformancePage.xaml" />
   </ItemGroup>
+  
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="4.5.3.2" />
     <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
-    <PackageReference Include="MahApps.Metro" Version="2.0.0-alpha0531" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.4.0-beta3-final" />
+    <PackageReference Include="MahApps.Metro" Version="2.0.0-alpha0660" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="3.0.1" />
+    <PackageReference Include="Wokhan.WPF" Version="1.1912.2202.206" />
+    <PackageReference Include="EPPlus" Version="4.5.3.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.4.0-beta4-final" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="NuGet.Commands" Version="5.1.0" />
-    <PackageReference Include="NuGet.DependencyResolver.Core" Version="5.1.0" />
-    <PackageReference Include="NuGet.Packaging" Version="5.1.0" />
-    <PackageReference Include="NuGet.Protocol" Version="5.1.0" />
-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.7.0-preview2.19523.17" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="4.7.0" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.19" />
-    <PackageReference Include="System.Management" Version="4.7.0-preview2.19523.17" />
+    <PackageReference Include="System.Management" Version="4.7.0" />
     <PackageReference Include="VirtualizingObservableCollection" Version="1.2.0" />
-    <PackageReference Include="Wokhan.Core" Version="1.1911.602.198" />
-    <PackageReference Include="Wokhan.Data.Providers" Version="1.1911.601.196" />
-    <PackageReference Include="Wokhan.Data.Providers.ExcelDataProvider" Version="1.1911.601.196" />
-    <PackageReference Include="System.Windows.Forms.DataVisualization" Version="1.0.0-prerelease.19218.1" />
-    <PackageReference Include="Wokhan.WPF" Version="1.1911.602.198" />
+    <PackageReference Include="Wokhan.Core" Version="1.1912.2202.206" />
+    <PackageReference Include="Wokhan.Data.Providers" Version="1.1912.3101.207" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ApplicationDefinition Update="App.xaml">
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <!--<Reference Include="AlphaChiTech.Virtualization, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL" /-->
-    <Reference Include="De.TorstenMandelkow.MetroChart">
-      <HintPath>Libs\De.TorstenMandelkow.MetroChart.dll</HintPath>
-    </Reference>
-    <!--<Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
-    <Reference Include="EPPlus, Version=4.0.5.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL" />
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL" />
-    <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="NPOI, Version=2.2.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL" />
-    <Reference Include="NPOI.Extension, Version=1.2.0.1, Culture=neutral, processorArchitecture=MSIL" />
-    <Reference Include="NPOI.OOXML, Version=2.2.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL" />
-    <Reference Include="NPOI.OpenXml4Net, Version=2.2.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL" />
-    <Reference Include="NPOI.OpenXmlFormats, Version=2.2.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL" />
-    <Reference Include="Sparrow.Chart.Wpf.40, Version=13.1.0.118, Culture=neutral, PublicKeyToken=50f33fb8697e9a92, processorArchitecture=MSIL" />-->
+    <Compile Update="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="StatisticsPage.xaml.cs">
+      <DependentUpon>StatisticsPage.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

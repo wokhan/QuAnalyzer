@@ -1,7 +1,11 @@
 ﻿using LiveCharts;
 using LiveCharts.Configurations;
 using LiveCharts.Defaults;
+#if _WPF_
 using LiveCharts.Wpf;
+#else 
+using LiveCharts.Uwp;
+#endif
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Features.Performance;
 using QuAnalyzer.Generic.Extensions;

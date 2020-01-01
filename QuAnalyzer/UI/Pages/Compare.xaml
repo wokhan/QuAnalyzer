@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:mahapps="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
     x:Class="QuAnalyzer.UI.Pages.Compare" 
@@ -11,20 +12,24 @@
 	Title="DataCompare" d:DesignHeight="607.375">
     <Grid x:Name="gridMain">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition MinHeight="250" Height="293"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="4" />
             <RowDefinition MinHeight="100"/>
         </Grid.RowDefinitions>
-        <DockPanel Margin="0" >
+        <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
+            <UC:ToolBarButton HorizontalAlignment="Center" ToolTip="Start comparisons for the selected items" BorderBrush="Green" Click="btnRun_Click" Image="{iconPacks:Material Kind=Play,Width=10}" Text="Run" />
+        </WrapPanel>
+        <DockPanel Margin="0" Grid.Row="1" >
             <WrapPanel Style="{StaticResource ToolBar}">
-                <UC:ToolBarToggleButton x:Name="btnToggleMode" Text="Single-mapping mode" ToolTip="Single-mapping mode" BorderBrush="Blue" Image="{StaticResource appbar_arrow_collapsed}" />
+                <UC:ToolBarToggleButton x:Name="btnToggleMode" Text="Single-mapping mode" ToolTip="Single-mapping mode" BorderBrush="Blue" Foreground="Blue" Image="{iconPacks:Material Kind=AbTesting}" IsChecked="False" />
                 <Rectangle />
-                <UC:ToolBarButton Text="Add" ToolTip="Add a mapping" BorderBrush="Green" Image="{StaticResource appbar_add}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnNewPrv_Click" />
-                <UC:ToolBarButton Text="Automap" ToolTip="Automap" BorderBrush="Green" Image="{StaticResource appbar_add_multiple}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnAuto_Click" />
+                <UC:ToolBarButton Text="Add" ToolTip="Add a mapping" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnNewPrv_Click" />
+                <UC:ToolBarButton Text="Automap" ToolTip="Automap" BorderBrush="Green" Image="{iconPacks:Material Kind=ShuffleVariant}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnAuto_Click" />
                 <Rectangle />
-                <UC:ToolBarButton Text="Sel. all" ToolTip="Select all" BorderBrush="Blue" Image="{StaticResource material_select}" Click="btnSelectAll_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
-                <UC:ToolBarButton Text="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" Image="{StaticResource material_unselect}" Click="btnUnSel_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
+                <UC:ToolBarButton Text="Sel. all" ToolTip="Select all" BorderBrush="Blue" Image="{iconPacks:Material Kind=SelectAll}" Click="btnSelectAll_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
+                <UC:ToolBarButton Text="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" Image="{iconPacks:Material Kind=Select}" Click="btnUnSel_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
             </WrapPanel>
             <TabControl Grid.Row="0" VerticalAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch" Padding="0">
                 <TabControl.Style>
@@ -79,12 +84,8 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <WrapPanel>
-                                            <Button Name="btnEditMapping" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Tag="{Binding}" Click="btnEditMapping_Click">
-                                                <Path Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{StaticResource appbar_edit}" Stretch="Uniform" />
-                                            </Button>
-                                            <Button Name="btnDeleteMapping" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteMapping_Click">
-                                                <Path Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"  Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
-                                            </Button>
+                                            <Button Name="btnEditMapping" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Tag="{Binding}" Click="btnEditMapping_Click" Foreground="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Content="{iconPacks:Material Kind=Pencil}" />
+                                            <Button Name="btnDeleteMapping" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteMapping_Click" Foreground="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Content="{iconPacks:Material Kind=DeleteOutline}" />
                                         </WrapPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -98,26 +99,18 @@
                 </TabItem>
             </TabControl>
         </DockPanel>
-        <Border Grid.Row="1" Style="{StaticResource ButtonBar}">
-            <Button Margin="3" HorizontalAlignment="Center" ToolTip="Start comparisons for the selected items" BorderBrush="Green" Click="btnRun_Click">
-                <StackPanel Orientation="Horizontal">
-                    <Path Fill="Green" Width="14" Height="14" Data="{StaticResource appbar_control_play}" Stretch="Uniform" />
-                    <Label Foreground="Black" FontSize="11" Padding="5,0,0,0" VerticalAlignment="Center" Content="Run" />
-                </StackPanel>
-            </Button>
-        </Border>
         <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" />
         <DockPanel Grid.Column="0" Grid.Row="3">
             <WrapPanel Style="{StaticResource ToolBar}">
                 <TextBlock Text="Global progress" Padding="4" Height="26" />
                 <ProgressBar x:Name="prgGlobal" Maximum="100" Height="22" Width="292"/>
                 <Rectangle />
-                <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" Image="{StaticResource appbar_page_copy}" Click="GlobalCopy_Click" />
+                <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" Image="{iconPacks:Material Kind=ContentCopy}" Click="GlobalCopy_Click" />
                 <Rectangle />
-                <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{StaticResource appbar_page_excel}" Click="GlobalExportCSV_Click" />
-                <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{StaticResource appbar_page_xml}" Click="GlobalExportHTML_Click" />
+                <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="GlobalExportCSV_Click" />
+                <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="GlobalExportHTML_Click" />
                 <Rectangle />
-                <UC:ToolBarButton Text="Create report" ToolTip="Create report" BorderBrush="BlueViolet" Image="{StaticResource appbar_cabinet_files}" Click="GlobalReport_Click" />
+                <UC:ToolBarButton Text="Create report" ToolTip="Create report" BorderBrush="BlueViolet" Image="{iconPacks:Material Kind=Export}" Click="GlobalReport_Click" />
             </WrapPanel>
             <DataGrid ColumnWidth="*" CanUserAddRows="False" BorderThickness="0" IsReadOnly="True" AutoGenerateColumns="False" Name="allProgress" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="Vertical" SelectionUnit="Cell">
                 <DataGrid.GroupStyle>
@@ -153,7 +146,7 @@
                                                                     </Style.Triggers>
                                                                 </Style>
                                                             </Button.Style>
-                                                            <Path Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                                                            <Path Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{iconPacks:Material Kind=DeleteOutline}" Stretch="Uniform" />
                                                         </Button>
                                                         <Grid HorizontalAlignment="Right" Width="180" Margin="0,0,40,0">
                                                             <Grid.Style>
@@ -181,7 +174,7 @@
                                                                 </ProgressBar.Style>
                                                             </ProgressBar>
                                                             <TextBlock Foreground="White" Text="{Binding [2].Progress, Mode=OneWay, FallbackValue='Current step'}" TextAlignment="Center" VerticalAlignment="Center" Margin="0,0,40,0" />
-                                                            <Button Name="btnCancel" Background="White" BorderBrush="OrangeRed" Tag="{Binding [4]}" VerticalAlignment="Top" BorderThickness="1" Height="40" Click="btnCancel_Click" HorizontalAlignment="Right" Width="40">
+                                                            <Button Name="btnCancel" Background="White" BorderBrush="OrangeRed" Tag="{Binding [4]}" VerticalAlignment="Top" BorderThickness="1" Height="40" Click="btnCancel_Click" HorizontalAlignment="Right" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=Delete}">
                                                                 <Button.Style>
                                                                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MetroCircleButtonStyle}">
                                                                         <Style.Triggers>
@@ -191,7 +184,6 @@
                                                                         </Style.Triggers>
                                                                     </Style>
                                                                 </Button.Style>
-                                                                <Path Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" Fill="OrangeRed" Data="{StaticResource appbar_close}" Stretch="Uniform" />
                                                             </Button>
                                                         </Grid>
                                                         <Grid>
@@ -210,9 +202,7 @@
                                                                 </Style>
                                                             </Grid.Style>
                                                             <TextBlock FontWeight="Bold" Text="{Binding [2].MatchingCount, FallbackValue='Matches: -', Mode=OneWay, StringFormat=Matches: \{0\}}" TextAlignment="Right" Padding="5" Margin="0,7,80,0" HorizontalAlignment="Right" VerticalAlignment="Top" />
-                                                            <Button Name="btnDetails" Background="White" Style="{DynamicResource MetroCircleButtonStyle}" BorderBrush="Green" Tag="{Binding [4]}" VerticalAlignment="Top" BorderThickness="1" Height="40" Click="btnDetails_Click" HorizontalAlignment="Right" Width="40" Margin="0,0,40,0">
-                                                                <Path Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Green" Data="{StaticResource appbar_eye}" Stretch="Uniform" />
-                                                            </Button>
+                                                            <Button Name="btnDetails" Background="White" Style="{DynamicResource MetroCircleButtonStyle}" BorderBrush="Green" Tag="{Binding [4]}" VerticalAlignment="Top" BorderThickness="1" Height="40" Click="btnDetails_Click" HorizontalAlignment="Right" Width="40" Margin="0,0,40,0" Content="{iconPacks:Material Kind=Eye}" Foreground="Green" />
                                                         </Grid>
                                                         <Grid>
                                                             <Grid.Style>
@@ -226,14 +216,14 @@
                                                                 </Style>
                                                             </Grid.Style>
                                                             <Button Name="btnError" Style="{DynamicResource MetroCircleButtonStyle}" Background="Yellow" BorderBrush="Red" Tag="{Binding [2].Message}" VerticalAlignment="Top" BorderThickness="1" Height="40" Click="btnError_Click" HorizontalAlignment="Right" Width="40" Margin="0,0,40,0">
-                                                                <Path Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="Red" Data="{StaticResource appbar_warning}" Stretch="Uniform">
-                                                                    <Path.Resources>
-                                                                        <Storyboard x:Key="sbBlink" AutoReverse="True" BeginTime="00:00:02" RepeatBehavior="Forever" Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)">
+                                                                <ContentControl Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red" Content="{iconPacks:Material Kind=Alert}">
+                                                                    <ContentControl.Resources>
+                                                                        <Storyboard x:Key="sbBlink" AutoReverse="True" BeginTime="00:00:02" RepeatBehavior="Forever" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)">
                                                                             <ColorAnimation From="Transparent" To="Red" Duration="0:0:2"/>
                                                                         </Storyboard>
-                                                                    </Path.Resources>
-                                                                    <Path.Style>
-                                                                        <Style TargetType="Path">
+                                                                    </ContentControl.Resources>
+                                                                    <ContentControl.Style>
+                                                                        <Style TargetType="ContentControl">
                                                                             <Style.Triggers>
                                                                                 <Trigger Property="Visibility" Value="Visible">
                                                                                     <Trigger.EnterActions>
@@ -245,8 +235,8 @@
                                                                                 </Trigger>
                                                                             </Style.Triggers>
                                                                         </Style>
-                                                                    </Path.Style>
-                                                                </Path>
+                                                                    </ContentControl.Style>
+                                                                </ContentControl>
                                                             </Button>
                                                         </Grid>
                                                     </Grid>

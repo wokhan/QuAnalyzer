@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:local="clr-namespace:QuAnalyzer.UI.Controls"
              mc:Ignorable="d" 
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
@@ -21,13 +22,13 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <WrapPanel Grid.ColumnSpan="2" Style="{StaticResource ToolBar}">
-            <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" Image="{StaticResource appbar_page_copy}" Click="GlobalCopy_Click" />
+            <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" Image="{iconPacks:Material Kind=ContentCopy}" Click="GlobalCopy_Click" />
             <Rectangle />
-            <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{StaticResource appbar_page_excel}" Click="GlobalExportCSV_Click" />
-            <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{StaticResource appbar_page_xml}" Click="GlobalExportHTML_Click" />
+            <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="GlobalExportCSV_Click" />
+            <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="GlobalExportHTML_Click" />
             <StackPanel Orientation="Horizontal" Visibility="{Binding EnableAdvancedFilters,Converter={StaticResource valueToVisibilityConverter}}">
                 <Rectangle />
-                <UC:ToolBarToggleButton x:Name="btnAggregate" IsChecked="False" Text="Group/Filter" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" Image="{StaticResource appbar_tiles_nine}" />
+                <UC:ToolBarToggleButton x:Name="btnAggregate" IsChecked="False" Text="Group/Filter" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" Image="{iconPacks:Material Kind=FilterMenu}" />
             </StackPanel>
         </WrapPanel>
         <WrapPanel Grid.Row="2" Height="25" Style="{StaticResource ToolBar}">
@@ -108,7 +109,7 @@
                                                                             <ColumnDefinition Width="Auto" />
                                                                             <ColumnDefinition Width="*" />
                                                                         </Grid.ColumnDefinitions>
-                                                                        <Path Data="{StaticResource appbar_add}" Stretch="Uniform" Width="20" Margin="10" Fill="Gray" />
+                                                                        <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="10" Foreground="Gray" />
                                                                         <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to add a filter. You can also directly type the filter below." FontStyle="Italic" />
                                                                     </Grid>
                                                                 </ControlTemplate>
@@ -130,9 +131,7 @@
                                             <DataGridTemplateColumn CanUserSort="False">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <Button Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteFilter_Click">
-                                                            <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
-                                                        </Button>
+                                                        <Button Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteFilter_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
@@ -156,7 +155,7 @@
                                                                             <ColumnDefinition Width="Auto" />
                                                                             <ColumnDefinition Width="*" />
                                                                         </Grid.ColumnDefinitions>
-                                                                        <Path Data="{StaticResource appbar_add}" Stretch="Uniform" Width="20" Margin="10" Fill="Gray" />
+                                                                        <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="10" Foreground="Gray" />
                                                                         <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to group by the related attribute" FontStyle="Italic" />
                                                                     </Grid>
                                                                 </ControlTemplate>
@@ -175,7 +174,7 @@
                                                     </Grid.ColumnDefinitions>
                                                     <Label Content="{Binding}" />
                                                     <Button Grid.Column="1" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteGrp_Click">
-                                                        <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                                                        <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{iconPacks:Material Kind=DeleteOutline}" Stretch="Uniform" />
                                                     </Button>
                                                 </Grid>
                                             </DataTemplate>
@@ -195,7 +194,7 @@
                                                                             <ColumnDefinition Width="Auto" />
                                                                             <ColumnDefinition Width="*" />
                                                                         </Grid.ColumnDefinitions>
-                                                                        <Path Data="{StaticResource appbar_add}" Stretch="Uniform" Width="20" Margin="10" Fill="Gray" />
+                                                                        <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="10" Foreground="Gray" />
                                                                         <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here or add a 'group by attribute' above to aggregate data. Note: at least one 'group by' attribute is required for the aggregation to be computed." FontStyle="Italic" />
                                                                     </Grid>
                                                                 </ControlTemplate>
@@ -216,7 +215,7 @@
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
                                                         <Button Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteAggreg_Click">
-                                                            <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{StaticResource appbar_delete}" Stretch="Uniform" />
+                                                            <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{iconPacks:Material Kind=DeleteOutline}" Stretch="Uniform" />
                                                         </Button>
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>

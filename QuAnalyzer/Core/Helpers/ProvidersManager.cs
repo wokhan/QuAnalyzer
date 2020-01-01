@@ -40,11 +40,14 @@ namespace QuAnalyzer.Core.Helpers
                 CancellationToken.None);
 
     */
-            var path = @$"{AppDomain.CurrentDomain.BaseDirectory}\providers\{new FileInfo(zipPath).Name}";
+            var path = $@"{AppDomain.CurrentDomain.BaseDirectory}\providers\{new FileInfo(zipPath).Name}";
 
             using (var fileStream = new FileStream(zipPath, FileMode.Open))
             {
-                new ZipArchive(fileStream, ZipArchiveMode.Read, false).ExtractToDirectory(path);
+                using (var zip = new ZipArchive(fileStream, ZipArchiveMode.Read, false))
+                {
+                    zip.ExtractToDirectory(path);
+                }
                 DataProviders.AddPath(path);
                 NotifyPropertyChanged(nameof(Providers));
             }

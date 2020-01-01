@@ -34,7 +34,7 @@ namespace QuAnalyzer.Features.Comparison
 
         public string TargetRepository { get; set; }
 
-        public List<SimpleMap> AllMappings;
+        public List<SimpleMap> AllMappings { get; set; } = new List<SimpleMap>();
 
         private bool _isOrdered = false;
         public bool IsOrdered

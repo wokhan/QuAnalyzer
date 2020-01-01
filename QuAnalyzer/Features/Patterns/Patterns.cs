@@ -7,9 +7,9 @@ namespace QuAnalyzer.Features.Patterns
     {
         internal static string GetRegEx(string src, int threshold)
         {
-            if (src == null)
+            if (String.IsNullOrEmpty(src))
             {
-                return null;
+                return src;
             }
 
             var previous = ' ';

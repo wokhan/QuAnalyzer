@@ -114,7 +114,7 @@ namespace QuAnalyzer.Core.Project
         internal void CreateNew()
         {
             FilePath = String.Empty;
-            Name = String.Empty;
+            Name = "Untitled project";
 
             CurrentProviders.Clear();
             SourceMapper.Clear();

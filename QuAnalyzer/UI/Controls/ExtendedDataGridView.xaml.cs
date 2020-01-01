@@ -1,4 +1,6 @@
-﻿using QuAnalyzer.Generic.Extensions;
+﻿using QuAnalyzer.Core.Helpers;
+using QuAnalyzer.Generic.Extensions;
+using QuAnalyzer.UI.Windows;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,7 +16,11 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Linq.Extensions;
+#if _WPF_ 
 using Wokhan.WPF.Extensions;
+#else
+using Wokhan.UWP.Extensions;
+#endif
 
 namespace QuAnalyzer.UI.Controls
 {
@@ -156,7 +162,12 @@ namespace QuAnalyzer.UI.Controls
             }
         }
 
-        private void GlobalExportCSV_Click(object sender, RoutedEventArgs e) => gridData.ExportAsXLSX();
+        //TODO: Generic
+        private void GlobalExportCSV_Click(object sender, RoutedEventArgs e)
+        {
+            var host = ((ModernMain)Window.GetWindow(this)).stackExports;
+            gridData.ExportAsXLSX(host: host, callback: SharedCallback.GetCallBackForExport(host, "Export", null));
+        }
 
         private void GlobalExportHTML_Click(object sender, RoutedEventArgs e) => gridData.ExportAsHTML();
 
