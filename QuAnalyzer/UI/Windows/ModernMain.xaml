@@ -3,7 +3,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     x:Class="QuAnalyzer.UI.Windows.ModernMain"
-    xmlns:QuAnalyzerHelpers="clr-namespace:QuAnalyzer.Core.Helpers"
     xmlns:UserControls="clr-namespace:QuAnalyzer.UI.Menus"
     xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
@@ -27,105 +26,12 @@
     </Window.TaskbarItemInfo>
     <Controls:MetroWindow.LeftWindowCommands>
         <Controls:WindowCommands ShowSeparators="False">
-            <StackPanel Orientation="Horizontal" Margin="5">
-                <Button Foreground="#1DAE16" FontSize="20" ToolTip="New project" x:Name="btnMenuNew" Click="btnMenuNew_Click" Content="{iconPacks:Material Kind=FileDocumentOutline}" />
-                <Controls:DropDownButton Foreground="Black" Width="32" ToolTip="Open..." Icon="{iconPacks:Material Kind=FolderOpenOutline}" x:Name="btnMenuOpen" Click="btnMenuOpen_Click" ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
-                    <Controls:DropDownButton.ItemContainerStyle>
-                        <Style TargetType="MenuItem">
-                            <Setter Property="Header" Value="{Binding Key}"/>
-                            <Setter Property="CommandParameter" Value="{Binding Key}"/>
-                            <EventSetter Event="Click" Handler="btnMenuRecent_Click" />
-                        </Style>
-                    </Controls:DropDownButton.ItemContainerStyle>
-                </Controls:DropDownButton>
-                <Controls:DropDownButton ToolTip="Save" Icon="{iconPacks:Material Kind=ContentSave}" x:Name="btnMenuSave" Click="btnMenuSave_Click" Width="32">
-
-                </Controls:DropDownButton>
-                <ToggleButton ToolTip="About..." x:Name="btnAbout" Content="{iconPacks:Material Kind=InformationOutline}" Foreground="#CC1DAE16" FontSize="26" />
-                <!--<MenuItem Header="Recent" x:Name="btnMenuRecent" ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
-                            <MenuItem.Icon>
-                                <Path Fill="#CCBF4747" Width="20" Data="{StaticResource appbar_folder_open}" Stretch="Uniform" />
-                            </MenuItem.Icon>
-                            <MenuItem.ItemContainerStyle>
-                                <Style TargetType="MenuItem">
-                                    <Setter Property="Header" Value="{Binding Key}"/>
-                                    <Setter Property="CommandParameter" Value="{Binding Key}"/>
-                                    <EventSetter Event="Click" Handler="btnMenuRecent_Click" />
-                                </Style>
-                            </MenuItem.ItemContainerStyle>
-                        </MenuItem>
-                        <Separator /-->
-                <!--<MenuItem Header="Save as..." Click="btnMenuSaveAs_Click">
-                    <MenuItem.Icon>
-                        <Path Data="{StaticResource appbar_disk_download}" Stretch="Uniform" Fill="#CC4747BF" Height="16" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <Separator />
-                <MenuItem Header="New project" x:Name="btnMenuNew" Click="btnMenuNew_Click">
-                    <MenuItem.Icon>
-                        <Path Fill="#CC1DAE16" Height="16" Data="{StaticResource appbar_folder_star}" Stretch="Uniform" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <Separator />
-                <MenuItem Header="Exit">
-                    <MenuItem.Icon>
-                        <Path Fill="OrangeRed" Height="16" Stretch="Uniform" Data="{StaticResource appbar_close}" />
-                    </MenuItem.Icon>
-                </MenuItem>
-
-                <MenuItem Header="_Options">
-                    <MenuItem IsCheckable="True" Header="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static Application.Current}, FallbackValue=True}"  />
-                </MenuItem>
-
-                <MenuItem Header="_Help">
-                    <MenuItem Header="About" x:Name="btnAbout" IsCheckable="True">
-                        <MenuItem.Icon>
-                            <Path Width="16" Stretch="Uniform" Data="{StaticResource appbar_information_circle}" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                </MenuItem>-->
-
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="100,0,0,0">
-                    <Controls:SplitButton ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}" SelectedItem="{Binding CurrentProject.AccentColor,Source={x:Static Application.Current},Mode=TwoWay}" Width="50">
-                        <ComboBox.ItemContainerStyle>
-                            <Style TargetType="ComboBoxItem">
-                                <Setter Property="ContentTemplate">
-                                    <Setter.Value>
-                                        <DataTemplate>
-                                            <Ellipse  Fill="{Binding}" Width="16" Height="16" VerticalAlignment="Stretch" />
-                                        </DataTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <!--<Setter Property="CommandParameter" Value="{Binding}"/>
-                                <Setter Property="IsCheckable" Value="True" />
-                                <EventSetter Event="Click" Handler="btnAccentColor_Click" />-->
-                            </Style>
-                        </ComboBox.ItemContainerStyle>
-                    </Controls:SplitButton>
-                    <TextBox x:Name="txtProjectTitle" MinWidth="200" FontSize="14" Foreground="Black" BorderThickness="1" BorderBrush="Transparent" VerticalContentAlignment="Center" Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}">
-                        <TextBox.Style>
-                            <Style TargetType="TextBox">
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="LightGray" />
-                                        <Setter Property="BorderBrush" Value="DimGray" />
-                                    </Trigger>
-                                    <Trigger Property="IsFocused" Value="True">
-                                        <Setter Property="Background" Value="WhiteSmoke" />
-                                        <Setter Property="BorderBrush" Value="Gray" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBox.Style>
-                    </TextBox>
-                    <Button Click="btnEditTitle_Click" Foreground="Gray" Content="{iconPacks:Material Kind=Pencil}" />
-                </StackPanel>
-            </StackPanel>
+            <UserControls:MainMenu />
         </Controls:WindowCommands>
     </Controls:MetroWindow.LeftWindowCommands>
     <Controls:MetroWindow.Flyouts>
         <Controls:FlyoutsControl>
-            <Controls:Flyout x:Name="flyAbout" Position="Top" Margin="0,100,0,0" Width="500" TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" IsOpen="{Binding IsChecked, Mode=TwoWay, ElementName=btnAbout}" IsPinned="False">
+            <Controls:Flyout x:Name="flyAbout" Position="Top" Margin="0,100,0,0" Width="500" TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" IsPinned="False">
                 <Controls:Flyout.Effect>
                     <DropShadowEffect Opacity="0.1" />
                 </Controls:Flyout.Effect>
@@ -162,7 +68,7 @@
         </Grid.RowDefinitions>
         <Controls:Flyout TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" BorderBrush="{DynamicResource AccentColorBrush}" IsAutoCloseEnabled="False" Position="Left" IsOpen="True" Header="Sources" HorizontalAlignment="Left" Width="200" Background="LightGray">
             <Grid>
-                <UserControls:MainMenu x:Name="mainMenu" />
+                <UserControls:SourcesMenu x:Name="mainMenu" />
                 <Rectangle Width="1" VerticalAlignment="Stretch" Fill="White" HorizontalAlignment="Right">
                     <Rectangle.Effect>
                         <DropShadowEffect Direction="180" BlurRadius="15" />

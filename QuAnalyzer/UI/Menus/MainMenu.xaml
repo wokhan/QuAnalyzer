@@ -1,112 +1,120 @@
 ﻿<UserControl x:Class="QuAnalyzer.UI.Menus.MainMenu"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"      
-    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" d:DesignHeight="460">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="32" />
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid Background="Gray">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <ContentControl Foreground="WhiteSmoke" Margin="10,0" Height="19" Content="{iconPacks:Material Kind=DatabaseExport}" />
-            <Label Grid.Column="1" VerticalAlignment="Center" Foreground="WhiteSmoke" Content="SOURCES" FontSize="12" />
-        </Grid>
-        <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
-            <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}"/>
-        </WrapPanel>
-        <ListView BorderThickness="0" Grid.Row="2" Name="lstProviders" SelectedItem="{Binding CurrentSelection,Source={x:Static Application.Current}}" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
-            <ListView.Resources>
-                <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
-                    <Setter Property="Background" Value="Transparent" />
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:QuAnalyzerHelpers="clr-namespace:QuAnalyzer.Core.Helpers"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+             mc:Ignorable="d" d:DesignWidth="600">
+    <StackPanel TextBlock.Foreground="Black" Orientation="Horizontal" MaxHeight="32" Margin="5">
+        <StackPanel.Resources>
+            <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.WindowCommands}" />
+            <Style TargetType="Controls:DropDownButton" BasedOn="{StaticResource MahApps.Styles.DropDownButton.WindowCommands}" />
+        </StackPanel.Resources>
+        <Button Foreground="Orange" FontSize="20" ToolTip="New project" x:Name="btnMenuNew" Click="btnMenuNew_Click" Content="{iconPacks:Material Kind=FileDocumentOutline}" />
+        <Button Foreground="Green" ToolTip="Open..." Content="{iconPacks:Material Kind=FolderOpenOutline}" x:Name="btnMenuOpen" Click="btnMenuOpen_Click" />
+        <Controls:DropDownButton Padding="0" Foreground="Green" ToolTip="Open..." ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
+            <Controls:DropDownButton.ItemContainerStyle>
+                <Style TargetType="MenuItem">
+                    <Setter Property="Header" Value="{Binding Key}"/>
+                    <Setter Property="CommandParameter" Value="{Binding Key}"/>
+                    <EventSetter Event="Click" Handler="btnMenuRecent_Click" />
                 </Style>
-            </ListView.Resources>
-            <ItemsControl.Style>
-                <Style TargetType="ItemsControl" BasedOn="{StaticResource {x:Type ItemsControl}}">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate>
-                                        <TextBlock Margin="10" TextWrapping="Wrap" Text="Please start by adding a new source." FontStyle="Italic" />
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </DataTrigger>
-                    </Style.Triggers>
+            </Controls:DropDownButton.ItemContainerStyle>
+        </Controls:DropDownButton>
+        <Button Foreground="Blue" ToolTip="Save" Content="{iconPacks:Material Kind=ContentSaveOutline}" x:Name="btnMenuSave" Click="btnMenuSave_Click" />
+        <Controls:DropDownButton Foreground="Blue" ToolTip="Save" Padding="0">
+            <Controls:DropDownButton.ItemContainerStyle>
+                <Style TargetType="MenuItem">
+                    <Setter Property="Header" Value="{Binding Key}"/>
+                    <Setter Property="CommandParameter" Value="{Binding Key}"/>
+                    <EventSetter Event="Click" Handler="btnMenuSaveAs_Click" />
                 </Style>
-            </ItemsControl.Style>
-            <!--<ItemsControl.Resources>
-                <Style TargetType="ListItem" BasedOn="{StaticResource {x:Type ListItem}}">
-                    -->
-            <!--<Setter Property="OverridesDefaultStyle" Value="True" />-->
-            <!--
-                    <Style.Triggers>
-                        <Trigger Property="Selector.IsSelected" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ItemsControl.Resources>-->
-            <ItemsControl.GroupStyle>
-                <GroupStyle>
-                    <GroupStyle.ContainerStyle>
-                        <Style TargetType="{x:Type GroupItem}">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate>
-                                        <Expander BorderThickness="0" IsExpanded="True">
-                                            <Expander.Header>
-                                                <Grid Background="Transparent">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="ImgCol" />
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
-                                                    <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name.Name}" VerticalAlignment="Center" />
-                                                    <Button Grid.Column="2" Name="btnEditProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Foreground="Blue" Tag="{Binding Name}" Click="btnEditProvider_Click" Content="{iconPacks:Material Kind=Pencil}" />
-                                                    <Button Grid.Column="3" Name="btnDeleteProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Foreground="OrangeRed" Tag="{Binding Name}" Click="btnDeleteProvider_Click" Content="{iconPacks:Material Kind=DeleteOutline}" />
-                                                </Grid>
-                                            </Expander.Header>
-                                            <ItemsPresenter />
-                                        </Expander>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </GroupStyle.ContainerStyle>
-                </GroupStyle>
-            </ItemsControl.GroupStyle>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border BorderThickness="5" Margin="5">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding CurrentSelectionLinked,Source={x:Static Application.Current}}" Value="True">
-                                        <Setter Property="CornerRadius" Value="10,0,0,10" />
-                                        <Setter Property="Margin" Value="5,0,5,5" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <TextBlock Grid.Column="1" Foreground="Black" Text="{Binding Value}" Tag="{Binding}" PreviewMouseLeftButtonDown="Repository_PreviewMouseLeftButtonDown" PreviewMouseMove="Repository_DataGrid_MouseMove" />
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ListView>
-    </Grid>
+            </Controls:DropDownButton.ItemContainerStyle>
+            <Controls:DropDownButton.Items>
+                <ContentControl Content="{iconPacks:Material Kind=ContentSaveMoveOutline}" />
+            </Controls:DropDownButton.Items>
+        </Controls:DropDownButton>
+        <Button ToolTip="About..." x:Name="btnAbout" Click="btnAbout_Click" Content="{iconPacks:Material Kind=InformationOutline}" Foreground="#CC1DAE16" FontSize="26" />
+        <!--<MenuItem Header="Recent" x:Name="btnMenuRecent" ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
+                            <MenuItem.Icon>
+                                <Path Fill="#CCBF4747" Width="20" Data="{StaticResource appbar_folder_open}" Stretch="Uniform" />
+                            </MenuItem.Icon>
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="Header" Value="{Binding Key}"/>
+                                    <Setter Property="CommandParameter" Value="{Binding Key}"/>
+                                    <EventSetter Event="Click" Handler="btnMenuRecent_Click" />
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                        <Separator /-->
+        <!--<MenuItem Header="Save as..." Click="btnMenuSaveAs_Click">
+                    <MenuItem.Icon>
+                        <Path Data="{StaticResource appbar_disk_download}" Stretch="Uniform" Fill="#CC4747BF" Height="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="New project" x:Name="btnMenuNew" Click="btnMenuNew_Click">
+                    <MenuItem.Icon>
+                        <Path Fill="#CC1DAE16" Height="16" Data="{StaticResource appbar_folder_star}" Stretch="Uniform" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Exit">
+                    <MenuItem.Icon>
+                        <Path Fill="OrangeRed" Height="16" Stretch="Uniform" Data="{StaticResource appbar_close}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+
+                <MenuItem Header="_Options">
+                    <MenuItem IsCheckable="True" Header="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static Application.Current}, FallbackValue=True}"  />
+                </MenuItem>
+
+                <MenuItem Header="_Help">
+                    <MenuItem Header="About" x:Name="btnAbout" IsCheckable="True">
+                        <MenuItem.Icon>
+                            <Path Width="16" Stretch="Uniform" Data="{StaticResource appbar_information_circle}" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>-->
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="100,0,0,0">
+            <Controls:SplitButton ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}" SelectedItem="{Binding CurrentProject.AccentColor,Source={x:Static Application.Current},Mode=TwoWay}" Width="50">
+                <ComboBox.ItemContainerStyle>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <Ellipse  Fill="{Binding}" Width="16" Height="16" VerticalAlignment="Stretch" />
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <!--<Setter Property="CommandParameter" Value="{Binding}"/>
+                                <Setter Property="IsCheckable" Value="True" />
+                                <EventSetter Event="Click" Handler="btnAccentColor_Click" />-->
+                    </Style>
+                </ComboBox.ItemContainerStyle>
+            </Controls:SplitButton>
+            <TextBox x:Name="txtProjectTitle" MinWidth="200" FontSize="14" Foreground="Black" BorderThickness="1" BorderBrush="Transparent" VerticalContentAlignment="Center" Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}">
+                <TextBox.Style>
+                    <Style TargetType="TextBox">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="LightGray" />
+                                <Setter Property="BorderBrush" Value="DimGray" />
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="Background" Value="WhiteSmoke" />
+                                <Setter Property="BorderBrush" Value="Gray" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+            <Button Click="btnEditTitle_Click" Foreground="Gray" Content="{iconPacks:Material Kind=Pencil}" />
+        </StackPanel>
+    </StackPanel>
+
 </UserControl>
