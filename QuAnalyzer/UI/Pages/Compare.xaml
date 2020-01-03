@@ -20,11 +20,11 @@
         </Grid.RowDefinitions>
         <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
             <UC:ToolBarButton HorizontalAlignment="Center" ToolTip="Start comparisons for the selected items" BorderBrush="Green" Click="btnRun_Click" Image="{iconPacks:Material Kind=Play,Width=10}" Text="Run" />
+            <Rectangle />
+            <UC:ToolBarToggleButton x:Name="btnToggleMode" Text="Single-mapping mode" ToolTip="Single-mapping mode" BorderBrush="Blue" Foreground="Blue" Image="{iconPacks:Material Kind=AbTesting}" IsChecked="False" />
         </WrapPanel>
         <DockPanel Margin="0" Grid.Row="1" >
             <WrapPanel Style="{StaticResource ToolBar}">
-                <UC:ToolBarToggleButton x:Name="btnToggleMode" Text="Single-mapping mode" ToolTip="Single-mapping mode" BorderBrush="Blue" Foreground="Blue" Image="{iconPacks:Material Kind=AbTesting}" IsChecked="False" />
-                <Rectangle />
                 <UC:ToolBarButton Text="Add" ToolTip="Add a mapping" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnNewPrv_Click" />
                 <UC:ToolBarButton Text="Automap" ToolTip="Automap" BorderBrush="Green" Image="{iconPacks:Material Kind=ShuffleVariant}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnAuto_Click" />
                 <Rectangle />

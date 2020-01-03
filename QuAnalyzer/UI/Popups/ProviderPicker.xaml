@@ -4,6 +4,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:QuAnalyzer.UI.Pages"
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
       x:Name="me"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -27,7 +29,7 @@
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate>
-                                            <Expander IsExpanded="False" Margin="10">
+                                            <Expander IsExpanded="True" Foreground="White" BorderThickness="0" Margin="10">
                                                 <Expander.Header>
                                                     <TextBlock FontWeight="Bold" FontSize="14" VerticalAlignment="Bottom">
                                                         <Run Text="{Binding Name, Mode=OneWay}" />
@@ -60,9 +62,7 @@
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <Border Grid.RowSpan="2" BorderBrush="Gray" BorderThickness="1" Background="White" Margin="10">
-                                <Image HorizontalAlignment="Center" Height="28" VerticalAlignment="Center" Margin="2" Stretch="Uniform" MaxWidth="50" Source="{Binding IconPath,Converter={StaticResource imageSourceConverter}}" />
-                            </Border>
+                            <Image Grid.RowSpan="2" HorizontalAlignment="Center" Height="28" VerticalAlignment="Center" Margin="2" Stretch="Uniform" MaxWidth="50" Source="{Binding IconPath,Converter={StaticResource imageSourceConverter}}" />
                             <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" FontWeight="Bold" Text="{Binding Name}" VerticalAlignment="Center" />
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Copyright}" Margin="5,0" HorizontalAlignment="Left" TextWrapping="Wrap" FontSize="10" />
                         </Grid>
@@ -73,11 +73,11 @@
         <Border Grid.Row="3" Style="{StaticResource ButtonBar}">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Button Content="Cancel" Name="btnRevert" HorizontalAlignment="Center" Click="btnCancel_Click" />
+                    <UC:ToolBarButton Text="Cancel" BorderBrush="Red" x:Name="btnRevert" HorizontalAlignment="Center" Click="btnCancel_Click" Image="{iconPacks:Material Kind=Cancel}"/>
                     <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Next &gt;" IsEnabled="{Binding SelectedValue,ElementName=lstProvidersTypes, Converter={StaticResource objectToBool}}" Name="btnNext" HorizontalAlignment="Center" Click="btnNewPrv_Click" />
+                    <UC:ToolBarButton Text="Next" BorderBrush="Green" IsEnabled="{Binding SelectedValue,ElementName=lstProvidersTypes, Converter={StaticResource objectToBool}}" x:Name="btnNext" HorizontalAlignment="Center" Click="btnNewPrv_Click" Image="{iconPacks:Material Kind=StepForward}"/>
                 </StackPanel>
             </Grid>
         </Border>

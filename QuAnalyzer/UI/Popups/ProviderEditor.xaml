@@ -17,7 +17,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Border BorderBrush="LightGray" BorderThickness="0,0,0,2" Background="WhiteSmoke" Padding="10">
+        <Border BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="WhiteSmoke" Padding="10,5">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -28,9 +28,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <Border Grid.RowSpan="3" Height="40" MinWidth="40" Background="White" BorderBrush="Gray" BorderThickness="1">
-                    <Image Source="{Binding CurrentType.IconPath, Converter={StaticResource imageSourceConverter}}" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Border>
+                <Image Grid.RowSpan="2" Source="{Binding CurrentType.IconPath, Converter={StaticResource imageSourceConverter}}" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 <Label Grid.Column="1" Content="{Binding CurrentType.Name}" FontWeight="Bold" />
                 <Label Grid.Column="1" Grid.Row="1" Content="{Binding CurrentType.Copyright}" FontSize="10" />
                 <Label Grid.Column="1" Grid.Row="2" Content="{Binding CurrentType.Description}" />
@@ -153,7 +151,7 @@
         <DockPanel x:Name="dockRepositories" Grid.Row="2" Visibility="Hidden">
             <WrapPanel Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton Text="Add" ToolTip="Add a repository" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnRepoAdd_Click" />
-                <UC:ToolBarButton Text="Retrieve" ToolTip="Add a repository" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleMultipleOutline}" Click="btnRepoRetr_Click" />
+                <UC:ToolBarButton Text="Retrieve" ToolTip="Add a repository" BorderBrush="Green" Image="{iconPacks:Material Kind=DownloadOutline}" Click="btnRepoRetr_Click" />
                 <UC:ToolBarButton Text="Clear" ToolTip="Clear" BorderBrush="OrangeRed" Image="{iconPacks:Material Kind=SelectionOff}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}" Click="btnRepoClear_Click" />
                 <Rectangle />
                 <UC:ToolBarButton Text="Sel. all" ToolTip="Select all" BorderBrush="Blue" Image="{iconPacks:Material Kind=SelectAll}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}"  Click="btnRepoSel_Click" />
@@ -181,7 +179,7 @@
                     <DataGridTemplateColumn Width="40" IsReadOnly="True" CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Name="btnDeleteRepo" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteRepo_Click" Foreground="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                <Button Name="btnDeleteRepo" Tag="{Binding}" Click="btnDeleteRepo_Click" Background="Transparent" BorderBrush="Transparent" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -191,13 +189,13 @@
         <Border Grid.Row="3" Style="{StaticResource ButtonBar}">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Button Content="Cancel" BorderBrush="Red" Name="btnRevert" HorizontalAlignment="Center" Click="btnRevert_Click" />
-                    <Button Content="Test" BorderBrush="Blue" Name="btnTest" HorizontalAlignment="Left" Click="btnTest_Click" />
+                    <UC:ToolBarButton Text="Cancel" BorderBrush="Red" x:Name="btnRevert" Image="{iconPacks:Material Kind=Cancel}" HorizontalAlignment="Center" Click="btnRevert_Click" />
+                    <UC:ToolBarButton Text="Test" BorderBrush="Blue" x:Name="btnTest" Image="{iconPacks:Material Kind=TestTube}" HorizontalAlignment="Left" Click="btnTest_Click" />
                     <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="&lt; Back" BorderBrush="Orange" Name="btnBack" HorizontalAlignment="Center" Click="btnBack_Click" IsEnabled="False" />
-                    <Button Content="Next &gt;" BorderBrush="Green" Name="btnNext" HorizontalAlignment="Center" Click="btnNext_Click" />
+                    <UC:ToolBarButton Text="Back" BorderBrush="Orange" Image="{iconPacks:Material Kind=StepBackward}" x:Name="btnBack" HorizontalAlignment="Center" Click="btnBack_Click" IsEnabled="False" />
+                    <UC:ToolBarButton Text="Next" BorderBrush="Green" Image="{iconPacks:Material Kind=StepForward}" x:Name="btnNext" HorizontalAlignment="Center" Click="btnNext_Click" />
                 </StackPanel>
             </Grid>
         </Border>
