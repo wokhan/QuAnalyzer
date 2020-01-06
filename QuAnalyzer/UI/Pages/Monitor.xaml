@@ -6,6 +6,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
       xmlns:charts="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+      xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
       mc:Ignorable="d"
       d:DesignHeight="700" d:DesignWidth="800"
       DataContext="{Binding RelativeSource={RelativeSource Self}}"
@@ -25,26 +26,23 @@
             <!--<UC:ToolBarButton Text="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />-->
             <UC:ToolBarButton x:Name="btnStop" IsEnabled="False" Text="Stop" ToolTip="Stop monitoring" BorderBrush="Red" Image="{iconPacks:Material Kind=Stop,Width=10}" Click="btnStopAll_Click" />
             <Rectangle />
+            <UC:ToolBarButton Text="Add" ToolTip="Add a step" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnAdd_Click" />
+            <UC:ToolBarButton Text="Clear" ToolTip="Remove all" BorderBrush="OrangeRed" Image="{iconPacks:Material Kind=DeleteOutline}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnClear_Click" />
             <UC:ToolBarToggleButton Text="Comparison mode" x:Name="btnCompareMode" BorderBrush="Violet" Image="{iconPacks:Material Kind=Shuffle}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" />
+            <Rectangle />
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Occurences: " VerticalAlignment="Center" />
-                <TextBox x:Name="txtNbOccur" IsEnabled="{Binding IsChecked,ElementName=btnBurstMode}"  Text="10" Width="40" Padding="0" Margin="2" VerticalAlignment="Center" />
+                <mah:NumericUpDown HideUpDownButtons="True" Width="40" VerticalContentAlignment="Center" IsEnabled="{Binding IsChecked,ElementName=btnBurstMode}" Minimum="1" Value="{Binding Occurences,Mode=TwoWay}" Padding="0" Margin="2" VerticalAlignment="Center" />
             </StackPanel>
             <Rectangle />
             <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
                 <TextBlock Text="Parallelism: " VerticalAlignment="Center" />
-                <TextBox x:Name="txtNbPara" Text="1" Width="40" VerticalAlignment="Center" Padding="0" Margin="2" />
+                <mah:NumericUpDown HideUpDownButtons="True" Width="40" VerticalContentAlignment="Center" Minimum="1" Value="{Binding MaxParallel,Mode=TwoWay}" VerticalAlignment="Center" Padding="0" Margin="2" />
             </StackPanel>
             <!--<Rectangle />
             <UC:ToolBarToggleButton Text="Enable chart" ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />-->
         </WrapPanel>
-        <DockPanel Grid.Row="1">
-            <TextBlock DockPanel.Dock="Top" Background="LightGray" Padding="5" Text="Configuration" />
-            <WrapPanel Style="{StaticResource ToolBar}">
-                <UC:ToolBarButton Text="Add" ToolTip="Add a step" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnAdd_Click" />
-                <UC:ToolBarButton Text="Clear" ToolTip="Remove all" BorderBrush="OrangeRed" Image="{iconPacks:Material Kind=DeleteOutline}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnClear_Click" />
-            </WrapPanel>
-            <DataGrid SelectionMode="Extended" VirtualizingPanel.ScrollUnit="Pixel" RowDetailsVisibilityMode="VisibleWhenSelected" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" x:Name="gridSteps" AutoGenerateColumns="False" IsReadOnly="True">
+        <DataGrid Grid.Row="1"  SelectionMode="Extended" VirtualizingPanel.ScrollUnit="Pixel" RowDetailsVisibilityMode="VisibleWhenSelected" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" x:Name="gridSteps" AutoGenerateColumns="False" IsReadOnly="True">
                 <DataGrid.Columns>
                     <DataGridCheckBoxColumn Binding="{Binding Selector.IsSelected}" Width="Auto" />
                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
@@ -114,7 +112,6 @@
                     </DataTemplate>
                 </DataGrid.RowDetailsTemplate>
             </DataGrid>
-        </DockPanel>
         <GridSplitter Grid.Row="2" Height="2" Background="LightGray" />
         <DockPanel Grid.Row="3">
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">

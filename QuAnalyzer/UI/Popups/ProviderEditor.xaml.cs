@@ -32,6 +32,7 @@ namespace QuAnalyzer.UI.Pages
 
         public IList<IGrouping<string, DataProviderMemberDefinition>> ExpParameters => DataProviders.GetParameters(CurrentProvider);
 
+        public bool HasMultipleItems => ExpParameters.Count > 1;
         public DataProviderDefinition CurrentType => CurrentProvider.Definition;
 
         protected void NotifyPropertyChanged(string propertyName)
@@ -53,7 +54,7 @@ namespace QuAnalyzer.UI.Pages
             Repositories.CollectionChanged += Repositories_CollectionChanged;
 
             CurrentProvider = currentProvider;
-
+            
             InitializeComponent();
         }
 
@@ -87,7 +88,7 @@ namespace QuAnalyzer.UI.Pages
             }
         }
 
-        void rdb_Checked(object sender, RoutedEventArgs e)
+        public void rdb_Checked(object sender, RoutedEventArgs e)
         {
             if (((RadioButton)sender).IsChecked.Value)
             {

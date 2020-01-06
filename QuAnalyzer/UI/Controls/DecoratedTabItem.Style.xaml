@@ -6,49 +6,26 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Border BorderThickness="0" CornerRadius="5,5,0,0">
+                    <Border BorderThickness="1,1,1,0" CornerRadius="5,5,0,0">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="LightGray" />
-                                    </Trigger>
-                                    <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={x:Static RelativeSource.TemplatedParent}}" Value="True">
                                         <Setter Property="Background" Value="WhiteSmoke" />
+                                        <Setter Property="BorderBrush" Value="Gray" />
+                                        <Setter Property="Height" Value="31" />
+                                    </Trigger>
+                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={x:Static RelativeSource.TemplatedParent}}" Value="True">
+                                        <Setter Property="Background" Value="WhiteSmoke" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}" />
+                                        <Setter Property="Height" Value="32" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0" Height="19" Content="{Binding Image,RelativeSource={x:Static RelativeSource.TemplatedParent}}">
-                                <ContentControl.Style>
-                                    <Style TargetType="ContentControl">
-                                        <Setter Property="Foreground" Value="DimGray" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={x:Static RelativeSource.TemplatedParent}}" Value="True">
-                                                <Setter Property="Foreground" Value="{DynamicResource AccentColorBrush}" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Path=IsMouseOver, RelativeSource={x:Static RelativeSource.TemplatedParent}}" Value="True">
-                                                <Setter Property="Foreground" Value="{DynamicResource AccentColorBrush}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ContentControl.Style>
-                            </ContentControl>
-                            <TextBlock Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Path=Header,RelativeSource={x:Static RelativeSource.TemplatedParent}}">
-                                <TextBlock.Style>
-                                    <Style>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={x:Static RelativeSource.TemplatedParent}}" Value="True">
-                                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource AccentColorBrush}" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Path=IsMouseOver, RelativeSource={x:Static RelativeSource.TemplatedParent}}" Value="True">
-                                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource AccentColorBrush}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                            <ContentControl HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding BorderBrush,RelativeSource={x:Static RelativeSource.TemplatedParent}}" Margin="10,0" Height="19" Content="{Binding Image,RelativeSource={x:Static RelativeSource.TemplatedParent}}" />
+                            <TextBlock Margin="0,0,10,0" Foreground="DimGray" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Path=Header,RelativeSource={x:Static RelativeSource.TemplatedParent}}" />
                         </StackPanel>
                     </Border>
                 </ControlTemplate>

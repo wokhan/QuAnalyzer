@@ -25,6 +25,7 @@
         </Grid>
         <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
             <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}"/>
+            <UC:ToolBarButton Text="Import..." IsEnabled="False" BorderBrush="Blue" Image="{iconPacks:Material Kind=Import}"/>
         </WrapPanel>
         <ListView BorderThickness="0" Grid.Row="2" Name="lstProviders" SelectedItem="{Binding CurrentSelection,Source={x:Static Application.Current}}" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
             <ListView.Resources>
@@ -39,7 +40,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
-                                        <TextBlock Margin="10" TextWrapping="Wrap" Text="Please start by adding a new source." FontStyle="Italic" />
+                                        <TextBlock Margin="10" Foreground="Black" TextWrapping="Wrap" Text="Please start by adding a new source." FontStyle="Italic" />
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
@@ -66,7 +67,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
-                                        <Expander BorderThickness="0" IsExpanded="True">
+                                        <Expander BorderThickness="0" IsExpanded="True" Foreground="Black">
                                             <Expander.Header>
                                                 <Grid Background="Transparent">
                                                     <Grid.ColumnDefinitions>
@@ -75,10 +76,9 @@
                                                         <ColumnDefinition Width="Auto" />
                                                         <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
-                                                    <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxWidth="50" Source="{Binding Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
+                                                    <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxHeight="20" Source="{Binding Name.Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
                                                     <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name.Name}" VerticalAlignment="Center" />
-                                                    <Button Grid.Column="2" Name="btnEditProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Foreground="Blue" Tag="{Binding Name}" Click="btnEditProvider_Click" Content="{iconPacks:Material Kind=Pencil}" />
-                                                    <Button Grid.Column="3" Name="btnDeleteProvider" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Foreground="OrangeRed" Tag="{Binding Name}" Click="btnDeleteProvider_Click" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                                    <Button Grid.Column="2" Name="btnEditProvider" Background="Transparent" BorderBrush="Transparent" Foreground="LightBlue" Tag="{Binding Name}" Click="btnEditProvider_Click" Content="{iconPacks:Material Kind=Pencil}" />
                                                 </Grid>
                                             </Expander.Header>
                                             <ItemsPresenter />

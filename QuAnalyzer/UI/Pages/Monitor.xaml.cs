@@ -45,7 +45,8 @@ namespace QuAnalyzer.UI.Pages
         //public ListCollectionView MonitorResultsView { get; } = new ListCollectionView(MonitorResults);
         public SeriesCollection ResultSeries { get; } = new SeriesCollection(Mappers.Xy<DateTimePoint>().X(d => d.DateTime.Ticks).Y(d => d.Value));
         public Dictionary<string, Series[]> ResultSeriesMappings { get; private set; }
-
+        public double? Occurences { get; set; } = 10;
+        public double? MaxParallel { get; set; } = 1;
         public Monitor()
         {
             this.DataContext = this;
@@ -77,9 +78,6 @@ namespace QuAnalyzer.UI.Pages
         {
             btnStart.IsEnabled = false;
             btnStop.IsEnabled = true;
-
-            var ntests = int.Parse(txtNbOccur.Text, NumberFormatInfo.CurrentInfo);
-            var parallel = int.Parse(txtNbPara.Text, NumberFormatInfo.CurrentInfo);
 
             MonitorResultsView.Clear();
 
@@ -137,14 +135,11 @@ namespace QuAnalyzer.UI.Pages
             var timer = (DispatcherTimer)sender;
             var monitors = (MonitorItem[])timer.Tag;
 
-            var nbOccur = int.Parse(txtNbOccur.Text, CultureInfo.CurrentCulture);
-            var nbTreads = int.Parse(txtNbPara.Text, CultureInfo.CurrentCulture);
-
             var monitorInstances = monitors.Select(m => m.GetInstance()).ToList();
 
 
             //TODO : Values !!!!
-            await Task.Run(() => Performance.Run(new TestCasesCollection() { TestCases = monitorInstances }, globalPerfCounter++, nbOccur, nbTreads, monitor_OnAdd)).ConfigureAwait(false);
+            await Task.Run(() => Performance.Run(new TestCasesCollection() { TestCases = monitorInstances }, globalPerfCounter++, (int)Occurences.Value, (int)MaxParallel.Value, monitor_OnAdd)).ConfigureAwait(false);
 
         }
 

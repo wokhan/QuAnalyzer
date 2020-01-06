@@ -70,11 +70,11 @@ namespace QuAnalyzer.UI.Pages
                                .OrderByDescending(g => g.Count);
                 }).ConfigureAwait(true);
 
-                gridPatterns.ItemsSource = res;
+                gridPatterns.Source = res.AsQueryable();
             }
             else
             {
-                gridPatterns.ItemsSource = null;
+                gridPatterns.Source = null;
             }
         }
 

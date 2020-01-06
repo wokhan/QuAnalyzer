@@ -4,6 +4,8 @@
       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    WindowTitleBrush="{Binding CurrentProject.AccentColor,Source={x:Static Application.Current}}"
+    TitleCharacterCasing="Normal"
     GlowBrush="{Binding CurrentProject.AccentColor,Source={x:Static Application.Current}}"
     mc:Ignorable="d" 
     Height="500" Width="800"

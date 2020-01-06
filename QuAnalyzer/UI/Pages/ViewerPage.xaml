@@ -10,5 +10,5 @@
       x:Name="thisWindow"
 	  Title="DataViewer"
       DataContext="{Binding RelativeSource={RelativeSource Self}}">
-    <UC:ExtendedDataGridView x:Name="gridData" />
+    <UC:ExtendedDataGridView x:Name="gridData" EnableAdvancedFilters="True" />
 </Page>

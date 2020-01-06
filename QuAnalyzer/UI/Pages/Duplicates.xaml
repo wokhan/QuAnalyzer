@@ -16,8 +16,8 @@
             <WrapPanel Style="{StaticResource ToolBar}">
                 <UC:ToolBarButton x:Name="btnRun" Click="btnRun_Click" Text="Run" BorderBrush="Green" Image="{iconPacks:Material Kind=Play,Width=10}" />
                 <WrapPanel VerticalAlignment="Center">
-                    <CheckBox Style="{StaticResource ToggleSwitch}" Content=" Keep all duplicates" IsChecked="{Binding KeepDuplicates,Mode=TwoWay}" Margin="7" />
-                    <CheckBox Style="{StaticResource ToggleSwitch}" Content=" Show other columns" IsChecked="{Binding KeepColumns,Mode=TwoWay}" IsEnabled="{Binding KeepDuplicates,Mode=OneWay}" Margin="7" />
+                    <CheckBox Content=" Keep all duplicates" IsChecked="{Binding KeepDuplicates,Mode=TwoWay}" Margin="7" />
+                    <CheckBox Content=" Show other columns" IsChecked="{Binding KeepColumns,Mode=TwoWay}" IsEnabled="{Binding KeepDuplicates,Mode=OneWay}" Margin="7" />
                 </WrapPanel>
             </WrapPanel>
         </StackPanel>

@@ -4,6 +4,7 @@
              xmlns:BindingConverters="clr-namespace:Wokhan.Shared.UI.Converters;assembly=Wokhan.WPF"
              xmlns:BindingConvertersEx="clr-namespace:QuAnalyzer.UI.BindingConverters"
              xmlns:System="clr-namespace:System;assembly=System.Runtime"
+             xmlns:mahapps="http://metro.mahapps.com/winfx/xaml/controls"
              x:Class="QuAnalyzer.App"
              StartupUri="UI/Windows/ModernMain.xaml">
     <Application.Resources>
@@ -23,6 +24,12 @@
             <BindingConverters:ValueToVisibilityConverter x:Key="valueToVisibilityConverter" />
             <BindingConvertersEx:ThicknessConverter x:Key="thicknessConverter" />
             <!--<BindingConvertersEx:CollectionViewSourceCreator x:Key="collectionViewSourceCreator" />-->
+            <Style TargetType="Expander" BasedOn="{StaticResource {x:Type Expander}}">
+                <Setter Property="mahapps:HeaderedControlHelper.HeaderBackground" Value="WhiteSmoke" />
+                <Setter Property="mahapps:HeaderedControlHelper.HeaderForeground" Value="DimGray" />
+                <Setter Property="Background" Value="WhiteSmoke" />
+                <Setter Property="BorderThickness" Value="0" />
+            </Style>
             <Style TargetType="{x:Type DataGrid}" BasedOn="{StaticResource {x:Type DataGrid}}">
                 <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="AlternatingRowBackground" Value="WhiteSmoke" />
@@ -108,12 +115,13 @@
                 </Setter>
             </Style>
             <Style x:Key="ButtonBar" TargetType="Border">
+                <Setter Property="Padding" Value="5" />
                 <Setter Property="Background" Value="WhiteSmoke" />
-                <Setter Property="BorderThickness" Value="0,2,0,0" />
+                <Setter Property="BorderThickness" Value="0,1,0,0" />
                 <Setter Property="BorderBrush" Value="LightGray" />
                 <Style.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
-                        <Setter Property="Width" Value="75" />
+                        <Setter Property="MinWidth" Value="90" />
                         <Setter Property="Margin" Value="10" />
                         <Setter Property="FontSize" Value="11" />
                     </Style>
@@ -179,87 +187,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <!--<Style x:Key="CustomTab" TargetType="TabControl">
-                <Setter Property="OverridesDefaultStyle" Value="True"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="TabControl">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-                                <Border Grid.Row="1" BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="0,1,0,0">
-                                    <ContentPresenter ContentSource="SelectedContent" Margin="0" />
-                                </Border>
-                                <TabPanel Margin="10,0,0,-1" Grid.Row="0" IsItemsHost="True" />
-                            </Grid>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-                <Style.Resources>
-                    <Style TargetType="TabItem">
-                        <Setter Property="OverridesDefaultStyle" Value="True" />
-                        <Setter Property="BorderThickness" Value="0" />
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <Setter Property="VerticalContentAlignment" Value="Stretch" />
-                        <Setter Property="Margin" Value="-1,0,0,0" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate>
-                                    <Border BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="1,1,1,0">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Setter Property="Background" Value="White" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=TabItem}}" Value="True">
-                                                        <Setter Property="Background" Value="WhiteSmoke" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <Border BorderThickness="0,0,0,1">
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=TabItem}}" Value="True">
-                                                            <Setter Property="BorderBrush" Value="WhiteSmoke" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                            <Label VerticalContentAlignment="Center" Padding="6,0" FontSize="12" Content="{Binding Header, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=TabItem}}" Height="26" Width="100" HorizontalContentAlignment="Center">
-                                                <Label.Style>
-                                                    <Style TargetType="Label">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=TabItem}}" Value="True">
-                                                                <Setter Property="FontWeight" Value="Bold" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Label.Style>
-                                            </Label>
-                                        </Border>
-                                        --><!--<Border Height="1" BorderBrush="{DynamicResource AccentColorBrush}">
-                                                <Border.Style>
-                                                    <Style TargetType="Border">
-                                                        <Setter Property="BorderThickness" Value="1" />
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=TabItem}}" Value="True">
-                                                                <Setter Property="BorderThickness" Value="0" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Border.Style>
-                                            </Border>--><!--
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Style.Resources>
-            </Style>-->
             <Style TargetType="ToggleButton" x:Key="ToggleSwitch">
                 <Setter Property="OverridesDefaultStyle" Value="True"/>
                 <Setter Property="Background" Value="White"/>

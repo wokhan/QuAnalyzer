@@ -269,6 +269,7 @@ namespace QuAnalyzer.UI.Controls
                                 .AsVirtualized();
                 Dispatcher.Invoke(() =>
                 {
+                    gridData.SelectedItems.Clear();
                     gridData.ItemsSource = data;
                     gridData.Columns.Single(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
                 });

@@ -16,7 +16,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <GroupBox Header="Source" Grid.Row="1" Height="97" VerticalAlignment="Top" Background="WhiteSmoke">
@@ -54,45 +54,44 @@
                 <ComboBox x:Name="lstTrgRepo" Margin="86,27,5,0" VerticalAlignment="Top" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding DataContext.TargetRepository, ElementName=lstMappings}" SelectionChanged="lstTrgRepo_SelectionChanged" DataContext="{Binding SelectedItem, ElementName=lstTrg}"/>
             </Grid>
         </GroupBox>
-        <GroupBox Style="{StaticResource NoMarginGroupBox}" Header="Mappings" Grid.Row="2" Grid.ColumnSpan="3" >
-            <DockPanel>
-                <WrapPanel Style="{StaticResource ToolBar}">
-                    <UC:ToolBarButton Text="Add" ToolTip="Add a mapping" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnAdd_Click" />
-                    <UC:ToolBarButton Margin="5,0" Text="By position" ToolTip="Map by position" BorderBrush="Blue" Image="{iconPacks:Material Kind=ShuffleVariant}" Click="btnMapPos_Click" />
-                    <UC:ToolBarButton Margin="5,0" Text="By name" ToolTip="Map by name" BorderBrush="Blue" Image="{iconPacks:Material Kind=ShuffleVariant}" Click="btnMapName_Click" />
-                    <UC:ToolBarButton Margin="5,0" Text="Clear" ToolTip="Clear all" IsEnabled="{Binding Items.IsEmpty,ElementName=gridMappings,Converter={StaticResource booleanNegator}}" BorderBrush="OrangeRed" Image="{iconPacks:Material Kind=BorderNoneVariant}" Click="btnRmAll_Click" />
-                </WrapPanel>
-                <DataGrid Name="gridMappings" ItemsSource="{Binding CurrentMaps,ElementName=me}" HorizontalAlignment="Stretch" CanUserAddRows="False" BorderThickness="1" BorderBrush="LightGray" VerticalAlignment="Stretch" AutoGenerateColumns="False">
-                    <DataGrid.Columns>
-                        <DataGridComboBoxColumn Width="*" Header="Source field" ItemsSource="{Binding SourceAttributes,ElementName=me}" TextBinding="{Binding Source, Mode=TwoWay}">
-                            <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
-                            </DataGridComboBoxColumn.EditingElementStyle>
-                        </DataGridComboBoxColumn>
-                        <DataGridComboBoxColumn Width="*" Header="Target field" ItemsSource="{Binding TargetAttributes,ElementName=me}" TextBinding="{Binding Target, Mode=TwoWay}">
-                            <DataGridComboBoxColumn.EditingElementStyle>
-                                <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
-                            </DataGridComboBoxColumn.EditingElementStyle>
-                        </DataGridComboBoxColumn>
-                        <DataGridTemplateColumn Width="80" Header="Use as keys">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="5,0" Foreground="Black" IsChecked="{Binding IsKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Width="Auto" IsReadOnly="True" CanUserResize="False">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Name="btnDelete" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnRm_Click">
-                                        <Path Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{iconPacks:Material Kind=DeleteOutline}" Stretch="Uniform" />
-                                    </Button>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </DockPanel>
-        </GroupBox>
+        <TextBlock Text="Mappings" Grid.Row="2"  Background="LightGray" Padding="5" Grid.ColumnSpan="3"/>
+        <DockPanel Grid.Row="3" Grid.ColumnSpan="3">
+            <WrapPanel Style="{StaticResource ToolBar}">
+                <UC:ToolBarButton Text="Add" ToolTip="Add a mapping" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnAdd_Click" />
+                <UC:ToolBarButton Text="By position" ToolTip="Map by position" BorderBrush="Blue" Image="{iconPacks:Material Kind=FormatListNumbered}" Click="btnMapPos_Click" />
+                <UC:ToolBarButton Text="By name" ToolTip="Map by name" BorderBrush="Blue" Image="{iconPacks:Material Kind=AbTesting}" Click="btnMapName_Click" />
+                <UC:ToolBarButton Text="Remove all" ToolTip="Clear all" IsEnabled="{Binding Items.IsEmpty,ElementName=gridMappings,Converter={StaticResource booleanNegator}}" BorderBrush="OrangeRed" Image="{iconPacks:Material Kind=DeleteSweepOutline}" Click="btnRmAll_Click" />
+            </WrapPanel>
+            <DataGrid Name="gridMappings" ItemsSource="{Binding CurrentMaps,ElementName=me}" HorizontalAlignment="Stretch" CanUserAddRows="False" BorderThickness="1" BorderBrush="LightGray" VerticalAlignment="Stretch" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridComboBoxColumn Width="*" Header="Source field" ItemsSource="{Binding SourceAttributes,ElementName=me}" TextBinding="{Binding Source, Mode=TwoWay}">
+                        <DataGridComboBoxColumn.EditingElementStyle>
+                            <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
+                        </DataGridComboBoxColumn.EditingElementStyle>
+                    </DataGridComboBoxColumn>
+                    <DataGridComboBoxColumn Width="*" Header="Target field" ItemsSource="{Binding TargetAttributes,ElementName=me}" TextBinding="{Binding Target, Mode=TwoWay}">
+                        <DataGridComboBoxColumn.EditingElementStyle>
+                            <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
+                        </DataGridComboBoxColumn.EditingElementStyle>
+                    </DataGridComboBoxColumn>
+                    <DataGridTemplateColumn Width="80" Header="Use as keys">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="5,0" Foreground="Black" IsChecked="{Binding IsKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="Auto" IsReadOnly="True" CanUserResize="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Name="btnDelete" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnRm_Click">
+                                    <Path Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{iconPacks:Material Kind=DeleteOutline}" Stretch="Uniform" />
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
     </Grid>
 </UserControl>

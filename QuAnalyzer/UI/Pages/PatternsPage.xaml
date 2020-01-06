@@ -35,6 +35,6 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-        <DataGrid x:Name="gridPatterns" />
+        <UC:ExtendedDataGridView x:Name="gridPatterns" />
     </DockPanel>
 </Page>

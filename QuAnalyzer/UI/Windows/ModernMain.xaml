@@ -66,7 +66,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Controls:Flyout TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" BorderBrush="{DynamicResource AccentColorBrush}" IsAutoCloseEnabled="False" Position="Left" IsOpen="True" Header="Sources" HorizontalAlignment="Left" Width="200" Background="LightGray">
+        <Controls:Flyout TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" BorderBrush="{DynamicResource AccentColorBrush}" IsAutoCloseEnabled="False" Position="Left" IsOpen="True" Header="Sources" HorizontalAlignment="Left" Width="200" Background="WhiteSmoke">
             <Grid>
                 <UserControls:SourcesMenu x:Name="mainMenu" />
                 <Rectangle Width="1" VerticalAlignment="Stretch" Fill="White" HorizontalAlignment="Right">
@@ -81,6 +81,9 @@
                 <Style TargetType="Frame">
                     <Setter Property="NavigationUIVisibility" Value="Hidden" />
                     <Setter Property="Background" Value="White" />
+                    <Setter Property="BorderThickness" Value="0,1,0,0" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}" />
+                    <Setter Property="Margin" Value="0,-1,0,0" />
                 </Style>
             </TabControl.Resources>
             <UC:DecoratedTabItem IsSelected="True" Header="DISPLAY" Image="{iconPacks:Material Kind=DatabaseSearch}" Tag="true">
