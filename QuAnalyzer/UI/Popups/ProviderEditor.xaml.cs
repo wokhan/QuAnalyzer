@@ -30,9 +30,19 @@ namespace QuAnalyzer.UI.Pages
             set { _currentProvider = value; NotifyPropertyChanged(nameof(CurrentProvider)); NotifyPropertyChanged(nameof(CurrentType)); fillProvider(); }
         }
 
-        public IList<IGrouping<string, DataProviderMemberDefinition>> ExpParameters => DataProviders.GetParameters(CurrentProvider);
+        public IList<IGrouping<string, DataProviderMemberDefinition>> ExpParameters
+        {
+            get
+            {
+                var ret = DataProviders.GetParameters(CurrentProvider);
+                _hasMultipleItems = ExpParameters.Count > 1;
+                NotifyPropertyChanged(nameof(HasMultipleItems));
+                return ret;
+            }
+        }
 
-        public bool HasMultipleItems => ExpParameters.Count > 1;
+        private bool _hasMultipleItems;
+        public bool HasMultipleItems => _hasMultipleItems;
         public DataProviderDefinition CurrentType => CurrentProvider.Definition;
 
         protected void NotifyPropertyChanged(string propertyName)

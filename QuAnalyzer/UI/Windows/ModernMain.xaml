@@ -11,7 +11,8 @@
     Title="QuAnalyzer v1.0beta" ShowIconOnTitleBar="False" TitleBarHeight="40" ShowTitleBar="True"
     ResizeMode="CanResizeWithGrip" TitleAlignment="Right"
     MinWidth="1030" MinHeight="600" Height="600" 
-    Width="900" BorderThickness="0" GlowBrush="Black" WindowTitleBrush="Transparent">
+    Width="900" BorderThickness="0" GlowBrush="Black" WindowTitleBrush="Transparent"
+    x:Name="me">
     <Window.Resources>
         <Style TargetType="{x:Type Controls:WindowButtonCommands}">
             <Style.Triggers>
@@ -31,13 +32,13 @@
     </Controls:MetroWindow.LeftWindowCommands>
     <Controls:MetroWindow.Flyouts>
         <Controls:FlyoutsControl>
-            <Controls:Flyout x:Name="flyAbout" Position="Top" Margin="0,100,0,0" Width="500" TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" IsPinned="False">
+            <Controls:Flyout x:Name="flyAbout" Theme="Adapt" Position="Top" Margin="0,100,0,0" Width="500" TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" IsPinned="False">
                 <Controls:Flyout.Effect>
                     <DropShadowEffect Opacity="0.1" />
                 </Controls:Flyout.Effect>
                 <popups:About BorderBrush="LightGray" BorderThickness="1"/>
             </Controls:Flyout>
-            <Controls:Flyout x:Name="flyExports" TitleVisibility="Collapsed" Position="Right" Width="350" Background="{DynamicResource AccentColorBrush}" CloseButtonVisibility="Collapsed" IsOpen="{Binding IsChecked, Mode=TwoWay, ElementName=btnTasks}" IsPinned="False" Margin="0,40,0,26" Foreground="Black">
+            <Controls:Flyout x:Name="flyExports" Theme="Adapt" TitleVisibility="Collapsed" Position="Right" Width="350" Background="{DynamicResource AccentColorBrush}" CloseButtonVisibility="Collapsed" IsOpen="{Binding IsChecked, Mode=TwoWay, ElementName=btnTasks}" IsPinned="False" Margin="0,40,0,26" Foreground="Black">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="32"/>
@@ -66,7 +67,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Controls:Flyout TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" BorderBrush="{DynamicResource AccentColorBrush}" IsAutoCloseEnabled="False" Position="Left" IsOpen="True" Header="Sources" HorizontalAlignment="Left" Width="200" Background="WhiteSmoke">
+        <Controls:Flyout TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" BorderBrush="{DynamicResource AccentColorBrush}" IsAutoCloseEnabled="False" Position="Left" IsOpen="True" Header="Sources" HorizontalAlignment="Left" Width="200" Background="WhiteSmoke" Theme="Adapt">
             <Grid>
                 <UserControls:SourcesMenu x:Name="mainMenu" />
                 <Rectangle Width="1" VerticalAlignment="Stretch" Fill="White" HorizontalAlignment="Right">

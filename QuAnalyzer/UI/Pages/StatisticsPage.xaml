@@ -5,6 +5,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:chart="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:QuAnalyzer.UI.Pages"
       xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       mc:Ignorable="d" x:Name="me"
@@ -50,7 +51,7 @@
                                                         <DataTemplate>
                                                             <chart:PieChart LegendLocation="None" InnerRadius="100">
                                                                 <chart:PieChart.Series>
-                                                                    <chart:PieSeries DataLabels="True" LabelPoint="{Binding LabelGetter,RelativeSource={RelativeSource AncestorType=Page}}" Values="{Binding Value.Frequencies}" />
+                                                                    <chart:PieSeries DataLabels="True" LabelPoint="{Binding LabelGetter,RelativeSource={RelativeSource AncestorType=local:StatisticsPage}}" Values="{Binding Value.Frequencies}" />
                                                                     <!--DisplayMember="Category" ValueMember="Frequency"-->
                                                                 </chart:PieChart.Series>
                                                             </chart:PieChart>
@@ -64,7 +65,7 @@
                                                         <DataTemplate>
                                                             <chart:PieChart LegendLocation="None">
                                                                 <chart:PieChart.Series>
-                                                                    <chart:PieSeries DataLabels="True" LabelPoint="{Binding LabelGetter,RelativeSource={RelativeSource AncestorType=Page}}" Values="{Binding Value.Frequencies}" />
+                                                                    <chart:PieSeries DataLabels="True" LabelPoint="{Binding LabelGetter,RelativeSource={RelativeSource AncestorType=local:StatisticsPage}}" Values="{Binding Value.Frequencies}" />
                                                                     <!--DisplayMember="Category" ValueMember="Frequency"-->
                                                                 </chart:PieChart.Series>
                                                             </chart:PieChart>
@@ -78,7 +79,7 @@
                                                         <DataTemplate>
                                                             <chart:CartesianChart LegendLocation="None">
                                                                 <chart:CartesianChart.Series>
-                                                                    <chart:ColumnSeries DataLabels="True" LabelPoint="{Binding LabelGetter,RelativeSource={RelativeSource AncestorType=Page}}" Values="{Binding Value.Frequencies}" />
+                                                                    <chart:ColumnSeries DataLabels="True" LabelPoint="{Binding LabelGetter,RelativeSource={RelativeSource AncestorType=local:StatisticsPage}}" Values="{Binding Value.Frequencies}" />
                                                                     <!--DataLabels="Category" Binding="Frequency"-->
                                                                 </chart:CartesianChart.Series>
                                                             </chart:CartesianChart >

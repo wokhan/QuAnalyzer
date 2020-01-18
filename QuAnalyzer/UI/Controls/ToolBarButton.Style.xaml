@@ -23,7 +23,7 @@
                         </Border.Style>
                         <StackPanel Orientation="Horizontal">
                             <ContentControl Foreground="{TemplateBinding BorderBrush}" Height="Auto" Content="{TemplateBinding Image}" />
-                            <Label Foreground="Black" FontSize="11" Padding="5,0,0,0" VerticalAlignment="Center" Content="{TemplateBinding Text}" />
+                            <Label FontSize="11" Padding="5,0,0,0" VerticalAlignment="Center" Content="{TemplateBinding Text}" />
                         </StackPanel>
                     </Border>
                 </ControlTemplate>

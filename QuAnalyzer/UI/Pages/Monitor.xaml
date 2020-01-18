@@ -22,7 +22,7 @@
             <RowDefinition MinHeight="150" Height="*" />
         </Grid.RowDefinitions>
         <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
-            <UC:ToolBarButton x:Name="btnStart" Text="Run" ToolTip="Start monitoring the selected items" BorderBrush="Green" Image="{iconPacks:Material Kind=Play,Width=10}" Click="btnStart_Click" />
+            <UC:ToolBarButton x:Name="btnStart" Text="Run" ToolTip="Start monitoring the selected items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}"  BorderBrush="Green" Image="{iconPacks:Material Kind=Play,Width=10}" Click="btnStart_Click" />
             <!--<UC:ToolBarButton Text="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />-->
             <UC:ToolBarButton x:Name="btnStop" IsEnabled="False" Text="Stop" ToolTip="Stop monitoring" BorderBrush="Red" Image="{iconPacks:Material Kind=Stop,Width=10}" Click="btnStopAll_Click" />
             <Rectangle />
@@ -32,7 +32,7 @@
             <Rectangle />
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Occurences: " VerticalAlignment="Center" />
-                <mah:NumericUpDown HideUpDownButtons="True" Width="40" VerticalContentAlignment="Center" IsEnabled="{Binding IsChecked,ElementName=btnBurstMode}" Minimum="1" Value="{Binding Occurences,Mode=TwoWay}" Padding="0" Margin="2" VerticalAlignment="Center" />
+                <mah:NumericUpDown HideUpDownButtons="True" Width="40" VerticalContentAlignment="Center" Minimum="1" Value="{Binding Occurences,Mode=TwoWay}" Padding="0" Margin="2" VerticalAlignment="Center" />
             </StackPanel>
             <Rectangle />
             <StackPanel Margin="10,0,0,0" Orientation="Horizontal">

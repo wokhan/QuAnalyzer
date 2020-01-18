@@ -20,7 +20,7 @@ namespace QuAnalyzer.UI.Pages
     {
         public string[] ChartTypes { get { return new[] { "Pie", "Bar", "Doughnut" }; } }
 
-        public Func<ChartPoint, string> LabelGetter { get; } = p => ((Values)p.Instance).Category;
+        public static string LabelGetter(ChartPoint p) => ((Values)p.Instance).Category;
         
         private string _chartType = "Bar";
         public string ChartType

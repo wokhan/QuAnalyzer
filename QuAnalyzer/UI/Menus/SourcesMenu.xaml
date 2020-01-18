@@ -40,7 +40,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
-                                        <TextBlock Margin="10" Foreground="Black" TextWrapping="Wrap" Text="Please start by adding a new source." FontStyle="Italic" />
+                                        <TextBlock Margin="10" TextWrapping="Wrap" Text="Please start by adding a new source." FontStyle="Italic" />
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
