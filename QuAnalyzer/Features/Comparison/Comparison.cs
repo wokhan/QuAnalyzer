@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -12,6 +13,8 @@ namespace QuAnalyzer.Features.Comparison
     {
         public static void Run<T>(IEnumerable<ComparerStruct<T>> comparerData, int nbSamplesCompared, int nbSamplesShown, Action<ComparerStruct<T>> progressCallback = null, bool useParallelism = true) where T : class
         {
+            Contract.Requires(comparerData != null);
+
             if (progressCallback == null)
             {
                 progressCallback = (s) => { };
@@ -101,7 +104,7 @@ namespace QuAnalyzer.Features.Comparison
                 var t = Task.Run(() => runForOne(comparerData.First()));
                 foreach (var cd in comparerData)
                 {
-                    t.ContinueWith((task) => runForOne(cd));
+                    t.ContinueWith(_ => runForOne(cd));
                 }
             }
             else
@@ -158,15 +161,8 @@ namespace QuAnalyzer.Features.Comparison
         /// <param name="token"></param>
         public static void CompareOrdered<T>(ComparerStruct<T> f, IEnumerable<T> srcData, IEnumerable<T> trgData, Action<ComparerStruct<T>> progressCallback, CancellationToken token) where T : class
         {
-            if (srcData == null)
-            {
-                throw new ArgumentNullException("Source");
-            }
-
-            if (trgData == null)
-            {
-                throw new ArgumentNullException("Target");
-            }
+            Contract.Requires(srcData != null);
+            Contract.Requires(trgData != null);
 
             var srcMissing = new List<T>();
             var trgMissing = new List<T>();
@@ -276,15 +272,9 @@ namespace QuAnalyzer.Features.Comparison
 
         public static void Compare<T>(ComparerStruct<T> f, IEnumerable<T> srcData, IEnumerable<T> trgData, Action<ComparerStruct<T>> progressCallback, CancellationToken token)
         {
-            if (srcData == null)
-            {
-                throw new ArgumentNullException("Source");
-            }
-
-            if (trgData == null)
-            {
-                throw new ArgumentNullException("Target");
-            }
+            Contract.Requires(srcData != null);
+            Contract.Requires(trgData != null);
+            Contract.Requires(progressCallback != null);
 
             var countA = f.Results.Source.Count;
             var countB = f.Results.Target.Count;

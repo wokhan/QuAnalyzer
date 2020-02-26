@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -35,14 +36,16 @@ namespace QuAnalyzer.UI.Pages
             get
             {
                 var ret = DataProviders.GetParameters(CurrentProvider);
-                _hasMultipleItems = ExpParameters.Count > 1;
+                HasMultipleItems = ExpParameters.Count > 1;
                 NotifyPropertyChanged(nameof(HasMultipleItems));
                 return ret;
             }
         }
 
-        private bool _hasMultipleItems;
-        public bool HasMultipleItems => _hasMultipleItems;
+        private int pageCount = 0;
+        private bool isNewProvider;
+
+        public bool HasMultipleItems { get; private set; }
         public DataProviderDefinition CurrentType => CurrentProvider.Definition;
 
         protected void NotifyPropertyChanged(string propertyName)
@@ -59,13 +62,19 @@ namespace QuAnalyzer.UI.Pages
 
         public ObservableCollection<RepositoryView> Repositories { get; } = new ObservableCollection<RepositoryView>();
 
-        public ProviderEditor(IDataProvider currentProvider)
+        public ProviderEditor(IDataProvider currentProvider, bool isNew = false)
         {
             Repositories.CollectionChanged += Repositories_CollectionChanged;
 
             CurrentProvider = currentProvider;
-            
+
             InitializeComponent();
+
+            if (isNew)
+            {
+                isNewProvider = true;
+                btnBack.IsEnabled = true;
+            }
         }
 
         void Repositories_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -100,6 +109,8 @@ namespace QuAnalyzer.UI.Pages
 
         public void rdb_Checked(object sender, RoutedEventArgs e)
         {
+            Contract.Requires(sender != null);
+
             if (((RadioButton)sender).IsChecked.Value)
             {
                 CurrentProvider.SelectedGroups.Add(((RadioButton)sender).Name);
@@ -272,7 +283,9 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnNext_Click(object sender, RoutedEventArgs e)
         {
-            if ((string)btnNext.Content == "Finish")
+            pageCount++;
+
+            if ((string)btnNext.Content == "Done")
             {
                 save();
             }
@@ -281,16 +294,26 @@ namespace QuAnalyzer.UI.Pages
                 dockRepositories.Visibility = Visibility.Visible;
                 gridParameters.Visibility = Visibility.Hidden;
                 btnBack.IsEnabled = true;
-                btnNext.Content = "Finish";
+                btnNext.Content = "Done";
             }
         }
 
         private void btnBack_Click(object sender, RoutedEventArgs e)
         {
-            dockRepositories.Visibility = Visibility.Hidden;
-            gridParameters.Visibility = Visibility.Visible;
-            btnNext.Content = "Next >";
-            btnBack.IsEnabled = false;
+            if (pageCount-- > 0)
+            {
+                dockRepositories.Visibility = Visibility.Hidden;
+                gridParameters.Visibility = Visibility.Visible;
+                btnNext.Content = "Next >";
+                if (!isNewProvider)
+                {
+                    btnBack.IsEnabled = false;
+                }
+            }
+            else
+            {
+                this.NavigationService.GoBack();
+            }
         }
     }
 }

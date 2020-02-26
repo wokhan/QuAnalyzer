@@ -43,7 +43,7 @@ namespace QuAnalyzer.UI.Pages
 
             newprv.Name = providerName + "#" + ((App)Application.Current).CurrentProject.CurrentProviders.Count;
 
-            this.NavigationService.Navigate(new ProviderEditor(newprv));
+            this.NavigationService.Navigate(new ProviderEditor(newprv, true));
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)

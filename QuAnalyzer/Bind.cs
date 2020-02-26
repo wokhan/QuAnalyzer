@@ -1,4 +1,5 @@
 ﻿using System.Xaml;
+using System.Diagnostics.Contracts;
 
 namespace System.Windows.Markup
 {
@@ -19,15 +20,8 @@ namespace System.Windows.Markup
 
 		public override object ProvideValue(IServiceProvider serviceProvider)
 		{
-			if (serviceProvider == null)
-			{
-				throw new ArgumentNullException(nameof(serviceProvider));
-			}
-
-			if (Path == null)
-			{
-				throw new InvalidOperationException("Name property is not set");
-			}
+			Contract.Requires(serviceProvider != null);
+			Contract.Requires(Path != null);
 
 			var r = serviceProvider.GetService(typeof(IXamlNameResolver)) as IXamlNameResolver;
 			if (r == null)
