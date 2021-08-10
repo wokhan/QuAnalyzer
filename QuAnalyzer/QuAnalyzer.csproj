@@ -10,8 +10,6 @@
     <ApplicationIcon>IconNew.ico</ApplicationIcon>
   </PropertyGroup>
   
-  <Import Project="..\QuAnalyzer.Shared\QuAnalyzer.Shared.projitems" Label="Shared" />
-  
   <ItemGroup>
     <Compile Remove="Features\Comparison - Copy.cs" />
     <Compile Remove="Features\ContractResolver.cs" />
