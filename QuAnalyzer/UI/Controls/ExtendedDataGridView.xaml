@@ -26,24 +26,24 @@
             <Rectangle />
             <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="GlobalExportCSV_Click" />
             <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="GlobalExportHTML_Click" />
-            <StackPanel Orientation="Horizontal" Visibility="{Binding EnableAdvancedFilters,Converter={StaticResource valueToVisibilityConverter}}">
+            <StackPanel Orientation="Horizontal" Visibility="{Binding EnableAdvancedFilters,Mode=OneWay,Converter={StaticResource valueToVisibilityConverter}}">
                 <Rectangle />
                 <UC:ToolBarToggleButton x:Name="btnAggregate" IsChecked="False" Text="Group/Filter" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" Image="{iconPacks:Material Kind=FilterMenu}" />
             </StackPanel>
         </WrapPanel>
         <WrapPanel Grid.Row="2" Height="25" Style="{StaticResource ToolBar}">
             <TextBlock Margin="20,4">
-                    <!--<Run Text="{Binding LoadingProgress,Mode=OneWay}" />
-                    <Run Text="/" />-->
+                    <Run Text="{Binding LoadingProgress,Mode=OneWay}" />
+                    <Run Text="/" />
                     <Run Text="{Binding Items.Count,Mode=OneWay,ElementName=gridData}" />
                     <Run Text=" item(s) found" />
             </TextBlock>
             <Label Content="{Binding Status,StringFormat='Status: {0}'}" />
-            <ProgressBar Value="{Binding LoadingProgress}" Margin="5"  Width="200" BorderThickness="0">
+            <ProgressBar Value="{Binding LoadingProgress,Mode=OneWay}" Margin="5"  Width="200" BorderThickness="0">
                 <ProgressBar.Style>
                     <Style TargetType="ProgressBar" BasedOn="{StaticResource {x:Type ProgressBar}}">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding LoadingProgress}" Value="-1">
+                            <DataTrigger Binding="{Binding LoadingProgress,Mode=OneWay}" Value="-1">
                                 <Setter Property="IsIndeterminate" Value="True" />
                             </DataTrigger>
                         </Style.Triggers>
@@ -131,7 +131,7 @@
                                             <DataGridTemplateColumn CanUserSort="False">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <Button Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteFilter_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                                        <Button Tag="{Binding}" Click="btnDeleteFilter_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
@@ -173,9 +173,7 @@
                                                         <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
                                                     <Label Content="{Binding}" />
-                                                    <Button Grid.Column="1" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteGrp_Click">
-                                                        <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{iconPacks:Material Kind=DeleteOutline}" Stretch="Uniform" />
-                                                    </Button>
+                                                    <Button Grid.Column="1" Foreground="OrangeRed" Tag="{Binding}" Click="btnDeleteGrp_Click" Content="{iconPacks:Material Kind=DeleteOutline}" />
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -214,9 +212,7 @@
                                             <DataGridTemplateColumn>
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <Button Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteAggreg_Click">
-                                                            <Path Width="11" Height="11" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{iconPacks:Material Kind=DeleteOutline}" Stretch="Uniform" />
-                                                        </Button>
+                                                        <Button Foreground="OrangeRed" Tag="{Binding}" Click="btnDeleteAggreg_Click" Content="{iconPacks:Material Kind=DeleteOutline}" />
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>

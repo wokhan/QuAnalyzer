@@ -1,6 +1,5 @@
 ﻿using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Core.Project;
-using QuAnalyzer.Generic.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,6 +8,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using Wokhan.Data.Providers.Contracts;
+using Wokhan.UI.Diagnostics;
 
 namespace QuAnalyzer
 {

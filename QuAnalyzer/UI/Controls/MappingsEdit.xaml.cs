@@ -79,7 +79,7 @@ namespace QuAnalyzer.UI.Controls
 
             if (prov != null && repo != null)
             {
-                attributes.AddRange(prov.GetColumns(repo).Select(a => a.Name));
+                attributes.AddAll(prov.GetColumns(repo).Select(a => a.Name));
             }
         }
 

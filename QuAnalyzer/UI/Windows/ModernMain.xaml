@@ -7,8 +7,8 @@
     xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:popups="clr-namespace:QuAnalyzer.UI.Popups"
-    xmlns:fa="http://schemas.fontawesome.io/icons/"
-    Title="QuAnalyzer v1.0beta" ShowIconOnTitleBar="False" TitleBarHeight="40" ShowTitleBar="True"
+    Title="QuAnalyzer v1.0beta" 
+    ShowIconOnTitleBar="False" TitleBarHeight="40" ShowTitleBar="True"
     ResizeMode="CanResizeWithGrip" TitleAlignment="Right"
     MinWidth="1030" MinHeight="600" Height="600" 
     Width="900" BorderThickness="0" GlowBrush="Black" WindowTitleBrush="Transparent"
@@ -50,7 +50,7 @@
                         </Rectangle.Effect>
                     </Rectangle>
                     <StackPanel Orientation="Horizontal" Background="Gray">
-                        <ContentControl Foreground="WhiteSmoke" Margin="10,0" Height="19" Content="{iconPacks:Material Kind=Worker}" />
+                        <ContentControl Foreground="WhiteSmoke" Margin="10,0" Height="19" Content="{iconPacks:Material Kind=FerrisWheel}" />
                         <Label Grid.Column="1" VerticalAlignment="Center" Foreground="WhiteSmoke" Content="TASKS" FontSize="12" />
                     </StackPanel>
                     <Border Background="LightGray" Grid.Row="2">
@@ -102,6 +102,9 @@
             <UC:DecoratedTabItem Header="COMPARISON" Image="{iconPacks:Material Kind=Compare}">
                 <Frame Source="../Pages/Compare.xaml" />
             </UC:DecoratedTabItem>
+            <!--<UC:DecoratedTabItem Header="PERFORMANCE" Image="{iconPacks:Material Kind=Speedometer}">
+                <Frame Source="../Pages/PerformancePage.xaml" />
+            </UC:DecoratedTabItem>-->
             <UC:DecoratedTabItem Header="MONITORING" Image="{iconPacks:Material Kind=ChartAreaspline}">
                 <Frame Source="../Pages/Monitor.xaml" />
             </UC:DecoratedTabItem>
@@ -115,7 +118,7 @@
                     <TextBlock Width="90" Text="{Binding Performance.MemoryUseFormatted, Source={x:Static Application.Current}, StringFormat='Memory: {0}',FallbackValue='Memory: -KB'}" Margin="0,0,20,0" />
                     <TextBlock Width="60" Text="{Binding Performance.CPUUsage, Source={x:Static Application.Current}, StringFormat=CPU: {0}%,FallbackValue='CPU: -%'}" Margin="0,0,20,0" />
                     <TextBlock Width="70" Text="{Binding Performance.ThreadsCount, Source={x:Static Application.Current}, StringFormat=Threads: {0},FallbackValue='Threads: -'}" Margin="0,0,20,0" />
-                    <ToggleButton Name="btnTasks" IsChecked="False" BorderThickness="0" Margin="0,0,30,0">
+                    <ToggleButton Name="btnTasks" IsChecked="False" BorderThickness="0" Margin="0,0,30,0" Padding="0">
                         <ToggleButton.Style>
                             <Style BasedOn="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" TargetType="ToggleButton">
                                 <Style.Triggers>
@@ -138,8 +141,8 @@
                             </Style>
                         </ToggleButton.Style>
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl Width="16" Margin="0,0,5,0" Foreground="White" Content="{iconPacks:Material Kind=Worker}" />
-                            <TextBlock Text="Tasks" VerticalAlignment="Center" />
+                            <ContentControl Width="16" Margin="0,0,5,0" Foreground="White" Content="{iconPacks:Material Kind=FerrisWheel}" />
+                            <TextBlock Text="Tasks" Foreground="White" FontSize="12" VerticalAlignment="Center" />
                         </StackPanel>
                     </ToggleButton>
                 </StackPanel>

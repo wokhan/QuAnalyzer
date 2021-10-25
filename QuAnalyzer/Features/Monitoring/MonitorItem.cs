@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Wokhan.Collections;
+
 using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers.Contracts;
 
@@ -10,7 +11,6 @@ namespace QuAnalyzer.Features.Monitoring
 {
     public class MonitorItem : NotifierHelper
     {
-       
         public bool RunWhenStarted { get; set; }
 
         public ObservableDictionary<MonitorItem, bool> PrecedingSteps { get; } = new ObservableDictionary<MonitorItem, bool>();
@@ -20,7 +20,7 @@ namespace QuAnalyzer.Features.Monitoring
         private string _name;
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set { _name = value; NotifyPropertyChanged(); }
         }
 
@@ -32,8 +32,8 @@ namespace QuAnalyzer.Features.Monitoring
         [JsonIgnore]
         public IDataProvider Provider
         {
-            get { return provider ??= ((App)System.Windows.Application.Current).CurrentProject.CurrentProviders.SingleOrDefault(c => c.Name == ProviderName); }
-            set { ProviderName = value != null ? value.Name : string.Empty; }
+            get => provider ??= ((App)System.Windows.Application.Current).CurrentProject.CurrentProviders.SingleOrDefault(c => c.Name == ProviderName);
+            set => ProviderName = value != null ? value.Name : string.Empty;
         }
 
         public string Repository { get; set; }
@@ -45,7 +45,7 @@ namespace QuAnalyzer.Features.Monitoring
         private int _interval;
         public int Interval
         {
-            get { return _interval; }
+            get => _interval;
             set { _interval = value; NotifyPropertyChanged(); }
         }
 
@@ -53,7 +53,7 @@ namespace QuAnalyzer.Features.Monitoring
 
         public string Type
         {
-            get { return _type; }
+            get => _type;
             set { _type = value; NotifyPropertyChanged(); }
         }
 

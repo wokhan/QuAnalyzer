@@ -28,18 +28,18 @@ namespace QuAnalyzer.UI.Windows
             e.Handled = true;
         }
 
-        private async void ForceDialog(string p1, string p2)
+        private async void ForceDialog(string message, string title)
         {
             var dial = await this.GetCurrentDialogAsync<BaseMetroDialog>().ConfigureAwait(true);
             if (dial != null)
             {
-                dial.Title = p2;
-                dial.Content = p1;
+                dial.Title = title;
+                dial.Content = message;
                 //await this.HideMetroDialogAsync(dial);
             }
             else
             {
-                await this.ShowMessageAsync(p2, p1, MessageDialogStyle.Affirmative).ConfigureAwait(false);
+                await this.ShowMessageAsync(title, message, MessageDialogStyle.Affirmative).ConfigureAwait(false);
             }
         }
 

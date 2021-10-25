@@ -1,6 +1,7 @@
 ﻿using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Windows;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,41 +15,45 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
+
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Linq.Extensions;
-#if _WPF_ 
-using Wokhan.WPF.Extensions;
-#else
-using Wokhan.UWP.Extensions;
-#endif
+using Wokhan.UI.Extensions;
+using Wokhan.ComponentModel.Extensions;
 
 namespace QuAnalyzer.UI.Controls
 {
     /// <summary>
     /// Logique d'interaction pour ExtendedDataGridView.xaml
     /// </summary>
-    public partial class ExtendedDataGridView : UserControl
+    public partial class ExtendedDataGridView : UserControl, INotifyPropertyChanged
     {
         public bool AutoGenerateColumns { get => gridData.AutoGenerateColumns; set => gridData.AutoGenerateColumns = value; }
-        public ObservableCollection<DataGridColumn> Columns { get => gridData.Columns; }
+        public ObservableCollection<DataGridColumn> Columns => gridData.Columns;
 
         private IQueryable _source;
         public IQueryable Source
         {
-            get { return _source; }
+            get => _source;
             set { _source = value; ClearAll(); btnApply_Click(null, null); }
         }
 
-        public bool EnableAdvancedFilters { get; set; }
-
-        public List<ColumnDescription> CustomHeaders { get; set; }
-
-
-        public static Dictionary<string, string> AggregationFormula
+        private bool _enableAdvancedFilters;
+        public bool EnableAdvancedFilters
         {
-            get
-            {
-                return new Dictionary<string, string>
+            get => _enableAdvancedFilters;
+            set => this.SetValue(ref _enableAdvancedFilters, value, NotifyPropertyChanged);
+        }
+
+        private List<ColumnDescription> _customHeaders;
+        public List<ColumnDescription> CustomHeaders
+        {
+            get => _customHeaders;
+            set => this.SetValue(ref _customHeaders, value, NotifyPropertyChanged);
+        }
+
+
+        public static Dictionary<string, string> AggregationFormula => new Dictionary<string, string>
                 {
                     { "Ignore", null },
                     { "Count", "Count()" },
@@ -60,14 +65,9 @@ namespace QuAnalyzer.UI.Controls
                     { "Min", "Min({0})" },
                     { "Max", "Max({0})" }
                 };
-            }
-        }
 
         public static Dictionary<string, string> FilterFormula //Func<LinqExpressions.Expression, LinqExpressions.Expression, LinqExpressions.BinaryExpression>> FilterFormula
-        {
-            get
-            {
-                return new Dictionary<string, string>
+=> new Dictionary<string, string>
                 {
                     { "Equals", "=" },
                     { "Differs from", "<>" },
@@ -76,21 +76,19 @@ namespace QuAnalyzer.UI.Controls
                     { "Less than", "<" },
                     { "Less than or equal", "<=" }
                 };
-            }
-        }
 
         private string _status;
         public string Status
         {
-            get { return _status; }
-            set { _status = value; NotifyPropertyChanged(nameof(Status)); }
+            get => _status;
+            set => this.SetValue(ref _status, value, NotifyPropertyChanged);
         }
 
         private int _loadingProgress;
         public int LoadingProgress
         {
-            get { return _loadingProgress; }
-            set { _loadingProgress = value; NotifyPropertyChanged(nameof(LoadingProgress)); }
+            get => _loadingProgress;
+            set => this.SetValue(ref _loadingProgress, value, NotifyPropertyChanged);
         }
 
         public ObservableCollection<string> Grouping { get; } = new ObservableCollection<string>();
@@ -120,18 +118,18 @@ namespace QuAnalyzer.UI.Controls
 
         public string CustomFilter { get; set; }
 
-        public bool IsCustomFilterError { get { return CustomFilterError != null; } }
+        public bool IsCustomFilterError => CustomFilterError != null;
 
         private string _customFilterError;
         public string CustomFilterError
         {
-            get { return _customFilterError; }
+            get => _customFilterError;
             set { _customFilterError = value; NotifyPropertyChanged(nameof(CustomFilterError)); NotifyPropertyChanged(nameof(IsCustomFilterError)); }
         }
 
         public ObservableCollection<ComputeStruct> Compute { get; } = new ObservableCollection<ComputeStruct>();
 
-        private string SortOrder { get { return (currentSortAttribute != null && (!Grouping.Any() || Grouping.Concat(Compute.Select(f => f.Attribute)).Contains(currentSortAttribute))) ? currentSortAttribute : (Grouping.FirstOrDefault() ?? CustomHeaders.First().Name); } }
+        private string SortOrder => (currentSortAttribute != null && (!Grouping.Any() || Grouping.Concat(Compute.Select(f => f.Attribute)).Contains(currentSortAttribute))) ? currentSortAttribute : (Grouping.FirstOrDefault() ?? CustomHeaders.First().Name);
 
         public ExtendedDataGridView()
         {
@@ -140,7 +138,7 @@ namespace QuAnalyzer.UI.Controls
             VirtualizedQueryableExtensions.Init(Dispatcher);
         }
 
-        private List<string> dispHeaders;
+        private readonly List<string> dispHeaders;
 
 
         private void ClearAll()
@@ -169,11 +167,17 @@ namespace QuAnalyzer.UI.Controls
             gridData.ExportAsXLSX(host: host, callback: SharedCallback.GetCallBackForExport(host, "Export", null));
         }
 
-        private void GlobalExportHTML_Click(object sender, RoutedEventArgs e) => gridData.ExportAsHTML();
+        private void GlobalExportHTML_Click(object sender, RoutedEventArgs e)
+        {
+            gridData.ExportAsHTML();
+        }
 
-        private void GlobalCopy_Click(object sender, RoutedEventArgs e) => gridData.CopyToClipboard();
+        private void GlobalCopy_Click(object sender, RoutedEventArgs e)
+        {
+            gridData.CopyToClipboard();
+        }
 
-        Point startPoint;
+        private Point startPoint;
         private void DataGrid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             startPoint = e.GetPosition(null);
@@ -239,7 +243,7 @@ namespace QuAnalyzer.UI.Controls
                     query = query.Where(Filters.Select((f, i) => f.Attribute + f.ComparerExpression + " @" + i).Aggregate((a, b) => a + " AND " + b), values);
                 }
 
-                if (!String.IsNullOrEmpty(CustomFilter))
+                if (!string.IsNullOrEmpty(CustomFilter))
                 {
                     try
                     {
@@ -279,13 +283,25 @@ namespace QuAnalyzer.UI.Controls
             }).ConfigureAwait(false);
         }
 
-        private void btnDeleteAggreg_Click(object sender, RoutedEventArgs e) => Compute.Remove((ComputeStruct)((Button)sender).Tag);
+        private void btnDeleteAggreg_Click(object sender, RoutedEventArgs e)
+        {
+            Compute.Remove((ComputeStruct)((Button)sender).Tag);
+        }
 
-        private void btnDeleteGrp_Click(object sender, RoutedEventArgs e) => Grouping.Remove((string)((Button)sender).Tag);
+        private void btnDeleteGrp_Click(object sender, RoutedEventArgs e)
+        {
+            Grouping.Remove((string)((Button)sender).Tag);
+        }
 
-        private void btnDeleteFilter_Click(object sender, RoutedEventArgs e) => Filters.Remove((FilterStruct)((Button)sender).Tag);
+        private void btnDeleteFilter_Click(object sender, RoutedEventArgs e)
+        {
+            Filters.Remove((FilterStruct)((Button)sender).Tag);
+        }
 
-        private void btnClear_Click(object sender, RoutedEventArgs e) => ClearAll();
+        private void btnClear_Click(object sender, RoutedEventArgs e)
+        {
+            ClearAll();
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
