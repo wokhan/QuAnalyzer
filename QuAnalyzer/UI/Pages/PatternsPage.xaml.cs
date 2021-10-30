@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -12,6 +13,8 @@ namespace QuAnalyzer.UI.Pages
     /// </summary>
     public partial class PatternsPage : Page
     {
+        private List<string> stringAttributes;
+
         public int SimThreshold { get; set; }
         public bool AutoUpdate { get; set; }
 
@@ -29,7 +32,8 @@ namespace QuAnalyzer.UI.Pages
 
             if (repo != null && attr == null)
             {
-                lstAttributes.ItemsSource = prov.GetColumns(repo).Where(h => h.Type == typeof(string)).Select(h => h.Name);
+                stringAttributes = prov.GetColumns(repo).Where(h => h.Type == typeof(string)).Select(h => h.Name).ToList();
+                lstAttributes.ItemsSource = stringAttributes;
             }
             else if (AutoUpdate)
             {
@@ -70,10 +74,12 @@ namespace QuAnalyzer.UI.Pages
                                .OrderByDescending(g => g.Count);
                 }).ConfigureAwait(true);
 
+                //gridPatterns.CustomHeaders = prov.GetColumns(repo).Join(stringAttributes, a => a.Name, b => b, (a, b) => a).ToList();
                 gridPatterns.Source = res.AsQueryable();
             }
             else
             {
+                //gridPatterns.CustomHeaders = null;
                 gridPatterns.Source = null;
             }
         }

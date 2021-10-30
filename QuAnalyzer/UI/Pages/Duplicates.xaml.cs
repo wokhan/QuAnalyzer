@@ -1,4 +1,5 @@
 ﻿using QuAnalyzer.Features.Comparison;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,8 +14,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Threading;
+
 using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Bases;
+
 using LExpr = System.Linq.Expressions;
 
 namespace QuAnalyzer.UI.Pages
@@ -163,14 +166,20 @@ namespace QuAnalyzer.UI.Pages
 
                 gridData.LoadingProgress = -1;
 
+                //TODO: move
+                //TODO: performance is now awful?! Use proxy object instead?
+                void updateStatusLoad(double i) => Dispatcher.InvokeAsync(() => gridData.Status = $"Parsed {i} entries");
                 var dataObjectArray = AsObjectCollection(data, KeepDuplicates ? headers : keys)
-                                          .WithProgress(i => gridData.Status = $"Parsed {i} entries")
+                                          .WithProgress(updateStatusLoad)
                                           .ToList();
-                                          
+                
                 gridData.LoadingProgress = 1;
 
                 var keyComparer = new SequenceEqualityComparer<object>(0, keys.Length);
-                var ret = Comparison.InitiateDuplicates(dataObjectArray.WithProgress(i => { gridData.Status = $"Checked {i} entries"; gridData.LoadingProgress = (int)(i * 100 / dataObjectArray.Count); }), keyComparer, new SequenceEqualityComparer<object>()).Duplicates;
+
+                //TODO: check
+                void updateStatusCheck(double i) { Dispatcher.InvokeAsync(() => gridData.Status = $"Checked {i} entries"); gridData.LoadingProgress = (int)(i * 100 / dataObjectArray.Count); }
+                var ret = Comparison.InitiateDuplicates(dataObjectArray.WithProgress(updateStatusCheck), keyComparer, new SequenceEqualityComparer<object>()).Duplicates;
 
                 if (!KeepDuplicates)
                 {

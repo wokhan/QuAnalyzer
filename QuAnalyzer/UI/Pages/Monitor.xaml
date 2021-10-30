@@ -10,7 +10,7 @@
       mc:Ignorable="d"
       d:DesignHeight="700" d:DesignWidth="800"
       DataContext="{Binding RelativeSource={RelativeSource Self}}"
-      x:Name="myself"
+      x:Name="me"
 	Title="DataMonitor">
     <Grid>
         <Grid.RowDefinitions>
@@ -46,8 +46,8 @@
                 <DataGrid.Columns>
                     <DataGridCheckBoxColumn Binding="{Binding Selector.IsSelected}" Width="Auto" />
                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-                    <DataGridComboBoxColumn Header="Provider" x:Name="lstDataProviders" MinWidth="150" ItemsSource="{Binding CurrentProject.Providers,Source={x:Static Application.Current}}" DisplayMemberPath="Name" SelectedValueBinding="{Binding Provider}" />
-                    <DataGridComboBoxColumn Header="Repository" MinWidth="150" ItemsSource="{Binding Repository.Repositories.Keys}" />
+                    <DataGridComboBoxColumn Header="Provider" x:Name="lstDataProviders" MinWidth="150" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static Application.Current}}" DisplayMemberPath="Name" SelectedValueBinding="{Binding Provider}" />
+                    <DataGridComboBoxColumn Header="Repository" MinWidth="150" ItemsSource="{Binding Provider.Repositories.Keys}" />
                     <DataGridComboBoxColumn Header="Type" SelectedValueBinding="{Binding Type}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding MonitoringTypes, ElementName=me}" />
                     <DataGridTextColumn Header="Interval" Binding="{Binding Interval}" />
                     <DataGridCheckBoxColumn Header="Run when started" Binding="{Binding RunWhenStarted}" />

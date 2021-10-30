@@ -18,7 +18,7 @@
             <Label Content="Similarity threshold" VerticalAlignment="Center" />
             <Slider x:Name="slideSim" ValueChanged="slideSim_ValueChanged" VerticalAlignment="Center" Minimum="1" TickFrequency="1" IsSnapToTickEnabled="True" LargeChange="1" SmallChange="1" Maximum="3" TickPlacement="BottomRight" Width="100" />
             <Rectangle />
-            <TextBlock x:Name="txtStatus" Margin="5,0,10,0" />
+            <TextBlock x:Name="txtStatus" VerticalAlignment="Center" Margin="5,0,10,0" />
             <ProgressBar x:Name="prg" Maximum="100" Minimum="0" Width="200" Height="20" BorderThickness="0" />
         </WrapPanel>
         <Grid>
@@ -27,7 +27,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <TextBlock Background="LightGray" Padding="5" Text="Attributes" />
-            <ListBox Grid.Row="1" BorderThickness="0,0,2,0" BorderBrush="LightGray" DockPanel.Dock="Left" VerticalAlignment="Stretch" SelectionChanged="lstDataSources_SelectionChanged" x:Name="lstAttributes" SelectionMode="Extended" MinWidth="200" Padding="5">
+            <ListBox Grid.Row="1" BorderThickness="0,0,2,0" BorderBrush="LightGray" DockPanel.Dock="Left" VerticalAlignment="Stretch" SelectionChanged="lstDataSources_SelectionChanged" x:Name="lstAttributes" SelectionMode="Single" MinWidth="200" Padding="5">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <CheckBox Content="{Binding}" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" />

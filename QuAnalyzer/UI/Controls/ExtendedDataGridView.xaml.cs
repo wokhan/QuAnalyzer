@@ -129,7 +129,7 @@ namespace QuAnalyzer.UI.Controls
 
         public ObservableCollection<ComputeStruct> Compute { get; } = new ObservableCollection<ComputeStruct>();
 
-        private string SortOrder => (currentSortAttribute != null && (!Grouping.Any() || Grouping.Concat(Compute.Select(f => f.Attribute)).Contains(currentSortAttribute))) ? currentSortAttribute : (Grouping.FirstOrDefault() ?? CustomHeaders.First().Name);
+        private string SortOrder => (currentSortAttribute != null && (!Grouping.Any() || Grouping.Concat(Compute.Select(f => f.Attribute)).Contains(currentSortAttribute))) ? currentSortAttribute : (Grouping.FirstOrDefault() ?? CustomHeaders?.FirstOrDefault()?.Name);
 
         public ExtendedDataGridView()
         {
@@ -269,13 +269,20 @@ namespace QuAnalyzer.UI.Controls
                 LoadingProgress = 0;
                 Status = "Loading data...";
 
-                var data = query.OrderBy(SortOrder + (currentSortDirectionAsc ? "" : " descending"))
-                                .AsVirtualized();
+                if (SortOrder is not null)
+                {
+                    query = query.OrderBy(SortOrder + (currentSortDirectionAsc ? "" : " descending"));
+                }
+
+                var virtualizedData = query.AsVirtualized();
                 Dispatcher.Invoke(() =>
                 {
                     gridData.SelectedItems.Clear();
-                    gridData.ItemsSource = data;
-                    gridData.Columns.Single(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
+                    gridData.ItemsSource = virtualizedData;
+                    if (SortOrder is not null)
+                    {
+                        gridData.Columns.Single(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
+                    }
                 });
 
                 Status = "Done.";

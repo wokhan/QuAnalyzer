@@ -86,7 +86,7 @@ namespace QuAnalyzer.Generic.Extensions
                 }
 
                 //Dispatcher.CurrentDispatcher.Invoke(() => { }, DispatcherPriority.Render);
-
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 using (var xl = new ExcelPackage(new FileInfo(path)))
                 {
                     xl.AddWorksheet(grid, worksheetName, host, callback);

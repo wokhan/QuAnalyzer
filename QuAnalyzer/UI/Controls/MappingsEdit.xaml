@@ -33,7 +33,7 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
                 <Label Content="Repository:" HorizontalAlignment="Left" Margin="0,30,0,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="lstSrcRepo" Margin="96,27,5,0" VerticalAlignment="Top" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding DataContext.SourceRepository, ElementName=lstMappings}" SelectionChanged="lstSrcRepo_SelectionChanged" DataContext="{Binding SelectedItem, ElementName=lstSrc}"/>
+                <ComboBox x:Name="lstSrcRepo" Margin="96,27,5,0" VerticalAlignment="Top" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding Mapping.SourceRepository,ElementName=me}" SelectionChanged="lstSrcRepo_SelectionChanged" DataContext="{Binding SelectedItem, ElementName=lstSrc}"/>
             </Grid>
         </GroupBox>
         <ContentControl Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{iconPacks:Material Kind=ArrowSplitVertical,Width=32,Height=32}" Foreground="Gray" Margin="10" />
@@ -51,7 +51,7 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
                 <Label Content="Repository:" HorizontalAlignment="Left" Margin="0,30,0,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="lstTrgRepo" Margin="86,27,5,0" VerticalAlignment="Top" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding DataContext.TargetRepository, ElementName=lstMappings}" SelectionChanged="lstTrgRepo_SelectionChanged" DataContext="{Binding SelectedItem, ElementName=lstTrg}"/>
+                <ComboBox x:Name="lstTrgRepo" Margin="86,27,5,0" VerticalAlignment="Top" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding Mapping.TargetRepository,ElementName=me}" SelectionChanged="lstTrgRepo_SelectionChanged" DataContext="{Binding SelectedItem, ElementName=lstTrg}"/>
             </Grid>
         </GroupBox>
         <TextBlock Text="Mappings" Grid.Row="2"  Background="LightGray" Padding="5" Grid.ColumnSpan="3"/>
@@ -84,9 +84,7 @@
                     <DataGridTemplateColumn Width="Auto" IsReadOnly="True" CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Name="btnDelete" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnRm_Click">
-                                    <Path Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Data="{iconPacks:Material Kind=DeleteOutline}" Stretch="Uniform" />
-                                </Button>
+                                <Button Name="btnDelete" Style="{StaticResource MetroCircleButtonStyle}" Background="White" Foreground="OrangeRed" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnRm_Click" Content="{iconPacks:Material Kind=DeleteOutline}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

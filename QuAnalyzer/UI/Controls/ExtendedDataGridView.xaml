@@ -11,6 +11,15 @@
       d:DesignHeight="600" d:DesignWidth="850"
       x:Name="thisWindow"
 	  DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    <UserControl.Resources>
+        <Style TargetType="Border" x:Key="DragDropBorder">
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="BorderBrush" Value="Gray" />
+            <Setter Property="BorderThickness" Value="0 2 0 2" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Background" Value="LightYellow" />
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -75,7 +84,7 @@
                     </Border>
                     <ScrollViewer>
                         <StackPanel>
-                            <Expander IsExpanded="True"  Header="Filtering" BorderThickness="0">
+                            <Expander IsExpanded="True" Header="Filtering" BorderThickness="0" Margin="5,10">
                                 <DockPanel>
                                     <Grid DockPanel.Dock="Bottom">
                                         <Grid.RowDefinitions>
@@ -104,16 +113,17 @@
                                                         <Setter Property="Template">
                                                             <Setter.Value>
                                                                 <ControlTemplate>
-                                                                    <Grid>
-                                                                        <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition Width="Auto" />
-                                                                            <ColumnDefinition Width="*" />
-                                                                        </Grid.ColumnDefinitions>
-                                                                        <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="10" Foreground="Gray" />
-                                                                        <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to add a filter. You can also directly type the filter below." FontStyle="Italic" />
-                                                                    </Grid>
+                                                                    <Border Style="{StaticResource DragDropBorder}">
+                                                                        <Grid>
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                                <ColumnDefinition Width="*" />
+                                                                            </Grid.ColumnDefinitions>
+                                                                            <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="10" Foreground="Gray" VerticalAlignment="Center" />
+                                                                            <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to add a filter. You can also directly type a filter expression below." FontStyle="Italic" />
+                                                                        </Grid>
+                                                                    </Border>
                                                                 </ControlTemplate>
-
                                                             </Setter.Value>
                                                         </Setter>
                                                     </DataTrigger>
@@ -139,7 +149,7 @@
                                     </DataGrid>
                                 </DockPanel>
                             </Expander>
-                            <Expander IsExpanded="True" Header="Aggregation" BorderThickness="0">
+                            <Expander IsExpanded="True" Header="Aggregation" BorderThickness="0" Margin="5">
                                 <StackPanel Margin="-5">
                                     <Label FontWeight="Bold" Content="Group by the following attributes:" />
                                     <ListBox ItemsSource="{Binding Grouping}" AllowDrop="True" x:Name="lstGrouping" Drop="lstGrouping_Drop">
@@ -150,14 +160,16 @@
                                                         <Setter Property="Template">
                                                             <Setter.Value>
                                                                 <ControlTemplate>
-                                                                    <Grid>
-                                                                        <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition Width="Auto" />
-                                                                            <ColumnDefinition Width="*" />
-                                                                        </Grid.ColumnDefinitions>
-                                                                        <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="10" Foreground="Gray" />
-                                                                        <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to group by the related attribute" FontStyle="Italic" />
-                                                                    </Grid>
+                                                                    <Border Style="{StaticResource DragDropBorder}">
+                                                                        <Grid>
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                                <ColumnDefinition Width="*" />
+                                                                            </Grid.ColumnDefinitions>
+                                                                            <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="5" VerticalAlignment="Center" Foreground="Gray" />
+                                                                            <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to group by the related attribute" FontStyle="Italic" />
+                                                                        </Grid>
+                                                                    </Border>
                                                                 </ControlTemplate>
                                                             </Setter.Value>
                                                         </Setter>
@@ -187,14 +199,16 @@
                                                         <Setter Property="Template">
                                                             <Setter.Value>
                                                                 <ControlTemplate>
-                                                                    <Grid>
-                                                                        <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition Width="Auto" />
-                                                                            <ColumnDefinition Width="*" />
-                                                                        </Grid.ColumnDefinitions>
-                                                                        <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="10" Foreground="Gray" />
-                                                                        <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here or add a 'group by attribute' above to aggregate data. Note: at least one 'group by' attribute is required for the aggregation to be computed." FontStyle="Italic" />
-                                                                    </Grid>
+                                                                    <Border Style="{StaticResource DragDropBorder}">
+                                                                        <Grid>
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                                <ColumnDefinition Width="*" />
+                                                                            </Grid.ColumnDefinitions>
+                                                                            <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="5" VerticalAlignment="Center" Foreground="Gray" />
+                                                                            <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here or add a 'group by attribute' above to aggregate data. Note: at least one 'group by' attribute is required for the aggregation to be computed." FontStyle="Italic" />
+                                                                        </Grid>
+                                                                    </Border>
                                                                 </ControlTemplate>
                                                             </Setter.Value>
                                                         </Setter>

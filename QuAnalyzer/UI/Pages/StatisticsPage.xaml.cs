@@ -5,6 +5,7 @@ using QuAnalyzer.Features.Statistics;
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using Wokhan.Collections;
 using Wokhan.Collections.Generic.Extensions;
@@ -109,25 +110,27 @@ namespace QuAnalyzer.UI.Pages
                 ComputedStats.Add(h.Name, new ResultsStruct());
             }
 
-            await System.Threading.Tasks.Task.Run(() =>
+            await Task.Run(() =>
             {
                 Progress = -1;
+
+                //TODO: Check if still used (side effect maybe?)
                 var defaults = headers.Select(h => h.Type.GetDefault()).ToList();
 
                 var data = prv.GetQueryable(repo);
 
                 headers.AsParallel(false).ForAll((h) =>
                 {
-                    var test = Features.Statistics.Statistics.GetData(data, h);
+                    var freq = Statistics.GetDataFrequency(data, h);
 
-                    foreach (var x in test)
+                    foreach (var x in freq)
                     {
                         UpdateFrequencies(h.Name, x);
                     }
 
-                    var bobby = Features.Statistics.Statistics.GetStats(data, h);
+                    var stats = Statistics.GetStats(data, h);
 
-                    UpdateMinMaxAvg(h.Name, bobby);
+                    UpdateMinMaxAvg(h.Name, stats);
                 });
             }).ConfigureAwait(false);
         }

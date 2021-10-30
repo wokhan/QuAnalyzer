@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+
 using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Bases;
 
@@ -11,17 +13,41 @@ namespace QuAnalyzer.Features.Statistics
     {
         static readonly Type[] numericTypes = new[] { typeof(int), typeof(int?), typeof(decimal), typeof(decimal?), typeof(double), typeof(double?), typeof(long), typeof(long?) };
 
-        private static ResultsStruct.Stats GetTypedStats<T, TK>(IQueryable data, string key)
+        //TODO: Check if using a typed method would help regarding perf (against DynamicLinq)
+        //private static ResultsStruct.Stats GetTypedStats<T, TK>(IQueryable data, string key)
+        //{
+        //    var param = Expression.Parameter(typeof(T));
+        //    var fn = Expression.GetFuncType(typeof(T), typeof(TK));
+        //    var group = Expression.Lambda<Func<T, TK>>(Expression.Property(param, key), param);
+
+        //    var xx = ((IQueryable<T>)data).GroupBy(x => true, group)
+        //                                  .Select(g => new { Min = g.Min(), Max = g.Max(), Count = g.Count(), Average = GetAverage(g, key), DistinctCount = g.Distinct().Count(), EmptyCount = g.Count(x => x is null) })
+        //                                  .First();
+        //    return new ResultsStruct.Stats { Count = xx.Count, Min = xx.Min, Max = xx.Max, Average = xx.Average, DistinctCount = xx.DistinctCount, EmptyCount = xx.EmptyCount };
+        //}
+
+        //private static object GetAverage<TK>(IGrouping<bool, TK> g, string key)
+        //{
+        //    try
+        //    {
+        //        return g.AsQueryable().Average(key);
+        //    }
+        //    catch
+        //    {
+        //        return "N/A";
+        //    }
+        //}
+
+        private static object GetAverage(IQueryable data, string key)
         {
-            var param = Expression.Parameter(typeof(T));
-            var fn = Expression.GetFuncType(typeof(T), typeof(TK));
-            var group = Expression.Lambda<Func<T, TK>>(Expression.Property(param, key), param);
-
-            var xx = ((IQueryable<T>)data).GroupBy(x => true, group)
-                                          .Select(g => new { Min = g.Min(), Max = g.Max(), Count = g.Count(), /*Average = g.Average(), DistinctCount = g.Distinct().Count(),*/ EmptyCount = g.Count(x => x == null) })
-                                          .First();
-
-            return new ResultsStruct.Stats { Min = xx.Min, Max = xx.Max, Average = "Not available", DistinctCount = "Not available", EmptyCount = xx.EmptyCount };//, Average = xx.Average, Count = xx.Count, DistinctCount = xx.DistinctCount, EmptyCount = xx.EmptyCount };
+            try
+            {
+                return data.Average(key);
+            }
+            catch
+            {
+                return "N/A";
+            }
         }
 
         private static IEnumerable<Values> GetTypedData<T, TK>(IQueryable data, string key)
@@ -41,7 +67,7 @@ namespace QuAnalyzer.Features.Statistics
             return xx;
         }
 
-        internal static IEnumerable<Values> GetData(IQueryable data, ColumnDescription groupKey)
+        internal static IEnumerable<Values> GetDataFrequency(IQueryable data, ColumnDescription groupKey)
         {
             var m = typeof(Statistics).GetMethod(nameof(GetTypedData), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
                                               .MakeGenericMethod(data.GetInnerType(), groupKey.Type);
@@ -50,9 +76,11 @@ namespace QuAnalyzer.Features.Statistics
 
         internal static ResultsStruct.Stats GetStats(IQueryable data, ColumnDescription groupKey)
         {
-            var mx = typeof(Statistics).GetMethod(nameof(GetTypedStats), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+            /*var mx = typeof(Statistics).GetMethod(nameof(GetTypedStats), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
                                                            .MakeGenericMethod(data.GetInnerType(), groupKey.Type);
-            return (ResultsStruct.Stats)mx.Invoke(null, new object[] { data, groupKey.Name });
+            return (ResultsStruct.Stats)mx.Invoke(null, new object[] { data, groupKey.Name });*/
+            var key = groupKey.Name;
+            return new ResultsStruct.Stats { Count = data.Count(), Min = data.Min(key), Max = data.Max(key), Average = GetAverage(data, key), DistinctCount = data.Select(key).Distinct().Count(), EmptyCount = data.Count($"{key} == null") };
         }
     }
 }
