@@ -30,7 +30,7 @@ namespace QuAnalyzer.Features.Performance
                 var dtRun = DateTime.Now;
 
                 Enumerable.Range(0, burstOccurences)
-                          //.Select(x => new { x, valueset = (tests.ValuesSet != null && !tests.DistinctParallelValues ? (tests.Selector ?? ValueSelectors.SequentialSelector).Invoke(tests.ValuesSet, x).Dump() : null) })
+                          //.Select(x => new { x, valueset = (tests.ValuesSet is not null && !tests.DistinctParallelValues ? (tests.Selector ?? ValueSelectors.SequentialSelector).Invoke(tests.ValuesSet, x).Dump() : null) })
                           //.ToList()
                           .AsParallel()
                           //.WithExecutionMode(ParallelExecutionMode.ForceParallelism)
@@ -39,7 +39,7 @@ namespace QuAnalyzer.Features.Performance
                           .ForAll(x =>
                           {
                               IList<Dictionary<string, string>> values = null;
-                              if (testsCollection.ValuesSet != null)// && tests.DistinctParallelValues)
+                              if (testsCollection.ValuesSet is not null)// && tests.DistinctParallelValues)
                               {
                                   values = (testsCollection.Selector ?? ValueSelectors.SequentialSelector).Invoke(testsCollection.ValuesSet, x);
                               }

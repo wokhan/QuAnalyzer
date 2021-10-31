@@ -33,7 +33,7 @@ namespace QuAnalyzer.Features.Monitoring
         public IDataProvider Provider
         {
             get => provider ??= ((App)System.Windows.Application.Current).CurrentProject.CurrentProviders.SingleOrDefault(c => c.Name == ProviderName);
-            set => ProviderName = value != null ? value.Name : string.Empty;
+            set => ProviderName = value is not null ? value.Name : string.Empty;
         }
 
         public string Repository { get; set; }

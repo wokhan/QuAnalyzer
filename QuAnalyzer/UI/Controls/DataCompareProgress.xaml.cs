@@ -19,7 +19,7 @@ namespace QuAnalyzer.UI.Controls
 
         private void btnDetails_Click(object sender, RoutedEventArgs e)
         {
-            if (DetailsHandler != null)
+            if (DetailsHandler is not null)
             {
                 DetailsHandler(sender, e);
             }
@@ -27,7 +27,7 @@ namespace QuAnalyzer.UI.Controls
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (CancelHandler != null)
+            if (CancelHandler is not null)
             {
                 CancelHandler(sender, e);
             }

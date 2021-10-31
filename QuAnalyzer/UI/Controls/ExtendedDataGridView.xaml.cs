@@ -20,6 +20,8 @@ using Wokhan.Data.Providers.Bases;
 using Wokhan.Linq.Extensions;
 using Wokhan.UI.Extensions;
 using Wokhan.ComponentModel.Extensions;
+using QuAnalyzer.Features.Comparison;
+using System.Collections;
 
 namespace QuAnalyzer.UI.Controls
 {
@@ -35,7 +37,7 @@ namespace QuAnalyzer.UI.Controls
         public IQueryable Source
         {
             get => _source;
-            set { _source = value; ClearAll(); btnApply_Click(null, null); }
+            set { _source = value; ClearAll(); Reload(); }
         }
 
         private bool _enableAdvancedFilters;
@@ -99,26 +101,28 @@ namespace QuAnalyzer.UI.Controls
         public class ComputeStruct
         {
             public string Attribute { get; set; }
+            public string DisplayName { get; set; }
             public string Aggregate { get; set; }
         }
 
         public class FilterStruct
         {
             public string Attribute { get; set; }
+            public string DisplayName { get; set; }
             public Type Type { get; set; }
             public string ComparerExpression { get; set; }
 
             public object TargetValue { get; set; }
             /*public string TargetValue
             {
-                get { return TargetValueAsObject != null ? TargetValueAsObject.ToString() : String.Empty; }
+                get { return TargetValueAsObject is not null ? TargetValueAsObject.ToString() : String.Empty; }
                 set { TargetValueAsObject = Convert.ChangeType(value, Type); }
             }*/
         }
 
         public string CustomFilter { get; set; }
 
-        public bool IsCustomFilterError => CustomFilterError != null;
+        public bool IsCustomFilterError => CustomFilterError is not null;
 
         private string _customFilterError;
         public string CustomFilterError
@@ -129,7 +133,9 @@ namespace QuAnalyzer.UI.Controls
 
         public ObservableCollection<ComputeStruct> Compute { get; } = new ObservableCollection<ComputeStruct>();
 
-        private string SortOrder => (currentSortAttribute != null && (!Grouping.Any() || Grouping.Concat(Compute.Select(f => f.Attribute)).Contains(currentSortAttribute))) ? currentSortAttribute : (Grouping.FirstOrDefault() ?? CustomHeaders?.FirstOrDefault()?.Name);
+        private string SortOrder => (currentSortAttribute is not null && (!Grouping.Any() || Grouping.Concat(Compute.Select(f => f.Attribute)).Contains(currentSortAttribute))) ? currentSortAttribute : (Grouping.FirstOrDefault() ?? CustomHeaders?.FirstOrDefault()?.Name);
+
+        public Style CellStyle => gridData.CellStyle;
 
         public ExtendedDataGridView()
         {
@@ -138,26 +144,12 @@ namespace QuAnalyzer.UI.Controls
             VirtualizedQueryableExtensions.Init(Dispatcher);
         }
 
-        private readonly List<string> dispHeaders;
-
 
         private void ClearAll()
         {
             Grouping.Clear();
             Compute.Clear();
             Filters.Clear();
-        }
-
-        private void GenHeaders()
-        {
-            gridData.Columns.Clear();
-
-            gridData.AutoGenerateColumns = false;
-
-            for (int i = 0; i < dispHeaders.Count; i++)
-            {
-                gridData.Columns.Add(new DataGridTextColumn() { Header = dispHeaders[i], Binding = new Binding(dispHeaders[i]) });
-            }
         }
 
         //TODO: Generic
@@ -188,7 +180,7 @@ namespace QuAnalyzer.UI.Controls
             Vector diff = startPoint - e.GetPosition(null);
             if (e.LeftButton == MouseButtonState.Pressed && (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
             {
-                DragDrop.DoDragDrop((Control)sender, new DataObject(((DataGridColumnHeader)sender).Content), DragDropEffects.Link);
+                DragDrop.DoDragDrop((Control)sender, new DataObject(((DataGridColumnHeader)sender).Column.SortMemberPath), DragDropEffects.Link);
                 e.Handled = true;
             }
         }
@@ -217,9 +209,14 @@ namespace QuAnalyzer.UI.Controls
             Filters.Add(new FilterStruct() { Attribute = attr, Type = CustomHeaders.First(c => c.Name == attr).Type });
         }
 
-        private async void btnApply_Click(object sender, RoutedEventArgs e)
+        private void btnApply_Click(object sender, RoutedEventArgs e)
         {
-            if (Source == null)
+            Reload();
+        }
+
+        private async void Reload()
+        {
+            if (Source is null)
             {
                 gridData.ItemsSource = Enumerable.Range(0, 100);
                 gridData.Columns.Add(new DataGridTextColumn() { Header = "..." });
@@ -227,7 +224,10 @@ namespace QuAnalyzer.UI.Controls
                 return;
             }
 
-            gridData.Columns.Clear();
+            if (AutoGenerateColumns)
+            {
+                gridData.Columns.Clear();
+            }
             gridData.IsEnabled = true;
 
             await Task.Run(() =>
@@ -256,7 +256,7 @@ namespace QuAnalyzer.UI.Controls
                     }
                 }
 
-                query = query.AggregateBy(Grouping, Compute.Where(c => c.Aggregate != null).ToDictionary(c => c.Attribute, c => c.Aggregate));
+                query = query.AggregateBy(Grouping, Compute.Where(c => c.Aggregate is not null).ToDictionary(c => c.Attribute, c => c.Aggregate));
                 {
                     /*if (!prov.IsDirectlyBindable)
                     {
@@ -274,14 +274,26 @@ namespace QuAnalyzer.UI.Controls
                     query = query.OrderBy(SortOrder + (currentSortDirectionAsc ? "" : " descending"));
                 }
 
-                var virtualizedData = query.AsVirtualized();
+                IEnumerable virtualizedData;
+                //TODO: temporary workaround since Object[] collections are not supported by AsVirtualized yet.
+                // One could wonder WHY I'm using object[] collections for a start, but tbh I don't remember.
+                // Performance was probably worse with dynamically typed collections?
+                try
+                {
+                    virtualizedData = query.AsVirtualized();
+                }
+                catch
+                {
+                    virtualizedData = query;
+                }
+
                 Dispatcher.Invoke(() =>
                 {
                     gridData.SelectedItems.Clear();
                     gridData.ItemsSource = virtualizedData;
-                    if (SortOrder is not null)
+                    if (SortOrder is not null && gridData.Columns.Any())
                     {
-                        gridData.Columns.Single(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
+                        gridData.Columns.FirstOrDefault(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
                     }
                 });
 
@@ -326,7 +338,7 @@ namespace QuAnalyzer.UI.Controls
 
             e.Column.SortDirection = currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending;
 
-            btnApply_Click(null, null);
+            Reload();
 
             e.Handled = true;
         }

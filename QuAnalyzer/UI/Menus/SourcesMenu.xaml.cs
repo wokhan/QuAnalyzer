@@ -46,11 +46,11 @@ namespace QuAnalyzer.UI.Menus
         {
             using (GroupedProviders.DeferRefresh())
             {
-                if (e.OldItems != null)
+                if (e.OldItems is not null)
                 {
                     e.OldItems.Cast<IDataProvider>().ToList().ForEach(x => Providers.Remove(Providers.First(prov => prov.Key == x)));
                 }
-                if (e.NewItems != null)
+                if (e.NewItems is not null)
                 {
                     Providers.AddAll((e.NewItems.Cast<IDataProvider>().SelectMany(prov => prov.Repositories.Select(r => new KeyValuePair<IDataProvider, string>(prov, r.Key)))));
                 }

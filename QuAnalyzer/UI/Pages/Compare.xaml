@@ -3,18 +3,17 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-    xmlns:mahapps="http://metro.mahapps.com/winfx/xaml/controls"
-    xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-    x:Class="QuAnalyzer.UI.Pages.Compare" 
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+      x:Class="QuAnalyzer.UI.Pages.Compare" 
+      x:Name="me"
       mc:Ignorable="d"
       d:DesignWidth="800"
 	Title="DataCompare" d:DesignHeight="607.375">
     <Grid x:Name="gridMain">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition MinHeight="250" Height="293"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" MinHeight="100"/>
             <RowDefinition Height="4" />
             <RowDefinition MinHeight="100"/>
         </Grid.RowDefinitions>
@@ -29,73 +28,72 @@
             <UC:ToolBarButton Text="Sel. all" ToolTip="Select all" BorderBrush="Blue" Image="{iconPacks:Material Kind=SelectAll}" Click="btnSelectAll_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
             <UC:ToolBarButton Text="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" Image="{iconPacks:Material Kind=Select}" Click="btnUnSel_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
         </WrapPanel>
-            <TabControl Grid.Row="1" VerticalAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch" Padding="0">
-                <TabControl.Style>
-                    <Style TargetType="TabControl">
-                        <Style.Resources>
-                            <Style TargetType="TabPanel">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </Style>
-                            <Style TargetType="TabItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            </Style>
-                        </Style.Resources>
-                    </Style>
-                </TabControl.Style>
-                <TabItem x:Name="tabMapping" IsSelected="{Binding IsChecked,ElementName=btnToggleMode, Converter={StaticResource booleanNegator}}">
-                    <DataGrid SelectionMode="Extended" ItemsSource="{Binding CurrentProject.SourceMapper, Source={x:Static Application.Current}}" HeadersVisibility="All" RowHeaderWidth="30" ColumnWidth="18*" AutoGenerateColumns="False" x:Name="lstMappings" CanUserAddRows="False">
-                        <DataGrid.RowHeaderStyle>
-                            <Style TargetType="DataGridRowHeader">
-                                <Style.Setters>
-                                    <Setter Property="Background" Value="WhiteSmoke" />
-                                    <Setter Property="BorderThickness" Value="0,0,2,0" />
-                                    <Setter Property="BorderBrush" Value="LightGray" />
-                                    <Setter Property="HorizontalContentAlignment" Value="Right" />
-                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                </Style.Setters>
-                                <Style.Resources>
-                                    <Style TargetType="StackPanel">
-                                        <Setter Property="HorizontalAlignment" Value="Right" />
-                                    </Style>
-                                </Style.Resources>
-                            </Style>
-                        </DataGrid.RowHeaderStyle>
-                        <DataGrid.RowHeaderTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=DataGridRow}}" />
-                            </DataTemplate>
-                        </DataGrid.RowHeaderTemplate>
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding Name}" Header="Mapping name" IsReadOnly="True" />
-                            <DataGridTextColumn Binding="{Binding SourceName}" Header="Source" IsReadOnly="True" />
-                            <DataGridTextColumn Binding="{Binding SourceRepository}" Header="Source repository" IsReadOnly="True" />
-                            <DataGridTextColumn Binding="{Binding TargetName}" Header="Target" IsReadOnly="True" />
-                            <DataGridTextColumn Binding="{Binding TargetRepository}" Header="Target repository" IsReadOnly="True" />
-                            <DataGridTemplateColumn Header="Stream" Width="Auto">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="5,0" Foreground="Black" IsChecked="{Binding IsOrdered, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Width="70" IsReadOnly="True" CanUserResize="False">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <WrapPanel>
-                                            <Button Name="btnEditMapping" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="Blue" Tag="{Binding}" Click="btnEditMapping_Click" Foreground="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Content="{iconPacks:Material Kind=Pencil}" />
-                                            <Button Name="btnDeleteMapping" Style="{StaticResource MetroCircleButtonStyle}" Background="White" BorderBrush="OrangeRed" Tag="{Binding}" Click="btnDeleteMapping_Click" Foreground="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Content="{iconPacks:Material Kind=DeleteOutline}" />
-                                        </WrapPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                        <!--<Button/>-->
-                    </DataGrid>
-                </TabItem>
-                <TabItem IsSelected="{Binding IsChecked, ElementName=btnToggleMode}">
-                    <UC:MappingsEdit Mapping="{Binding SingleMap,Mode=OneWay}" />
-                </TabItem>
-            </TabControl>
+        <TabControl Grid.Row="1" VerticalAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch" Padding="0">
+            <TabControl.Style>
+                <Style TargetType="TabControl">
+                    <Style.Resources>
+                        <Style TargetType="TabPanel">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Style>
+                        <Style TargetType="TabItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </Style.Resources>
+                </Style>
+            </TabControl.Style>
+            <TabItem x:Name="tabMapping" IsSelected="{Binding IsChecked,ElementName=btnToggleMode, Converter={StaticResource booleanNegator}}">
+                <DataGrid SelectionMode="Extended" ItemsSource="{Binding CurrentProject.SourceMapper, Source={x:Static Application.Current}}" HeadersVisibility="All" RowHeaderWidth="30" ColumnWidth="18*" AutoGenerateColumns="False" x:Name="lstMappings" CanUserAddRows="False">
+                    <DataGrid.RowHeaderStyle>
+                        <Style TargetType="DataGridRowHeader">
+                            <Style.Setters>
+                                <Setter Property="Background" Value="WhiteSmoke" />
+                                <Setter Property="BorderThickness" Value="0,0,2,0" />
+                                <Setter Property="BorderBrush" Value="LightGray" />
+                                <Setter Property="HorizontalContentAlignment" Value="Right" />
+                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                            </Style.Setters>
+                            <Style.Resources>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="HorizontalAlignment" Value="Right" />
+                                </Style>
+                            </Style.Resources>
+                        </Style>
+                    </DataGrid.RowHeaderStyle>
+                    <DataGrid.RowHeaderTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=DataGridRow}}" />
+                        </DataTemplate>
+                    </DataGrid.RowHeaderTemplate>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding Name}" Header="Mapping name" IsReadOnly="True" />
+                        <DataGridTextColumn Binding="{Binding SourceName}" Header="Source" IsReadOnly="True" />
+                        <DataGridTextColumn Binding="{Binding SourceRepository}" Header="Source repository" IsReadOnly="True" />
+                        <DataGridTextColumn Binding="{Binding TargetName}" Header="Target" IsReadOnly="True" />
+                        <DataGridTextColumn Binding="{Binding TargetRepository}" Header="Target repository" IsReadOnly="True" />
+                        <DataGridTemplateColumn Header="Stream" Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="5,0" Foreground="Black" IsChecked="{Binding IsOrdered, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="70" IsReadOnly="True" CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <WrapPanel>
+                                        <Button Name="btnEditMapping" Tag="{Binding}" Click="btnEditMapping_Click" Foreground="Blue" Content="{iconPacks:Material Kind=Pencil}" />
+                                        <Button Name="btnDeleteMapping" Tag="{Binding}" Click="btnDeleteMapping_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                    </WrapPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem IsSelected="{Binding IsChecked, ElementName=btnToggleMode}">
+                <UC:MappingsEdit Mapping="{Binding}" DataContext="{Binding SingleMap,ElementName=me}" />
+            </TabItem>
+        </TabControl>
         <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" />
         <DockPanel Grid.Column="0" Grid.Row="3">
             <WrapPanel Style="{StaticResource ToolBar}">
@@ -120,34 +118,17 @@
                                             <StackPanel>
                                                 <DataGridCell BorderThickness="0" Grid.ColumnSpan="9" Margin="0" Background="#FFEEEEEE" Padding="0">
                                                     <Grid DataContext="{Binding Items[0]}" Height="Auto">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
                                                         <TextBlock FontWeight="Bold" Text="{Binding [0], Mode=OneWay, FallbackValue='Mapping title'}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,3,0,0" />
                                                         <TextBlock Text="{Binding [2].TotalTime, FallbackValue='Total time: -ms', Mode=OneWay, StringFormat='Total time: {0}ms'}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,3"/>
-                                                        <Button Name="btnDelete" Background="White" BorderBrush="OrangeRed" Tag="{Binding [4]}" VerticalAlignment="Center" BorderThickness="1" Height="40" Click="btnDelete_Click" HorizontalAlignment="Right" Width="40">
-                                                            <Button.Style>
-                                                                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MetroCircleButtonStyle}">
-                                                                    <Setter Property="IsEnabled" Value="False" />
-                                                                    <Setter Property="Opacity" Value="0.5" />
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding IsEnabled, ElementName=btnCancel}" Value="False" >
-                                                                            <Setter Property="IsEnabled" Value="True" />
-                                                                            <Setter Property="Opacity" Value="1" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding Value, ElementName=prg}" Value="100">
-                                                                            <Setter Property="IsEnabled" Value="True" />
-                                                                            <Setter Property="Opacity" Value="1" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding [2].Message, Mode=OneWay, Converter={StaticResource objectToBool}}" Value="True" >
-                                                                            <Setter Property="IsEnabled" Value="True" />
-                                                                            <Setter Property="Opacity" Value="1" />
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </Button.Style>
-                                                            <Path Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="OrangeRed" Data="{iconPacks:Material Kind=DeleteOutline}" Stretch="Uniform" />
-                                                        </Button>
-                                                        <Grid HorizontalAlignment="Right" Width="180" Margin="0,0,40,0">
-                                                            <Grid.Style>
-                                                                <Style TargetType="{x:Type Grid}">
+                                                        <!-- Progress and cancel button -->
+                                                        <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
+                                                            <StackPanel.Style>
+                                                                <Style TargetType="StackPanel">
                                                                     <Setter Property="Visibility" Value="Visible" />
                                                                     <Style.Triggers>
                                                                         <DataTrigger Binding="{Binding Value, ElementName=prg}" Value="100">
@@ -158,22 +139,14 @@
                                                                         </DataTrigger>
                                                                     </Style.Triggers>
                                                                 </Style>
-                                                            </Grid.Style>
-                                                            <ProgressBar Name="prg" BorderThickness="1" Value="{Binding [2].LocalProgress, Mode=OneWay, FallbackValue=0}" Maximum="100" Height="20" Margin="0,0,40,0" >
-                                                                <ProgressBar.Style>
-                                                                    <Style TargetType="{x:Type ProgressBar}" BasedOn="{StaticResource {x:Type ProgressBar}}">
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding Value, ElementName=prg}" Value="0" >
-                                                                                <Setter Property="IsIndeterminate" Value="True" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </ProgressBar.Style>
-                                                            </ProgressBar>
-                                                            <TextBlock Foreground="White" Text="{Binding [2].Progress, Mode=OneWay, FallbackValue='Current step'}" TextAlignment="Center" VerticalAlignment="Center" Margin="0,0,40,0" />
-                                                            <Button Name="btnCancel" Background="White" BorderBrush="OrangeRed" Tag="{Binding [4]}" VerticalAlignment="Top" BorderThickness="1" Height="40" Click="btnCancel_Click" HorizontalAlignment="Right" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=Delete}">
+                                                            </StackPanel.Style>
+                                                            <Grid>
+                                                                <ProgressBar Name="prg" BorderThickness="1" Value="{Binding [2].LocalProgress, Mode=OneWay, FallbackValue=0}" Maximum="100" Height="20" Width="150" Margin="10,0" />
+                                                                <TextBlock Foreground="White" Text="{Binding [2].Progress, Mode=OneWay, FallbackValue='Current step'}" TextAlignment="Center" VerticalAlignment="Center" />
+                                                            </Grid>
+                                                            <Button Name="btnCancel" Tag="{Binding [4]}" Height="40" Click="btnCancel_Click" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=StopCircleOutline}">
                                                                 <Button.Style>
-                                                                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MetroCircleButtonStyle}">
+                                                                    <Style TargetType="Button">
                                                                         <Style.Triggers>
                                                                             <DataTrigger Binding="{Binding IsEnabled, ElementName=btnCancel}" Value="False" >
                                                                                 <Setter Property="Opacity" Value="0.5" />
@@ -182,10 +155,11 @@
                                                                     </Style>
                                                                 </Button.Style>
                                                             </Button>
-                                                        </Grid>
-                                                        <Grid>
-                                                            <Grid.Style>
-                                                                <Style TargetType="{x:Type Grid}">
+                                                        </StackPanel>
+                                                        <!--Results-->
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                                            <StackPanel.Style>
+                                                                <Style TargetType="StackPanel">
                                                                     <Setter Property="Visibility" Value="Hidden" />
                                                                     <Style.Triggers>
                                                                         <MultiDataTrigger>
@@ -197,13 +171,14 @@
                                                                         </MultiDataTrigger>
                                                                     </Style.Triggers>
                                                                 </Style>
-                                                            </Grid.Style>
-                                                            <TextBlock FontWeight="Bold" Text="{Binding [2].MatchingCount, FallbackValue='Matches: -', Mode=OneWay, StringFormat=Matches: \{0\}}" TextAlignment="Right" Padding="5" Margin="0,7,80,0" HorizontalAlignment="Right" VerticalAlignment="Top" />
-                                                            <Button Name="btnDetails" Background="White" Style="{DynamicResource MetroCircleButtonStyle}" BorderBrush="Green" Tag="{Binding [4]}" VerticalAlignment="Top" BorderThickness="1" Height="40" Click="btnDetails_Click" HorizontalAlignment="Right" Width="40" Margin="0,0,40,0" Content="{iconPacks:Material Kind=Eye}" Foreground="Green" />
-                                                        </Grid>
-                                                        <Grid>
-                                                            <Grid.Style>
-                                                                <Style TargetType="{x:Type Grid}">
+                                                            </StackPanel.Style>
+                                                            <TextBlock FontWeight="Bold" Text="{Binding [2].MatchingCount, FallbackValue='Matches: -', Mode=OneWay, StringFormat=Matches: \{0\}}" Padding="5" VerticalAlignment="Center" />
+                                                            <Button Name="btnDetails" Tag="{Binding [4]}" Height="40" Click="btnDetails_Click" Width="40" Content="{iconPacks:Material Kind=Eye}" Foreground="Green" />
+                                                        </StackPanel>
+                                                        <!--Error-->
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                                            <StackPanel.Style>
+                                                                <Style TargetType="StackPanel">
                                                                     <Setter Property="Visibility" Value="Hidden" />
                                                                     <Style.Triggers>
                                                                         <DataTrigger Binding="{Binding [2].Message, Mode=OneWay, Converter={StaticResource objectToBool}}" Value="True" >
@@ -211,8 +186,8 @@
                                                                         </DataTrigger>
                                                                     </Style.Triggers>
                                                                 </Style>
-                                                            </Grid.Style>
-                                                            <Button Name="btnError" Style="{DynamicResource MetroCircleButtonStyle}" Background="Yellow" BorderBrush="Red" Tag="{Binding [2].Message}" VerticalAlignment="Top" BorderThickness="1" Height="40" Click="btnError_Click" HorizontalAlignment="Right" Width="40" Margin="0,0,40,0">
+                                                            </StackPanel.Style>
+                                                            <Button Name="btnError" Background="Yellow" BorderBrush="Red" Tag="{Binding [2].Message}" Height="40" Click="btnError_Click" Width="40">
                                                                 <ContentControl Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red" Content="{iconPacks:Material Kind=Alert}">
                                                                     <ContentControl.Resources>
                                                                         <Storyboard x:Key="sbBlink" AutoReverse="True" BeginTime="00:00:02" RepeatBehavior="Forever" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)">
@@ -235,7 +210,29 @@
                                                                     </ContentControl.Style>
                                                                 </ContentControl>
                                                             </Button>
-                                                        </Grid>
+                                                        </StackPanel>
+                                                        <Button Grid.Column="2" Name="btnDelete" Tag="{Binding [4]}" Height="40" Click="btnDelete_Click" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}">
+                                                            <Button.Style>
+                                                                <Style TargetType="Button">
+                                                                    <Setter Property="IsEnabled" Value="False" />
+                                                                    <Setter Property="Opacity" Value="0.5" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsEnabled, ElementName=btnCancel}" Value="False" >
+                                                                            <Setter Property="IsEnabled" Value="True" />
+                                                                            <Setter Property="Opacity" Value="1" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Value, ElementName=prg}" Value="100">
+                                                                            <Setter Property="IsEnabled" Value="True" />
+                                                                            <Setter Property="Opacity" Value="1" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding [2].Message, Mode=OneWay, Converter={StaticResource objectToBool}}" Value="True" >
+                                                                            <Setter Property="IsEnabled" Value="True" />
+                                                                            <Setter Property="Opacity" Value="1" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Button.Style>
+                                                        </Button>
                                                     </Grid>
                                                 </DataGridCell>
                                                 <ItemsPresenter />

@@ -19,7 +19,7 @@ namespace QuAnalyzer.Generic.Extensions
         {
             grid.CopyToClipboard();
 
-            if (path == null)
+            if (path is null)
             {
                 var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = p1 };
                 if (dial.ShowDialog().Value)
@@ -28,7 +28,7 @@ namespace QuAnalyzer.Generic.Extensions
                 }
             }
 
-            if (path != null)
+            if (path is not null)
             {
                 var str = new StreamWriter(path);
 
@@ -43,7 +43,7 @@ namespace QuAnalyzer.Generic.Extensions
 
         /*public static void ExportAsXLSX<T>(this IEnumerable<T> src, string[] headers, int keysCount, string worksheetName, Func<T, int, string, ExcelStyle, object> GetValueSetStyle, string path = null, Action<double> callback = null)
         {
-            if (path == null)
+            if (path is null)
             {
                 var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = "Excel 2007 File|*.xlsx" };
                 if (dial.ShowDialog().Value)
@@ -72,7 +72,7 @@ namespace QuAnalyzer.Generic.Extensions
 #pragma warning restore CS0219 // La variable 'canceled' est assignée, mais sa valeur n'est jamais utilisée
             //try
             {
-                if (path == null)
+                if (path is null)
                 {
                     var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = "Excel 2007 File|*.xlsx" };
                     if (dial.ShowDialog().Value)

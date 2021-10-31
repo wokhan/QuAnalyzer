@@ -24,7 +24,7 @@ namespace QuAnalyzer.UI.Popups
 
             this.DataContext = CurrentItem;
 
-            if (CurrentItem.Provider != null && !String.IsNullOrEmpty(CurrentItem.Repository))
+            if (CurrentItem.Provider is not null && !String.IsNullOrEmpty(CurrentItem.Repository))
             {
                 lstAttributes.ItemsSource = CurrentItem.Provider.GetColumns(CurrentItem.Repository)
                                                                 .ToDictionary(h => h.Name, h => CurrentItem.AttributesList.Contains(h.Name));
@@ -51,7 +51,7 @@ namespace QuAnalyzer.UI.Popups
 
         private void lstSrcRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (lstSrcRepo.SelectedItem != null)
+            if (lstSrcRepo.SelectedItem is not null)
             {
                 lstAttributes.ItemsSource = ((IDataProvider)lstSrc.SelectedItem).GetColumns((string)lstSrcRepo.SelectedItem)
                                                                                 .ToDictionary(h => h.Name, h => CurrentItem.AttributesList.Contains(h.Name));

@@ -49,123 +49,110 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <ScrollViewer.Resources>
-                        <DataTemplate x:Key="parametersEditor">
-                            <ItemsControl Grid.IsSharedSizeScope="True" IsEnabled="{Binding IsChecked, ElementName=rdb, Mode=OneWay}" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True" x:Name="itms">
-                                <ItemsControl.Resources>
-                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                        <EventSetter Event="Click" Handler="ShowFileDialog" />
-                                    </Style>
-                                </ItemsControl.Resources>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <ContentControl Content="{Binding}">
-                                            <ContentControl.Style>
-                                                <Style TargetType="ContentControl">
-                                                    <Setter Property="ContentTemplate">
-                                                        <Setter.Value>
-                                                            <DataTemplate>
-                                                                <Grid HorizontalAlignment="Stretch">
-                                                                    <Grid.ColumnDefinitions>
-                                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="gridFirst" />
-                                                                        <ColumnDefinition />
-                                                                    </Grid.ColumnDefinitions>
-                                                                    <Label Content="{Binding Description}" VerticalContentAlignment="Center" />
-                                                                    <TextBox Grid.Column="1" Text="{Binding ValueWrapper,Mode=TwoWay}" />
-                                                                </Grid>
-                                                            </DataTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding MemberType}" Value="{x:Type sys:Boolean}">
-                                                            <Setter Property="ContentTemplate">
-                                                                <Setter.Value>
-                                                                    <DataTemplate>
-                                                                        <Grid HorizontalAlignment="Stretch">
-                                                                            <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="Auto" SharedSizeGroup="gridFirst" />
-                                                                                <ColumnDefinition />
-                                                                            </Grid.ColumnDefinitions>
-                                                                            <Label Content="{Binding Description}" VerticalContentAlignment="Center" />
-                                                                            <CheckBox Grid.Column="1" IsChecked="{Binding ValueWrapper,Mode=TwoWay}" />
-                                                                        </Grid>
-                                                                    </DataTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding IsFile}" Value="True">
-                                                            <Setter Property="ContentTemplate">
-                                                                <Setter.Value>
-                                                                    <DataTemplate>
-                                                                        <Grid HorizontalAlignment="Stretch">
-                                                                            <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="Auto" SharedSizeGroup="gridFirst" />
-                                                                                <ColumnDefinition />
-                                                                            </Grid.ColumnDefinitions>
-                                                                            <Label Content="{Binding Description}" VerticalContentAlignment="Center" />
-                                                                            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Left">
-                                                                                <TextBox x:Name="txtFile" Width="200" Text="{Binding ValueWrapper,Mode=TwoWay}" />
-                                                                                <Button Margin="10,0,0,0" Content="Browse" Tag="{Binding}" />
-                                                                            </StackPanel>
-                                                                        </Grid>
-                                                                    </DataTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding HasValuesGetter}" Value="True">
-                                                            <Setter Property="ContentTemplate">
-                                                                <Setter.Value>
-                                                                    <DataTemplate>
-                                                                        <Grid HorizontalAlignment="Stretch">
-                                                                            <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="Auto" SharedSizeGroup="gridFirst" />
-                                                                                <ColumnDefinition />
-                                                                            </Grid.ColumnDefinitions>
-                                                                            <Label Content="{Binding Description}" VerticalContentAlignment="Center" />
-                                                                            <ComboBox Grid.Column="1" DisplayMemberPath="Value" SelectedValuePath="Key" ItemsSource="{Binding Values}" SelectedValue="{Binding ValueWrapper,Mode=TwoWay}" />
-                                                                        </Grid>
-                                                                    </DataTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </ContentControl.Style>
-                                        </ContentControl>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </DataTemplate>
-                    </ScrollViewer.Resources>
-                    <ContentControl.Style>
-                        <Style TargetType="ContentControl">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding HasMultipleItems}" Value="True">
-                                    <Setter Property="ContentTemplate">
-                                        <Setter.Value>
+                    <ItemsControl x:Name="itms" ItemsSource="{Binding ExpParameters}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <GroupBox>
+                                    <GroupBox.Style>
+                                        <Style TargetType="GroupBox">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasMultipleItems,ElementName=me}" Value="False">
+                                                    <Setter Property="BorderThickness" Value="0" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </GroupBox.Style>
+                                    <GroupBox.Header>
+                                        <RadioButton x:Name="rdb" Visibility="{Binding HasMultipleItems,ElementName=me,Converter={StaticResource BooleanToVisibilityConverter}}" IsChecked="{Binding ExpParameters.Count,ElementName=me,Converter={StaticResource valueChecker}, ConverterParameter=1, Mode=OneWay}" GroupName="optionsGroup" Background="LightGray" BorderBrush="LightGray" Content="{Binding Key}" />
+                                    </GroupBox.Header>
+                                    <ItemsControl Grid.IsSharedSizeScope="True" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True" x:Name="itms">
+                                        <ItemsControl.Resources>
+                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                <EventSetter Event="Click" Handler="ShowFileDialog" />
+                                            </Style>
+                                        </ItemsControl.Resources>
+                                        <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <ItemsControl x:Name="itms" ItemsSource="{Binding ExpParameters}">
-                                                    <ItemsControl.ItemTemplate>
-                                                        <DataTemplate>
-                                                            <GroupBox>
-                                                                <GroupBox.Header>
-                                                                    <RadioButton x:Name="rdb" IsChecked="{Binding ItemsSource.Count, ElementName=itms, Converter={StaticResource valueChecker}, ConverterParameter=1, Mode=OneWay}" GroupName="optionsGroup" Background="LightGray" BorderBrush="LightGray" Content="{Binding Key}" Checked="{Binding rdb_Checked,RelativeSource={RelativeSource AncestorType=Page}}" />
-                                                                </GroupBox.Header>
-                                                                <ContentControl DataContext="{Binding}" Content="{StaticResource parametersEditor}" />
-                                                            </GroupBox>
-                                                        </DataTemplate>
-                                                    </ItemsControl.ItemTemplate>
-                                                </ItemsControl>
+                                                <ContentControl Content="{Binding}">
+                                                    <ContentControl.Style>
+                                                        <Style TargetType="ContentControl">
+                                                            <Setter Property="ContentTemplate">
+                                                                <Setter.Value>
+                                                                    <DataTemplate>
+                                                                        <Grid HorizontalAlignment="Stretch">
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="Auto" SharedSizeGroup="gridFirst" />
+                                                                                <ColumnDefinition />
+                                                                            </Grid.ColumnDefinitions>
+                                                                            <Label Content="{Binding Description}" VerticalContentAlignment="Center" />
+                                                                            <TextBox Grid.Column="1" Text="{Binding ValueWrapper,Mode=TwoWay}" />
+                                                                        </Grid>
+                                                                    </DataTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding MemberType}" Value="{x:Type sys:Boolean}">
+                                                                    <Setter Property="ContentTemplate">
+                                                                        <Setter.Value>
+                                                                            <DataTemplate>
+                                                                                <Grid HorizontalAlignment="Stretch">
+                                                                                    <Grid.ColumnDefinitions>
+                                                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="gridFirst" />
+                                                                                        <ColumnDefinition />
+                                                                                    </Grid.ColumnDefinitions>
+                                                                                    <Label Content="{Binding Description}" VerticalContentAlignment="Center" />
+                                                                                    <CheckBox Grid.Column="1" IsChecked="{Binding ValueWrapper,Mode=TwoWay}" />
+                                                                                </Grid>
+                                                                            </DataTemplate>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsFile}" Value="True">
+                                                                    <Setter Property="ContentTemplate">
+                                                                        <Setter.Value>
+                                                                            <DataTemplate>
+                                                                                <Grid HorizontalAlignment="Stretch">
+                                                                                    <Grid.ColumnDefinitions>
+                                                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="gridFirst" />
+                                                                                        <ColumnDefinition />
+                                                                                    </Grid.ColumnDefinitions>
+                                                                                    <Label Content="{Binding Description}" VerticalContentAlignment="Center" />
+                                                                                    <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Left">
+                                                                                        <TextBox x:Name="txtFile" Width="200" Text="{Binding ValueWrapper,Mode=TwoWay}" />
+                                                                                        <Button Margin="10,0,0,0" Content="Browse" Tag="{Binding}" />
+                                                                                    </StackPanel>
+                                                                                </Grid>
+                                                                            </DataTemplate>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding HasValuesGetter}" Value="True">
+                                                                    <Setter Property="ContentTemplate">
+                                                                        <Setter.Value>
+                                                                            <DataTemplate>
+                                                                                <Grid HorizontalAlignment="Stretch">
+                                                                                    <Grid.ColumnDefinitions>
+                                                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="gridFirst" />
+                                                                                        <ColumnDefinition />
+                                                                                    </Grid.ColumnDefinitions>
+                                                                                    <Label Content="{Binding Description}" VerticalContentAlignment="Center" />
+                                                                                    <ComboBox Grid.Column="1" DisplayMemberPath="Value" SelectedValuePath="Key" ItemsSource="{Binding Values}" SelectedValue="{Binding ValueWrapper,Mode=TwoWay}" />
+                                                                                </Grid>
+                                                                            </DataTemplate>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </ContentControl.Style>
+                                                </ContentControl>
                                             </DataTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding HasMultipleItems}" Value="False">
-                                    <Setter Property="ContentTemplate" Value="{StaticResource parametersEditor}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ContentControl.Style>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </GroupBox>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                     <!--<StackPanel Name="stackOptions" Grid.IsSharedSizeScope="True"  CanHorizontallyScroll="True" />-->
                 </ScrollViewer>
             </Grid>
@@ -182,8 +169,8 @@
             <DataGrid Name="gridRepositories" BorderBrush="LightGray" BorderThickness="1,0,1,1" CanUserAddRows="False" AutoGenerateColumns="False" ItemsSource="{Binding Repositories}" SelectionMode="Single" CanUserReorderColumns="False">
                 <DataGrid.Columns>
                     <DataGridCheckBoxColumn Binding="{Binding Selected,UpdateSourceTrigger=PropertyChanged}" Width="80" Header="Selected" />
-                    <DataGridTextColumn Binding="{Binding Key, UpdateSourceTrigger=PropertyChanged}" Width="0.3*" Header="{Binding CurrentProvider.RepositoriesColumnNames[0],ElementName=thisWindow}" />
-                    <DataGridTextColumn Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Width="0.7*" Header="{Binding CurrentProvider.RepositoriesColumnNames[1],ElementName=thisWindow}">
+                    <DataGridTextColumn Binding="{Binding Key, UpdateSourceTrigger=PropertyChanged}" Width="0.3*" Header="Name" />
+                    <DataGridTextColumn Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Width="0.7*" Header="Definition">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="TextTrimming" Value="CharacterEllipsis" />

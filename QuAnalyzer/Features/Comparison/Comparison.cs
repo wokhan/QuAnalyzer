@@ -13,9 +13,9 @@ namespace QuAnalyzer.Features.Comparison
     {
         public static void Run<T>(IEnumerable<ComparerStruct<T>> comparerData, int nbSamplesCompared, int nbSamplesShown, Action<ComparerStruct<T>> progressCallback = null, bool useParallelism = true) where T : class
         {
-            Contract.Requires(comparerData != null);
+            Contract.Requires(comparerData is not null);
 
-            if (progressCallback == null)
+            if (progressCallback is null)
             {
                 progressCallback = (s) => { };
             }
@@ -44,7 +44,7 @@ namespace QuAnalyzer.Features.Comparison
 
                         Task.WaitAll(t1, t2);
 
-                        if (srcData != null && trgData != null)
+                        if (srcData is not null && trgData is not null)
                         {
                             if (nbSamplesShown > 0)
                             {
@@ -161,8 +161,8 @@ namespace QuAnalyzer.Features.Comparison
         /// <param name="token"></param>
         public static void CompareOrdered<T>(ComparerStruct<T> f, IEnumerable<T> srcData, IEnumerable<T> trgData, Action<ComparerStruct<T>> progressCallback, CancellationToken token) where T : class
         {
-            Contract.Requires(srcData != null);
-            Contract.Requires(trgData != null);
+            Contract.Requires(srcData is not null);
+            Contract.Requires(trgData is not null);
 
             var srcMissing = new List<T>();
             var trgMissing = new List<T>();
@@ -174,7 +174,7 @@ namespace QuAnalyzer.Features.Comparison
             var srcPrev = default(T);
             var trgPrev = default(T);
 
-            var scmp = new SequenceComparer(f.SourceKeys != null ? f.SourceKeys.ToArray() : Enumerable.Range(0, f.SourceHeaders.Count).Select(i => i.ToString()).ToArray());
+            var scmp = new SequenceComparer(f.SourceKeys is not null ? f.SourceKeys.ToArray() : Enumerable.Range(0, f.SourceHeaders.Count).Select(i => i.ToString()).ToArray());
             // TODO : gen type
             var sqc = new SequenceEqualityComparer<object>();
 
@@ -272,9 +272,9 @@ namespace QuAnalyzer.Features.Comparison
 
         public static void Compare<T>(ComparerStruct<T> f, IEnumerable<T> srcData, IEnumerable<T> trgData, Action<ComparerStruct<T>> progressCallback, CancellationToken token)
         {
-            Contract.Requires(srcData != null);
-            Contract.Requires(trgData != null);
-            Contract.Requires(progressCallback != null);
+            Contract.Requires(srcData is not null);
+            Contract.Requires(trgData is not null);
+            Contract.Requires(progressCallback is not null);
 
             var countA = f.Results.Source.Count;
             var countB = f.Results.Target.Count;
@@ -324,7 +324,7 @@ namespace QuAnalyzer.Features.Comparison
                 // Get items only in target = get items missing from the source
                 var targetOnly = RetrieveOnly(filteredB, filteredA, f, progressCallback, ProgressType.CheckingTargetOnly);
 
-                if (f.KeysComparer != null)
+                if (f.KeysComparer is not null)
                 {
                     var differences = sourceOnly.Join(targetOnly, s => s, t => t, (s, t) => new { s, t }, f.KeysComparer).ToList();
 
@@ -361,7 +361,7 @@ namespace QuAnalyzer.Features.Comparison
 
         private static void InitiateDuplicates<T>(IEnumerable<T> srcData, ItemResult<T> itemResult, IEqualityComparer<T> keysComparer, IEqualityComparer<T> comparer)
         {
-            if (keysComparer == null)
+            if (keysComparer is null)
             {
                 itemResult.PerfectDups = srcData.GroupBy(x => x, comparer).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
             }

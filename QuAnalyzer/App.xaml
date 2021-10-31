@@ -226,29 +226,6 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
-            <Style TargetType="Button" x:Key="MetroCircleButtonStyle" BasedOn="{x:Null}">
-                <Setter Property="Width" Value="25" />
-                <Setter Property="Height" Value="25" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border CornerRadius="20" BorderThickness="0" Cursor="Hand">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsMouseOver,RelativeSource={RelativeSource Self}}" Value="True">
-                                                <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
-                                <ContentPresenter />
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
             <SolidColorBrush x:Key="ParametersBlockColor" Color="#CCBF4747" />
             <SolidColorBrush x:Key="SourceColorBrush" Color="#CC47BF47" />
             <SolidColorBrush x:Key="TargetColorBrush" Color="#CC4747BF" />

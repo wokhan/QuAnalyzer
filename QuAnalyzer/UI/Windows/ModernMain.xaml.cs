@@ -12,14 +12,16 @@ namespace QuAnalyzer.UI.Windows
     /// </summary>
     public partial class ModernMain
     {
+        private bool showMessageInProgress;
+
         public ModernMain()
         {
             InitializeComponent();
 
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+            //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            //Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
         }
 
         void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
@@ -31,15 +33,17 @@ namespace QuAnalyzer.UI.Windows
         private async void ForceDialog(string message, string title)
         {
             var dial = await this.GetCurrentDialogAsync<BaseMetroDialog>().ConfigureAwait(true);
-            if (dial != null)
+            if (dial is not null)
             {
                 dial.Title = title;
                 dial.Content = message;
-                //await this.HideMetroDialogAsync(dial);
             }
-            else
+            //TODO: might get useless (added when we encounter a bugged loop, inducing multiple error messages being spawned too fast)
+            else if (!showMessageInProgress)
             {
+                showMessageInProgress = true;
                 await this.ShowMessageAsync(title, message, MessageDialogStyle.Affirmative).ConfigureAwait(false);
+                showMessageInProgress = false;
             }
         }
 
@@ -67,7 +71,7 @@ namespace QuAnalyzer.UI.Windows
         //{
         //    ThemeManager.ChangeTheme(Application.Current, ThemeManager.Accents.First(), ThemeManager.AppThemes.First());
 
-        //    if (Close != null)
+        //    if (Close is not null)
         //    {
         //        ctxRecentFiles.IsOpen = false;
         //        ctxSaveAs.IsOpen = false;

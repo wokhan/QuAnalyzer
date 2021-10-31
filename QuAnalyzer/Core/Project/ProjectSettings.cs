@@ -96,7 +96,7 @@ namespace QuAnalyzer.Core.Project
                 var ser = new JsonSerializer();
                 ser.TypeNameHandling = TypeNameHandling.Auto;
 
-                if (p != null)
+                if (p is not null)
                 {
                     this.FilePath = p;
                 }

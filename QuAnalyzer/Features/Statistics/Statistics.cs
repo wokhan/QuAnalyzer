@@ -61,7 +61,7 @@ namespace QuAnalyzer.Features.Statistics
                                         .OrderByDescending(x => x.Cnt)
                                         .Take(10)
                                         .ToList()
-                                        .Select(x => new Values() { Category = (x.Key != null ? x.Key.ToString() : String.Empty), Frequency = x.Cnt })
+                                        .Select(x => new Values() { Category = (x.Key is not null ? x.Key.ToString() : String.Empty), Frequency = x.Cnt })
                                         .ToList();
 
             return xx;

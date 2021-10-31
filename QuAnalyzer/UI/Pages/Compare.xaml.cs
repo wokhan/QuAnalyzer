@@ -200,7 +200,7 @@ namespace QuAnalyzer.UI.Pages
 
         //private void lstSrcTrgRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         //{
-        //    if (lstTrgRepo.SelectedItem != null && lstSrcRepo.SelectedItem != null)
+        //    if (lstTrgRepo.SelectedItem is not null && lstSrcRepo.SelectedItem is not null)
         //    {
         //        lstCustMappings.ItemsSource = ((App)App.Current).CurrentProject.SourceMapper.Where(c => c.Source == lstSrc.SelectedItem && c.SourceRepository == (string)lstSrcRepo.SelectedItem
         //                                                                                && c.Target == lstTrg.SelectedItem && c.TargetRepository == (string)lstTrgRepo.SelectedItem);
@@ -272,7 +272,7 @@ namespace QuAnalyzer.UI.Pages
                 string p = folderPath + "\\" + name + "_Details.xlsx";
 
                 var file = new FileInfo(p);
-                //if (cmp.Results.MergedDiff != null)
+                //if (cmp.Results.MergedDiff is not null)
                 var cb1 = SharedCallback.GetCallBackForExport(host, "Differences", file.Name);
                 var cb2 = SharedCallback.GetCallBackForExport(host, "Missing from source", file.Name);
                 var cb3 = SharedCallback.GetCallBackForExport(host, "Missing from target", file.Name);
@@ -288,22 +288,22 @@ namespace QuAnalyzer.UI.Pages
                         cmp.Results.InitDiff(cmp);
                         xl.AddWorksheet(cmp.Results.MergedDiff, cmp.Results.MergedHeaders.Prepend("Name").ToArray(), cmp.SourceKeys.Count, "Differences", (x, i, h, s) => { if (x.IsDiff[i]) { s.Font.Color.SetColor(System.Drawing.Color.Red); } return x.Values[i]; }, cb1);
 
-                        //if (cmp.Results.Source.Missing != null)
+                        //if (cmp.Results.Source.Missing is not null)
                         xl.AddWorksheet(cmp.Results.Source.Missing.Cast<object[]>(), cmp.SourceHeaders, cmp.SourceKeys.Count, "Missing from source", (x, i, h, s) => x[i], cb2);
 
-                        //if (dgMissingTarget.ItemsSource != null)
+                        //if (dgMissingTarget.ItemsSource is not null)
                         xl.AddWorksheet(cmp.Results.Target.Missing.Cast<object[]>(), cmp.TargetHeaders, 0, "Missing from target", (x, i, h, s) => x[i], cb3);
 
-                        //if (dgSourceDups.ItemsSource != null)
+                        //if (dgSourceDups.ItemsSource is not null)
                         xl.AddWorksheet(cmp.Results.Source.Duplicates.Cast<object[]>(), cmp.SourceHeaders, 0, "Source duplicates", (x, i, h, s) => x[i], cb4);
 
-                        //if (dgTargetDups.ItemsSource != null)
+                        //if (dgTargetDups.ItemsSource is not null)
                         xl.AddWorksheet(cmp.Results.Target.Duplicates.Cast<object[]>(), cmp.TargetHeaders, 0, "Target duplicates", (x, i, h, s) => x[i], cb5);
 
-                        //if (dgSourcePerfectDups.ItemsSource != null)
+                        //if (dgSourcePerfectDups.ItemsSource is not null)
                         xl.AddWorksheet(cmp.Results.Source.PerfectDups.Cast<object[]>(), cmp.SourceHeaders, 0, "Source clones", (x, i, h, s) => x[i], cb6);
 
-                        //if (dgTargetPerfectDups.ItemsSource != null)
+                        //if (dgTargetPerfectDups.ItemsSource is not null)
                         xl.AddWorksheet(cmp.Results.Target.PerfectDups.Cast<object[]>(), cmp.TargetHeaders, 0, "Target clones", (x, i, h, s) => x[i], cb7);
 
                         //xl.AddWorksheet(dgDiff, "Differences");

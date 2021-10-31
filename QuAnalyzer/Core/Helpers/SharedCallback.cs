@@ -14,7 +14,7 @@ namespace QuAnalyzer.Core.Helpers
             }
 
             var txtb = new TextBlock();
-            if (worksheetName != null)
+            if (worksheetName is not null)
             {
                 txtb.Text = "Exporting '" + worksheetName + "' data to " + fileName;
             }

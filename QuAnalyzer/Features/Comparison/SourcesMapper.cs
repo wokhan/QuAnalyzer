@@ -16,7 +16,7 @@ namespace QuAnalyzer.Features.Comparison
         public IDataProvider Source
         {
             get { return ((App)App.Current).CurrentProject.CurrentProviders.SingleOrDefault(c => c.Name == SourceName); }
-            set { SourceName = value != null ? value.Name : String.Empty; }
+            set { SourceName = value is not null ? value.Name : String.Empty; }
         }
 
         public string SourceName { get; set; }
@@ -27,7 +27,7 @@ namespace QuAnalyzer.Features.Comparison
         public IDataProvider Target
         {
             get { return ((App)App.Current).CurrentProject.CurrentProviders.SingleOrDefault(c => c.Name == TargetName); }
-            set { TargetName = value != null ? value.Name : String.Empty; }
+            set { TargetName = value is not null ? value.Name : String.Empty; }
         }
 
         public string TargetName { get; set; }

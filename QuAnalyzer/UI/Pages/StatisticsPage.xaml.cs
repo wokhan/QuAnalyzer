@@ -68,7 +68,7 @@ namespace QuAnalyzer.UI.Pages
         private void UpdateSelection()
         {
             var (prov, repo) = ((App)App.Current).CurrentSelection;
-            if (prov != null && btnAuto.IsChecked.Value)
+            if (prov is not null && btnAuto.IsChecked.Value)
             {
                 Computedata(prov, repo);
             }

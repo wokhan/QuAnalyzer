@@ -10,11 +10,11 @@ namespace QuAnalyzer.UI.Controls
     {
         [Bindable(true)]
         public string Text { get; set; }
-        public static DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(ToolBarToggleButton), new PropertyMetadata(null));
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(ToolBarToggleButton), new PropertyMetadata(null));
 
         [Bindable(true)]
         public object Image { get; set; }
-        public static DependencyProperty ImageProperty = DependencyProperty.Register("Image", typeof(object), typeof(ToolBarToggleButton), new PropertyMetadata(null));
+        public static readonly DependencyProperty ImageProperty = DependencyProperty.Register("Image", typeof(object), typeof(ToolBarToggleButton), new PropertyMetadata(null));
 
         [Bindable(true)]
         public Orientation Orientation { get; set; }

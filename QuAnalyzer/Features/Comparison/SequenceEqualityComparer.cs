@@ -28,7 +28,7 @@ namespace QuAnalyzer.Features.Comparison
         // To ensure that Equals is always called, you can return 0.
         public int GetHashCode(IEnumerable<T> obj)
         {
-            return obj.Skip(startFrom).Take(maxCount).Aggregate(17, (a, i) => a * 23 + (i == null || i is DBNull ? 0 : i.GetHashCode()));
+            return obj.Skip(startFrom).Take(maxCount).Aggregate(17, (a, i) => a * 23 + (i is null || i is DBNull ? 0 : i.GetHashCode()));
         }
     }
 }

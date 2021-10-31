@@ -1,52 +1,24 @@
 ﻿using QuAnalyzer.Features.Comparison;
-using System.Collections.Generic;
+
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+
 using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Controls
 {
-    /// <summary>
-    /// Logique d'interaction pour MappingsEdit.xaml
-    /// </summary>
     public partial class MappingsEdit : UserControl
     {
-        public string MappingName
-        {
-            get => (string)GetValue(MappingNameProperty);
-            set => SetValue(MappingNameProperty, value);
-        }
-
-        public static DependencyProperty MappingNameProperty = DependencyProperty.Register(nameof(MappingName), typeof(string), typeof(MappingsEdit), new PropertyMetadata(null));
-
         public SourcesMapper Mapping
         {
             get => (SourcesMapper)GetValue(MappingProperty);
             set => SetValue(MappingProperty, value);
         }
 
-        public static DependencyProperty MappingProperty = DependencyProperty.Register(nameof(Mapping), typeof(SourcesMapper), typeof(MappingsEdit), new PropertyMetadata(mappingPropertyChanged));
-
-        private static void mappingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((MappingsEdit)d).UpdateMapping();
-        }
-
-        private void UpdateMapping()
-        {
-            CurrentMaps.ReplaceAll(Mapping.AllMappings);
-            CurrentMaps.CollectionChanged += CurrentMaps_CollectionChanged;
-        }
-
-        private void CurrentMaps_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            Mapping.AllMappings = CurrentMaps.ToList();
-        }
-
-        public ObservableCollection<SimpleMap> CurrentMaps { get; private set; } = new ObservableCollection<SimpleMap>();
+        public static readonly DependencyProperty MappingProperty = DependencyProperty.Register(nameof(Mapping), typeof(SourcesMapper), typeof(MappingsEdit));
 
         public ObservableCollection<string> SourceAttributes { get; } = new ObservableCollection<string>();
 
@@ -61,7 +33,11 @@ namespace QuAnalyzer.UI.Controls
         }
 
 
-        private void btnAdd_Click(object sender, RoutedEventArgs e) => CurrentMaps.Add(new SimpleMap());
+        private void btnAdd_Click(object sender, RoutedEventArgs e)
+        {
+            Mapping.AllMappings.Add(new SimpleMap());
+            gridMappings.Items.Refresh();
+        }
 
         private void lstSrcRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -77,30 +53,37 @@ namespace QuAnalyzer.UI.Controls
         {
             attributes.Clear();
 
-            if (prov != null && repo != null)
+            if (prov is not null && repo is not null)
             {
                 attributes.AddAll(prov.GetColumns(repo).Select(a => a.Name));
             }
         }
 
-        private void btnRm_Click(object sender, RoutedEventArgs e) => CurrentMaps.Remove((SimpleMap)((Button)sender).Tag);
+        private void btnRm_Click(object sender, RoutedEventArgs e)
+        {
+            Mapping.AllMappings.Remove((SimpleMap)((Button)sender).Tag);
+            // TODO: Use an observable collection?
+            gridMappings.Items.Refresh();
+        }
 
-        private void btnRmAll_Click(object sender, RoutedEventArgs e) => CurrentMaps.Clear();
+        private void btnRmAll_Click(object sender, RoutedEventArgs e)
+        {
+            Mapping.AllMappings.Clear();
+            gridMappings.Items.Refresh();
+        }
 
 
         private void btnMapName_Click(object sender, RoutedEventArgs e)
         {
-            CurrentMaps.ReplaceAll(SourceAttributes.Where(s => TargetAttributes.Contains(s)).Select(s => new SimpleMap(s, s)));
+            Mapping.AllMappings.ReplaceAll(SourceAttributes.Where(s => TargetAttributes.Contains(s)).Select(s => new SimpleMap(s, s)));
+            gridMappings.Items.Refresh();
+
         }
 
         private void btnMapPos_Click(object sender, RoutedEventArgs e)
         {
-            CurrentMaps.ReplaceAll(SourceAttributes.Take(TargetAttributes.Count).Select((s, i) => new SimpleMap(s, TargetAttributes[i])));
-        }
-
-        private void DataGridComboBoxColumn_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            CurrentMaps_CollectionChanged(null, null);
+            Mapping.AllMappings.ReplaceAll(SourceAttributes.Take(TargetAttributes.Count).Select((s, i) => new SimpleMap(s, TargetAttributes[i])));
+            gridMappings.Items.Refresh();
         }
     }
 }

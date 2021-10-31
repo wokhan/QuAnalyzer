@@ -20,7 +20,7 @@ namespace QuAnalyzer.Generic.Extensions
         public static void AddWorksheet<T>(this ExcelPackage xl, IEnumerable<T> src, IList<string> headers, int keysCount, string worksheetName, Func<T, int, string, ExcelStyle, object> GetValueSetStyle, Action<double> callback = null)
         {
             var sheet = xl.Workbook.Worksheets[worksheetName ?? "Report"];
-            if (sheet != null)
+            if (sheet is not null)
             {
                 xl.Workbook.Worksheets.Delete(sheet);
             }
@@ -102,7 +102,7 @@ namespace QuAnalyzer.Generic.Extensions
             DoEvents();
 
             var sheet = xl.Workbook.Worksheets[worksheetName ?? "Report"];
-            if (sheet != null)
+            if (sheet is not null)
             {
                 xl.Workbook.Worksheets.Delete(sheet);
             }
@@ -124,7 +124,7 @@ namespace QuAnalyzer.Generic.Extensions
             {
                 var row = (DataGridRow)gridClone.ItemContainerGenerator.ContainerFromIndex(j - 2);
 
-                if (row == null)
+                if (row is null)
                 {
                     gridClone.ScrollIntoView(gridClone.Items[j - 2]);
                     row = (DataGridRow)gridClone.ItemContainerGenerator.ContainerFromIndex(j - 2);
@@ -134,7 +134,7 @@ namespace QuAnalyzer.Generic.Extensions
 
                 DoEvents();
 
-                if (row.Background != null && ((SolidColorBrush)row.Background).Color != noColor)
+                if (row.Background is not null && ((SolidColorBrush)row.Background).Color != noColor)
                 {
                     sheet.Row(j).Style.Fill.PatternType = ExcelFillStyle.Solid;
                     sheet.Row(j).Style.Fill.BackgroundColor.SetColor(((SolidColorBrush)row.Background).Color.AsDrawingColor());
@@ -148,7 +148,7 @@ namespace QuAnalyzer.Generic.Extensions
                 for (var k = 1; k < gridClone.Columns.Count + 1; k++)
                 {
                     var txt = (TextBlock)gridClone.Columns[k - 1].GetCellContent(row);
-                    if (txt != null)
+                    if (txt is not null)
                     {
                         sheet.Cells[j, k].Value = txt.Text;
 
@@ -167,7 +167,7 @@ namespace QuAnalyzer.Generic.Extensions
 
             }
 
-            if (callback != null)
+            if (callback is not null)
             {
                 callback(1);
                 DoEvents();
@@ -186,7 +186,7 @@ namespace QuAnalyzer.Generic.Extensions
         {
             grid.CopyToClipboard();
 
-            if (path == null)
+            if (path is null)
             {
                 var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = p1 };
                 if (dial.ShowDialog().Value)
@@ -195,7 +195,7 @@ namespace QuAnalyzer.Generic.Extensions
                 }
             }
 
-            if (path != null)
+            if (path is not null)
             {
                 var str = new StreamWriter(path);
 
@@ -210,7 +210,7 @@ namespace QuAnalyzer.Generic.Extensions
 
         public static void ExportAsXLSX<T>(this IEnumerable<T> src, string[] headers, int keysCount, string worksheetName, Func<T, int, string, ExcelStyle, object> GetValueSetStyle, string path = null, Action<double> callback = null)
         {
-            if (path == null)
+            if (path is null)
             {
                 var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = "Excel 2007 File|*.xlsx" };
                 if (dial.ShowDialog().Value)
@@ -240,7 +240,7 @@ namespace QuAnalyzer.Generic.Extensions
 #pragma warning restore CS0219 // La variable 'canceled' est assignée, mais sa valeur n'est jamais utilisée
             //try
             {
-                if (path == null)
+                if (path is null)
                 {
                     var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = "Excel 2007 File|*.xlsx" };
                     if (dial.ShowDialog().Value)
@@ -273,7 +273,7 @@ namespace QuAnalyzer.Generic.Extensions
         //public static void AddWorksheet<T>(this ExcelPackage xl, IEnumerable<T> src, IList<string> headers, int keysCount, string worksheetName, Func<T, int, string, ExcelStyle, object> GetValueSetStyle, Action<double> callback = null)
         //{
         //    var sheet = xl.Workbook.Worksheets[worksheetName ?? "Report"];
-        //    if (sheet != null)
+        //    if (sheet is not null)
         //    {
         //        xl.Workbook.Worksheets.Delete(sheet);
         //    }
@@ -294,7 +294,7 @@ namespace QuAnalyzer.Generic.Extensions
         //    foreach (var x in src)
         //    {
         //        j++;
-        //        if (callback != null)
+        //        if (callback is not null)
         //        {
         //            callback((double)(j - 2) / cnt);
         //        }
@@ -305,7 +305,7 @@ namespace QuAnalyzer.Generic.Extensions
         //        }
         //    }
 
-        //    if (callback != null)
+        //    if (callback is not null)
         //    {
         //        callback(1);
         //    }
@@ -361,7 +361,7 @@ namespace QuAnalyzer.Generic.Extensions
         //    DoEvents();
 
         //    var sheet = xl.Workbook.Worksheets[worksheetName ?? "Report"];
-        //    if (sheet != null)
+        //    if (sheet is not null)
         //    {
         //        xl.Workbook.Worksheets.Delete(sheet);
         //    }
@@ -383,20 +383,20 @@ namespace QuAnalyzer.Generic.Extensions
         //    {
         //        var row = (DataGridRow)gridClone.ItemContainerGenerator.ContainerFromIndex(j - 2);
 
-        //        if (row == null)
+        //        if (row is null)
         //        {
         //            gridClone.ScrollIntoView(gridClone.Items[j - 2]);
         //            row = (DataGridRow)gridClone.ItemContainerGenerator.ContainerFromIndex(j - 2);
         //        }
 
-        //        if (callback != null)
+        //        if (callback is not null)
         //        {
         //            callback(j - 1 / gridClone.Items.Count);
         //        }
 
         //        DoEvents();
 
-        //        if (row.Background != null && ((SolidColorBrush)row.Background).Color != noColor)
+        //        if (row.Background is not null && ((SolidColorBrush)row.Background).Color != noColor)
         //        {
         //            sheet.Row(j).Style.Fill.PatternType = ExcelFillStyle.Solid;
         //            sheet.Row(j).Style.Fill.BackgroundColor.SetColor(((SolidColorBrush)row.Background).Color.AsDrawingColor());
@@ -410,7 +410,7 @@ namespace QuAnalyzer.Generic.Extensions
         //        for (int k = 1; k < gridClone.Columns.Count + 1; k++)
         //        {
         //            var txt = (TextBlock)gridClone.Columns[k - 1].GetCellContent(row);
-        //            if (txt != null)
+        //            if (txt is not null)
         //            {
         //                sheet.Cells[j, k].Value = txt.Text;
 
@@ -427,7 +427,7 @@ namespace QuAnalyzer.Generic.Extensions
         //            }
         //        }
 
-        //        if (callback != null)
+        //        if (callback is not null)
         //        {
         //            callback(1);
         //            DoEvents();
@@ -440,7 +440,7 @@ namespace QuAnalyzer.Generic.Extensions
 
         public static void DoEvents()
         {
-            if (Application.Current == null)
+            if (Application.Current is null)
             {
                 return;
             }

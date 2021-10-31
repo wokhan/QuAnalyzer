@@ -55,7 +55,7 @@
                     <DataGridTemplateColumn Width="70" >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Name="btnDelete" Click="btnDelete_Click" Style="{StaticResource MetroCircleButtonStyle}" BorderBrush="OrangeRed" Tag="{Binding}" Foreground="{Binding Path=BorderBrush, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                <Button Name="btnDelete" Click="btnDelete_Click" Tag="{Binding}" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

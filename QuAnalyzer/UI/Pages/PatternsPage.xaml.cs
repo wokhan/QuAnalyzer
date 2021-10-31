@@ -30,7 +30,7 @@ namespace QuAnalyzer.UI.Pages
             var (prov, repo) = ((App)App.Current).CurrentSelection;
             var attr = (string)lstAttributes.SelectedValue;
 
-            if (repo != null && attr == null)
+            if (repo is not null && attr is null)
             {
                 stringAttributes = prov.GetColumns(repo).Where(h => h.Type == typeof(string)).Select(h => h.Name).ToList();
                 lstAttributes.ItemsSource = stringAttributes;
@@ -47,7 +47,7 @@ namespace QuAnalyzer.UI.Pages
 
             var attr = (string)lstAttributes.SelectedValue;
 
-            if (repo != null && attr != null)
+            if (repo is not null && attr is not null)
             {
                 prg.IsIndeterminate = true;
 
@@ -92,7 +92,7 @@ namespace QuAnalyzer.UI.Pages
         private void slideSim_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
             SimThreshold = (int)e.NewValue;
-            if (gridPatterns != null)
+            if (gridPatterns is not null)
             {
                 UpdateSelection();
             }

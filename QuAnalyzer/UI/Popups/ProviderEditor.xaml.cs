@@ -31,21 +31,23 @@ namespace QuAnalyzer.UI.Pages
             set { _currentProvider = value; NotifyPropertyChanged(nameof(CurrentProvider)); NotifyPropertyChanged(nameof(CurrentType)); fillProvider(); }
         }
 
+        private IList<IGrouping<string, DataProviderMemberDefinition>> expParameters = null;
+
         public IList<IGrouping<string, DataProviderMemberDefinition>> ExpParameters
         {
             get
             {
-                var ret = DataProviders.GetParameters(CurrentProvider);
-                HasMultipleItems = ExpParameters.Count > 1;
+                expParameters = DataProviders.GetParameters(CurrentProvider);
                 NotifyPropertyChanged(nameof(HasMultipleItems));
-                return ret;
+                return expParameters;
             }
         }
 
         private int pageCount = 0;
         private bool isNewProvider;
 
-        public bool HasMultipleItems { get; private set; }
+        public bool HasMultipleItems => (expParameters?.Count > 1);
+
         public DataProviderDefinition CurrentType => CurrentProvider.Definition;
 
         protected void NotifyPropertyChanged(string propertyName)
@@ -79,7 +81,7 @@ namespace QuAnalyzer.UI.Pages
 
         void Repositories_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems != null)
+            if (e.NewItems is not null)
             {
                 foreach (RepositoryView repo in e.NewItems)
                 {
@@ -87,7 +89,7 @@ namespace QuAnalyzer.UI.Pages
                 }
             }
 
-            if (e.OldItems != null)
+            if (e.OldItems is not null)
             {
                 foreach (RepositoryView repo in e.OldItems)
                 {
@@ -98,7 +100,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void fillProvider()
         {
-            if (CurrentProvider.Repositories != null)
+            if (CurrentProvider.Repositories is not null)
             {
                 foreach (var r in CurrentProvider.Repositories)
                 {
@@ -109,7 +111,7 @@ namespace QuAnalyzer.UI.Pages
 
         public void rdb_Checked(object sender, RoutedEventArgs e)
         {
-            Contract.Requires(sender != null);
+            Contract.Requires(sender is not null);
 
             if (((RadioButton)sender).IsChecked.Value)
             {
@@ -133,7 +135,7 @@ namespace QuAnalyzer.UI.Pages
             //((App)App.Current).CurrentProject.CurrentProviders[((App)App.Current).CurrentProject.CurrentProviders.IndexOf((IDataProvider)lstProviders.SelectedItem)] = CurrentProvider;
 
             _owner.Close();
-            //if (lstProviders.SelectedItem == null)
+            //if (lstProviders.SelectedItem is null)
             ////{
             ////((App)App.Current).CurrentProject.CurrentProviders[((App)App.Current).CurrentProject.CurrentProviders.IndexOf((IDataProvider)lstProviders.SelectedItem)] = currentProvider;
             ////lstProviders.Items.Refresh();
@@ -179,7 +181,7 @@ namespace QuAnalyzer.UI.Pages
                 msg.SetTitle("Unexpected error");*/
             }
 
-            if (res != null)
+            if (res is not null)
             {
                 await msg.CloseAsync();
                 await _owner.ShowMessageAsync("Unexpected error", res);
@@ -193,7 +195,7 @@ namespace QuAnalyzer.UI.Pages
         /*private async void ForceDialog(string p1, string p2)
         {
             var dial = await this.GetCurrentDialogAsync<BaseMetroDialog>();
-            if (dial != null)
+            if (dial is not null)
             {
                 dial.Title = p2;
                 dial.Content = p1;

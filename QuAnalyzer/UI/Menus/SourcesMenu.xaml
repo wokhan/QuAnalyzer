@@ -67,9 +67,9 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
-                                        <Expander BorderThickness="0" IsExpanded="True" Foreground="Black">
+                                        <Expander Margin="5" BorderThickness="0" IsExpanded="True" Foreground="Black">
                                             <Expander.Header>
-                                                <Grid Background="Transparent">
+                                                <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto" SharedSizeGroup="ImgCol" />
                                                         <ColumnDefinition Width="*" />
@@ -78,7 +78,7 @@
                                                     </Grid.ColumnDefinitions>
                                                     <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxHeight="20" Source="{Binding Name.Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
                                                     <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name.Name}" VerticalAlignment="Center" />
-                                                    <Button Grid.Column="2" Name="btnEditProvider" Background="Transparent" BorderBrush="Transparent" Foreground="LightBlue" Tag="{Binding Name}" Click="btnEditProvider_Click" Content="{iconPacks:Material Kind=Pencil}" />
+                                                    <Button Grid.Column="2" Name="btnEditProvider" Foreground="RoyalBlue" Tag="{Binding Name}" Click="btnEditProvider_Click" Content="{iconPacks:Material Kind=Pencil}" />
                                                 </Grid>
                                             </Expander.Header>
                                             <ItemsPresenter />

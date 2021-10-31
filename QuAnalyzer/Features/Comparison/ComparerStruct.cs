@@ -59,7 +59,7 @@ namespace QuAnalyzer.Features.Comparison
             else
             {
 
-                if (attributes == null)
+                if (attributes is null)
                 {
                     attributes = innertype.GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(a => a.Name).ToArray();
                 }
@@ -124,11 +124,11 @@ namespace QuAnalyzer.Features.Comparison
             }
 
 
-            var srcDataGetter = s.Source.GetQueryable(s.SourceRepository);//, srcKeys != null ? srcKeys.ToDictionary(sk => sk, sk => srcHeaders.First(h => h.Name == sk).Type) : null);
-            var trgDataGetter = s.Target.GetQueryable(s.TargetRepository);//, trgKeys != null ? trgKeys.ToDictionary(sk => sk, sk => trgHeaders.First(h => h.Name == sk).Type) : null);
+            var srcDataGetter = s.Source.GetQueryable(s.SourceRepository);//, srcKeys is not null ? srcKeys.ToDictionary(sk => sk, sk => srcHeaders.First(h => h.Name == sk).Type) : null);
+            var trgDataGetter = s.Target.GetQueryable(s.TargetRepository);//, trgKeys is not null ? trgKeys.ToDictionary(sk => sk, sk => trgHeaders.First(h => h.Name == sk).Type) : null);
             if (s.IsOrdered)
             {
-                if (srcKeys != null && trgKeys != null)
+                if (srcKeys is not null && trgKeys is not null)
                 {
                     srcDataGetter = srcDataGetter.OrderBy(String.Join(",", srcHeaders.Select(h => h.Name).Intersect(srcKeys)));
                     trgDataGetter = trgDataGetter.OrderBy(String.Join(",", trgHeaders.Select(h => h.Name).Intersect(trgKeys)));
@@ -148,7 +148,7 @@ namespace QuAnalyzer.Features.Comparison
             SourceKeys = srcKeys;
             TargetKeys = trgKeys;
             Comparer = (IEqualityComparer<T>)new SequenceEqualityComparer<object>();
-            KeysComparer = (IEqualityComparer<T>)(srcKeys != null ? new SequenceEqualityComparer<object>(0, srcKeys.Length) : null);
+            KeysComparer = (IEqualityComparer<T>)(srcKeys is not null ? new SequenceEqualityComparer<object>(0, srcKeys.Length) : null);
             GetSourceData = () => (IEnumerable<T>)normalizeTypes(Transform(srcDataGetter, fieldsSrc), allTypesTrg); //.Select(r => allIdxSr.Select(i => r[i]).ToArray()),
             GetTargetData = () => (IEnumerable<T>)normalizeTypes(Transform(trgDataGetter, fieldsTrg), allTypesTrg);//.Select(r => allIdxTr.Select(i => r[i]).ToArray())
             IsOrdered = s.IsOrdered;
@@ -156,7 +156,7 @@ namespace QuAnalyzer.Features.Comparison
 
         /*private static SequenceEqualityComparer<T> GetComparer(string[] fields)
         {
-            return (fields != null ? new SequenceEqualityComparer<T>(0, fields.Length) : null);
+            return (fields is not null ? new SequenceEqualityComparer<T>(0, fields.Length) : null);
         }
 
         private static SequenceEqualityComparer<IEnumerable<T>> GetComparer()

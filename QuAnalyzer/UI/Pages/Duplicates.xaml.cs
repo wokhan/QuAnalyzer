@@ -54,7 +54,7 @@ namespace QuAnalyzer.UI.Pages
             if (e.PropertyName == nameof(App.CurrentSelection))
             {
                 var (prov, repo) = ((App)App.Current).CurrentSelection;
-                if (prov != null)
+                if (prov is not null)
                 {
                     lstColumns.ItemsSource = prov.GetColumns(repo);
                 }
@@ -86,7 +86,7 @@ namespace QuAnalyzer.UI.Pages
         /// <returns></returns>
         public static IEnumerable<object[]> AsObjectCollection<T>(IEnumerable<T> src, params string[] properties)
         {
-            Contract.Requires(src != null);
+            Contract.Requires(src is not null);
 
             var innertype = src.GetInnerType();
             if (innertype.IsArray)
@@ -96,7 +96,7 @@ namespace QuAnalyzer.UI.Pages
             else
             {
 
-                if (properties == null)
+                if (properties is null)
                 {
                     properties = innertype.GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(a => a.Name).ToArray();
                 }
@@ -135,7 +135,7 @@ namespace QuAnalyzer.UI.Pages
 
                 var attrExpr = LExpr.Expression.Lambda<Func<T, object[]>>(LExpr.Expression.NewArrayInit(typeof(object), atrs), param).Compile();
 
-                return src.Select(x => { if (x == null) { throw new Exception("Should never get there."); } return attrExpr(x); });
+                return src.Select(x => { if (x is null) { throw new Exception("Should never get there."); } return attrExpr(x); });
             }
         }
 
@@ -207,7 +207,7 @@ namespace QuAnalyzer.UI.Pages
             var count = (KeepColumns && KeepDuplicates ? headers.Length : keysCount);
             gridData.CustomHeaders = headers.Take(count).Select(h => new ColumnDescription { Name = h, DisplayName = h }).ToList();
 
-            if (data != null && data.Any())
+            if (data is not null && data.Any())
             {
                 gridData.Columns.AddAll(headers.Take(count).Select((h, i) => new DataGridTextColumn() { Header = h, Binding = new Binding("[" + i + "]") }));
                 gridData.Source = data.AsQueryable();

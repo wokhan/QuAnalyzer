@@ -12,7 +12,7 @@ namespace QuAnalyzer.UI.Controls
     {
         [Bindable(true)]
         public object Image { get; set; }
-        public static DependencyProperty ImageProperty = DependencyProperty.Register(nameof(Image), typeof(object), typeof(DecoratedTabItem), new PropertyMetadata(null));
+        public static readonly DependencyProperty ImageProperty = DependencyProperty.Register(nameof(Image), typeof(object), typeof(DecoratedTabItem), new PropertyMetadata(null));
 
         static DecoratedTabItem()
         {

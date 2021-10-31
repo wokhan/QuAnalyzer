@@ -21,7 +21,7 @@ namespace QuAnalyzer.UI.Pages
         private void UpdateSelection()
         {
             var (prov, repo) = ((App)App.Current).CurrentSelection;
-            if (prov != null && repo != null)
+            if (prov is not null && repo is not null)
             {
                 gridData.CustomHeaders = prov.GetColumns(repo);
                 gridData.Source = prov.GetQueryable(repo);
