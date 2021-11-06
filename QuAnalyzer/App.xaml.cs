@@ -31,8 +31,8 @@ namespace QuAnalyzer
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private KeyValuePair<IDataProvider, string> _currentSelection;
-        public KeyValuePair<IDataProvider, string> CurrentSelection
+        private (IDataProvider, string) _currentSelection;
+        public (IDataProvider, string) CurrentSelection
         {
             get => _currentSelection;
             set { _currentSelection = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentSelection))); }

@@ -1,11 +1,13 @@
 ﻿<Page x:Class="QuAnalyzer.UI.Popups.DetailsWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        Title="{Binding Name, StringFormat='Comparison details - {0}'}"
-        MinWidth="800" MinHeight="500" xmlns:myself="clr-namespace:QuAnalyzer.UI.Popups" x:Name="me">
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
+      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+      Title="{Binding Name, StringFormat='Comparison details - {0}'}"
+      MinWidth="800" MinHeight="600" 
+      x:Name="me">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="{Binding ActualHeight,ElementName=tabDiff}" />
@@ -17,83 +19,93 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Controls:MetroAnimatedSingleRowTabControl Grid.RowSpan="2" Name="tabs" Padding="0">
-            <Controls:MetroAnimatedSingleRowTabControl.Resources>
-                <Style TargetType="UC:DecoratedTabItem" BasedOn="{StaticResource {x:Type TabItem}}">
-                    <Setter Property="Height" Value="32"/>
+            <TabControl.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="BorderThickness" Value="0,1,0,0" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}" />
+                    <Setter Property="Margin" Value="0,-1,0,0" />
                 </Style>
-            </Controls:MetroAnimatedSingleRowTabControl.Resources>
-            <UC:DecoratedTabItem x:Name="tabDiff" Image="{iconPacks:Material Kind=ViewGrid}" Header="DIFFERENCES">
-                <DockPanel DataContext="{Binding DataContext,ElementName=me}">
-                    <DockPanel.Resources>
-                        <Style TargetType="DataGridRow">
-                            <Style.Triggers>
-                                <Trigger Property="ItemsControl.AlternationIndex" Value="2">
-                                    <Setter Property="Background" Value="#EEE"></Setter>
-                                </Trigger>
-                                <Trigger Property="ItemsControl.AlternationIndex" Value="3">
-                                    <Setter Property="Background" Value="#EEE"></Setter>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DockPanel.Resources>
-                    <UC:ExtendedDataGridView x:Name="dgDiff" EnableAdvancedFilters="True" />
-                    <!--AlternationCount="4" IsReadOnly="True" FrozenColumnCount="1">-->
-                </DockPanel>
-            </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem x:Name="tabMissingSrc" Header="MISSING ENTRIES" Image="{iconPacks:Material Kind=SelectionSearch}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="180*" />
-                        <RowDefinition Height="5" />
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="179*" />
-                    </Grid.RowDefinitions>
-                    <Label Content="{Binding SourceName,FallbackValue=Source}" ContentStringFormat="Items missing from {0}" Background="#FFEEEEEE" />
-                    <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgMissingSource" />
-                    <!--IsReadOnly="True" FrozenColumnCount="1"-->
-                    <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
-                    <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" ContentStringFormat="Items missing from {0}" Background="#FFEEEEEE" />
-                    <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgMissingTarget" />
-                    <!--IsReadOnly="True" FrozenColumnCount="1"-->
-                </Grid>
-            </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem x:Name="tabDupTrg" Image="{iconPacks:Material Kind=TableSearch}" Header="SIMILAR ENTRIES">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="180*" />
-                        <RowDefinition Height="5" />
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="179*" />
-                    </Grid.RowDefinitions>
-                    <Label Content="{Binding SourceName,FallbackValue=Source}" Background="#FFEEEEEE" />
-                    <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourceDups" />
-                    <!--IsReadOnly="True" FrozenColumnCount="1"-->
-                    <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
-                    <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" Background="#FFEEEEEE" />
-                    <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetDups" />
-                    <!--IsReadOnly="True" FrozenColumnCount="1"-->
-                </Grid>
-            </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem x:Name="tabDupPrfSrc" Image="{iconPacks:Material Kind=Equal}" Header="DUPLICATES">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="180*" />
-                        <RowDefinition Height="5" />
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="179*" />
-                    </Grid.RowDefinitions>
-                    <Label Content="{Binding SourceName,FallbackValue=Source}" Background="#FFEEEEEE" />
-                    <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourcePerfectDups" EnableAdvancedFilters="True" />
-                    <!--IsReadOnly="True" FrozenColumnCount="1"-->
-                    <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
-                    <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" Background="#FFEEEEEE" />
-                    <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetPerfectDups" EnableAdvancedFilters="True" />
-                    <!--IsReadOnly="True" FrozenColumnCount="1"-->
-                </Grid>
-            </UC:DecoratedTabItem>
+            </TabControl.Resources>
+            <TabItem x:Name="tabDiff" Header="DIFFERENCES" ext:CustomAdorner.PreserveTemplate="True" ext:CustomAdorner.Image="{iconPacks:Material Kind=VectorDifference}">
+                <Border>
+                    <DockPanel DataContext="{Binding DataContext,ElementName=me}">
+                        <DockPanel.Resources>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <Trigger Property="ItemsControl.AlternationIndex" Value="2">
+                                        <Setter Property="Background" Value="#EEE"></Setter>
+                                    </Trigger>
+                                    <Trigger Property="ItemsControl.AlternationIndex" Value="3">
+                                        <Setter Property="Background" Value="#EEE"></Setter>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DockPanel.Resources>
+                        <UC:ExtendedDataGridView x:Name="dgDiff" EnableAdvancedFilters="True" />
+                        <!--AlternationCount="4" IsReadOnly="True" FrozenColumnCount="1">-->
+                    </DockPanel>
+                </Border>
+            </TabItem>
+            <TabItem x:Name="tabMissingSrc" Header="MISSING ENTRIES" ext:CustomAdorner.PreserveTemplate="True" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectionSearch}">
+                <Border>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="180*" />
+                            <RowDefinition Height="5" />
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="179*" />
+                        </Grid.RowDefinitions>
+                        <Label Content="{Binding SourceName,FallbackValue=Source}" ContentStringFormat="Items missing from {0}" Background="#FFEEEEEE" />
+                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgMissingSource" />
+                        <!--IsReadOnly="True" FrozenColumnCount="1"-->
+                        <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
+                        <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" ContentStringFormat="Items missing from {0}" Background="#FFEEEEEE" />
+                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgMissingTarget" />
+                        <!--IsReadOnly="True" FrozenColumnCount="1"-->
+                    </Grid>
+                </Border>
+            </TabItem>
+            <TabItem x:Name="tabDupTrg" ext:CustomAdorner.PreserveTemplate="True" ext:CustomAdorner.Image="{iconPacks:Material Kind=TableSearch}" Header="SIMILAR ENTRIES">
+                <Border>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="180*" />
+                            <RowDefinition Height="5" />
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="179*" />
+                        </Grid.RowDefinitions>
+                        <Label Content="{Binding SourceName,FallbackValue=Source}" Background="#FFEEEEEE" />
+                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourceDups" />
+                        <!--IsReadOnly="True" FrozenColumnCount="1"-->
+                        <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
+                        <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" Background="#FFEEEEEE" />
+                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetDups" />
+                        <!--IsReadOnly="True" FrozenColumnCount="1"-->
+                    </Grid>
+                </Border>
+            </TabItem>
+            <TabItem x:Name="tabDupPrfSrc" ext:CustomAdorner.Image="{iconPacks:Material Kind=Equal}" Header="DUPLICATES">
+                <Border>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="180*" />
+                            <RowDefinition Height="5" />
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="179*" />
+                        </Grid.RowDefinitions>
+                        <Label Content="{Binding SourceName,FallbackValue=Source}" Background="#FFEEEEEE" />
+                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourcePerfectDups" EnableAdvancedFilters="True" />
+                        <!--IsReadOnly="True" FrozenColumnCount="1"-->
+                        <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
+                        <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" Background="#FFEEEEEE" />
+                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetPerfectDups" EnableAdvancedFilters="True" />
+                        <!--IsReadOnly="True" FrozenColumnCount="1"-->
+                    </Grid>
+                </Border>
+            </TabItem>
         </Controls:MetroAnimatedSingleRowTabControl>
     </Grid>
 </Page>

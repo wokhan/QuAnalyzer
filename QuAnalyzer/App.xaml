@@ -5,6 +5,7 @@
              xmlns:BindingConvertersEx="clr-namespace:QuAnalyzer.UI.BindingConverters"
              xmlns:System="clr-namespace:System;assembly=System.Runtime"
              xmlns:mahapps="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
              x:Class="QuAnalyzer.App"
              StartupUri="UI/Windows/ModernMain.xaml">
     <Application.Resources>
@@ -13,9 +14,6 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
-                <ResourceDictionary Source="/UI/Controls/DecoratedTabItem.Style.xaml" />
-                <ResourceDictionary Source="/UI/Controls/ToolBarButton.Style.xaml" />
-                <ResourceDictionary Source="/UI/Controls/ToolBarToggleButton.Style.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BindingConverters:BooleanNegateConverter x:Key="booleanNegator" />
             <BindingConverters:ObjectToBoolConverter x:Key="objectToBool" />
@@ -119,13 +117,13 @@
                 <Setter Property="Background" Value="WhiteSmoke" />
                 <Setter Property="BorderThickness" Value="0,1,0,0" />
                 <Setter Property="BorderBrush" Value="LightGray" />
-                <Style.Resources>
+                <!--<Style.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
                         <Setter Property="MinWidth" Value="90" />
                         <Setter Property="Margin" Value="10" />
                         <Setter Property="FontSize" Value="11" />
                     </Style>
-                </Style.Resources>
+                </Style.Resources>-->
             </Style>
             <Style x:Key="ToolBar" TargetType="WrapPanel">
                 <!--<Setter Property="MinHeight" Value="32" />-->
@@ -145,9 +143,68 @@
                         <Setter Property="Fill" Value="LightGray" />
                         <Setter Property="Margin" Value="4" />
                     </Style>
+                    
                 </Style.Resources>
             </Style>
-            <Style TargetType="ToolBar">
+
+            <Style TargetType="Button">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.4" />
+                    </Trigger>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="LightBlue" />
+                    </Trigger>
+                </Style.Triggers>
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Padding" Value="10,5" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="LightGray" />
+                <Setter Property="Background" Value="WhiteSmoke" />
+                <Setter Property="ext:CustomAdorner.CornerRadius" Value="3"/>
+                <Setter Property="ext:CustomAdorner.ImageStyle">
+                    <Setter.Value>
+                        <Style TargetType="Control">
+                            <Setter Property="Margin" Value="0,0,5,0" />
+                            <Setter Property="Foreground" Value="{Binding BorderBrush,RelativeSource={x:Static RelativeSource.TemplatedParent}}" />
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
+            
+            <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.6" />
+                    </Trigger>
+                    <Trigger Property="IsChecked" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
+                        <Setter Property="BorderBrush" Value="White" />
+                    </Trigger>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="LightBlue" />
+                    </Trigger>
+                </Style.Triggers>
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontWeight" Value="Normal" />
+                <Setter Property="Padding" Value="10,5" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="LightGray" />
+                <Setter Property="Background" Value="WhiteSmoke" />
+                <Setter Property="ext:CustomAdorner.CornerRadius" Value="3"/>
+                <Setter Property="ext:CustomAdorner.ImageStyle">
+                    <Setter.Value>
+                        <Style TargetType="Control">
+                            <Setter Property="Margin" Value="0,0,5,0" />
+                            <Setter Property="Foreground" Value="{Binding BorderBrush,RelativeSource={x:Static RelativeSource.TemplatedParent}}" />
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <!--<Style TargetType="ToolBar">
                 <Setter Property="Background" Value="WhiteSmoke" />
                 <Setter Property="DockPanel.Dock" Value="Top" />
                 <Style.Resources>
@@ -156,8 +213,17 @@
                         <Setter Property="Fill" Value="LightGray" />
                         <Setter Property="Margin" Value="8" />
                     </Style>
+                    <Style TargetType="Button">
+                        <Setter Property="ext:CustomAdorner.ImageStyle">
+                            <Setter.Value>
+                                <Style TargetType="Control">
+                                    <Setter Property="Foreground" Value="{Binding BorderBrush,RelativeSource={x:Static RelativeSource.TemplatedParent}}" />
+                                </Style>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
                 </Style.Resources>
-            </Style>
+            </Style>-->
             <Style x:Key="NoMarginGroupBox" TargetType="GroupBox" BasedOn="{StaticResource {x:Type GroupBox}}">
                 <Style.Resources>
                     <Converters:ToUpperConverter x:Key="ToUpperConverter" />
@@ -233,106 +299,6 @@
             <System:Double x:Key="DialogTitleFontSize">14</System:Double>
             <System:Double x:Key="DialogMessageFontSize">12</System:Double>
 
-
-            <!--<Style TargetType="{x:Type MenuItem}">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type MenuItem}">
-                            <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                                <Grid>
-
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition MinWidth="17" Width="Auto" SharedSizeGroup="MenuItemIconColumnGroup" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" SharedSizeGroup="MenuItemIGTColumnGroup" />
-                                        <ColumnDefinition Width="14" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <ContentPresenter Margin="5,0,10,0" x:Name="Icon" VerticalAlignment="Center" ContentSource="Icon" />
-
-                                    <Grid Visibility="Hidden" Margin="4,0,6,0" x:Name="GlyphPanel" VerticalAlignment="Center">
-                                        <Path x:Name="GlyphPanelpath" VerticalAlignment="Center" Fill="{TemplateBinding Foreground}" Data="M0,2 L0,4.8 L2.5,7.4 L7.1,2.8 L7.1,0 L2.5,4.6 z" FlowDirection="LeftToRight" />
-                                    </Grid>
-                                    <Rectangle Grid.Column="0" Grid.ColumnSpan="4" x:Name="BackgroundGradientOver" Stroke="#FFDBCE99" Opacity="0" Fill="{DynamicResource MouseOverBrush}"/>
-
-                                    <ContentPresenter Grid.Column="1" Margin="{TemplateBinding Padding}" x:Name="HeaderHost" RecognizesAccessKey="True" ContentSource="Header" />
-
-                                    <Grid Grid.Column="3" Margin="5" x:Name="ArrowPanel" VerticalAlignment="Center">
-                                        <Path x:Name="ArrowPanelPath" VerticalAlignment="Center" Fill="{TemplateBinding Foreground}" Data="M0,0 L0,8 L4,4 z" />
-                                    </Grid>
-
-                                    <Popup IsOpen="{Binding Path=IsSubmenuOpen, RelativeSource={x:Static RelativeSource.TemplatedParent}}" Placement="Bottom" x:Name="SubMenuPopup" Focusable="false" AllowsTransparency="true" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}" VerticalOffset="-3">
-                                        <Grid x:Name="SubMenu" Margin="10">
-                                            <Border x:Name="SubMenuBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                                                --><!--<Border.Effect>
-                                                    <DropShadowEffect BlurRadius="15" />
-                                                </Border.Effect>--><!--
-                                            </Border>
-                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
-                                        </Grid>
-                                    </Popup>
-
-                                </Grid>
-                            </Border>
-
-                            <ControlTemplate.Triggers>
-
-                                <Trigger Property="Role" Value="TopLevelHeader">
-                                    <Setter Property="Margin" Value="0,1,0,1" />
-                                    <Setter Property="Padding" Value="6,3,6,3" />
-                                    <Setter Property="Grid.IsSharedSizeScope" Value="true" />
-                                    <Setter Property="Placement" Value="Bottom" TargetName="SubMenuPopup" />
-                                    <Setter Property="Visibility" Value="Collapsed" TargetName="ArrowPanel" />
-                                </Trigger>
-
-                                <Trigger Property="Role" Value="TopLevelItem">
-                                    <Setter Property="Margin" Value="0,1,0,1" />
-                                    <Setter Property="Padding" Value="6,3,6,3" />
-                                    <Setter Property="Visibility" Value="Collapsed" TargetName="ArrowPanel" />
-                                </Trigger>
-
-                                <Trigger Property="Role" Value="SubmenuHeader">
-                                    <Setter Property="DockPanel.Dock" Value="Top" />
-                                    <Setter Property="Padding" Value="0,2,0,2" />
-                                    <Setter Property="Placement" Value="Right" TargetName="SubMenuPopup" />
-                                    <Setter Property="Grid.IsSharedSizeScope" Value="true" />
-                                </Trigger>
-
-                                <Trigger Property="Role" Value="SubmenuItem">
-                                    <Setter Property="DockPanel.Dock" Value="Top" />
-                                    <Setter Property="Padding" Value="0,2,0,2" />
-                                    <Setter Property="Visibility" Value="Collapsed" TargetName="ArrowPanel" />
-                                </Trigger>
-                                <Trigger Property="IsSuspendingPopupAnimation" Value="true">
-                                    <Setter Property="PopupAnimation" Value="None" TargetName="SubMenuPopup" />
-                                </Trigger>
-
-                                <Trigger Property="Icon" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Collapsed" TargetName="Icon" />
-                                </Trigger>
-
-                                <Trigger Property="IsChecked" Value="true">
-                                    <Setter Property="Visibility" Value="Visible" TargetName="GlyphPanel" />
-                                    <Setter Property="Visibility" Value="Collapsed" TargetName="Icon" />
-                                </Trigger>
-
-                                <Trigger Property="AllowsTransparency" SourceName="SubMenuPopup" Value="True">
-                                    <Setter Property="Margin" Value="0,0,3,3" TargetName="SubMenu" />
-                                    <Setter Property="SnapsToDevicePixels" Value="true" TargetName="SubMenu" />
-                                </Trigger>
-
-                                <Trigger Property="IsHighlighted" Value="true">
-                                    <Setter Property="Background" Value="Gray" />
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="Foreground" Value="Gray" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>-->
-
             <Style TargetType="{x:Type Separator}">
                 <Setter Property="Height" Value="1" />
                 <Setter Property="Margin" Value="0,2,0,2" />
@@ -341,6 +307,39 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Separator}">
                             <Border BorderBrush="#FFB1703C" BorderThickness="10" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+
+            <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
+                <Setter Property="Height" Value="32"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Border BorderThickness="1,3,1,0" CornerRadius="5,5,0,0">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="WhiteSmoke" />
+                                                <Setter Property="BorderBrush" Value="Gray" />
+                                                <Setter Property="Height" Value="31" />
+                                            </Trigger>
+                                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={x:Static RelativeSource.TemplatedParent}}" Value="True">
+                                                <Setter Property="Background" Value="WhiteSmoke" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}" />
+                                                <Setter Property="Height" Value="32" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <ContentControl HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="SteelBlue" Margin="10,0" Height="19" Content="{Binding Image,RelativeSource={x:Static RelativeSource.TemplatedParent}}" />
+                                    <TextBlock Margin="0,0,10,0" Foreground="DarkSlateGray" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Path=Header,RelativeSource={x:Static RelativeSource.TemplatedParent}}" />
+                                </StackPanel>
+                            </Border>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>

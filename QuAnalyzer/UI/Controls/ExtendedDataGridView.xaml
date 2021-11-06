@@ -4,9 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
              xmlns:local="clr-namespace:QuAnalyzer.UI.Controls"
              mc:Ignorable="d" 
-      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
       xmlns:myself="clr-namespace:QuAnalyzer.UI.Controls"
       d:DesignHeight="600" d:DesignWidth="850"
       x:Name="thisWindow"
@@ -31,13 +31,13 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <WrapPanel Grid.ColumnSpan="2" Style="{StaticResource ToolBar}">
-            <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" Image="{iconPacks:Material Kind=ContentCopy}" Click="GlobalCopy_Click" />
+            <Button Content="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" ext:CustomAdorner.Image="{iconPacks:Material Kind=ContentCopy}" Click="GlobalCopy_Click" />
             <Rectangle />
-            <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="GlobalExportCSV_Click" />
-            <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="GlobalExportHTML_Click" />
+            <Button Content="Excel" ToolTip="Export to CSV" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="GlobalExportCSV_Click" />
+            <Button Content="HTML" ToolTip="Export to HTML" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Xml}" Click="GlobalExportHTML_Click" />
             <StackPanel Orientation="Horizontal" Visibility="{Binding EnableAdvancedFilters,Mode=OneWay,Converter={StaticResource valueToVisibilityConverter}}">
                 <Rectangle />
-                <UC:ToolBarToggleButton x:Name="btnAggregate" IsChecked="False" Text="Group/Filter" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" Image="{iconPacks:Material Kind=FilterMenu}" />
+                <ToggleButton x:Name="btnAggregate" IsChecked="False" Content="Group/Filter" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" ext:CustomAdorner.Image="{iconPacks:Material Kind=FilterMenu}" />
             </StackPanel>
         </WrapPanel>
         <WrapPanel Grid.Row="2" Height="25" Style="{StaticResource ToolBar}">

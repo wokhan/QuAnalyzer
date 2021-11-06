@@ -2,32 +2,78 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"      
+    xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:local="clr-namespace:Wokhan.Data.Providers.Contracts;assembly=Wokhan.Data.Providers"
     mc:Ignorable="d" d:DesignHeight="460">
-    <Grid>
+    <Grid Background="Gray">
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Background="Gray">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <ContentControl Foreground="WhiteSmoke" Margin="10,0" Height="19" Content="{iconPacks:Material Kind=DatabaseExport}" />
-            <Label Grid.Column="1" VerticalAlignment="Center" Foreground="WhiteSmoke" Content="SOURCES" FontSize="12" />
-        </Grid>
+        <Label Margin="10,0,0,0" VerticalAlignment="Center" Foreground="WhiteSmoke" Content="SOURCES" FontSize="12" ext:CustomAdorner.HeaderImage="{iconPacks:Material Kind=DatabaseExport}">
+            <Label.Resources>
+                <Style TargetType="Control">
+                    <Setter Property="Background" Value="Gray" />
+                </Style>
+            </Label.Resources>
+        </Label>
         <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
-            <UC:ToolBarButton Text="Add..." Click="btnNewSource_Click" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}"/>
-            <UC:ToolBarButton Text="Import..." IsEnabled="False" BorderBrush="Blue" Image="{iconPacks:Material Kind=Import}"/>
+            <Button Content="Add..." Click="btnNewSource_Click" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" />
+            <Button Content="Import..." IsEnabled="False" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Import}"/>
         </WrapPanel>
-        <ListView BorderThickness="0" Grid.Row="2" Name="lstProviders" SelectedItem="{Binding CurrentSelection,Source={x:Static Application.Current}}" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
+        <TreeView Grid.Row="2" Background="White" BorderThickness="0" TreeViewItem.Selected="TreeView_Selected" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static Application.Current}}" SelectedValuePath="Key" IsEnabled="{Binding CurrentSelectionLinked,Source={x:Static Application.Current}}">
+            <TreeView.Resources>
+                <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                    <Style.Triggers>
+                        <Trigger Property="HasItems" Value="True">
+                            <Setter Property="Focusable" Value="False" />
+                            <Setter Property="Tag" Value="{Binding}" />
+                        </Trigger>
+                        <Trigger Property="HasItems" Value="False">
+                            <Setter Property="Tag" Value="{Binding Tag,RelativeSource={RelativeSource AncestorType=TreeViewItem}}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TreeView.Resources>
+            <TreeView.Style>
+                <Style TargetType="TreeView">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <TextBlock Background="White" Padding="10" TextWrapping="Wrap" Text="Please start by adding a new source." FontStyle="Italic" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TreeView.Style>
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:IDataProvider}" ItemsSource="{Binding Repositories}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxHeight="20" Source="{Binding Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
+                        <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Center" />
+                        <Button Grid.Column="2" Name="btnEditProvider" Foreground="RoyalBlue" Tag="{Binding}" Click="btnEditProvider_Click" Content="{iconPacks:Material Kind=Pencil}" />
+                    </Grid>
+                    <HierarchicalDataTemplate.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Key}" />
+                        </DataTemplate>
+                    </HierarchicalDataTemplate.ItemTemplate>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+        <!--<ListView Visibility="Collapsed" BorderThickness="0" Grid.Row="2" Name="lstProviders" SelectedItem="{Binding CurrentSelection,Source={x:Static Application.Current}}" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
             <ListView.Resources>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
                     <Setter Property="Background" Value="Transparent" />
@@ -48,18 +94,18 @@
                     </Style.Triggers>
                 </Style>
             </ItemsControl.Style>
-            <!--<ItemsControl.Resources>
+            <ItemsControl.Resources>
                 <Style TargetType="ListItem" BasedOn="{StaticResource {x:Type ListItem}}">
-                    -->
-            <!--<Setter Property="OverridesDefaultStyle" Value="True" />-->
-            <!--
+                    
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            
                     <Style.Triggers>
                         <Trigger Property="Selector.IsSelected" Value="True">
                             <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
                         </Trigger>
                     </Style.Triggers>
                 </Style>
-            </ItemsControl.Resources>-->
+            </ItemsControl.Resources>
             <ItemsControl.GroupStyle>
                 <GroupStyle>
                     <GroupStyle.ContainerStyle>
@@ -107,6 +153,6 @@
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </ListView>
+        </ListView>-->
     </Grid>
 </UserControl>

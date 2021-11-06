@@ -5,6 +5,7 @@
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
       mc:Ignorable="d" 
       d:DesignWidth="820"
 	d:DesignHeight="610"
@@ -12,8 +13,8 @@
       DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <DockPanel>
         <WrapPanel Style="{StaticResource ToolBar}">
-            <UC:ToolBarButton Click="btnUpdate_Click" Text="Update" ToolTip="Update now" BorderBrush="Green" Image="{iconPacks:Material Kind=Play,Width=10}" />
-            <UC:ToolBarToggleButton x:Name="btnAuto" IsChecked="{Binding AutoUpdate}" Text="Auto update" ToolTip="Analyze automatically" BorderBrush="Blue" Image="{iconPacks:Material Kind=Calculator}" />
+            <Button Click="btnUpdate_Click" Content="Update" ToolTip="Update now" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" />
+            <ToggleButton x:Name="btnAuto" IsChecked="{Binding AutoUpdate}" Content="Auto update" ToolTip="Analyze automatically" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Calculator}" />
             <Rectangle />
             <Label Content="Similarity threshold" VerticalAlignment="Center" />
             <Slider x:Name="slideSim" ValueChanged="slideSim_ValueChanged" VerticalAlignment="Center" Minimum="1" TickFrequency="1" IsSnapToTickEnabled="True" LargeChange="1" SmallChange="1" Maximum="3" TickPlacement="BottomRight" Width="100" />
@@ -21,20 +22,37 @@
             <TextBlock x:Name="txtStatus" VerticalAlignment="Center" Margin="5,0,10,0" />
             <ProgressBar x:Name="prg" Maximum="100" Minimum="0" Width="200" Height="20" BorderThickness="0" />
         </WrapPanel>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Background="LightGray" Padding="5" Text="Attributes" />
-            <ListBox Grid.Row="1" BorderThickness="0,0,2,0" BorderBrush="LightGray" DockPanel.Dock="Left" VerticalAlignment="Stretch" SelectionChanged="lstDataSources_SelectionChanged" x:Name="lstAttributes" SelectionMode="Single" MinWidth="200" Padding="5">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox Content="{Binding}" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </Grid>
+        <Border BorderThickness="0,0,2,0" BorderBrush="LightGray" DockPanel.Dock="Left" Width="200">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Background="LightGray" Padding="5" Text="Attributes" />
+                <ListBox Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="lstDataSources_SelectionChanged" x:Name="lstAttributes" SelectionMode="Single" Width="200" Padding="5">
+                    <ListBox.Style>
+                        <Style TargetType="ListBox">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <TextBlock Background="White" Padding="10" TextWrapping="Wrap" Text="The selected source must provide at least one attribute of type String." FontStyle="Italic" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListBox.Style>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Content="{Binding}" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
         <UC:ExtendedDataGridView x:Name="gridPatterns" />
     </DockPanel>
 </Page>

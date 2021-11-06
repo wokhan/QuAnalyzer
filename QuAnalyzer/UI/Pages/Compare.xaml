@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+      xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
       x:Class="QuAnalyzer.UI.Pages.Compare" 
       x:Name="me"
       mc:Ignorable="d"
@@ -13,20 +14,20 @@
     <Grid x:Name="gridMain">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" MinHeight="100"/>
+            <RowDefinition Height="Auto" MinHeight="240"/>
             <RowDefinition Height="4" />
             <RowDefinition MinHeight="100"/>
         </Grid.RowDefinitions>
         <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
-            <UC:ToolBarButton HorizontalAlignment="Center" ToolTip="Start comparisons for the selected items" BorderBrush="Green" Click="btnRun_Click" Image="{iconPacks:Material Kind=Play,Width=10}" Text="Run" />
+            <Button HorizontalAlignment="Center" ToolTip="Start comparisons for the selected items" BorderBrush="Green" Click="btnRun_Click" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" Content="Run" />
             <Rectangle />
-            <UC:ToolBarToggleButton x:Name="btnToggleMode" Text="Single-mapping mode" ToolTip="Single-mapping mode" BorderBrush="Blue" Foreground="Blue" Image="{iconPacks:Material Kind=AbTesting}" IsChecked="False" />
+            <ToggleButton x:Name="btnToggleMode" Content="Single-mapping mode" ToolTip="Single-mapping mode" BorderBrush="Blue" Foreground="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=AbTesting}" IsChecked="False" />
             <Rectangle />
-            <UC:ToolBarButton Text="Add" ToolTip="Add a mapping" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnNewPrv_Click" />
-            <UC:ToolBarButton Text="Automap" ToolTip="Automap" BorderBrush="Green" Image="{iconPacks:Material Kind=ShuffleVariant}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnAuto_Click" />
+            <Button Content="Add" ToolTip="Add a mapping" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnNewPrv_Click" />
+            <Button Content="Automap" ToolTip="Automap" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=ShuffleVariant}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnAuto_Click" />
             <Rectangle />
-            <UC:ToolBarButton Text="Sel. all" ToolTip="Select all" BorderBrush="Blue" Image="{iconPacks:Material Kind=SelectAll}" Click="btnSelectAll_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
-            <UC:ToolBarButton Text="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" Image="{iconPacks:Material Kind=Select}" Click="btnUnSel_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
+            <Button Content="Sel. all" ToolTip="Select all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectAll}" Click="btnSelectAll_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
+            <Button Content="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Select}" Click="btnUnSel_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
         </WrapPanel>
         <TabControl Grid.Row="1" VerticalAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch" Padding="0">
             <TabControl.Style>
@@ -77,7 +78,7 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Width="70" IsReadOnly="True" CanUserResize="False">
+                        <DataGridTemplateColumn Width="100" IsReadOnly="True" CanUserResize="False">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <WrapPanel>
@@ -100,12 +101,12 @@
                 <TextBlock Text="Global progress" Padding="4" Height="26" />
                 <ProgressBar x:Name="prgGlobal" Maximum="100" Height="22" Width="292"/>
                 <Rectangle />
-                <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" Image="{iconPacks:Material Kind=ContentCopy}" Click="GlobalCopy_Click" />
+                <Button Content="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" ext:CustomAdorner.Image="{iconPacks:Material Kind=ContentCopy}" Click="GlobalCopy_Click" />
                 <Rectangle />
-                <UC:ToolBarButton Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="GlobalExportCSV_Click" />
-                <UC:ToolBarButton Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="GlobalExportHTML_Click" />
+                <Button Content="Excel" ToolTip="Export to CSV" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="GlobalExportCSV_Click" />
+                <Button Content="HTML" ToolTip="Export to HTML" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Xml}" Click="GlobalExportHTML_Click" />
                 <Rectangle />
-                <UC:ToolBarButton Text="Create report" ToolTip="Create report" BorderBrush="BlueViolet" Image="{iconPacks:Material Kind=Export}" Click="GlobalReport_Click" />
+                <Button Content="Create report" ToolTip="Create report" BorderBrush="BlueViolet" ext:CustomAdorner.Image="{iconPacks:Material Kind=Export}" Click="GlobalReport_Click" />
             </WrapPanel>
             <DataGrid ColumnWidth="*" CanUserAddRows="False" BorderThickness="0" IsReadOnly="True" AutoGenerateColumns="False" Name="allProgress" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="Vertical" SelectionUnit="Cell">
                 <DataGrid.GroupStyle>

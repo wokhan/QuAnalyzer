@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace QuAnalyzer
 {
@@ -8,48 +10,70 @@ namespace QuAnalyzer
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INotifyCollectionChanged where TKey : class
+    public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INotifyCollectionChanged, INotifyPropertyChanged //where TKey : class
     {
 
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
-
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public new void Add(TKey key, TValue value)
         {
             base.Add(key, value);
 
-            NotifyCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue>(key, value)));
+            NotifyCollectionChanged(NotifyCollectionChangedAction.Add, (key, value));
+            //NotifyPropertyChanged(nameof(Keys));
+            //NotifyPropertyChanged(nameof(Values));
         }
 
         public new void Remove(TKey key)
         {
             base.Remove(key);
 
-            NotifyCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            NotifyCollectionChanged(NotifyCollectionChangedAction.Reset);
+            //NotifyPropertyChanged(nameof(Keys));
+            //NotifyPropertyChanged(nameof(Values));
+
         }
 
         public void Refresh()
         {
-            NotifyCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-
+            NotifyCollectionChanged(NotifyCollectionChangedAction.Reset);
+            //NotifyPropertyChanged(nameof(Keys));
+            //NotifyPropertyChanged(nameof(Values));
         }
 
         public new void Clear()
         {
             base.Clear();
 
-            NotifyCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            NotifyCollectionChanged(NotifyCollectionChangedAction.Reset);
+            //NotifyPropertyChanged(nameof(Keys));
+            //NotifyPropertyChanged(nameof(Values));
         }
 
         public new TValue this[TKey key]
         {
             get { return base[key]; }
-            set { var oldvalue = base[key]; base[key] = value; NotifyCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue>(key, value), new KeyValuePair<TKey, TValue>(key, oldvalue))); }
+            set
+            {
+                var oldvalue = base[key]; 
+                base[key] = value;
+                NotifyCollectionChanged(NotifyCollectionChangedAction.Replace, (key, value), (key, oldvalue));
+               // NotifyPropertyChanged(nameof(Values));
+
+            }
         }
 
-        protected virtual void NotifyCollectionChanged(NotifyCollectionChangedEventArgs e)
+        protected void NotifyCollectionChanged(NotifyCollectionChangedAction action, object? item = null, object? oldItem = null)
         {
-            CollectionChanged?.Invoke(this, e);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, item, oldItem));
         }
+
+
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
     }
 }

@@ -38,14 +38,13 @@ namespace QuAnalyzer.UI.Popups
             set { _gridDiffExported = value; NotifyPropertyChanged("GridDiffExported"); }
         }*/
 
-        public DetailsWindow(IDataComparer r)
+        public DetailsWindow(IDataComparer comparer)
         {
+            this.DataContext = comparer;
+            
             InitializeComponent();
 
-            this.DataContext = r;
-            //mainGrid.DataContext = r;
-
-            InitGrids(r);
+            InitGrids(comparer);
             this.Loaded += DetailsWindow_Loaded;
 
         }

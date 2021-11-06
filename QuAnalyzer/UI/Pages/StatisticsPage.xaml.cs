@@ -1,36 +1,43 @@
-﻿using LiveCharts;
-using LiveCharts.Configurations;
-using LiveCharts.Wpf;
+﻿using LiveChartsCore.SkiaSharpView.Drawing;
+using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
+
 using QuAnalyzer.Features.Statistics;
+
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Wokhan.Collections;
+
 using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Core.Extensions;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages
 {
-    /// <summary>
-    /// Interaction logic for Statistics.xaml
-    /// </summary>
+
     public partial class StatisticsPage : Page, INotifyPropertyChanged
     {
-        public string[] ChartTypes { get { return new[] { "Pie", "Bar", "Doughnut" }; } }
+        public string[] ChartTypes { get; } = new[] { "Pie", "Bar", "Doughnut" };
 
-        public static string LabelGetter(ChartPoint p) => ((Values)p.Instance).Category;
-        
-        private string _chartType = "Bar";
+        private string _chartType = "Pie";
         public string ChartType
         {
             get { return _chartType; }
-            set { _chartType = value; NotifyPropertyChanged(nameof(ChartType)); ComputedStats.Refresh(); }
+            set { _chartType = value; NotifyPropertyChanged(nameof(ChartType)); }
+        }
+
+        private bool _ignoreEmptyInChart = true;
+        public bool IgnoreEmptyInChart
+        {
+            get { return _ignoreEmptyInChart; }
+            set { _ignoreEmptyInChart = value; NotifyPropertyChanged(nameof(IgnoreEmptyInChart)); }
         }
 
         private int _progress;
+
         public int Progress
         {
             get { return _progress; }
@@ -38,8 +45,8 @@ namespace QuAnalyzer.UI.Pages
         }
 
 
-  //      public ObservableDictionary<string, Series> ComputedStatsForGraph { get; } = new ObservableDictionary<string, Series>();
-        public ObservableDictionary<string, ResultsStruct> ComputedStats { get; } = new ObservableDictionary<string, ResultsStruct>();
+        //      public ObservableDictionary<string, Series> ComputedStatsForGraph { get; } = new ObservableDictionary<string, Series>();
+        public ObservableCollection<StatisticsHolder> ComputedStats { get; } = new ObservableCollection<StatisticsHolder>();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -48,12 +55,13 @@ namespace QuAnalyzer.UI.Pages
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-
         public StatisticsPage()
         {
             //ComputedStats = new Dictionary<string, ResultsStruct>();
 
             InitializeComponent();
+
+            //LiveCharts.HasMapFor<Values>((v, point) => { point.PrimaryValue = v.Frequency; });
 
             //ComputedStats.CollectionChanged += ComputedStats_CollectionChanged;
             ((App)App.Current).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
@@ -61,8 +69,8 @@ namespace QuAnalyzer.UI.Pages
 
         private void ComputedStats_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            ((ResultsStruct)e.NewItems[0]).Frequencies.CollectionChanged += null;
-//            ComputedStatsForGraph.AddAll(e.NewItems.Cast<ResultsStruct>().Select(x => new PieSeries(Mappers.Pie<ResultsStruct>().Value(data => data))));
+            //((ResultsStruct)e.NewItems[0]).Frequencies.CollectionChanged += null;
+            //            ComputedStatsForGraph.AddAll(e.NewItems.Cast<ResultsStruct>().Select(x => new PieSeries(Mappers.Pie<ResultsStruct>().Value(data => data))));
         }
 
         private void UpdateSelection()
@@ -72,24 +80,6 @@ namespace QuAnalyzer.UI.Pages
             {
                 Computedata(prov, repo);
             }
-        }
-
-
-        private async void UpdateMinMaxAvg(string h, ResultsStruct.Stats stats)
-        {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                var c = ComputedStats[h];
-                c.Statistics = stats;
-            });
-        }
-
-        private async void UpdateFrequencies(string h, Values stats)
-        {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                ComputedStats[h].Frequencies.Add(stats);
-            });
         }
 
         private void btnCompute_Click(object sender, System.Windows.RoutedEventArgs e)
@@ -102,45 +92,20 @@ namespace QuAnalyzer.UI.Pages
         {
             Progress = 0;
             ComputedStats.Clear();
-
-            var headers = prv.GetColumns(repo);
-
-            foreach (var h in headers)
-            {
-                ComputedStats.Add(h.Name, new ResultsStruct());
-            }
-
-            await Task.Run(() =>
+            
+            await Task.Run(async () =>
             {
                 Progress = -1;
 
-                //TODO: Check if still used (side effect maybe?)
-                var defaults = headers.Select(h => h.Type.GetDefault()).ToList();
-
+                var headers = prv.GetColumns(repo);
+                
                 var data = prv.GetQueryable(repo);
 
-                headers.AsParallel(false).ForAll((h) =>
-                {
-                    var freq = Statistics.GetDataFrequency(data, h);
+                var results = headers.ToDictionary(h => h, h => new StatisticsHolder() { Name = h.Name, Source = data });
+                await Dispatcher.InvokeAsync(() => ComputedStats.AddAll(results.Values));
 
-                    foreach (var x in freq)
-                    {
-                        UpdateFrequencies(h.Name, x);
-                    }
-
-                    var stats = Statistics.GetStats(data, h);
-
-                    UpdateMinMaxAvg(h.Name, stats);
-                });
+                headers.AsParallel().ForAll(h => results[h].Update(h, Dispatcher));
             }).ConfigureAwait(false);
         }
-        //private async void UpdateResults(string key, string itkey, int itcnt)
-        //{
-        //    await Dispatcher.InvokeAsync(() =>
-        //    {
-        //        var sec = ComputedStats.Single(c => c.Key == key);
-        //        sec.Value.Add(new Values() { Category = itkey, Frequency = itcnt });
-        //    });
-        //}
     }
 }

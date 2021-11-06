@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-             xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+             xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
              xmlns:providers="clr-namespace:Wokhan.Data.Providers;assembly=Wokhan.Data.Providers"
              mc:Ignorable="d" x:Name="me"
              DataContext="{Binding Mapping,ElementName=me}"
@@ -49,10 +49,10 @@
         <TextBlock Text="Mappings" Grid.Row="2"  Background="LightGray" Padding="5" Grid.ColumnSpan="3"/>
         <DockPanel Grid.Row="3" Grid.ColumnSpan="3">
             <WrapPanel Style="{StaticResource ToolBar}">
-                <UC:ToolBarButton Text="Add" ToolTip="Add a mapping" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnAdd_Click" />
-                <UC:ToolBarButton Text="By position" ToolTip="Map by position" BorderBrush="Blue" Image="{iconPacks:Material Kind=FormatListNumbered}" Click="btnMapPos_Click" />
-                <UC:ToolBarButton Text="By name" ToolTip="Map by name" BorderBrush="Blue" Image="{iconPacks:Material Kind=AbTesting}" Click="btnMapName_Click" />
-                <UC:ToolBarButton Text="Remove all" ToolTip="Clear all" IsEnabled="{Binding Items.IsEmpty,ElementName=gridMappings,Converter={StaticResource booleanNegator}}" BorderBrush="OrangeRed" Image="{iconPacks:Material Kind=DeleteSweepOutline}" Click="btnRmAll_Click" />
+                <Button Content="Add" ToolTip="Add a mapping" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnAdd_Click" />
+                <Button Content="By position" ToolTip="Map by position" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=FormatListNumbered}" Click="btnMapPos_Click" />
+                <Button Content="By name" ToolTip="Map by name" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=AbTesting}" Click="btnMapName_Click" />
+                <Button Content="Remove all" ToolTip="Clear all" IsEnabled="{Binding Items.IsEmpty,ElementName=gridMappings,Converter={StaticResource booleanNegator}}" BorderBrush="OrangeRed" ext:CustomAdorner.Image="{iconPacks:Material Kind=DeleteSweepOutline}" Click="btnRmAll_Click" />
             </WrapPanel>
             <DataGrid Name="gridMappings" ItemsSource="{Binding AllMappings}" HorizontalAlignment="Stretch" CanUserAddRows="False" BorderThickness="1" BorderBrush="LightGray" VerticalAlignment="Stretch" AutoGenerateColumns="False">
                 <DataGrid.Columns>

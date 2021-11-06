@@ -13,7 +13,23 @@
         <Label Content="{Binding HelpLink, Source={x:Static Application.Current}, FallbackValue='Link'}" HorizontalContentAlignment="Right" Foreground="Black" Margin="10,0" />
         <Label Content="External resources" Padding="5" Background="{DynamicResource AccentColorBrush}" FontWeight="Bold" />
         <TextBlock Foreground="Black" Margin="10,10" TextWrapping="Wrap">
-            This project uses icons from http://modernuiicons.com/ and http://materialdesignicons.com/ (provided by Templarian), which provide high quality modern icons and designs thanks to Austin Andrews (http://templarian.com/).
+            This project uses the following libraries:
+            <LineBreak />
+            - EPPlus
+            <LineBreak />
+            - LiveCharts.Wpf
+            <LineBreak />
+            - MahApps.Metro
+            <LineBreak />
+            - MahApps.Metro.IconPacks.Material
+            <LineBreak />
+            - VirtualizedObservableCollection
+            <LineBreak />
+            - Wokhan.Core
+            <LineBreak />
+            - Wokhan.DataProviders
+            <LineBreak />
+            - Wokhan.UI
         </TextBlock>
         <TextBlock Foreground="Black" Margin="10,10" TextWrapping="Wrap">
             Each additional Data Provider plugin belongs to their developer, as stated in corresponding application pages.

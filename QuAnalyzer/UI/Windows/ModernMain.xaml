@@ -6,20 +6,17 @@
     xmlns:UserControls="clr-namespace:QuAnalyzer.UI.Menus"
     xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
     xmlns:popups="clr-namespace:QuAnalyzer.UI.Popups"
     Title="QuAnalyzer v1.0beta" 
-    ShowIconOnTitleBar="False" TitleBarHeight="40" ShowTitleBar="True"
+    ShowIconOnTitleBar="False" TitleBarHeight="40" 
     ResizeMode="CanResizeWithGrip" TitleAlignment="Right"
-    MinWidth="1030" MinHeight="600" Height="600" 
+    MinWidth="1030" MinHeight="600" Height="600" TitleForeground="DarkGray" NonActiveWindowTitleBrush="LightGray"
     Width="900" BorderThickness="0" GlowBrush="Black" WindowTitleBrush="Transparent"
     x:Name="me">
     <Window.Resources>
         <Style TargetType="{x:Type Controls:WindowButtonCommands}">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding ShowTitleBar, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:MetroWindow}}}" Value="True">
-                    <Setter Property="Foreground" Value="Black" />
-                </DataTrigger>
-            </Style.Triggers>
+            <Setter Property="Foreground" Value="Black" />
         </Style>
     </Window.Resources>
     <Window.TaskbarItemInfo>
@@ -68,46 +65,44 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Controls:Flyout TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" BorderBrush="{DynamicResource AccentColorBrush}" IsAutoCloseEnabled="False" Position="Left" IsOpen="True" Header="Sources" HorizontalAlignment="Left" Width="200" Background="WhiteSmoke" Theme="Adapt">
-            <Grid>
-                <UserControls:SourcesMenu x:Name="mainMenu" />
-                <Rectangle Width="1" VerticalAlignment="Stretch" Fill="White" HorizontalAlignment="Right">
-                    <Rectangle.Effect>
-                        <DropShadowEffect Direction="180" BlurRadius="15" />
-                    </Rectangle.Effect>
-                </Rectangle>
-            </Grid>
+            <UserControls:SourcesMenu x:Name="mainMenu" />
         </Controls:Flyout>
         <Controls:MetroAnimatedSingleRowTabControl Name="tabMenu" SelectionChanged="tabMenu_SelectionChanged" Margin="{Binding ActualWidth,ElementName=mainMenu,Converter={StaticResource thicknessConverter},ConverterParameter='LEFT'}">
             <TabControl.Resources>
                 <Style TargetType="Frame">
                     <Setter Property="NavigationUIVisibility" Value="Hidden" />
                     <Setter Property="Background" Value="White" />
-                    <Setter Property="BorderThickness" Value="0,1,0,0" />
+                    <Setter Property="BorderThickness" Value="1,1,0,0" />
                     <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}" />
                     <Setter Property="Margin" Value="0,-1,0,0" />
+                    <!--<Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=TabItem,AncestorLevel=1}}" Value="True">
+                            <Setter Property="Source" Value="{Binding Tag,RelativeSource={RelativeSource Self}}" />
+                        </DataTrigger>
+                    </Style.Triggers>-->
                 </Style>
             </TabControl.Resources>
-            <UC:DecoratedTabItem IsSelected="True" Header="DISPLAY" Image="{iconPacks:Material Kind=DatabaseSearch}" Tag="true">
+            <TabItem ext:CustomAdorner.PreserveTemplate="True" IsSelected="True" Header="DISPLAY" ext:CustomAdorner.Image="{iconPacks:Material Kind=DatabaseSearch}" Tag="true">
                 <Frame Source="../Pages/ViewerPage.xaml" />
-            </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="DUPLICATES" Image="{iconPacks:Material Kind=ContentDuplicate}" Tag="true">
+            </TabItem>
+            <TabItem ext:CustomAdorner.PreserveTemplate="True" Header="DUPLICATES" ext:CustomAdorner.Image="{iconPacks:Material Kind=ContentDuplicate}" Tag="true">
                 <Frame Source="../Pages/Duplicates.xaml" />
-            </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="PATTERNS" Image="{iconPacks:Material Kind=LockPattern}" Tag="true">
+            </TabItem>
+            <TabItem ext:CustomAdorner.PreserveTemplate="True" Header="PATTERNS" ext:CustomAdorner.Image="{iconPacks:Material Kind=LockPattern}" Tag="true">
                 <Frame Source="../Pages/PatternsPage.xaml" />
-            </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="STATISTICS" Image="{iconPacks:Material Kind=ChartBar}" Tag="true">
+            </TabItem>
+            <TabItem ext:CustomAdorner.PreserveTemplate="True" Header="STATISTICS" ext:CustomAdorner.Image="{iconPacks:Material Kind=ChartBar}" Tag="true">
                 <Frame Source="../Pages/StatisticsPage.xaml" />
-            </UC:DecoratedTabItem>
-            <UC:DecoratedTabItem Header="COMPARISON" Image="{iconPacks:Material Kind=Compare}">
+            </TabItem>
+            <TabItem ext:CustomAdorner.PreserveTemplate="True" Header="COMPARISON" ext:CustomAdorner.Image="{iconPacks:Material Kind=Compare}">
                 <Frame Source="../Pages/Compare.xaml" />
-            </UC:DecoratedTabItem>
+            </TabItem>
             <!--<UC:DecoratedTabItem Header="PERFORMANCE" Image="{iconPacks:Material Kind=Speedometer}">
                 <Frame Source="../Pages/PerformancePage.xaml" />
             </UC:DecoratedTabItem>-->
-            <UC:DecoratedTabItem Header="MONITORING" Image="{iconPacks:Material Kind=ChartAreaspline}">
+            <TabItem ext:CustomAdorner.PreserveTemplate="True" Header="MONITORING" ext:CustomAdorner.Image="{iconPacks:Material Kind=ChartAreaspline}">
                 <Frame Source="../Pages/Monitor.xaml" />
-            </UC:DecoratedTabItem>
+            </TabItem>
         </Controls:MetroAnimatedSingleRowTabControl>
         <StatusBar Grid.Row="1" Height="25" Background="{DynamicResource AccentColorBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
             <StatusBarItem>

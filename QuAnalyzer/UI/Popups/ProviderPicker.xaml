@@ -3,9 +3,8 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:QuAnalyzer.UI.Pages"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
+      xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
       x:Name="me"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -80,11 +79,11 @@
         <Border Grid.Row="3" Style="{StaticResource ButtonBar}">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <UC:ToolBarButton Text="Cancel" BorderBrush="Red" x:Name="btnRevert" HorizontalAlignment="Center" Click="btnCancel_Click" Image="{iconPacks:Material Kind=Cancel}"/>
+                    <Button Content="Cancel" BorderBrush="Red" x:Name="btnRevert" HorizontalAlignment="Center" Click="btnCancel_Click" ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}"/>
                     <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <UC:ToolBarButton Text="Next" BorderBrush="Green" IsEnabled="{Binding SelectedValue,ElementName=lstProvidersTypes, Converter={StaticResource objectToBool}}" x:Name="btnNext" HorizontalAlignment="Center" Click="btnNewPrv_Click" Image="{iconPacks:Material Kind=StepForward}"/>
+                    <Button Content="Next" BorderBrush="Green" IsEnabled="{Binding SelectedValue,ElementName=lstProvidersTypes, Converter={StaticResource objectToBool}}" x:Name="btnNext" HorizontalAlignment="Center" Click="btnNewPrv_Click" ext:CustomAdorner.Image="{iconPacks:Material Kind=StepForward}"/>
                 </StackPanel>
             </Grid>
         </Border>

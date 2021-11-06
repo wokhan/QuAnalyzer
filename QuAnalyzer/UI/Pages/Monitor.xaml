@@ -4,8 +4,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-      xmlns:charts="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+      xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
+      xmlns:charts="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
       xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
       mc:Ignorable="d"
       d:DesignHeight="700" d:DesignWidth="800"
@@ -22,13 +22,13 @@
             <RowDefinition MinHeight="150" Height="*" />
         </Grid.RowDefinitions>
         <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
-            <UC:ToolBarButton x:Name="btnStart" Text="Run" ToolTip="Start monitoring the selected items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}"  BorderBrush="Green" Image="{iconPacks:Material Kind=Play,Width=10}" Click="btnStart_Click" />
-            <!--<UC:ToolBarButton Text="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />-->
-            <UC:ToolBarButton x:Name="btnStop" IsEnabled="False" Text="Stop" ToolTip="Stop monitoring" BorderBrush="Red" Image="{iconPacks:Material Kind=Stop,Width=10}" Click="btnStopAll_Click" />
+            <Button x:Name="btnStart" Content="Run" ToolTip="Start monitoring the selected items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}"  BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" Click="btnStart_Click" />
+            <!--<Button Content="Run all" ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" ext:CustomAdorner.Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />-->
+            <Button x:Name="btnStop" IsEnabled="False" Content="Stop" ToolTip="Stop monitoring" BorderBrush="Red" ext:CustomAdorner.Image="{iconPacks:Material Kind=Stop,Width=10}" Click="btnStopAll_Click" />
             <Rectangle />
-            <UC:ToolBarButton Text="Add" ToolTip="Add a step" BorderBrush="Green" Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnAdd_Click" />
-            <UC:ToolBarButton Text="Clear" ToolTip="Remove all" BorderBrush="OrangeRed" Image="{iconPacks:Material Kind=DeleteOutline}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnClear_Click" />
-            <UC:ToolBarToggleButton Text="Comparison mode" x:Name="btnCompareMode" BorderBrush="Violet" Image="{iconPacks:Material Kind=Shuffle}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" />
+            <Button Content="Add" ToolTip="Add a step" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnAdd_Click" />
+            <Button Content="Clear" ToolTip="Remove all" BorderBrush="OrangeRed" ext:CustomAdorner.Image="{iconPacks:Material Kind=DeleteOutline}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" Click="btnClear_Click" />
+            <ToggleButton Content="Comparison mode" x:Name="btnCompareMode" BorderBrush="Violet" ext:CustomAdorner.Image="{iconPacks:Material Kind=Shuffle}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" />
             <Rectangle />
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Occurences: " VerticalAlignment="Center" />
@@ -40,7 +40,7 @@
                 <mah:NumericUpDown HideUpDownButtons="True" Width="40" VerticalContentAlignment="Center" Minimum="1" Value="{Binding MaxParallel,Mode=TwoWay}" VerticalAlignment="Center" Padding="0" Margin="2" />
             </StackPanel>
             <!--<Rectangle />
-            <UC:ToolBarToggleButton Text="Enable chart" ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />-->
+            <ToggleButton Content="Enable chart" ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" ext:CustomAdorner.Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />-->
         </WrapPanel>
         <DataGrid Grid.Row="1"  SelectionMode="Extended" VirtualizingPanel.ScrollUnit="Pixel" RowDetailsVisibilityMode="VisibleWhenSelected" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" x:Name="gridSteps" AutoGenerateColumns="False" IsReadOnly="True">
                 <DataGrid.Columns>
@@ -115,10 +115,10 @@
         <GridSplitter Grid.Row="2" Height="2" Background="LightGray" />
         <DockPanel Grid.Row="3">
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
-                <UC:ToolBarButton x:Name="btnGrCopy" Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{iconPacks:Material Kind=ContentCopy}" Click="btnGrCopy_Click" />
+                <Button x:Name="btnGrCopy" Content="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" ext:CustomAdorner.Image="{iconPacks:Material Kind=ContentCopy}" Click="btnGrCopy_Click" />
                 <Rectangle />
-                <UC:ToolBarButton x:Name="btnGrCSV" Text="Excel" ToolTip="Export to CSV" BorderBrush="Green" Image="{iconPacks:Material Kind=FileExcelOutline}" Click="btnGrCSV_Click" />
-                <UC:ToolBarButton x:Name="btnGrHTML" Text="HTML" ToolTip="Export to HTML" BorderBrush="Blue" Image="{iconPacks:Material Kind=Xml}" Click="btnGrHTML_Click" />
+                <Button x:Name="btnGrCSV" Content="Excel" ToolTip="Export to CSV" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=FileExcelOutline}" Click="btnGrCSV_Click" />
+                <Button x:Name="btnGrHTML" Content="HTML" ToolTip="Export to HTML" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Xml}" Click="btnGrHTML_Click" />
             </WrapPanel>
             <!--<CheckBox Content="Group by step name" Name="chkGroup" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-25" Checked="chkGroup_Checked" IsChecked="True" />-->
             <DataGrid x:Name="gridResults" ItemsSource="{Binding MonitorResultsView}" VirtualizingPanel.ScrollUnit="Pixel" RowDetailsVisibilityMode="VisibleWhenSelected" IsReadOnly="True" AutoGenerateColumns="False">
@@ -217,16 +217,16 @@
         <GridSplitter Grid.Row="4" Height="2" Background="LightGray" />
         <DockPanel Grid.Row="5">
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
-                <UC:ToolBarButton Text="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" Image="{iconPacks:Material Kind=ContentCopy}" IsEnabled="False" x:Name="btnCopy" Click="btnCopy_Click" />
+                <Button Content="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" ext:CustomAdorner.Image="{iconPacks:Material Kind=ContentCopy}" IsEnabled="False" x:Name="btnCopy" Click="btnCopy_Click" />
             </WrapPanel>
-            <charts:CartesianChart x:Name="chart" Series="{Binding ResultSeries}" ScrollMode="X" DisableAnimations="True" Margin="0" DataTooltip="{x:Null}" Hoverable="False">
-                <charts:CartesianChart.AxisX>
+            <charts:CartesianChart x:Name="chart" Series="{Binding ResultSeries}"><!--ScrollMode="X" DisableAnimations="True" Margin="0" DataTooltip="{x:Null}" Hoverable="False">-->
+                <!--<charts:CartesianChart.XAxes>
                     <charts:Axis></charts:Axis>
-                </charts:CartesianChart.AxisX>
+                </charts:CartesianChart.XAxes>
                 <charts:CartesianChart.AxisY>
                     <charts:LogarithmicAxis></charts:LogarithmicAxis>
                     <charts:LogarithmicAxis Position="RightTop"></charts:LogarithmicAxis>
-                </charts:CartesianChart.AxisY>
+                </charts:CartesianChart.AxisY>-->
             </charts:CartesianChart>
         </DockPanel>
     </Grid>

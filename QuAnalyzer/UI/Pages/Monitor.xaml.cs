@@ -1,9 +1,8 @@
-﻿using LiveCharts;
-using LiveCharts.Configurations;
-using LiveCharts.Defaults;
-#if _WPF_
-using LiveCharts.Wpf;
-#else 
+﻿#if _WPF_
+using LiveChartsCore;
+using LiveChartsCore.Defaults;
+using LiveChartsCore.SkiaSharpView;
+#else
 using LiveCharts.Uwp;
 #endif
 using QuAnalyzer.Features.Monitoring;
@@ -11,17 +10,18 @@ using QuAnalyzer.Features.Performance;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Threading;
+
 using Wokhan.Collections.Generic.Extensions;
 
 namespace QuAnalyzer.UI.Pages
@@ -43,8 +43,8 @@ namespace QuAnalyzer.UI.Pages
         public Dictionary<string, string> MonitoringTypes { get; } = MonitoringModes.MonitoringTypes;
         public static ObservableCollection<ResultsClass> MonitorResultsView { get; } = new ObservableCollection<ResultsClass>();
         //public ListCollectionView MonitorResultsView { get; } = new ListCollectionView(MonitorResults);
-        public SeriesCollection ResultSeries { get; } = new SeriesCollection(Mappers.Xy<DateTimePoint>().X(d => d.DateTime.Ticks).Y(d => d.Value));
-        public Dictionary<string, Series[]> ResultSeriesMappings { get; private set; }
+
+        public Dictionary<string, ISeries[]> ResultSeriesMappings { get; private set; }
         public double? Occurences { get; set; } = 10;
         public double? MaxParallel { get; set; } = 1;
         public Monitor()
@@ -66,10 +66,11 @@ namespace QuAnalyzer.UI.Pages
                     var serie = ResultSeriesMappings[t.Name][0];
                     var serie2 = ResultSeriesMappings[t.Name][1];
 
-                    serie.Values.Add(new DateTimePoint(t.LastCheck.DateTime, (double)t.LastCheck.Ticks - startDate + 1));
-                    var d = new DateTimePoint(t.LastCheck.DateTime, 0);
-                    serie2.Values.Add(d);
-                    t.Duration.CollectionChanged += (s, e) => { if (t.Duration.ContainsKey("_TOTAL_DEFAULT")) { d.Value = t.Duration["_TOTAL_DEFAULT"]; } };
+                    ((ObservableCollection<(DateTime, double)>)serie.Values).Add((t.LastCheck.DateTime, (double)t.LastCheck.Ticks - startDate + 1));
+
+                    var d = new ObservablePoint(t.LastCheck.DateTime.Ticks, 0);
+                    ((ObservableCollection<ObservablePoint>)serie2.Values).Add(d);
+                    t.Duration.CollectionChanged += (s, e) => { if (t.Duration.ContainsKey("_TOTAL_DEFAULT")) { d.Y = t.Duration["_TOTAL_DEFAULT"]; } };
                 });
             }
         }
@@ -179,14 +180,11 @@ namespace QuAnalyzer.UI.Pages
 
         private void InitChart(IEnumerable<MonitorItem> mitems)
         {
-            ResultSeries.Clear();
-
             var tests = mitems.Select(mitem => new TestCase() { Name = mitem.Name, GetData = (values, statsBag) => mitem.Provider.GetQueryable(mitem.Repository, values, statsBag), Repository = mitem.Repository }).ToList();
-            ResultSeriesMappings = tests.ToDictionary(t => t.Name, t => new Series[] {
-                    new StepLineSeries() { ScalesYAt = 1, Title = t.Name + " (Freq)", Values = new ChartValues<DateTimePoint>() },
-                    new LineSeries() { Title = t.Name + " (Duration)", Values = new ChartValues<DateTimePoint>() }
+            ResultSeriesMappings = tests.ToDictionary(t => t.Name, t => new ISeries[] {
+                    new StepLineSeries<(DateTime, int)>() { ScalesYAt = 1, Name = t.Name + " (Freq)", Values = new ObservableCollection<(DateTime, int)>() },
+                    new LineSeries<ObservablePoint>() { Name = t.Name + " (Duration)", Values = new ObservableCollection<ObservablePoint>() }
                 });
-            ResultSeries.AddRange(ResultSeriesMappings.SelectMany(_ => _.Value));
         }
 
         void monitor_OnAdd(ResultsClass results)
@@ -224,8 +222,8 @@ namespace QuAnalyzer.UI.Pages
 
         private void globalTimer_Tick(object sender, EventArgs e)
         {
-            chart.ScrollHorizontalFrom = DateTime.Now.Ticks;
-            chart.ScrollHorizontalTo = DateTime.Now.AddMinutes(chartTimeSpanMinutes).Ticks;
+            //chart.ScrollHorizontalFrom = DateTime.Now.Ticks;
+            //chart.ScrollHorizontalTo = DateTime.Now.AddMinutes(chartTimeSpanMinutes).Ticks;
         }
 
         private void btnStopAll_Click(object sender, RoutedEventArgs e)

@@ -7,65 +7,50 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
-             xmlns:collections="clr-namespace:System.Collections;assembly=System.Runtime"
-             xmlns:collections1="clr-namespace:System.Collections;assembly=System.Runtime.Extensions"
              mc:Ignorable="d" d:DesignWidth="600">
-    <StackPanel TextBlock.Foreground="Black" Orientation="Horizontal" MaxHeight="32" Margin="5">
-        <StackPanel.Resources>
-            <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.WindowCommands}" />
-            <Style TargetType="Controls:DropDownButton" BasedOn="{StaticResource MahApps.Styles.DropDownButton.WindowCommands}" />
-        </StackPanel.Resources>
-        <Button Foreground="Orange" FontSize="20" ToolTip="New project" x:Name="btnMenuNew" Click="btnMenuNew_Click" Content="{iconPacks:Material Kind=FileDocumentOutline}" />
-        <Button Foreground="Green" ToolTip="Open..." Content="{iconPacks:Material Kind=FolderOpenOutline}" x:Name="btnMenuOpen" Click="btnMenuOpen_Click" />
-        <Controls:DropDownButton Padding="0" Foreground="Green" ToolTip="Open..." ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
-            <Controls:DropDownButton.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="32" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <ContentControl Foreground="YellowGreen" Content="{iconPacks:Material Kind=FileOutline}" />
-                        <TextBlock Grid.Column="1" Text="{Binding Key}" />
-                    </Grid>
-                </DataTemplate>
-            </Controls:DropDownButton.ItemTemplate>
-            <Controls:DropDownButton.ItemContainerStyle>
-                <Style TargetType="MenuItem">
-                    <Setter Property="Padding" Value="5" />
-                    <Setter Property="CommandParameter" Value="{Binding Key}"/>
-                    <EventSetter Event="Click" Handler="btnMenuRecent_Click" />
-                </Style>
-            </Controls:DropDownButton.ItemContainerStyle>
-        </Controls:DropDownButton>
-        <Button Foreground="Blue" ToolTip="Save" Content="{iconPacks:Material Kind=ContentSaveOutline}" x:Name="btnMenuSave" Click="btnMenuSave_Click" />
-        <Controls:DropDownButton Foreground="Blue" ToolTip="Save" Padding="0">
-            <Controls:DropDownButton.ItemContainerStyle>
-                <Style TargetType="MenuItem">
-                    <Setter Property="Padding" Value="5" />
-                    <Setter Property="Header" Value="{Binding [1]}"/>
-                    <Setter Property="Icon" Value="{Binding [0]}" />
-                    <EventSetter Event="Click" Handler="btnMenuSaveAs_Click" />
-                </Style>
-            </Controls:DropDownButton.ItemContainerStyle>
-            <Controls:DropDownButton.Items>
-                <x:Array Type="system:Object">
-                    <iconPacks:PackIconMaterial Foreground="Blue" Margin="5" Kind="ContentSaveMoveOutline" /> Save as...
-                </x:Array>
-            </Controls:DropDownButton.Items>
-        </Controls:DropDownButton>
-        <Button ToolTip="About..." x:Name="btnAbout" Click="btnAbout_Click" Content="{iconPacks:Material Kind=InformationOutline}" Foreground="#CC1DAE16" FontSize="26" />
-                <!--<MenuItem Header="_Options">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel TextBlock.Foreground="Black" Orientation="Horizontal" MaxHeight="32" Margin="5">
+            <StackPanel.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.WindowCommands}" />
+                <Style TargetType="Controls:DropDownButton" BasedOn="{StaticResource MahApps.Styles.DropDownButton.WindowCommands}" />
+            </StackPanel.Resources>
+            <Button Foreground="Blue" FontSize="20" ToolTip="New project" x:Name="btnMenuNew" Click="btnMenuNew_Click" Content="{iconPacks:Material Kind=FileDocumentOutline}" />
+            <Button Foreground="Green" ToolTip="Open..." Content="{iconPacks:Material Kind=FolderOpenOutline}" x:Name="btnMenuOpen" Click="btnMenuOpen_Click" />
+            <Controls:DropDownButton Padding="0" Foreground="Green" ToolTip="Open..." ItemsSource="{Binding Source={x:Static QuAnalyzerHelpers:MRUManager.RecentFiles}, Mode=OneWay}">
+                <Controls:DropDownButton.ItemContainerStyle>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="Padding" Value="5" />
+                        <Setter Property="CommandParameter" Value="{Binding Key}"/>
+                        <Setter Property="Header" Value="{Binding Key}"/>
+                        <Setter Property="Icon" Value="{iconPacks:Material Kind=FileOutline}" />
+                        <EventSetter Event="Click" Handler="btnMenuRecent_Click" />
+                    </Style>
+                </Controls:DropDownButton.ItemContainerStyle>
+            </Controls:DropDownButton>
+            <Button Foreground="Blue" ToolTip="Save" Content="{iconPacks:Material Kind=ContentSaveOutline}" x:Name="btnMenuSave" Click="btnMenuSave_Click" />
+            <Controls:DropDownButton Foreground="Blue" ToolTip="Save" Padding="0">
+                <Controls:DropDownButton.ItemContainerStyle>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="Padding" Value="5" />
+                        <Setter Property="Header" Value="{Binding Tag}"/>
+                        <Setter Property="Icon" Value="{Binding}" />
+                        <EventSetter Event="Click" Handler="btnMenuSaveAs_Click" />
+                    </Style>
+                </Controls:DropDownButton.ItemContainerStyle>
+                <Controls:DropDownButton.Items>
+                    <iconPacks:PackIconMaterial Tag="Save as..." Foreground="Blue" Margin="5" Kind="ContentSaveMoveOutline" />
+                </Controls:DropDownButton.Items>
+            </Controls:DropDownButton>
+            <Button ToolTip="About..." x:Name="btnAbout" Click="btnAbout_Click" Content="{iconPacks:Material Kind=InformationOutline}" Foreground="#CC1DAE16" FontSize="26" />
+            <!--<MenuItem Header="_Options">
                     <MenuItem IsCheckable="True" Header="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static Application.Current}, FallbackValue=True}"  />
                 </MenuItem>-->
-        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="100,0,0,0">
-            <Controls:SplitButton ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}" SelectedItem="{Binding CurrentProject.AccentColor,Source={x:Static Application.Current},Mode=TwoWay}" Width="50">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <Ellipse Fill="{Binding}" Width="16" Height="16" VerticalAlignment="Stretch" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </Controls:SplitButton>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
             <TextBox x:Name="txtProjectTitle" MinWidth="200" FontSize="14" Foreground="Black" BorderThickness="1" BorderBrush="Transparent" VerticalContentAlignment="Center" Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}">
                 <TextBox.Style>
                     <Style TargetType="TextBox">
@@ -83,7 +68,13 @@
                 </TextBox.Style>
             </TextBox>
             <Button Click="btnEditTitle_Click" Foreground="Gray" Content="{iconPacks:Material Kind=Pencil}" />
+            <ComboBox Background="Transparent" BorderThickness="0" ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}" SelectedItem="{Binding CurrentProject.AccentColor,Source={x:Static Application.Current},Mode=TwoWay}" Width="Auto">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Ellipse Fill="{Binding}" Width="16" Height="16" VerticalAlignment="Stretch" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </StackPanel>
-    </StackPanel>
-
+    </Grid>
 </UserControl>

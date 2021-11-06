@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
+
 using QuAnalyzer.UI.Pages;
 using QuAnalyzer.UI.Windows;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+
 using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Contracts;
 
@@ -20,41 +23,11 @@ namespace QuAnalyzer.UI.Menus
     public partial class SourcesMenu : UserControl
     {
 
-        private readonly ObservableCollection<KeyValuePair<IDataProvider, string>> Providers = new ObservableCollection<KeyValuePair<IDataProvider, string>>();
         private Point startPoint;
-
-        private CollectionViewSource GroupedProviders { get; set; }
 
         public SourcesMenu()
         {
-            var currentProviders = ((App)Application.Current).CurrentProject.CurrentProviders;
-            Providers.AddAll(currentProviders.SelectMany(prov => prov.Repositories.Select(r => new KeyValuePair<IDataProvider, string>(prov, r.Key))));
-            currentProviders.CollectionChanged += CurrentProviders_CollectionChanged;
-
-            GroupedProviders = new CollectionViewSource()
-            {
-                Source = Providers
-            };
-            GroupedProviders.GroupDescriptions.Add(new PropertyGroupDescription("Key"));
-
             InitializeComponent();
-
-            lstProviders.ItemsSource = GroupedProviders.View;
-        }
-
-        private void CurrentProviders_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            using (GroupedProviders.DeferRefresh())
-            {
-                if (e.OldItems is not null)
-                {
-                    e.OldItems.Cast<IDataProvider>().ToList().ForEach(x => Providers.Remove(Providers.First(prov => prov.Key == x)));
-                }
-                if (e.NewItems is not null)
-                {
-                    Providers.AddAll((e.NewItems.Cast<IDataProvider>().SelectMany(prov => prov.Repositories.Select(r => new KeyValuePair<IDataProvider, string>(prov, r.Key)))));
-                }
-            }
         }
 
         private void btnDeleteProvider_Click(object sender, RoutedEventArgs e)
@@ -75,13 +48,6 @@ namespace QuAnalyzer.UI.Menus
 
         private void btnNewSource_Click(object sender, RoutedEventArgs e) => Popup.OpenNew(new ProviderPicker());
 
-        /*private void lstProviders_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var currentSelection = ((App)App.Current).CurrentSelection;
-            currentSelection.RemoveRange(e.RemovedItems.Cast<KeyValuePair<IDataProvider, string>>());
-            currentSelection.AddRange(e.AddedItems.Cast<KeyValuePair<IDataProvider, string>>());
-        }*/
-
         private void Repository_DataGrid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
             Vector diff = startPoint - e.GetPosition(null);
@@ -96,6 +62,16 @@ namespace QuAnalyzer.UI.Menus
         private void Repository_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             startPoint = e.GetPosition(null);
+        }
+
+        private void TreeView_Selected(object sender, RoutedEventArgs e)
+        {
+            var treeViewItem = (TreeViewItem)e.OriginalSource;
+            var provider = (IDataProvider)treeViewItem.Tag;
+            var repository = (string)((TreeView)sender).SelectedValue;
+
+            ((App)Application.Current).CurrentSelection = (provider, repository);
+
         }
     }
 }
