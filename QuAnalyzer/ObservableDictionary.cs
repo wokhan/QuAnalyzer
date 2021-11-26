@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace QuAnalyzer
 {
@@ -12,6 +12,41 @@ namespace QuAnalyzer
     /// <typeparam name="TValue"></typeparam>
     public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INotifyCollectionChanged, INotifyPropertyChanged //where TKey : class
     {
+        public ObservableDictionary(IDictionary<TKey, TValue> dictionary) : base(dictionary)
+        {
+        }
+
+        public ObservableDictionary()
+        {
+        }
+
+        public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer) : base(dictionary, comparer)
+        {
+        }
+
+        public ObservableDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection) : base(collection)
+        {
+        }
+
+        public ObservableDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer) : base(collection, comparer)
+        {
+        }
+
+        public ObservableDictionary(IEqualityComparer<TKey> comparer) : base(comparer)
+        {
+        }
+
+        public ObservableDictionary(int capacity) : base(capacity)
+        {
+        }
+
+        public ObservableDictionary(int capacity, IEqualityComparer<TKey> comparer) : base(capacity, comparer)
+        {
+        }
+
+        protected ObservableDictionary(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
 
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -56,10 +91,10 @@ namespace QuAnalyzer
             get { return base[key]; }
             set
             {
-                var oldvalue = base[key]; 
+                var oldvalue = base[key];
                 base[key] = value;
                 NotifyCollectionChanged(NotifyCollectionChangedAction.Replace, (key, value), (key, oldvalue));
-               // NotifyPropertyChanged(nameof(Values));
+                // NotifyPropertyChanged(nameof(Values));
 
             }
         }

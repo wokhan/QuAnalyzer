@@ -3,6 +3,7 @@ using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Windows;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,26 +13,24 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using Wokhan.ComponentModel.Extensions;
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Linq.Extensions;
 using Wokhan.UI.Extensions;
-using Wokhan.ComponentModel.Extensions;
-using QuAnalyzer.Features.Comparison;
-using System.Collections;
 
 namespace QuAnalyzer.UI.Controls
 {
     /// <summary>
     /// Logique d'interaction pour ExtendedDataGridView.xaml
     /// </summary>
-    public partial class ExtendedDataGridView : UserControl, INotifyPropertyChanged
+    public partial class ExtendedDataGridView : DataGrid, INotifyPropertyChanged
     {
-        public bool AutoGenerateColumns { get => gridData.AutoGenerateColumns; set => gridData.AutoGenerateColumns = value; }
-        public ObservableCollection<DataGridColumn> Columns => gridData.Columns;
+        public Action<double> ExportProgressCallback { get; set; }
+
+        public IEnumerable<string> DemoItems { get; } = new[] { "Item #1", "Item #2" };
 
         private IQueryable _source;
         public IQueryable Source
@@ -55,29 +54,28 @@ namespace QuAnalyzer.UI.Controls
         }
 
 
-        public static Dictionary<string, string> AggregationFormula => new Dictionary<string, string>
-                {
-                    { "Ignore", null },
-                    { "Count", "Count()" },
-                    //{ "Distinct Count", (x) => x.Distinct().Count() },
-                    //{ "First", Enumerable.First },
-                    //{ "Last", Enumerable.Last },
-                    { "Sum", "Sum({0})" },
-                    { "Average", "Average({0})" },
-                    { "Min", "Min({0})" },
-                    { "Max", "Max({0})" }
-                };
+        public static Dictionary<string, string> AggregationFormula { get; } = new()
+        {
+            { "Ignore", null },
+            { "Count", "Count()" },
+            //{ "Distinct Count", (x) => x.Distinct().Count() },
+            //{ "First", Enumerable.First },
+            //{ "Last", Enumerable.Last },
+            { "Sum", "Sum({0})" },
+            { "Average", "Average({0})" },
+            { "Min", "Min({0})" },
+            { "Max", "Max({0})" }
+        };
 
-        public static Dictionary<string, string> FilterFormula //Func<LinqExpressions.Expression, LinqExpressions.Expression, LinqExpressions.BinaryExpression>> FilterFormula
-=> new Dictionary<string, string>
-                {
-                    { "Equals", "=" },
-                    { "Differs from", "<>" },
-                    { "Greater than", ">" },
-                    { "Greater than or equal", ">=" },
-                    { "Less than", "<" },
-                    { "Less than or equal", "<=" }
-                };
+        public static Dictionary<string, string> FilterFormula { get; } = new()
+        {
+            { "Equals", "=" },
+            { "Differs from", "<>" },
+            { "Greater than", ">" },
+            { "Greater than or equal", ">=" },
+            { "Less than", "<" },
+            { "Less than or equal", "<=" }
+        };
 
         private string _status;
         public string Status
@@ -93,32 +91,9 @@ namespace QuAnalyzer.UI.Controls
             set => this.SetValue(ref _loadingProgress, value, NotifyPropertyChanged);
         }
 
-        public ObservableCollection<string> Grouping { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> Grouping { get; } = new();
 
-        public ObservableCollection<FilterStruct> Filters { get; } = new ObservableCollection<FilterStruct>();
-
-
-        public class ComputeStruct
-        {
-            public string Attribute { get; set; }
-            public string DisplayName { get; set; }
-            public string Aggregate { get; set; }
-        }
-
-        public class FilterStruct
-        {
-            public string Attribute { get; set; }
-            public string DisplayName { get; set; }
-            public Type Type { get; set; }
-            public string ComparerExpression { get; set; }
-
-            public object TargetValue { get; set; }
-            /*public string TargetValue
-            {
-                get { return TargetValueAsObject is not null ? TargetValueAsObject.ToString() : String.Empty; }
-                set { TargetValueAsObject = Convert.ChangeType(value, Type); }
-            }*/
-        }
+        public ObservableCollection<FilterStruct> Filters { get; } = new();
 
         public string CustomFilter { get; set; }
 
@@ -131,11 +106,9 @@ namespace QuAnalyzer.UI.Controls
             set { _customFilterError = value; NotifyPropertyChanged(nameof(CustomFilterError)); NotifyPropertyChanged(nameof(IsCustomFilterError)); }
         }
 
-        public ObservableCollection<ComputeStruct> Compute { get; } = new ObservableCollection<ComputeStruct>();
+        public ObservableCollection<ComputeStruct> Compute { get; } = new();
 
         private string SortOrder => (currentSortAttribute is not null && (!Grouping.Any() || Grouping.Concat(Compute.Select(f => f.Attribute)).Contains(currentSortAttribute))) ? currentSortAttribute : (Grouping.FirstOrDefault() ?? CustomHeaders?.FirstOrDefault()?.Name);
-
-        public Style CellStyle => gridData.CellStyle;
 
         public ExtendedDataGridView()
         {
@@ -152,21 +125,21 @@ namespace QuAnalyzer.UI.Controls
             Filters.Clear();
         }
 
-        //TODO: Generic
         private void GlobalExportCSV_Click(object sender, RoutedEventArgs e)
         {
-            var host = ((ModernMain)Window.GetWindow(this)).stackExports;
-            gridData.ExportAsXLSX(host: host, callback: SharedCallback.GetCallBackForExport(host, "Export", null));
+            //TODO: Externalize (shouldn't be at the Control level)
+            var (host, callback, cancellationToken) = ((App)Application.Current).AddTaskAndGetCallback("Exporting data");
+            this.ExportAsXLSX(host: host, callback: callback, cancellationToken: cancellationToken);
         }
 
         private void GlobalExportHTML_Click(object sender, RoutedEventArgs e)
         {
-            gridData.ExportAsHTML();
+            this.ExportAsHTML();
         }
 
         private void GlobalCopy_Click(object sender, RoutedEventArgs e)
         {
-            gridData.CopyToClipboard();
+            this.CopyToClipboard();
         }
 
         private Point startPoint;
@@ -191,7 +164,7 @@ namespace QuAnalyzer.UI.Controls
             if (!Grouping.Contains(src))
             {
                 Grouping.Add(src);
-                foreach (var h in gridData.Columns.Select(c => c.SortMemberPath).Except(Grouping).Except(Compute.Select(c => c.Attribute)))
+                foreach (var h in this.Columns.Select(c => c.SortMemberPath).Except(Grouping).Except(Compute.Select(c => c.Attribute)))
                 {
                     Compute.Add(new ComputeStruct() { Attribute = h, Aggregate = null });
                 }
@@ -218,17 +191,17 @@ namespace QuAnalyzer.UI.Controls
         {
             if (Source is null)
             {
-                gridData.ItemsSource = Enumerable.Range(0, 100);
-                gridData.Columns.Add(new DataGridTextColumn() { Header = "..." });
-                gridData.IsEnabled = false;
+                this.ItemsSource = Enumerable.Range(0, 100);
+                this.Columns.Add(new DataGridTextColumn() { Header = "..." });
+                this.IsEnabled = false;
                 return;
             }
 
             if (AutoGenerateColumns)
             {
-                gridData.Columns.Clear();
+                this.Columns.Clear();
             }
-            gridData.IsEnabled = true;
+            this.IsEnabled = true;
 
             await Task.Run(() =>
             {
@@ -289,11 +262,11 @@ namespace QuAnalyzer.UI.Controls
 
                 Dispatcher.Invoke(() =>
                 {
-                    gridData.SelectedItems.Clear();
-                    gridData.ItemsSource = virtualizedData;
-                    if (SortOrder is not null && gridData.Columns.Any())
+                    this.SelectedItems.Clear();
+                    this.ItemsSource = virtualizedData;
+                    if (SortOrder is not null && this.Columns.Any())
                     {
-                        gridData.Columns.FirstOrDefault(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
+                        this.Columns.First(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
                     }
                 });
 

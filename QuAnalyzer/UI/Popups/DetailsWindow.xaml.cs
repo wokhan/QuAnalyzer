@@ -4,9 +4,7 @@ using MahApps.Metro.Controls.Dialogs;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.UI.Controls;
 
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -14,7 +12,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
-using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer.UI.Popups
@@ -25,6 +22,8 @@ namespace QuAnalyzer.UI.Popups
     public partial class DetailsWindow : Page
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public IDataComparer Comparer { get; private set; }
 
         protected void NotifyPropertyChanged(string propertyName)
         {
@@ -40,13 +39,11 @@ namespace QuAnalyzer.UI.Popups
 
         public DetailsWindow(IDataComparer comparer)
         {
-            this.DataContext = comparer;
-            
+            Comparer = comparer;
+
             InitializeComponent();
 
             InitGrids(comparer);
-            this.Loaded += DetailsWindow_Loaded;
-
         }
 
         private void InitGrids(IDataComparer r)
@@ -65,21 +62,6 @@ namespace QuAnalyzer.UI.Popups
 
             displayData(dgSourcePerfectDups, results.Source.PerfectDups, r.SourceHeaders.ToArray(), r.SourceKeys.Count);
             displayData(dgTargetPerfectDups, results.Target.PerfectDups, r.TargetHeaders.ToArray(), r.TargetKeys.Count);
-
-        }
-
-        void DetailsWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            var actTab = tabs.Items.Cast<TabItem>().FirstOrDefault(t => t.IsEnabled);
-            if (actTab is not null)
-            {
-                tabs.SelectedItem = actTab;
-            }
-            else
-            {
-                //await MahApps.Metro.Controls.Dialogs.DialogManager.ShowMessageAsync((MetroWindow)Window.GetWindow(this), "", "Nothing to show.");
-                ((MetroWindow)Window.GetWindow(this)).ShowMessageAsync("", "Nothing to show.");
-            }
         }
 
         private void displayDiffData(ExtendedDataGridView gridData, IEnumerable<DiffClass> data, string[] headers, int keysCount)
@@ -106,13 +88,17 @@ namespace QuAnalyzer.UI.Popups
                         FontWeight = (i < keysCount ? FontWeights.Bold : FontWeights.Normal)
                     };
 
-                    Style style = new Style();
-                    style.TargetType = typeof(DataGridCell);
-                    style.BasedOn = gridData.CellStyle;
+                    Style style = new Style
+                    {
+                        TargetType = typeof(DataGridCell),
+                        BasedOn = gridData.CellStyle
+                    };
 
-                    DataTrigger trigger = new DataTrigger();
-                    trigger.Value = true;
-                    trigger.Binding = new Binding("IsDiff[" + (i + 1) + "]");
+                    DataTrigger trigger = new DataTrigger
+                    {
+                        Value = true,
+                        Binding = new Binding("IsDiff[" + (i + 1) + "]")
+                    };
                     trigger.Setters.Add(new Setter(DataGridCell.ForegroundProperty, Brushes.Red));
 
                     style.Triggers.Add(trigger);

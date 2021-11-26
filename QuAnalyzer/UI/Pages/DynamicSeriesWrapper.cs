@@ -16,7 +16,7 @@ namespace QuAnalyzer.UI.Pages
 {
     public class DynamicSeriesWrapper : Freezable
     {
-        string type;
+        private string type;
         private static Axis xAxis;
 
         public string Type { set => type = value; }

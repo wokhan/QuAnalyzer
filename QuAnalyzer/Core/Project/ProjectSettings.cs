@@ -1,14 +1,18 @@
 ﻿using Microsoft.Win32;
+
 using Newtonsoft.Json;
+
 using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Core.Project.Exceptions;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Features.Performance;
+
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows.Media;
+
 using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers.Contracts;
@@ -51,18 +55,19 @@ namespace QuAnalyzer.Core.Project
             set { App.Current.Resources["AccentColorBrush"] = value; }
         }
 
-        public ObservableCollection<IDataProvider> CurrentProviders { get; } = new ObservableCollection<IDataProvider>();
-
-        public ObservableCollection<MonitorItem> MonitorItems { get; } = new ObservableCollection<MonitorItem>();
-        public ObservableCollection<SourcesMapper> SourceMapper { get; } = new ObservableCollection<SourcesMapper>();
-        public ObservableCollection<TestCasesCollection> PerformanceItems { get; } = new ObservableCollection<TestCasesCollection>();
+        public ObservableCollection<IDataProvider> CurrentProviders { get; } = new();
+        public ObservableCollection<MonitorItem> MonitorItems { get; } = new();
+        public ObservableCollection<SourcesMapper> SourceMapper { get; } = new();
+        public ObservableCollection<TestCasesCollection> PerformanceItems { get; } = new();
 
         internal void Open(string p)
         {
             try
             {
-                var ser = new JsonSerializer();
-                ser.TypeNameHandling = TypeNameHandling.Auto;
+                var ser = new JsonSerializer
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                };
 
                 using var stream = new JsonTextReader(new StreamReader(p));
 
@@ -93,8 +98,10 @@ namespace QuAnalyzer.Core.Project
                     return;
                 }
 
-                var ser = new JsonSerializer();
-                ser.TypeNameHandling = TypeNameHandling.Auto;
+                var ser = new JsonSerializer
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                };
 
                 if (p is not null)
                 {

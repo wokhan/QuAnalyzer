@@ -13,7 +13,7 @@ namespace QuAnalyzer.Features.Monitoring
     {
         public bool RunWhenStarted { get; set; }
 
-        public ObservableDictionary<MonitorItem, bool> PrecedingSteps { get; } = new ObservableDictionary<MonitorItem, bool>();
+        public ObservableDictionary<MonitorItem, bool> PrecedingSteps { get; private set; } = new();
 
         public List<string> AttributesList => Attributes.Split(',').ToList();
 
@@ -28,7 +28,9 @@ namespace QuAnalyzer.Features.Monitoring
 
         public string ProviderName { get; set; }
 
+
         private IDataProvider provider;
+
         [JsonIgnore]
         public IDataProvider Provider
         {
@@ -38,7 +40,12 @@ namespace QuAnalyzer.Features.Monitoring
 
         public string Repository { get; set; }
 
-        public Func<IList<Dictionary<string, string>>, Dictionary<string, long>, IQueryable> GetData => (values, statsBag) => Provider.GetQueryable(Repository, values, statsBag);
+        // TODO: Why?
+        //public Func<IList<Dictionary<string, string>>, Dictionary<string, long>, IQueryable> GetData => (values, statsBag) => Provider.GetQueryable(Repository, values, statsBag);
+        public IQueryable GetData(IList<Dictionary<string, string>> values, Dictionary<string, long> statsBag)
+        {
+            return Provider.GetQueryable(Repository, values, statsBag);
+        }
 
         public string Filter { get; set; }
 
@@ -67,9 +74,27 @@ namespace QuAnalyzer.Features.Monitoring
 
         public string Attributes { get; set; } = "";
 
-        internal MonitoringItemInstance GetInstance()
+        public MonitoringItemInstance CreateInstance()
         {
             return new MonitoringItemInstance(this);
         }
+
+        public MonitorItem Clone()
+        {
+            return new()
+            {
+                Attributes = this.Attributes,
+                Filter = this.Filter,
+                PrecedingSteps = new(this.PrecedingSteps),
+                Interval = this.Interval,
+                Name = this.Name,
+                ProviderName = this.ProviderName,
+                Repository = this.Repository,
+                RunWhenStarted = this.RunWhenStarted,
+                Selector = this.Selector,
+                Type = this.Type
+            };
+        }
+
     }
 }

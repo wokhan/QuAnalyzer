@@ -4,9 +4,11 @@
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      DataContext="{Binding Comparer,RelativeSource={x:Static RelativeSource.Self}}"
       Title="{Binding Name, StringFormat='Comparison details - {0}'}"
-      MinWidth="800" MinHeight="600" 
+      mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600" 
       x:Name="me">
     <Grid>
         <Grid.RowDefinitions>
@@ -18,7 +20,7 @@
             <ColumnDefinition Width="5"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <Controls:MetroAnimatedSingleRowTabControl Grid.RowSpan="2" Name="tabs" Padding="0">
+        <TabControl Grid.RowSpan="2" Name="tabs" Padding="0">
             <TabControl.Resources>
                 <Style TargetType="Border">
                     <Setter Property="BorderThickness" Value="0,1,0,0" />
@@ -28,7 +30,8 @@
             </TabControl.Resources>
             <TabItem x:Name="tabDiff" Header="DIFFERENCES" ext:CustomAdorner.PreserveTemplate="True" ext:CustomAdorner.Image="{iconPacks:Material Kind=VectorDifference}">
                 <Border>
-                    <DockPanel DataContext="{Binding DataContext,ElementName=me}">
+                    <DockPanel>
+                        <!--DataContext="{Binding DataContext,ElementName=me}">-->
                         <DockPanel.Resources>
                             <Style TargetType="DataGridRow">
                                 <Style.Triggers>
@@ -41,8 +44,7 @@
                                 </Style.Triggers>
                             </Style>
                         </DockPanel.Resources>
-                        <UC:ExtendedDataGridView x:Name="dgDiff" EnableAdvancedFilters="True" />
-                        <!--AlternationCount="4" IsReadOnly="True" FrozenColumnCount="1">-->
+                        <UC:ExtendedDataGridView x:Name="dgDiff" AlternatingRowBackground="White" AlternationCount="4" IsReadOnly="True" FrozenColumnCount="1" />
                     </DockPanel>
                 </Border>
             </TabItem>
@@ -57,12 +59,10 @@
                             <RowDefinition Height="179*" />
                         </Grid.RowDefinitions>
                         <Label Content="{Binding SourceName,FallbackValue=Source}" ContentStringFormat="Items missing from {0}" Background="#FFEEEEEE" />
-                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgMissingSource" />
-                        <!--IsReadOnly="True" FrozenColumnCount="1"-->
+                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgMissingSource" IsReadOnly="True" FrozenColumnCount="1" />
                         <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
                         <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" ContentStringFormat="Items missing from {0}" Background="#FFEEEEEE" />
-                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgMissingTarget" />
-                        <!--IsReadOnly="True" FrozenColumnCount="1"-->
+                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgMissingTarget" IsReadOnly="True" FrozenColumnCount="1" />
                     </Grid>
                 </Border>
             </TabItem>
@@ -77,16 +77,14 @@
                             <RowDefinition Height="179*" />
                         </Grid.RowDefinitions>
                         <Label Content="{Binding SourceName,FallbackValue=Source}" Background="#FFEEEEEE" />
-                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourceDups" />
-                        <!--IsReadOnly="True" FrozenColumnCount="1"-->
+                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourceDups"  IsReadOnly="True" FrozenColumnCount="1" />
                         <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
                         <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" Background="#FFEEEEEE" />
-                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetDups" />
-                        <!--IsReadOnly="True" FrozenColumnCount="1"-->
+                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetDups"  IsReadOnly="True" FrozenColumnCount="1" />
                     </Grid>
                 </Border>
             </TabItem>
-            <TabItem x:Name="tabDupPrfSrc" ext:CustomAdorner.Image="{iconPacks:Material Kind=Equal}" Header="DUPLICATES">
+            <TabItem x:Name="tabDupPrfSrc" ext:CustomAdorner.PreserveTemplate="True" ext:CustomAdorner.Image="{iconPacks:Material Kind=Equal}" Header="DUPLICATES">
                 <Border>
                     <Grid>
                         <Grid.RowDefinitions>
@@ -97,15 +95,13 @@
                             <RowDefinition Height="179*" />
                         </Grid.RowDefinitions>
                         <Label Content="{Binding SourceName,FallbackValue=Source}" Background="#FFEEEEEE" />
-                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourcePerfectDups" EnableAdvancedFilters="True" />
-                        <!--IsReadOnly="True" FrozenColumnCount="1"-->
+                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourcePerfectDups" IsReadOnly="True" FrozenColumnCount="1" />
                         <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
                         <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" Background="#FFEEEEEE" />
-                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetPerfectDups" EnableAdvancedFilters="True" />
-                        <!--IsReadOnly="True" FrozenColumnCount="1"-->
+                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetPerfectDups" IsReadOnly="True" FrozenColumnCount="1" />
                     </Grid>
                 </Border>
             </TabItem>
-        </Controls:MetroAnimatedSingleRowTabControl>
+        </TabControl>
     </Grid>
 </Page>

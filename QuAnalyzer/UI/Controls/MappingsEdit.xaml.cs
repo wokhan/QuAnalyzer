@@ -20,9 +20,9 @@ namespace QuAnalyzer.UI.Controls
 
         public static readonly DependencyProperty MappingProperty = DependencyProperty.Register(nameof(Mapping), typeof(SourcesMapper), typeof(MappingsEdit));
 
-        public ObservableCollection<string> SourceAttributes { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> SourceAttributes { get; } = new();
 
-        public ObservableCollection<string> TargetAttributes { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> TargetAttributes { get; } = new();
 
         public MappingsEdit()
         {

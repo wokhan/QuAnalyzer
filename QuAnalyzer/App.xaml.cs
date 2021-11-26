@@ -1,12 +1,22 @@
-﻿using QuAnalyzer.Core.Helpers;
+﻿using Microsoft.Win32;
+
+using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Core.Project;
+using QuAnalyzer.UI.Windows;
+
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
+
 using Wokhan.Data.Providers.Contracts;
 using Wokhan.UI.Diagnostics;
 
@@ -55,6 +65,7 @@ namespace QuAnalyzer
         public string Copyright { get; } = "";
 
         public string HelpLink { get; } = "https://www.wokhan.com";
+        public ObservableCollection<GlobalTask> Tasks { get; private set; } = new();
 
         public App()
         {
@@ -64,14 +75,93 @@ namespace QuAnalyzer
             Performance = new ResourcesWatcher();
             ProvidersMan = new ProvidersManager();
 
+            RegisterCommands();
+
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             this.Exit += App_Exit;
         }
 
-        void App_Exit(object sender, ExitEventArgs e)
+        private void RegisterCommands()
+        {
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(ApplicationCommands.Save, ProjectSave));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(ApplicationCommands.SaveAs, ProjectSaveAs));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(ApplicationCommands.Open, ProjectOpen));
+            CommandManager.RegisterClassCommandBinding(typeof(Window), new CommandBinding(ApplicationCommands.New, ProjectNew));
+        }
+
+        private void ProjectNew(object sender, ExecutedRoutedEventArgs e)
+        {
+            CurrentProject.CreateNew();
+        }
+
+        private void ProjectOpen(object sender, ExecutedRoutedEventArgs e)
+        {
+            var dial = new OpenFileDialog()
+            {
+                CheckFileExists = true,
+                ValidateNames = true,
+                AddExtension = true,
+                Filter = "QuAnalyzer project file|*.qap"
+            };
+
+            if (dial.ShowDialog().Value)
+            {
+                CurrentProject.Open(dial.FileName);
+            }
+        }
+
+        private void ProjectSaveAs(object sender, ExecutedRoutedEventArgs e)
+        {
+            CurrentProject.SaveAs();
+        }
+
+        private void ProjectSave(object sender, ExecutedRoutedEventArgs e)
+        {
+            CurrentProject.Save();
+        }
+
+        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "providers", args.Name.Split(',')[0] + ".dll");
+
+            if (File.Exists(path))
+            {
+                return Assembly.LoadFrom(path);
+            }
+
+            return null;
+        }
+
+        private void App_Exit(object sender, ExitEventArgs e)
         {
             // Ensures all threads are killed as well.
             Environment.Exit(0);
+        }
+
+        /// <summary>
+        /// Temporary method (the callback handling is not good, and the "host" retrieval ain't better)
+        /// </summary>
+        /// <param name="title"></param>
+        /// <returns></returns>
+        internal (Panel host, Action<double>, CancellationTokenSource) AddTaskAndGetCallback(string title)
+        {
+            var window = ((MainWindow)this.MainWindow);
+
+            var task = new GlobalTask() { Title = title };
+
+            return (window.stackExports,
+                    i =>
+                    {
+                        if (task.Progress is null)
+                        {
+                            Tasks.Add(task);
+                        }
+                        task.Progress = i;
+                    },
+                    task.CancellationTokenSource
+            );
         }
     }
 }

@@ -1,9 +1,15 @@
-﻿<Page
-    x:Class="QuAnalyzer.UI.Popups.MonitoringDetails"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="{Binding Name,StringFormat='Monitoring settings - {0}',FallbackValue='New monitor'}"
-        x:Name="myself" Width="388">
+﻿<Page x:Class="QuAnalyzer.UI.Popups.MonitoringDetails"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:monitor="clr-namespace:QuAnalyzer.Features.Monitoring"
+      mc:Ignorable="d" 
+      d:DesignWidth="388" DataContext="{Binding CurrentItem,RelativeSource={RelativeSource Self}}"
+      Title="{Binding Name,StringFormat='Monitoring settings - {0}',FallbackValue='New monitor'}"
+      x:Name="myself">
     <Page.Resources>
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="Margin" Value="5" />
@@ -26,8 +32,8 @@
     <DockPanel>
         <Border DockPanel.Dock="Bottom" Grid.ColumnSpan="4" Style="{StaticResource ButtonBar}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Save" x:Name="btnSave" Click="btnSave_Click" HorizontalAlignment="Right" />
-                <Button Content="Cancel" x:Name="btnCancel" IsCancel="True" HorizontalAlignment="Right" Click="btnCancel_Click"/>
+                <Button Content="Apply" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Check}" x:Name="btnSave" Click="btnSave_Click" />
+                <Button Content="Cancel" BorderBrush="OrangeRed" ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}" x:Name="btnCancel" IsCancel="True" Click="btnCancel_Click"/>
             </StackPanel>
         </Border>
         <Grid Margin="5">
@@ -56,20 +62,20 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <WrapPanel>
-                            <Image HorizontalAlignment="Center" Grid.Column="0" Height="16" VerticalAlignment="Center" Margin="2" Source="{Binding ProviderTypeInfo.IconPath, Converter={StaticResource imageSourceConverter}}" />
+                            <Image HorizontalAlignment="Center" Grid.Column="0" Height="16" VerticalAlignment="Center" Margin="2" Source="{Binding Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
                             <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="2" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Center" />
                         </WrapPanel>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <Label Grid.Row="2" Content="Repository:" />
-            <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstSrcRepo" SelectionChanged="lstSrcRepo_SelectionChanged" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding DataContext.Repository, ElementName=myself}" DataContext="{Binding SelectedItem, ElementName=lstSrc}"/>
+            <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstSrcRepo" SelectionChanged="lstSrcRepo_SelectionChanged" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding Repository}" DataContext="{Binding Provider}"/>
             <Label Grid.Row="3" Content="Interval (in seconds):" />
             <TextBox Grid.Row="3" Grid.Column="1" x:Name="txtInterval" Text="{Binding Interval}" />
             <Label Grid.Row="3" Content="Run when started:" Grid.Column="2"  />
             <CheckBox Grid.Row="3" Grid.Column="3" x:Name="chkRunWS" IsChecked="{Binding RunWhenStarted}" />
             <Label Grid.Row="5" Content="Type:" />
-            <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" x:Name="cbType" SelectedValue="{Binding Type}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding SelectedItem.MonitoringTypes, ElementName=lstSrc}" />
+            <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" x:Name="cbType" SelectedValue="{Binding Type}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding Source={x:Static monitor:MonitoringModes.MonitoringTypes}}" />
             <Label Grid.Row="6" Content="Attributes:" VerticalAlignment="Top"/>
             <ListBox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstAttributes" Height="80" SelectionMode="Multiple">
                 <ListBox.Resources>

@@ -1,5 +1,6 @@
-﻿using System.Linq;
-using System.Linq.Dynamic.Core;
+﻿using QuAnalyzer.UI.Windows;
+
+using System.Windows;
 using System.Windows.Controls;
 
 namespace QuAnalyzer.UI.Pages

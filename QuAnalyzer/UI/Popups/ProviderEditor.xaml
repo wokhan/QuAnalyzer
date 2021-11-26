@@ -63,7 +63,7 @@
                                         </Style>
                                     </GroupBox.Style>
                                     <GroupBox.Header>
-                                        <RadioButton x:Name="rdb" Visibility="{Binding HasMultipleItems,ElementName=me,Converter={StaticResource BooleanToVisibilityConverter}}" IsChecked="{Binding ExpParameters.Count,ElementName=me,Converter={StaticResource valueChecker}, ConverterParameter=1, Mode=OneWay}" GroupName="optionsGroup" Background="LightGray" BorderBrush="LightGray" Content="{Binding Key}" />
+                                        <RadioButton x:Name="rdb" Visibility="{Binding HasMultipleItems,ElementName=me,Converter={StaticResource valueToVisibilityConverter}}" IsChecked="{Binding ExpParameters.Count,ElementName=me,Converter={StaticResource valueChecker}, ConverterParameter=1, Mode=OneWay}" GroupName="optionsGroup" Background="LightGray" BorderBrush="LightGray" Content="{Binding Key}" />
                                     </GroupBox.Header>
                                     <ItemsControl Grid.IsSharedSizeScope="True" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True" x:Name="itms">
                                         <ItemsControl.Resources>
@@ -185,10 +185,10 @@
                             </Style>
                         </DataGridTextColumn.EditingElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTemplateColumn Width="40" IsReadOnly="True" CanUserResize="False">
+                    <DataGridTemplateColumn IsReadOnly="True" CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Name="btnDeleteRepo" Tag="{Binding}" Click="btnDeleteRepo_Click" Background="Transparent" BorderBrush="Transparent" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                <Button Name="btnDeleteRepo" Tag="{Binding}" Click="btnDeleteRepo_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -208,5 +208,14 @@
                 </StackPanel>
             </Grid>
         </Border>
+        <Grid Grid.RowSpan="3" VerticalAlignment="Center" HorizontalAlignment="Center" Background="White" Width="400" Visibility="{Binding MessageTitle,Converter={StaticResource valueToVisibilityConverter}}">
+            <StackPanel Margin="10">
+                <TextBlock Text="{Binding MessageTitle}" VerticalAlignment="Stretch" />
+                <TextBlock Text="{Binding MessageContent}" VerticalAlignment="Stretch" />
+                <ProgressBar x:Name="progress" VerticalAlignment="Top" />
+                <Button Content="Cancel" HorizontalAlignment="Center" />
+            </StackPanel>
+        </Grid>
+
     </Grid>
 </Page>

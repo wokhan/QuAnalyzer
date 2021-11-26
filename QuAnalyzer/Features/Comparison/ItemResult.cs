@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
 using Wokhan.Core.ComponentModel;
 
 namespace QuAnalyzer.Features.Comparison
@@ -13,29 +15,29 @@ namespace QuAnalyzer.Features.Comparison
             internal set { _count = value; NotifyPropertyChanged(); }
         }
 
-        private List<T> _differences;
-        public List<T> Differences
+        private IList<T> _differences;
+        public IList<T> Differences
         {
             get { return _differences; }
             internal set { _differences = value; NotifyPropertyChanged(); }
         }
 
-        private List<T> _duplicates;
-        public List<T> Duplicates
+        private IList<T> _duplicates;
+        public IList<T> Duplicates
         {
             get { return _duplicates; }
             internal set { _duplicates = value; NotifyPropertyChanged(); }
         }
 
-        private List<T> _perfDups;
-        public List<T> PerfectDups
+        private IList<T> _perfDups;
+        public IList<T> PerfectDups
         {
             get { return _perfDups; }
             internal set { _perfDups = value; NotifyPropertyChanged(); }
         }
 
-        private List<T> _missing;
-        public List<T> Missing
+        private IList<T> _missing;
+        public IList<T> Missing
         {
             get { return _missing; }
             internal set { _missing = value; NotifyPropertyChanged(); }

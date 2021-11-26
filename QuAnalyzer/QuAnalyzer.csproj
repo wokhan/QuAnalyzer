@@ -10,6 +10,7 @@
   <PropertyGroup>
     <ApplicationIcon>IconNew.ico</ApplicationIcon>
     <StartupObject>QuAnalyzer.App</StartupObject>
+    <Nullable>warnings</Nullable>
   </PropertyGroup>
   
   <ItemGroup>

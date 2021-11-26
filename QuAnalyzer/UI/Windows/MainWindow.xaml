@@ -1,80 +1,52 @@
-﻿<Controls:MetroWindow
+﻿<Window
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-    x:Class="QuAnalyzer.UI.Windows.ModernMain"
+    x:Class="QuAnalyzer.UI.Windows.MainWindow"
     xmlns:UserControls="clr-namespace:QuAnalyzer.UI.Menus"
-    xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
+    xmlns:helpers="clr-namespace:QuAnalyzer.Core.Helpers"
+    xmlns:uicontrols="clr-namespace:Wokhan.UI.Xaml.Controls;assembly=Wokhan.UI" 
     xmlns:popups="clr-namespace:QuAnalyzer.UI.Popups"
-    Title="QuAnalyzer v1.0beta" 
-    ShowIconOnTitleBar="False" TitleBarHeight="40" 
-    ResizeMode="CanResizeWithGrip" TitleAlignment="Right"
-    MinWidth="1030" MinHeight="600" Height="600" TitleForeground="DarkGray" NonActiveWindowTitleBrush="LightGray"
-    Width="900" BorderThickness="0" GlowBrush="Black" WindowTitleBrush="Transparent"
+    Title="{Binding AppName,RelativeSource={x:Static RelativeSource.Self}}" 
+    ResizeMode="CanResizeWithGrip"
+    MinWidth="1030" MinHeight="600" Height="600" 
+    Width="900" 
     x:Name="me">
-    <Window.Resources>
-        <Style TargetType="{x:Type Controls:WindowButtonCommands}">
-            <Setter Property="Foreground" Value="Black" />
-        </Style>
-    </Window.Resources>
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo />
     </Window.TaskbarItemInfo>
-    <Controls:MetroWindow.LeftWindowCommands>
-        <Controls:WindowCommands ShowSeparators="False">
-            <UserControls:MainMenu />
-        </Controls:WindowCommands>
-    </Controls:MetroWindow.LeftWindowCommands>
-    <Controls:MetroWindow.Flyouts>
-        <Controls:FlyoutsControl>
-            <Controls:Flyout x:Name="flyAbout" Theme="Adapt" Position="Top" Margin="0,100,0,0" Width="500" TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" IsPinned="False">
-                <Controls:Flyout.Effect>
-                    <DropShadowEffect Opacity="0.1" />
-                </Controls:Flyout.Effect>
-                <popups:About BorderBrush="LightGray" BorderThickness="1"/>
-            </Controls:Flyout>
-            <Controls:Flyout x:Name="flyExports" Theme="Adapt" TitleVisibility="Collapsed" Position="Right" Width="350" Background="{DynamicResource AccentColorBrush}" CloseButtonVisibility="Collapsed" IsOpen="{Binding IsChecked, Mode=TwoWay, ElementName=btnTasks}" IsPinned="False" Margin="0,40,0,26" Foreground="Black">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="32"/>
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Rectangle Grid.RowSpan="2" Width="2" VerticalAlignment="Stretch" Fill="White" HorizontalAlignment="Left">
-                        <Rectangle.Effect>
-                            <DropShadowEffect Direction="180" BlurRadius="15" />
-                        </Rectangle.Effect>
-                    </Rectangle>
-                    <StackPanel Orientation="Horizontal" Background="Gray">
-                        <ContentControl Foreground="WhiteSmoke" Margin="10,0" Height="19" Content="{iconPacks:Material Kind=FerrisWheel}" />
-                        <Label Grid.Column="1" VerticalAlignment="Center" Foreground="WhiteSmoke" Content="TASKS" FontSize="12" />
-                    </StackPanel>
-                    <Border Background="LightGray" Grid.Row="2">
-                        <ScrollViewer HorizontalScrollBarVisibility="Hidden">
-                            <StackPanel x:Name="stackExports" />
-                        </ScrollViewer>
-                    </Border>
-                </Grid>
-            </Controls:Flyout>
-        </Controls:FlyoutsControl>
-    </Controls:MetroWindow.Flyouts>
-    <Grid Name="mainGrid">
+    <Grid x:Name="gridMain">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Controls:Flyout TitleVisibility="Collapsed" CloseButtonVisibility="Collapsed" BorderBrush="{DynamicResource AccentColorBrush}" IsAutoCloseEnabled="False" Position="Left" IsOpen="True" Header="Sources" HorizontalAlignment="Left" Width="200" Background="WhiteSmoke" Theme="Adapt">
-            <UserControls:SourcesMenu x:Name="mainMenu" />
-        </Controls:Flyout>
-        <Controls:MetroAnimatedSingleRowTabControl Name="tabMenu" SelectionChanged="tabMenu_SelectionChanged" Margin="{Binding ActualWidth,ElementName=mainMenu,Converter={StaticResource thicknessConverter},ConverterParameter='LEFT'}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <uicontrols:CustomWindowChrome WindowChrome.IsHitTestVisibleInChrome="True" Grid.ColumnSpan="2" Height="35" TitleAlignment="Right">
+            <uicontrols:CustomWindowChrome.TitleStyle>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Margin" Value="0,0,130,0" />
+                    <Setter Property="Foreground" Value="SlateGray" />
+                    <Setter Property="Typography.Capitals" Value="SmallCaps" />
+                    <Setter Property="IsHitTestVisible" Value="False" />
+                </Style>
+            </uicontrols:CustomWindowChrome.TitleStyle>
+            <UserControls:MainMenu Width="{Binding ActualWidth,RelativeSource={RelativeSource AncestorType=Window}}" Padding="130,3,120,0" />
+        </uicontrols:CustomWindowChrome>
+        <Grid Grid.Row="1" x:Name="stackExports" />
+        <UserControls:SourcesMenu Grid.Row="1" Width="200" />
+        <TabControl Grid.Row="1" Grid.Column="1" Name="tabMenu" SelectionChanged="tabMenu_SelectionChanged">
             <TabControl.Resources>
                 <Style TargetType="Frame">
                     <Setter Property="NavigationUIVisibility" Value="Hidden" />
                     <Setter Property="Background" Value="White" />
                     <Setter Property="BorderThickness" Value="1,1,0,0" />
                     <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}" />
-                    <Setter Property="Margin" Value="0,-1,0,0" />
+                    <Setter Property="Margin" Value="-3,-4,-3,-3" />
                     <!--<Style.Triggers>
                         <DataTrigger Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=TabItem,AncestorLevel=1}}" Value="True">
                             <Setter Property="Source" Value="{Binding Tag,RelativeSource={RelativeSource Self}}" />
@@ -103,8 +75,43 @@
             <TabItem ext:CustomAdorner.PreserveTemplate="True" Header="MONITORING" ext:CustomAdorner.Image="{iconPacks:Material Kind=ChartAreaspline}">
                 <Frame Source="../Pages/Monitor.xaml" />
             </TabItem>
-        </Controls:MetroAnimatedSingleRowTabControl>
-        <StatusBar Grid.Row="1" Height="25" Background="{DynamicResource AccentColorBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+        </TabControl>
+        <popups:About x:Name="flyAbout" Visibility="Collapsed" Grid.RowSpan="3" Grid.ColumnSpan="2" Width="500" VerticalAlignment="Center">
+            <popups:About.Effect>
+                <DropShadowEffect BlurRadius="10" ShadowDepth="1" Color="Gray" />
+            </popups:About.Effect>
+        </popups:About>
+        <Grid x:Name="flyExports" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="350" Background="{DynamicResource AccentColorBrush}" Visibility="{Binding IsChecked,ElementName=btnTasks,Converter={StaticResource valueToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32"/>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Rectangle Grid.RowSpan="2" Width="2" VerticalAlignment="Stretch" Fill="White" HorizontalAlignment="Left">
+                <Rectangle.Effect>
+                    <DropShadowEffect Direction="180" BlurRadius="15" />
+                </Rectangle.Effect>
+            </Rectangle>
+            <StackPanel Orientation="Horizontal" Background="Gray">
+                <ContentControl Foreground="WhiteSmoke" Margin="10,0" Height="19" Content="{iconPacks:Material Kind=FerrisWheel}" />
+                <Label Grid.Column="1" VerticalAlignment="Center" Foreground="WhiteSmoke" Content="TASKS" FontSize="12" />
+            </StackPanel>
+            <Border Background="LightGray" Grid.Row="2">
+                <ScrollViewer HorizontalScrollBarVisibility="Hidden">
+                    <ItemsControl ItemsSource="{Binding Tasks,Source={x:Static Application.Current}}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type helpers:GlobalTask}">
+                                <StackPanel Margin="20,2,20,2">
+                                    <TextBlock Text="{Binding Title}" />
+                                    <ProgressBar Value="{Binding Progress}" Height="20" HorizontalAlignment="Stretch" Maximum="1" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <!--<StackPanel x:Name="stackExports" />-->
+                </ScrollViewer>
+            </Border>
+        </Grid>
+        <StatusBar Grid.Row="2" Grid.ColumnSpan="2" Height="25" Background="{DynamicResource AccentColorBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
             <StatusBarItem>
                 <TextBlock Text="{Binding CurrentProject.FilePath, Source={x:Static Application.Current},FallbackValue='No project has been loaded nor saved.'}" Background="Transparent" HorizontalAlignment="Right" Margin="0,0,20,0" />
             </StatusBarItem>
@@ -144,5 +151,4 @@
             </StatusBarItem>
         </StatusBar>
     </Grid>
-
-</Controls:MetroWindow>
+</Window>

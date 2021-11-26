@@ -1,22 +1,41 @@
-﻿<Page
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
       xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
-      x:Class="QuAnalyzer.UI.Pages.Compare" 
+      xmlns:local="clr-namespace:QuAnalyzer.UI.Pages"
+      xmlns:quanalyzer="clr-namespace:QuAnalyzer" xmlns:comparison="clr-namespace:QuAnalyzer.Features.Comparison"
+      x:Class="QuAnalyzer.UI.Pages.Compare"
       x:Name="me"
+      DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}"
       mc:Ignorable="d"
       d:DesignWidth="800"
-	Title="DataCompare" d:DesignHeight="607.375">
+      d:DesignHeight="607.375"
+      Title="DataCompare">
+    <Page.Resources>
+        <CollectionViewSource Source="{Binding ComparisonInstances}" x:Key="groupedViewSource">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="Name" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+        <Style x:Key="RedWhenNotZero"  TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+            <Setter Property="Foreground" Value="OrangeRed" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Content.Text,RelativeSource={x:Static RelativeSource.Self}}" Value="0">
+                    <Setter Property="Foreground" Value="Black" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <local:SourceOrTargetPicker x:Key="SourceOrTargetPicker" />
+    </Page.Resources>
     <Grid x:Name="gridMain">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" MinHeight="240"/>
+            <RowDefinition Height="Auto" MinHeight="240" />
             <RowDefinition Height="4" />
-            <RowDefinition MinHeight="100"/>
+            <RowDefinition MinHeight="100" />
         </Grid.RowDefinitions>
         <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
             <Button HorizontalAlignment="Center" ToolTip="Start comparisons for the selected items" BorderBrush="Green" Click="btnRun_Click" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" Content="Run" />
@@ -43,28 +62,7 @@
                 </Style>
             </TabControl.Style>
             <TabItem x:Name="tabMapping" IsSelected="{Binding IsChecked,ElementName=btnToggleMode, Converter={StaticResource booleanNegator}}">
-                <DataGrid SelectionMode="Extended" ItemsSource="{Binding CurrentProject.SourceMapper, Source={x:Static Application.Current}}" HeadersVisibility="All" RowHeaderWidth="30" ColumnWidth="18*" AutoGenerateColumns="False" x:Name="lstMappings" CanUserAddRows="False">
-                    <DataGrid.RowHeaderStyle>
-                        <Style TargetType="DataGridRowHeader">
-                            <Style.Setters>
-                                <Setter Property="Background" Value="WhiteSmoke" />
-                                <Setter Property="BorderThickness" Value="0,0,2,0" />
-                                <Setter Property="BorderBrush" Value="LightGray" />
-                                <Setter Property="HorizontalContentAlignment" Value="Right" />
-                                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                            </Style.Setters>
-                            <Style.Resources>
-                                <Style TargetType="StackPanel">
-                                    <Setter Property="HorizontalAlignment" Value="Right" />
-                                </Style>
-                            </Style.Resources>
-                        </Style>
-                    </DataGrid.RowHeaderStyle>
-                    <DataGrid.RowHeaderTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=DataGridRow}}" />
-                        </DataTemplate>
-                    </DataGrid.RowHeaderTemplate>
+                <DataGrid SelectionMode="Extended" ItemsSource="{Binding CurrentProject.SourceMapper, Source={x:Static quanalyzer:App.Current}}" ColumnWidth="18*" AutoGenerateColumns="False" x:Name="lstMappings" CanUserAddRows="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Binding="{Binding Name}" Header="Mapping name" IsReadOnly="True" />
                         <DataGridTextColumn Binding="{Binding SourceName}" Header="Source" IsReadOnly="True" />
@@ -74,16 +72,16 @@
                         <DataGridTemplateColumn Header="Stream" Width="Auto">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="5,0" Foreground="Black" IsChecked="{Binding IsOrdered, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  />
+                                    <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="5,0" Foreground="Black" IsChecked="{Binding IsOrdered, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Width="100" IsReadOnly="True" CanUserResize="False">
+                        <DataGridTemplateColumn IsReadOnly="True" CanUserResize="False" Width="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <WrapPanel>
-                                        <Button Name="btnEditMapping" Tag="{Binding}" Click="btnEditMapping_Click" Foreground="Blue" Content="{iconPacks:Material Kind=Pencil}" />
-                                        <Button Name="btnDeleteMapping" Tag="{Binding}" Click="btnDeleteMapping_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                        <Button x:Name="btnEditMapping" Tag="{Binding}" Click="btnEditMapping_Click" Foreground="Blue" Content="{iconPacks:Material Kind=Pencil}" />
+                                        <Button x:Name="btnDeleteMapping" Tag="{Binding}" Click="btnDeleteMapping_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
                                     </WrapPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -99,16 +97,11 @@
         <DockPanel Grid.Column="0" Grid.Row="3">
             <WrapPanel Style="{StaticResource ToolBar}">
                 <TextBlock Text="Global progress" Padding="4" Height="26" />
-                <ProgressBar x:Name="prgGlobal" Maximum="100" Height="22" Width="292"/>
-                <Rectangle />
-                <Button Content="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" ext:CustomAdorner.Image="{iconPacks:Material Kind=ContentCopy}" Click="GlobalCopy_Click" />
-                <Rectangle />
-                <Button Content="Excel" ToolTip="Export to CSV" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="GlobalExportCSV_Click" />
-                <Button Content="HTML" ToolTip="Export to HTML" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Xml}" Click="GlobalExportHTML_Click" />
+                <ProgressBar x:Name="prgGlobal" Maximum="100" Height="22" Width="292" />
                 <Rectangle />
                 <Button Content="Create report" ToolTip="Create report" BorderBrush="BlueViolet" ext:CustomAdorner.Image="{iconPacks:Material Kind=Export}" Click="GlobalReport_Click" />
             </WrapPanel>
-            <DataGrid ColumnWidth="*" CanUserAddRows="False" BorderThickness="0" IsReadOnly="True" AutoGenerateColumns="False" Name="allProgress" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="Vertical" SelectionUnit="Cell">
+            <UC:ExtendedDataGridView ItemsSource="{Binding Source={StaticResource groupedViewSource}}" ColumnWidth="*" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" x:Name="allProgress" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="None" SelectionUnit="Cell">
                 <DataGrid.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.ContainerStyle>
@@ -117,125 +110,123 @@
                                     <Setter.Value>
                                         <ControlTemplate TargetType="{x:Type GroupItem}">
                                             <StackPanel>
-                                                <DataGridCell BorderThickness="0" Grid.ColumnSpan="9" Margin="0" Background="#FFEEEEEE" Padding="0">
-                                                    <Grid DataContext="{Binding Items[0]}" Height="Auto">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock FontWeight="Bold" Text="{Binding [0], Mode=OneWay, FallbackValue='Mapping title'}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,3,0,0" />
-                                                        <TextBlock Text="{Binding [2].TotalTime, FallbackValue='Total time: -ms', Mode=OneWay, StringFormat='Total time: {0}ms'}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,3"/>
-                                                        <!-- Progress and cancel button -->
-                                                        <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
-                                                            <StackPanel.Style>
-                                                                <Style TargetType="StackPanel">
-                                                                    <Setter Property="Visibility" Value="Visible" />
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Value, ElementName=prg}" Value="100">
-                                                                            <Setter Property="Visibility" Value="Hidden" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding [2].Message, Mode=OneWay, Converter={StaticResource objectToBool}}" Value="True" >
-                                                                            <Setter Property="Visibility" Value="Hidden" />
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </StackPanel.Style>
-                                                            <Grid>
-                                                                <ProgressBar Name="prg" BorderThickness="1" Value="{Binding [2].LocalProgress, Mode=OneWay, FallbackValue=0}" Maximum="100" Height="20" Width="150" Margin="10,0" />
-                                                                <TextBlock Foreground="White" Text="{Binding [2].Progress, Mode=OneWay, FallbackValue='Current step'}" TextAlignment="Center" VerticalAlignment="Center" />
-                                                            </Grid>
-                                                            <Button Name="btnCancel" Tag="{Binding [4]}" Height="40" Click="btnCancel_Click" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=StopCircleOutline}">
-                                                                <Button.Style>
-                                                                    <Style TargetType="Button">
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding IsEnabled, ElementName=btnCancel}" Value="False" >
-                                                                                <Setter Property="Opacity" Value="0.5" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </Button.Style>
-                                                            </Button>
-                                                        </StackPanel>
-                                                        <!--Results-->
-                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                                                            <StackPanel.Style>
-                                                                <Style TargetType="StackPanel">
-                                                                    <Setter Property="Visibility" Value="Hidden" />
-                                                                    <Style.Triggers>
-                                                                        <MultiDataTrigger>
-                                                                            <MultiDataTrigger.Conditions>
-                                                                                <Condition Binding="{Binding Value, Mode=OneWay,ElementName=prg}" Value="100" />
-                                                                                <Condition Binding="{Binding [2].Message, Mode=OneWay, Converter={StaticResource objectToBool}}" Value="False" />
-                                                                            </MultiDataTrigger.Conditions>
-                                                                            <Setter Property="Visibility" Value="Visible" />
-                                                                        </MultiDataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </StackPanel.Style>
-                                                            <TextBlock FontWeight="Bold" Text="{Binding [2].MatchingCount, FallbackValue='Matches: -', Mode=OneWay, StringFormat=Matches: \{0\}}" Padding="5" VerticalAlignment="Center" />
-                                                            <Button Name="btnDetails" Tag="{Binding [4]}" Height="40" Click="btnDetails_Click" Width="40" Content="{iconPacks:Material Kind=Eye}" Foreground="Green" />
-                                                        </StackPanel>
-                                                        <!--Error-->
-                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                                                            <StackPanel.Style>
-                                                                <Style TargetType="StackPanel">
-                                                                    <Setter Property="Visibility" Value="Hidden" />
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding [2].Message, Mode=OneWay, Converter={StaticResource objectToBool}}" Value="True" >
-                                                                            <Setter Property="Visibility" Value="Visible" />
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </StackPanel.Style>
-                                                            <Button Name="btnError" Background="Yellow" BorderBrush="Red" Tag="{Binding [2].Message}" Height="40" Click="btnError_Click" Width="40">
-                                                                <ContentControl Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red" Content="{iconPacks:Material Kind=Alert}">
-                                                                    <ContentControl.Resources>
-                                                                        <Storyboard x:Key="sbBlink" AutoReverse="True" BeginTime="00:00:02" RepeatBehavior="Forever" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)">
-                                                                            <ColorAnimation From="Transparent" To="Red" Duration="0:0:2"/>
-                                                                        </Storyboard>
-                                                                    </ContentControl.Resources>
-                                                                    <ContentControl.Style>
-                                                                        <Style TargetType="ContentControl">
-                                                                            <Style.Triggers>
-                                                                                <Trigger Property="Visibility" Value="Visible">
-                                                                                    <Trigger.EnterActions>
-                                                                                        <BeginStoryboard Storyboard="{StaticResource sbBlink}" x:Name="AnimationBeginStoryboard"/>
-                                                                                    </Trigger.EnterActions>
-                                                                                    <Trigger.ExitActions>
-                                                                                        <RemoveStoryboard BeginStoryboardName="AnimationBeginStoryboard"/>
-                                                                                    </Trigger.ExitActions>
-                                                                                </Trigger>
-                                                                            </Style.Triggers>
-                                                                        </Style>
-                                                                    </ContentControl.Style>
-                                                                </ContentControl>
-                                                            </Button>
-                                                        </StackPanel>
-                                                        <Button Grid.Column="2" Name="btnDelete" Tag="{Binding [4]}" Height="40" Click="btnDelete_Click" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}">
+                                                <!--<DataGridCell BorderThickness="0" Margin="0" Padding="0">-->
+                                                <Grid Height="55" DataContext="{Binding Items[0]}" Background="#FFEEEEEE" >
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock FontWeight="Bold" Text="{Binding Name, Mode=OneWay, FallbackValue='Mapping title'}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,10,0,0" />
+                                                    <TextBlock Text="{Binding Results.TotalTime, FallbackValue='Ellapsed time: -ms', Mode=OneWay, StringFormat='Ellapsed time: {0}ms'}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,10"/>
+                                                    <!-- Progress and cancel button -->
+                                                    <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
+                                                        <StackPanel.Style>
+                                                            <Style TargetType="StackPanel">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Results.LocalProgress}" Value="100">
+                                                                        <Setter Property="Visibility" Value="Hidden" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Results.Message, Mode=OneWay, Converter={StaticResource objectToBool}}" Value="True" >
+                                                                        <Setter Property="Visibility" Value="Hidden" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </StackPanel.Style>
+                                                        <Grid>
+                                                            <ProgressBar BorderThickness="1" Value="{Binding Results.LocalProgress, Mode=OneWay, FallbackValue=0}" Maximum="100" Height="20" Width="150" Margin="10,0" />
+                                                            <TextBlock Foreground="White" Text="{Binding Results.Progress, Mode=OneWay, FallbackValue='Current step'}" TextAlignment="Center" VerticalAlignment="Center" />
+                                                        </Grid>
+                                                        <Button Tag="{Binding}" Height="40" Click="btnCancel_Click" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=StopCircleOutline}">
                                                             <Button.Style>
-                                                                <Style TargetType="Button">
-                                                                    <Setter Property="IsEnabled" Value="False" />
-                                                                    <Setter Property="Opacity" Value="0.5" />
+                                                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                                                                     <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding IsEnabled, ElementName=btnCancel}" Value="False" >
-                                                                            <Setter Property="IsEnabled" Value="True" />
-                                                                            <Setter Property="Opacity" Value="1" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding Value, ElementName=prg}" Value="100">
-                                                                            <Setter Property="IsEnabled" Value="True" />
-                                                                            <Setter Property="Opacity" Value="1" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding [2].Message, Mode=OneWay, Converter={StaticResource objectToBool}}" Value="True" >
-                                                                            <Setter Property="IsEnabled" Value="True" />
-                                                                            <Setter Property="Opacity" Value="1" />
-                                                                        </DataTrigger>
+                                                                        <Trigger Property="IsEnabled" Value="False" >
+                                                                            <Setter Property="Opacity" Value="0.5" />
+                                                                        </Trigger>
                                                                     </Style.Triggers>
                                                                 </Style>
                                                             </Button.Style>
                                                         </Button>
-                                                    </Grid>
-                                                </DataGridCell>
+                                                    </StackPanel>
+                                                    <!--Results-->
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                                        <StackPanel.Style>
+                                                            <Style TargetType="StackPanel">
+                                                                <Setter Property="Visibility" Value="Hidden" />
+                                                                <Style.Triggers>
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding Results.LocalProgress}" Value="100" />
+                                                                            <Condition Binding="{Binding Results.Message,Converter={StaticResource objectToBool}}" Value="False" />
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </MultiDataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </StackPanel.Style>
+                                                        <TextBlock FontWeight="Bold" Text="{Binding Results.MatchingCount, FallbackValue='Matches: -', Mode=OneWay, StringFormat=Matches: \{0\}}" Padding="5" VerticalAlignment="Center" />
+                                                        <Button Tag="{Binding}" Height="40" Click="btnDetails_Click" Width="40" Content="{iconPacks:Material Kind=Eye}" Foreground="Green" />
+                                                    </StackPanel>
+                                                    <!--Error-->
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                                        <StackPanel.Style>
+                                                            <Style TargetType="StackPanel">
+                                                                <Setter Property="Visibility" Value="Hidden" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Results.Message, Mode=OneWay, Converter={StaticResource objectToBool}}" Value="True" >
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </StackPanel.Style>
+                                                        <ContentControl Background="Yellow" BorderBrush="Red" ToolTip="{Binding Results.Message}" Height="40" Width="40" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red" Content="{iconPacks:Material Kind=Alert}">
+                                                            <ContentControl.Resources>
+                                                                <Storyboard x:Key="sbBlink" AutoReverse="True" BeginTime="00:00:02" RepeatBehavior="Forever" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)">
+                                                                    <ColorAnimation From="Transparent" To="Red" Duration="0:0:2"/>
+                                                                </Storyboard>
+                                                            </ContentControl.Resources>
+                                                            <!--<ContentControl.Style>
+                                                                <Style TargetType="ContentControl">
+                                                                    <Style.Triggers>
+                                                                        <Trigger Property="Visibility" Value="Visible">
+                                                                            <Trigger.EnterActions>
+                                                                                <BeginStoryboard Storyboard="{StaticResource sbBlink}" x:Name="AnimationBeginStoryboard" />
+                                                                            </Trigger.EnterActions>
+                                                                            <Trigger.ExitActions>
+                                                                                <RemoveStoryboard BeginStoryboardName="AnimationBeginStoryboard"/>
+                                                                            </Trigger.ExitActions>
+                                                                        </Trigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </ContentControl.Style>-->
+                                                        </ContentControl>
+                                                    </StackPanel>
+                                                    <Button Grid.Column="2" Tag="{Binding}" Height="40" Click="btnDelete_Click" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                                <Setter Property="IsEnabled" Value="False" />
+                                                                <Setter Property="Opacity" Value="0.5" />
+                                                                <Style.Triggers>
+                                                                    <!--<DataTrigger Binding="{Binding IsEnabled, ElementName=btnCancel}" Value="False" >
+                                                                        <Setter Property="IsEnabled" Value="True" />
+                                                                        <Setter Property="Opacity" Value="1" />
+                                                                    </DataTrigger>-->
+                                                                    <DataTrigger Binding="{Binding Results.LocalProgress}" Value="100">
+                                                                        <Setter Property="IsEnabled" Value="True" />
+                                                                        <Setter Property="Opacity" Value="1" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Results.Message, Converter={StaticResource objectToBool}}" Value="True" >
+                                                                        <Setter Property="IsEnabled" Value="True" />
+                                                                        <Setter Property="Opacity" Value="1" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                    </Button>
+                                                </Grid>
+                                                <!--</DataGridCell>-->
                                                 <ItemsPresenter />
                                             </StackPanel>
                                         </ControlTemplate>
@@ -251,62 +242,74 @@
                     </GroupStyle>
                 </DataGrid.GroupStyle>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Width="0" MinWidth="0" Header="Name" Binding="{Binding [0]}" />
-                    <DataGridTextColumn Header="Item" Width="Auto" MinWidth="110" Binding="{Binding [1]}" FontWeight="Bold" />
-                    <DataGridTextColumn Header="Start time" Binding="{Binding [3].StartTime}" />
-                    <DataGridTextColumn Header="Loading time" Binding="{Binding [3].LoadingTime}" />
-                    <DataGridTextColumn Header="Count" Binding="{Binding [3].Count}" />
-                    <DataGridTextColumn Width="0" MinWidth="0" Header="Matches" Binding="{Binding [2].MatchingCount, FallbackValue=0}" />
-                    <DataGridTextColumn Header="Missing" Binding="{Binding [3].Missing.Count, FallbackValue=0}">
-                        <DataGridTextColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Background" Value="OrangeRed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding [3].Missing.Count, FallbackValue=0}" Value="0">
-                                        <Setter Property="Background" Value="Transparent" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTextColumn.CellStyle>
+                    <DataGridTextColumn Width="0" MinWidth="0" Header="Name" Binding="{Binding Name}" />
+                    <DataGridTextColumn Header="Item" Width="Auto" MinWidth="110" FontWeight="Bold">
+                        <DataGridBoundColumn.Binding>
+                            <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding Path="SourceName" />
+                                <Binding Path="TargetName" />
+                            </MultiBinding>
+                        </DataGridBoundColumn.Binding>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="Differences" Binding="{Binding [3].Differences.Count, FallbackValue=0}">
-                        <DataGridTextColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Background" Value="OrangeRed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding [3].Differences.Count, FallbackValue=0}" Value="0">
-                                        <Setter Property="Background" Value="Transparent" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTextColumn.CellStyle>
+                    <DataGridTextColumn Header="Start time">
+                        <DataGridBoundColumn.Binding>
+                            <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding Path="Results.Source.StartTime" />
+                                <Binding Path="Results.Target.StartTime" />
+                            </MultiBinding>
+                        </DataGridBoundColumn.Binding>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="Look-alikes" Binding="{Binding [3].Duplicates.Count, FallbackValue=0}">
-                        <DataGridTextColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Background" Value="OrangeRed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding [3].Duplicates.Count, FallbackValue=0}" Value="0">
-                                        <Setter Property="Background" Value="Transparent" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTextColumn.CellStyle>
+                    <DataGridTextColumn Header="Loading time">
+                        <DataGridBoundColumn.Binding>
+                            <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding Path="Results.Source.LoadingTime" />
+                                <Binding Path="Results.Target.LoadingTime" />
+                            </MultiBinding>
+                        </DataGridBoundColumn.Binding>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="Duplicates" Binding="{Binding [3].PerfectDups.Count, FallbackValue=0}">
-                        <DataGridTextColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Background" Value="OrangeRed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding [3].PerfectDups.Count, FallbackValue=0}" Value="0">
-                                        <Setter Property="Background" Value="Transparent" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTextColumn.CellStyle>
+                    <DataGridTextColumn Header="Count">
+                        <DataGridBoundColumn.Binding>
+                            <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding Path="Results.Source.Count" />
+                                <Binding Path="Results.Target.Count" />
+                            </MultiBinding>
+                        </DataGridBoundColumn.Binding>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="0" MinWidth="0" Header="Matches" Binding="{Binding Results.MatchingCount, FallbackValue=0}" />
+                    <DataGridTextColumn Header="Missing" CellStyle="{StaticResource RedWhenNotZero}">
+                        <DataGridBoundColumn.Binding>
+                            <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding Path="Results.Source.Missing.Count" />
+                                <Binding Path="Results.Target.Missing.Count" />
+                            </MultiBinding>
+                        </DataGridBoundColumn.Binding>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Differences" Binding="{Binding Results.Source.Differences.Count}" CellStyle="{StaticResource RedWhenNotZero}" />
+                    <DataGridTextColumn Header="Look-alikes" CellStyle="{StaticResource RedWhenNotZero}">
+                        <DataGridBoundColumn.Binding>
+                            <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding Path="Results.Source.Duplicates.Count" />
+                                <Binding Path="Results.Target.Duplicates.Count" />
+                            </MultiBinding>
+                        </DataGridBoundColumn.Binding>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Duplicates" CellStyle="{StaticResource RedWhenNotZero}">
+                        <DataGridBoundColumn.Binding>
+                            <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding Path="Results.Source.PerfectDups.Count" />
+                                <Binding Path="Results.Target.PerfectDups.Count" />
+                            </MultiBinding>
+                        </DataGridBoundColumn.Binding>
                     </DataGridTextColumn>
                 </DataGrid.Columns>
-            </DataGrid>
+            </UC:ExtendedDataGridView>
         </DockPanel>
     </Grid>
 </Page>

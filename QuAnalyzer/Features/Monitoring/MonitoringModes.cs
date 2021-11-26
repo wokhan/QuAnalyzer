@@ -9,7 +9,8 @@ namespace QuAnalyzer.Features.Monitoring
         internal const string CHECKVAL = nameof(CHECKVAL);
         internal const string PERF = nameof(PERF);
 
-        public static readonly Dictionary<string, string> MonitoringTypes = new Dictionary<string, string> {
+        public static readonly Dictionary<string, string> MonitoringTypes = new()
+        {
             { MonitoringModes.COUNTALL, "Count" },
             { MonitoringModes.CHECKVAL, "Retrieve attributes values" },
             { MonitoringModes.PERF, "Performance check" },

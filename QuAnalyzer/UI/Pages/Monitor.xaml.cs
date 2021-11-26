@@ -1,10 +1,7 @@
-﻿#if _WPF_
-using LiveChartsCore;
+﻿using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
-#else
-using LiveCharts.Uwp;
-#endif
+
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Features.Performance;
 using QuAnalyzer.Generic.Extensions;
@@ -33,16 +30,11 @@ namespace QuAnalyzer.UI.Pages
     {
         private const int chartTimeSpanMinutes = 1;
         private long startDate;
+        private DispatcherTimer globalTimer;
+        private Dictionary<MonitorItem, DispatcherTimer> timers = new();
+        private Dictionary<MonitorItem, (MonitoringItemInstance, int)> instances;
 
-        DispatcherTimer globalTimer;
-
-        Dictionary<MonitorItem, DispatcherTimer> timers = new Dictionary<MonitorItem, DispatcherTimer>();
-        Dictionary<MonitorItem, (MonitoringItemInstance, int)> instances;
-
-        //TODO: use a static reference instead
-        public Dictionary<string, string> MonitoringTypes { get; } = MonitoringModes.MonitoringTypes;
-        public static ObservableCollection<ResultsClass> MonitorResultsView { get; } = new ObservableCollection<ResultsClass>();
-        //public ListCollectionView MonitorResultsView { get; } = new ListCollectionView(MonitorResults);
+        public static ObservableCollection<ResultsClass> MonitorResultsView { get; } = new();
 
         public Dictionary<string, ISeries[]> ResultSeriesMappings { get; private set; }
         public double? Occurences { get; set; } = 10;
@@ -77,12 +69,17 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
+            if (gridSteps.SelectedItems.Count == 0)
+            {
+                return;
+            }
+            
+            var mitems = gridSteps.SelectedItems.Cast<MonitorItem>();
+
             btnStart.IsEnabled = false;
             btnStop.IsEnabled = true;
 
             MonitorResultsView.Clear();
-
-            var mitems = gridSteps.SelectedItems.Cast<MonitorItem>();
 
             InitChart(mitems);
 
@@ -105,7 +102,7 @@ namespace QuAnalyzer.UI.Pages
 
                 globalTimer_Tick(null, null);
 
-                instances = mitems.ToDictionary(m => m, m => (m.GetInstance(), 1));
+                instances = mitems.ToDictionary(m => m, m => (m.CreateInstance(), 1));
                 instances.ToList().ForEach(i => i.Value.Item1.AttachPrecedingStepInstances(i.Key.PrecedingSteps.Select(step => instances[step.Key].Item1)));
 
                 timers = mitems.ToDictionary(m => m, m =>
@@ -130,13 +127,13 @@ namespace QuAnalyzer.UI.Pages
             btnStop.IsEnabled = false;
         }
 
-        int globalPerfCounter ;
+        private int globalPerfCounter;
         private async void globalCompTimer_Tick(object sender, EventArgs e)
         {
             var timer = (DispatcherTimer)sender;
             var monitors = (MonitorItem[])timer.Tag;
 
-            var monitorInstances = monitors.Select(m => m.GetInstance()).ToList();
+            var monitorInstances = monitors.Select(m => m.CreateInstance()).ToList();
 
 
             //TODO : Values !!!!
@@ -153,7 +150,7 @@ namespace QuAnalyzer.UI.Pages
             var cnt = instances[monitor].Item2;
             if (monitorInstance.Status == MonitoringStatus.DONE)
             {
-                monitorInstance = monitor.GetInstance();
+                monitorInstance = monitor.CreateInstance();
                 instances[monitor] = (monitorInstance, cnt++);
                 monitorInstance.AttachPrecedingStepInstances(monitor.PrecedingSteps.Select(step => instances[step.Key].Item1));
             }
@@ -187,7 +184,7 @@ namespace QuAnalyzer.UI.Pages
                 });
         }
 
-        void monitor_OnAdd(ResultsClass results)
+        private void monitor_OnAdd(ResultsClass results)
         {
             MonitorResultsView.Add(results);
             gridResults.ScrollIntoView(results);
@@ -195,7 +192,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
-            ((App)Application.Current).CurrentProject.MonitorItems.Add(new MonitorItem() { Name = "Monitor #" + (((App)Application.Current).CurrentProject.MonitorItems.Count + 1) });
+            Popup.OpenNew(new MonitoringDetails());
         }
 
         private void btnClear_Click(object sender, RoutedEventArgs e)
@@ -208,7 +205,10 @@ namespace QuAnalyzer.UI.Pages
 
         }
 
-        private void btnEdit_Click(object sender, RoutedEventArgs e) => Popup.OpenNew(new MonitoringDetails((MonitorItem)((Button)sender).Tag));
+        private void btnEdit_Click(object sender, RoutedEventArgs e)
+        {
+            Popup.OpenNew(new MonitoringDetails((MonitorItem)((Button)sender).Tag));
+        }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {

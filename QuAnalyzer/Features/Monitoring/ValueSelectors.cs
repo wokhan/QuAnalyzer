@@ -6,7 +6,7 @@ namespace QuAnalyzer.Features.Monitoring
 {
     public static class ValueSelectors
     {
-        static Random rnd = new Random();
+        private static readonly Random rnd = new Random();
 
         public delegate IList<Dictionary<string, string>> Selector(IList<Dictionary<string, string>> src, int ix);
 

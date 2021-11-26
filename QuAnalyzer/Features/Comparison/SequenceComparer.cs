@@ -6,8 +6,8 @@ namespace QuAnalyzer.Features.Comparison
 {
     public class SequenceComparer : IComparer<IEnumerable<object>>
     {
-        private static SequenceEqualityComparer<object> sec = new SequenceEqualityComparer<object>();
-        private string[] keys;
+        private static readonly SequenceEqualityComparer<object> seqComparer = new();
+        private readonly string[] keys;
 
         public SequenceComparer()
         {
@@ -21,25 +21,30 @@ namespace QuAnalyzer.Features.Comparison
 
         public int Compare(IEnumerable<object> x, IEnumerable<object> y)
         {
-            if (sec.Equals(x, y))
+            if (seqComparer.Equals(x, y))
             {
                 return 0;
             }
 
-            if (sec.Equals(keys.Select((k, i) => x.ElementAt(i)), keys.Select((k, i) => y.ElementAt(i))))
+            if (seqComparer.Equals(keys.Zip(x, (_, x) => x), keys.Zip(x, (_, x) => x)))
             {
                 return int.MaxValue;
             }
 
+            /*
             var id = keys.Select((k, i) => i)
                        .SkipWhile(i => x.ElementAt(i).Equals(y.ElementAt(i)))
                        .First();
 
             var xi = x.ElementAt(id);
             var yi = y.ElementAt(id);
-            if (xi is string)
+            */
+            var (_, xi, yi) = keys.Zip(x, y)
+                                  .First(xy => !xy.Second.Equals(xy.Third));
+
+            if (xi is string sxi)
             {
-                return string.CompareOrdinal((string)xi, (string)yi);
+                return string.CompareOrdinal(sxi, (string)yi);
             }
 
             return ((IComparable)xi).CompareTo((IComparable)yi);

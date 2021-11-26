@@ -1,7 +1,9 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
+
 using System;
-using System.IO;
+using System.Collections.Specialized;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -10,29 +12,37 @@ namespace QuAnalyzer.UI.Windows
     /// <summary>
     /// Interaction logic for ModernMain.xaml
     /// </summary>
-    public partial class ModernMain
+    public partial class MainWindow
     {
         private bool showMessageInProgress;
 
-        public ModernMain()
+        public string AppName { get; } = $"QuAnalyzer {Assembly.GetExecutingAssembly().GetName().Version}";
+
+        public MainWindow()
         {
             InitializeComponent();
 
-            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            ((App)Application.Current).Tasks.CollectionChanged += Tasks_CollectionChanged;
 
             //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             //Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
         }
 
-        void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        private void Tasks_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            btnTasks.IsChecked = true;
+        }
+
+        private void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             ForceDialog(e.Exception.Message, "Unexpected error");
             e.Handled = true;
         }
 
-        private async void ForceDialog(string message, string title)
+        CustomDialog dial;
+        private void ForceDialog(string message, string title)
         {
-            var dial = await this.GetCurrentDialogAsync<BaseMetroDialog>().ConfigureAwait(true);
+            //var dial = await new CustomDialog().show.GetCurrentDialogAsync<BaseMetroDialog>().ConfigureAwait(true);
             if (dial is not null)
             {
                 dial.Title = title;
@@ -42,28 +52,17 @@ namespace QuAnalyzer.UI.Windows
             else if (!showMessageInProgress)
             {
                 showMessageInProgress = true;
-                await this.ShowMessageAsync(title, message, MessageDialogStyle.Affirmative).ConfigureAwait(false);
+                dial = new CustomDialog() { Title = title, Content = message };
+                dial.ShowModalDialogExternally(this);
+                //await this.ShowMessageAsync(title, message, MessageDialogStyle.Affirmative).ConfigureAwait(false);
                 showMessageInProgress = false;
             }
         }
 
-        void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             ForceDialog(((Exception)e.ExceptionObject).Message, "Unexpected error");
             //this.ShowMessageAsync("Unexpected error", ((Exception)e.ExceptionObject).Message, MessageDialogStyle.Affirmative);
-        }
-
-
-        Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "providers", args.Name.Split(',')[0] + ".dll");
-
-            if (File.Exists(path))
-            {
-                return Assembly.LoadFrom(path);
-            }
-
-            return null;
         }
 
 
@@ -82,13 +81,23 @@ namespace QuAnalyzer.UI.Windows
 
         private void tabMenu_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var useBouba = tabMenu.SelectedIndex < 4;
-            ((App)Application.Current).CurrentSelectionLinked = useBouba;
+            // Determines if the current tab requires a source selection (otherwise it will be disabled in the menu)
+            ((App)Application.Current).CurrentSelectionLinked = tabMenu.SelectedIndex < 4;
         }
 
         public void ShowAbout()
         {
-            flyAbout.IsOpen = true;
+            flyAbout.Visibility = Visibility.Visible;
+        }
+
+        private void btnMenuRecent_Click(object sender, RoutedEventArgs e)
+        {
+            ((App)Application.Current).CurrentProject.Open((string)((MenuItem)sender).CommandParameter);
+        }
+
+        internal Task ShowProgress(string v1, string v2, bool v3)
+        {
+            throw new NotImplementedException();
         }
     }
 }

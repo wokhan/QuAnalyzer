@@ -1,7 +1,10 @@
 ﻿using Microsoft.Win32;
+
 using OfficeOpenXml;
+
 using System;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -22,7 +25,7 @@ namespace QuAnalyzer.Generic.Extensions
             if (path is null)
             {
                 var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = p1 };
-                if (dial.ShowDialog().Value)
+                if (dial.ShowDialog() is true)
                 {
                     path = dial.FileName;
                 }
@@ -65,17 +68,15 @@ namespace QuAnalyzer.Generic.Extensions
             }
         }*/
 
-        public static void ExportAsXLSX(this DataGrid grid, string path = null, string worksheetName = null, Panel host = null, Action<double> callback = null)
+        public static void ExportAsXLSX(this DataGrid grid, string path = null, string worksheetName = null, Panel host = null, Action<double> callback = null, CancellationTokenSource cancellationToken = null)
         {
-#pragma warning disable CS0219 // La variable 'canceled' est assignée, mais sa valeur n'est jamais utilisée
-            var canceled = false;
-#pragma warning restore CS0219 // La variable 'canceled' est assignée, mais sa valeur n'est jamais utilisée
+            //var canceled = false;
             //try
             {
                 if (path is null)
                 {
                     var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = "Excel 2007 File|*.xlsx" };
-                    if (dial.ShowDialog().Value)
+                    if (dial.ShowDialog() is true)
                     {
                         path = dial.FileName;
                     }
@@ -89,8 +90,10 @@ namespace QuAnalyzer.Generic.Extensions
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 using (var xl = new ExcelPackage(new FileInfo(path)))
                 {
-                    xl.AddWorksheet(grid, worksheetName, host, callback);
-                    xl.Save();
+                    if (xl.AddWorksheetFromDataGrid(grid, worksheetName, host, callback, cancellationToken))
+                    {
+                        xl.Save();
+                    }
                 }
             }
             /*catch
@@ -109,7 +112,5 @@ namespace QuAnalyzer.Generic.Extensions
             ApplicationCommands.Copy.Execute(null, grid);
             grid.UnselectAllCells();
         }
-
     }
-
 }

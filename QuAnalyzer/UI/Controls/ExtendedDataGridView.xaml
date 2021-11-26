@@ -1,17 +1,21 @@
-﻿<UserControl x:Class="QuAnalyzer.UI.Controls.ExtendedDataGridView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-             xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
-             xmlns:local="clr-namespace:QuAnalyzer.UI.Controls"
-             mc:Ignorable="d" 
-      xmlns:myself="clr-namespace:QuAnalyzer.UI.Controls"
-      d:DesignHeight="600" d:DesignWidth="850"
-      x:Name="thisWindow"
-	  DataContext="{Binding RelativeSource={RelativeSource Self}}">
-    <UserControl.Resources>
+﻿<DataGrid x:Class="QuAnalyzer.UI.Controls.ExtendedDataGridView"
+          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+          xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+          xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+          xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
+          mc:Ignorable="d" 
+          xmlns:myself="clr-namespace:QuAnalyzer.UI.Controls"
+          d:DesignHeight="600" d:DesignWidth="850"
+          d:DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}"
+          d:ItemsSource="{Binding DemoItems}"
+          d:AutoGenerateColumns="True"
+          x:Name="me"
+          IsReadOnly="True" CanUserAddRows="False" CanUserSortColumns="True" CanUserReorderColumns="True" 
+          Sorting="gridData_Sorting" 
+          BorderThickness="0" ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto">
+    <DataGrid.Resources>
         <Style TargetType="Border" x:Key="DragDropBorder">
             <Setter Property="Margin" Value="10" />
             <Setter Property="BorderBrush" Value="Gray" />
@@ -19,225 +23,333 @@
             <Setter Property="CornerRadius" Value="5" />
             <Setter Property="Background" Value="LightYellow" />
         </Style>
-    </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        <WrapPanel Grid.ColumnSpan="2" Style="{StaticResource ToolBar}">
-            <Button Content="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" ext:CustomAdorner.Image="{iconPacks:Material Kind=ContentCopy}" Click="GlobalCopy_Click" />
-            <Rectangle />
-            <Button Content="Excel" ToolTip="Export to CSV" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="GlobalExportCSV_Click" />
-            <Button Content="HTML" ToolTip="Export to HTML" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Xml}" Click="GlobalExportHTML_Click" />
-            <StackPanel Orientation="Horizontal" Visibility="{Binding EnableAdvancedFilters,Mode=OneWay,Converter={StaticResource valueToVisibilityConverter}}">
-                <Rectangle />
-                <ToggleButton x:Name="btnAggregate" IsChecked="False" Content="Group/Filter" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" ext:CustomAdorner.Image="{iconPacks:Material Kind=FilterMenu}" />
-            </StackPanel>
-        </WrapPanel>
-        <WrapPanel Grid.Row="2" Height="25" Style="{StaticResource ToolBar}">
-            <TextBlock Margin="20,4">
+        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGrid_PreviewMouseLeftButtonDown" />
+            <EventSetter Event="PreviewMouseMove" Handler="DataGrid_MouseMove" />
+        </Style>
+    </DataGrid.Resources>
+    <!-- Setting the template directly through DataGrid.Template doesn't work, using a Style to do so (as it might in fact be expected for a control which is NOT a usercontrol) -->
+    <DataGrid.Style>
+        <Style TargetType="{x:Type DataGrid}" BasedOn="{StaticResource {x:Type DataGrid}}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGrid">
+                        <Grid DataContext="{Binding ElementName=me}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <WrapPanel Grid.ColumnSpan="2" Style="{StaticResource ToolBar}">
+                                <Button Content="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" ext:CustomAdorner.Image="{iconPacks:Material Kind=ContentCopy}" Click="GlobalCopy_Click" />
+                                <Rectangle />
+                                <Button Content="Excel" ToolTip="Export to CSV" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="GlobalExportCSV_Click" />
+                                <Button Content="HTML" ToolTip="Export to HTML" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Xml}" Click="GlobalExportHTML_Click" />
+                                <StackPanel Orientation="Horizontal" Visibility="{Binding EnableAdvancedFilters,Converter={StaticResource valueToVisibilityConverter}}">
+                                    <Rectangle />
+                                    <ToggleButton x:Name="btnAggregate" IsChecked="False" Content="Group/Filter" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" ext:CustomAdorner.Image="{iconPacks:Material Kind=FilterMenu}" />
+                                </StackPanel>
+                            </WrapPanel>
+                            <WrapPanel Grid.Row="2" Height="25" Style="{StaticResource ToolBar}">
+                                <TextBlock Margin="20,4">
                     <Run Text="{Binding LoadingProgress,Mode=OneWay}" />
                     <Run Text="/" />
-                    <Run Text="{Binding Items.Count,Mode=OneWay,ElementName=gridData}" />
+                    <Run Text="{Binding Items.Count,Mode=OneWay}" />
                     <Run Text=" item(s) found" />
-            </TextBlock>
-            <Label Content="{Binding Status,StringFormat='Status: {0}'}" />
-            <ProgressBar Value="{Binding LoadingProgress,Mode=OneWay}" Margin="5"  Width="200" BorderThickness="0">
-                <ProgressBar.Style>
-                    <Style TargetType="ProgressBar" BasedOn="{StaticResource {x:Type ProgressBar}}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding LoadingProgress,Mode=OneWay}" Value="-1">
-                                <Setter Property="IsIndeterminate" Value="True" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ProgressBar.Style>
-            </ProgressBar>
-        </WrapPanel>
-        <DataGrid Grid.Row="1" Sorting="gridData_Sorting" x:Name="gridData" IsReadOnly="True" CanUserAddRows="False" CanUserSortColumns="True" CanUserReorderColumns="True" BorderThickness="0" ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto">
-            <DataGrid.Resources>
-                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGrid_PreviewMouseLeftButtonDown" />
-                    <EventSetter Event="PreviewMouseMove" Handler="DataGrid_MouseMove" />
-                </Style>
-            </DataGrid.Resources>
-        </DataGrid>
-        <Border Width="250" Grid.RowSpan="3" Grid.Column="1" Visibility="{Binding IsChecked,ElementName=btnAggregate,Converter={StaticResource valueToVisibilityConverter}}" Background="WhiteSmoke" BorderThickness="0">
-            <Grid>
-                <Rectangle Width="1" VerticalAlignment="Stretch" Fill="WhiteSmoke" HorizontalAlignment="Left">
-                    <Rectangle.Effect>
-                        <DropShadowEffect Direction="180" BlurRadius="15" />
-                    </Rectangle.Effect>
-                </Rectangle>
-                <DockPanel>
-                    <Border DockPanel.Dock="Bottom" Grid.Row="2" Grid.ColumnSpan="2" Background="LightBlue">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Content="Apply" BorderBrush="Green" Padding="5" Width="75" Margin="5" x:Name="btnApply" Click="btnApply_Click"/>
-                            <Button Content="Clear" BorderBrush="Red" Padding="5" Width="75" Margin="5" Click="btnClear_Click" />
-                        </StackPanel>
-                    </Border>
-                    <ScrollViewer>
-                        <StackPanel>
-                            <Expander IsExpanded="True" Header="Filtering" BorderThickness="0" Margin="5,10">
-                                <DockPanel>
-                                    <Grid DockPanel.Dock="Bottom">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-                                        <Label Content="Custom filter:" />
-                                        <TextBox TextWrapping="Wrap" MinHeight="25" HorizontalAlignment="Stretch" Text="{Binding CustomFilter}" Grid.Row="1">
-                                            <TextBox.Style>
-                                                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsCustomFilterError}" Value="True">
-                                                            <Setter Property="Foreground" Value="Red" />
-                                                            <Setter Property="ToolTip" Value="{Binding CustomFilterError}" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBox.Style>
-                                        </TextBox>
-                                    </Grid>
-                                    <DataGrid Margin="-5" AllowDrop="True" AutoGenerateColumns="False" CanUserAddRows="False" ItemsSource="{Binding Filters}" x:Name="gridFilters" Drop="gridFilters_Drop">
-                                        <DataGrid.Style>
-                                            <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate>
-                                                                    <Border Style="{StaticResource DragDropBorder}">
-                                                                        <Grid>
-                                                                            <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="Auto" />
-                                                                                <ColumnDefinition Width="*" />
-                                                                            </Grid.ColumnDefinitions>
-                                                                            <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="10" Foreground="Gray" VerticalAlignment="Center" />
-                                                                            <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to add a filter. You can also directly type a filter expression below." FontStyle="Italic" />
-                                                                        </Grid>
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </DataGrid.Style>
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" />
-                                            <DataGridComboBoxColumn Width="*" Header="Operator" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedValueBinding="{Binding ComparerExpression,Mode=TwoWay}" ItemsSource="{Binding Source={x:Static myself:ExtendedDataGridView.FilterFormula},Mode=OneTime}">
-                                                <DataGridComboBoxColumn.EditingElementStyle>
-                                                    <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
-                                                </DataGridComboBoxColumn.EditingElementStyle>
-                                            </DataGridComboBoxColumn>
-                                            <DataGridTextColumn Width="*" Header="Value" Binding="{Binding TargetValue}"/>
-                                            <DataGridTemplateColumn CanUserSort="False">
-                                                <DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <Button Tag="{Binding}" Click="btnDeleteFilter_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
-                                                    </DataTemplate>
-                                                </DataGridTemplateColumn.CellTemplate>
-                                            </DataGridTemplateColumn>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </DockPanel>
-                            </Expander>
-                            <Expander IsExpanded="True" Header="Aggregation" BorderThickness="0" Margin="5">
-                                <StackPanel Margin="-5">
-                                    <Label FontWeight="Bold" Content="Group by the following attributes:" />
-                                    <ListBox ItemsSource="{Binding Grouping}" AllowDrop="True" x:Name="lstGrouping" Drop="lstGrouping_Drop">
-                                        <ListBox.Style>
-                                            <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate>
-                                                                    <Border Style="{StaticResource DragDropBorder}">
-                                                                        <Grid>
-                                                                            <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="Auto" />
-                                                                                <ColumnDefinition Width="*" />
-                                                                            </Grid.ColumnDefinitions>
-                                                                            <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="5" VerticalAlignment="Center" Foreground="Gray" />
-                                                                            <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to group by the related attribute" FontStyle="Italic" />
-                                                                        </Grid>
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ListBox.Style>
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid>
+                                </TextBlock>
+                                <Label Content="{Binding Status,StringFormat='Status: {0}'}" />
+                                <ProgressBar Value="{Binding LoadingProgress,Mode=OneWay}" Margin="5"  Width="200" BorderThickness="0">
+                                    <ProgressBar.Style>
+                                        <Style TargetType="ProgressBar" BasedOn="{StaticResource {x:Type ProgressBar}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding LoadingProgress,Mode=OneWay}" Value="-1">
+                                                    <Setter Property="IsIndeterminate" Value="True" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ProgressBar.Style>
+                                </ProgressBar>
+                            </WrapPanel>
+                            <!--<ContentPresenter Grid.Row="1" Content="{Binding InnerBorder,RelativeSource={x:Static RelativeSource.TemplatedParent}}" ContentTemplate="{Binding BaseTemplate,RelativeSource={x:Static RelativeSource.TemplatedParent}}" />-->
+                            <Border x:Name="border" Grid.Row="1"
+                SnapsToDevicePixels="True"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Padding="{TemplateBinding Padding}">
+                                <Border.Background>
+                                    <SolidColorBrush Color="{DynamicResource ControlLightColor}" />
+                                </Border.Background>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Disabled">
+                                            <Storyboard>
+                                                <ColorAnimationUsingKeyFrames Storyboard.TargetName="border"
+                                                Storyboard.TargetProperty="(Panel.Background).
+                      (SolidColorBrush.Color)">
+                                                    <EasingColorKeyFrame KeyTime="0"
+                                         Value="{DynamicResource ControlLightColor}" />
+                                                </ColorAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Normal" />
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <ScrollViewer x:Name="DG_ScrollViewer"
+                        Focusable="false"
+                        Background="Black">
+                                    <ScrollViewer.Template>
+                                        <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+
+                                                <Button Focusable="false"
+                          Command="{x:Static DataGrid.SelectAllCommand}"
+                          Style="{DynamicResource {ComponentResourceKey 
+                      ResourceId=DataGridSelectAllButtonStyle, 
+                      TypeInTargetAssembly={x:Type DataGrid}}}"
+                          Visibility="{Binding HeadersVisibility, 
+                      ConverterParameter={x:Static DataGridHeadersVisibility.All}, 
+                      Converter={x:Static DataGrid.HeadersVisibilityConverter}, 
+                      RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
+                          Width="{Binding CellsPanelHorizontalOffset, 
+                      RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+
+                                                <DataGridColumnHeadersPresenter x:Name="PART_ColumnHeadersPresenter"
+                                                  Grid.Column="1"
+                                                  Visibility="{Binding HeadersVisibility, 
+                      ConverterParameter={x:Static DataGridHeadersVisibility.Column}, 
+                      Converter={x:Static DataGrid.HeadersVisibilityConverter}, 
+                      RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+
+                                                <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
+                                          Grid.ColumnSpan="2"
+                                          Grid.Row="1"
+                                          CanContentScroll="{TemplateBinding CanContentScroll}" />
+
+                                                <ScrollBar x:Name="PART_VerticalScrollBar"
+                             Grid.Column="2"
+                             Grid.Row="1"
+                             Orientation="Vertical"
+                             ViewportSize="{TemplateBinding ViewportHeight}"
+                             Maximum="{TemplateBinding ScrollableHeight}"
+                             Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                             Value="{Binding VerticalOffset, Mode=OneWay, 
+                      RelativeSource={RelativeSource TemplatedParent}}"/>
+
+                                                <Grid Grid.Column="1"
+                        Grid.Row="2">
                                                     <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="{Binding NonFrozenColumnsViewportHorizontalOffset, 
+                          RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
                                                         <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
-                                                    <Label Content="{Binding}" />
-                                                    <Button Grid.Column="1" Foreground="OrangeRed" Tag="{Binding}" Click="btnDeleteGrp_Click" Content="{iconPacks:Material Kind=DeleteOutline}" />
+
+                                                    <ScrollBar x:Name="PART_HorizontalScrollBar"
+                               Grid.Column="1"
+                               Orientation="Horizontal"
+                               ViewportSize="{TemplateBinding ViewportWidth}"
+                               Maximum="{TemplateBinding ScrollableWidth}"
+                               Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+                               Value="{Binding HorizontalOffset, Mode=OneWay, 
+                        RelativeSource={RelativeSource TemplatedParent}}"/>
                                                 </Grid>
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
-                                    <Label FontWeight="Bold" Content="Aggregated attributes:" />
-                                    <DataGrid Grid.Column="1" CanUserAddRows="False" x:Name="gridCompute" AutoGenerateColumns="False" AllowDrop="True" Drop="gridCompute_Drop" ItemsSource="{Binding Compute}">
-                                        <DataGrid.Style>
-                                            <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate>
-                                                                    <Border Style="{StaticResource DragDropBorder}">
-                                                                        <Grid>
-                                                                            <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="Auto" />
-                                                                                <ColumnDefinition Width="*" />
-                                                                            </Grid.ColumnDefinitions>
-                                                                            <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="5" VerticalAlignment="Center" Foreground="Gray" />
-                                                                            <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here or add a 'group by attribute' above to aggregate data. Note: at least one 'group by' attribute is required for the aggregation to be computed." FontStyle="Italic" />
-                                                                        </Grid>
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </DataGrid.Style>
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" IsReadOnly="True" />
-                                            <DataGridComboBoxColumn Width="*" Header="Aggregation" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedValueBinding="{Binding Aggregate,Mode=TwoWay}" ItemsSource="{Binding Source={x:Static myself:ExtendedDataGridView.AggregationFormula},Mode=OneTime}">
-                                                <DataGridComboBoxColumn.EditingElementStyle>
-                                                    <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
-                                                </DataGridComboBoxColumn.EditingElementStyle>
-                                            </DataGridComboBoxColumn>
-                                            <DataGridTemplateColumn>
-                                                <DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <Button Foreground="OrangeRed" Tag="{Binding}" Click="btnDeleteAggreg_Click" Content="{iconPacks:Material Kind=DeleteOutline}" />
-                                                    </DataTemplate>
-                                                </DataGridTemplateColumn.CellTemplate>
-                                            </DataGridTemplateColumn>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </StackPanel>
-                            </Expander>
-                        </StackPanel>
-                    </ScrollViewer>
-                </DockPanel>
-            </Grid>
-        </Border>
-    </Grid>
-</UserControl>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </ScrollViewer.Template>
+                                    <ItemsPresenter x:Name="ItemsPresenter" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                </ScrollViewer>
+                            </Border>
+                            <!--<DataGrid Grid.Row="1" Sorting="gridData_Sorting" x:Name="gridData" IsReadOnly="True" CanUserAddRows="False" CanUserSortColumns="True" CanUserReorderColumns="True" BorderThickness="0" ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGrid_PreviewMouseLeftButtonDown" />
+                                <EventSetter Event="PreviewMouseMove" Handler="DataGrid_MouseMove" />
+                            </Style>
+                        </DataGrid.Resources>
+                    </DataGrid>-->
+                            <Grid Width="250" Grid.RowSpan="3" Grid.Column="1" Visibility="{Binding IsChecked,ElementName=btnAggregate,Converter={StaticResource valueToVisibilityConverter}}" Background="WhiteSmoke">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <ScrollViewer>
+                                    <StackPanel>
+                                        <Expander IsExpanded="True" Header="Filtering" BorderThickness="0" Margin="5,10">
+                                            <DockPanel>
+                                                <Grid DockPanel.Dock="Bottom">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+                                                    <Label Content="Custom filter:" />
+                                                    <TextBox TextWrapping="Wrap" MinHeight="25" HorizontalAlignment="Stretch" Text="{Binding CustomFilter}" Grid.Row="1">
+                                                        <TextBox.Style>
+                                                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsCustomFilterError}" Value="True">
+                                                                        <Setter Property="Foreground" Value="Red" />
+                                                                        <Setter Property="ToolTip" Value="{Binding CustomFilterError}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBox.Style>
+                                                    </TextBox>
+                                                </Grid>
+                                                <DataGrid Margin="-5" AllowDrop="True" AutoGenerateColumns="False" CanUserAddRows="False" ItemsSource="{Binding Filters}" x:Name="gridFilters" Drop="gridFilters_Drop">
+                                                    <DataGrid.Style>
+                                                        <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
+                                                                    <Setter Property="Template">
+                                                                        <Setter.Value>
+                                                                            <ControlTemplate>
+                                                                                <Border Style="{StaticResource DragDropBorder}">
+                                                                                    <Grid>
+                                                                                        <Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="Auto" />
+                                                                                            <ColumnDefinition Width="*" />
+                                                                                        </Grid.ColumnDefinitions>
+                                                                                        <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="10" Foreground="Gray" VerticalAlignment="Center" />
+                                                                                        <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to add a filter. You can also directly type a filter expression below." FontStyle="Italic" />
+                                                                                    </Grid>
+                                                                                </Border>
+                                                                            </ControlTemplate>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </DataGrid.Style>
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" />
+                                                        <DataGridComboBoxColumn Width="*" Header="Operator" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedValueBinding="{Binding ComparerExpression,Mode=TwoWay}" ItemsSource="{Binding Source={x:Static myself:ExtendedDataGridView.FilterFormula},Mode=OneTime}">
+                                                            <DataGridComboBoxColumn.EditingElementStyle>
+                                                                <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
+                                                            </DataGridComboBoxColumn.EditingElementStyle>
+                                                        </DataGridComboBoxColumn>
+                                                        <DataGridTextColumn Width="*" Header="Value" Binding="{Binding TargetValue}"/>
+                                                        <DataGridTemplateColumn Width="*" CanUserSort="False">
+                                                            <DataGridTemplateColumn.CellTemplate>
+                                                                <DataTemplate>
+                                                                    <Button Tag="{Binding}" Click="btnDeleteFilter_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                                                </DataTemplate>
+                                                            </DataGridTemplateColumn.CellTemplate>
+                                                        </DataGridTemplateColumn>
+                                                    </DataGrid.Columns>
+                                                </DataGrid>
+                                            </DockPanel>
+                                        </Expander>
+                                        <Expander IsExpanded="True" Header="Aggregation" BorderThickness="0" Margin="5">
+                                            <StackPanel Margin="-5">
+                                                <Label FontWeight="Bold" Content="Group by the following attributes:" />
+                                                <ListBox ItemsSource="{Binding Grouping}" AllowDrop="True" x:Name="lstGrouping" Drop="lstGrouping_Drop">
+                                                    <ListBox.Style>
+                                                        <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
+                                                                    <Setter Property="Template">
+                                                                        <Setter.Value>
+                                                                            <ControlTemplate>
+                                                                                <Border Style="{StaticResource DragDropBorder}">
+                                                                                    <Grid>
+                                                                                        <Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="Auto" />
+                                                                                            <ColumnDefinition Width="*" />
+                                                                                        </Grid.ColumnDefinitions>
+                                                                                        <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="5" VerticalAlignment="Center" Foreground="Gray" />
+                                                                                        <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to group by the related attribute" FontStyle="Italic" />
+                                                                                    </Grid>
+                                                                                </Border>
+                                                                            </ControlTemplate>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </ListBox.Style>
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <Label Content="{Binding}" />
+                                                                <Button Grid.Column="1" Foreground="OrangeRed" Tag="{Binding}" Click="btnDeleteGrp_Click" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                                <Label FontWeight="Bold" Content="Aggregated attributes:" />
+                                                <DataGrid Grid.Column="1" CanUserAddRows="False" x:Name="gridCompute" AutoGenerateColumns="False" AllowDrop="True" Drop="gridCompute_Drop" ItemsSource="{Binding Compute}">
+                                                    <DataGrid.Style>
+                                                        <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
+                                                                    <Setter Property="Template">
+                                                                        <Setter.Value>
+                                                                            <ControlTemplate>
+                                                                                <Border Style="{StaticResource DragDropBorder}">
+                                                                                    <Grid>
+                                                                                        <Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="Auto" />
+                                                                                            <ColumnDefinition Width="*" />
+                                                                                        </Grid.ColumnDefinitions>
+                                                                                        <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="5" VerticalAlignment="Center" Foreground="Gray" />
+                                                                                        <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here or add a 'group by attribute' above to aggregate data. Note: at least one 'group by' attribute is required for the aggregation to be computed." FontStyle="Italic" />
+                                                                                    </Grid>
+                                                                                </Border>
+                                                                            </ControlTemplate>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </DataGrid.Style>
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" IsReadOnly="True" />
+                                                        <DataGridComboBoxColumn Width="*" Header="Aggregation" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedValueBinding="{Binding Aggregate,Mode=TwoWay}" ItemsSource="{Binding Source={x:Static myself:ExtendedDataGridView.AggregationFormula},Mode=OneTime}">
+                                                            <DataGridComboBoxColumn.EditingElementStyle>
+                                                                <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
+                                                            </DataGridComboBoxColumn.EditingElementStyle>
+                                                        </DataGridComboBoxColumn>
+                                                        <DataGridTemplateColumn>
+                                                            <DataGridTemplateColumn.CellTemplate>
+                                                                <DataTemplate>
+                                                                    <Button Foreground="OrangeRed" Tag="{Binding}" Click="btnDeleteAggreg_Click" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                                                </DataTemplate>
+                                                            </DataGridTemplateColumn.CellTemplate>
+                                                        </DataGridTemplateColumn>
+                                                    </DataGrid.Columns>
+                                                </DataGrid>
+                                            </StackPanel>
+                                        </Expander>
+                                    </StackPanel>
+                                </ScrollViewer>
+                                <Border Grid.Row="1" Background="LightBlue">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Button ext:CustomAdorner.Image="{iconPacks:Material Kind=Forward}" Content="Apply" BorderBrush="Green" x:Name="btnApply" Click="btnApply_Click"/>
+                                        <Button ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}" Content="Clear" BorderBrush="Red" Click="btnClear_Click" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </DataGrid.Style>
+</DataGrid>

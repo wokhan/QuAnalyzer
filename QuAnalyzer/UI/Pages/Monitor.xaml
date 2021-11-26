@@ -6,6 +6,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
       xmlns:charts="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+      xmlns:monitor="clr-namespace:QuAnalyzer.Features.Monitoring"
       xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
       mc:Ignorable="d"
       d:DesignHeight="700" d:DesignWidth="800"
@@ -42,25 +43,27 @@
             <!--<Rectangle />
             <ToggleButton Content="Enable chart" ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" ext:CustomAdorner.Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />-->
         </WrapPanel>
-        <DataGrid Grid.Row="1"  SelectionMode="Extended" VirtualizingPanel.ScrollUnit="Pixel" RowDetailsVisibilityMode="VisibleWhenSelected" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" x:Name="gridSteps" AutoGenerateColumns="False" IsReadOnly="True">
-                <DataGrid.Columns>
-                    <DataGridCheckBoxColumn Binding="{Binding Selector.IsSelected}" Width="Auto" />
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-                    <DataGridComboBoxColumn Header="Provider" x:Name="lstDataProviders" MinWidth="150" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static Application.Current}}" DisplayMemberPath="Name" SelectedValueBinding="{Binding Provider}" />
-                    <DataGridComboBoxColumn Header="Repository" MinWidth="150" ItemsSource="{Binding Provider.Repositories.Keys}" />
-                    <DataGridComboBoxColumn Header="Type" SelectedValueBinding="{Binding Type}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding MonitoringTypes, ElementName=me}" />
-                    <DataGridTextColumn Header="Interval" Binding="{Binding Interval}" />
-                    <DataGridCheckBoxColumn Header="Run when started" Binding="{Binding RunWhenStarted}" />
-                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto" />
-                    <DataGridTemplateColumn Width="70" >
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
+        <DataGrid Grid.Row="1" SelectionMode="Extended" VirtualizingPanel.ScrollUnit="Pixel" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" x:Name="gridSteps" AutoGenerateColumns="False" ColumnWidth="18*" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                <DataGridComboBoxColumn Header="Provider" x:Name="lstDataProviders" MinWidth="150" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static Application.Current}}" DisplayMemberPath="Name" SelectedValueBinding="{Binding Provider}" />
+                <DataGridComboBoxColumn Header="Repository" MinWidth="150" ItemsSource="{Binding Provider.Repositories.Keys}" />
+                <DataGridComboBoxColumn Header="Type" SelectedValueBinding="{Binding Type}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding Source={x:Static monitor:MonitoringModes.MonitoringTypes}}" />
+                <DataGridTextColumn Header="Interval" Binding="{Binding Interval}" />
+                <DataGridCheckBoxColumn Header="Run when started" Binding="{Binding RunWhenStarted}" />
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" />
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <WrapPanel>
+                                <Button Name="btnEditMapping" Tag="{Binding}" Click="btnEdit_Click" Foreground="Blue" Content="{iconPacks:Material Kind=Pencil}" />
                                 <Button Name="btnDelete" Click="btnDelete_Click" Tag="{Binding}" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-                <DataGrid.RowDetailsTemplate>
+                            </WrapPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+            <!--<DataGrid.RowDetailsTemplate>
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -97,7 +100,8 @@
                                 <TextBox x:Name="txtFilter" Text="{Binding Filter}" />
                             </StackPanel>
                             <Label Grid.Column="1" Content="Preceding steps:" />
-                            <DataGrid Grid.Row="2" Grid.Column="1" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}">
+                            -->
+            <!--<DataGrid Grid.Row="2" Grid.Column="1" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}">
                                 <DataGridCheckBoxColumn Header="Select" Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=DataGridRow}}" />
                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                                 <DataGridTemplateColumn>
@@ -107,11 +111,12 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                            </DataGrid>
+                            </DataGrid>-->
+            <!--
                         </Grid>
                     </DataTemplate>
-                </DataGrid.RowDetailsTemplate>
-            </DataGrid>
+                </DataGrid.RowDetailsTemplate>-->
+        </DataGrid>
         <GridSplitter Grid.Row="2" Height="2" Background="LightGray" />
         <DockPanel Grid.Row="3">
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
@@ -121,7 +126,7 @@
                 <Button x:Name="btnGrHTML" Content="HTML" ToolTip="Export to HTML" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Xml}" Click="btnGrHTML_Click" />
             </WrapPanel>
             <!--<CheckBox Content="Group by step name" Name="chkGroup" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-25" Checked="chkGroup_Checked" IsChecked="True" />-->
-            <DataGrid x:Name="gridResults" ItemsSource="{Binding MonitorResultsView}" VirtualizingPanel.ScrollUnit="Pixel" RowDetailsVisibilityMode="VisibleWhenSelected" IsReadOnly="True" AutoGenerateColumns="False">
+            <DataGrid x:Name="gridResults" ItemsSource="{Binding MonitorResultsView}" VirtualizingPanel.ScrollUnit="Pixel" IsReadOnly="True" AutoGenerateColumns="False">
                 <DataGrid.RowDetailsTemplate>
                     <DataTemplate>
                         <DataGrid Margin="10,0,0,0" BorderThickness="1,0,0,0" BorderBrush="{DynamicResource AccentColorBrush}" IsReadOnly="True">
@@ -219,7 +224,8 @@
             <WrapPanel Grid.Column="7" Style="{StaticResource ToolBar}">
                 <Button Content="Copy" ToolTip="Copy to clipboard" BorderBrush="Magenta" ext:CustomAdorner.Image="{iconPacks:Material Kind=ContentCopy}" IsEnabled="False" x:Name="btnCopy" Click="btnCopy_Click" />
             </WrapPanel>
-            <charts:CartesianChart x:Name="chart" Series="{Binding ResultSeries}"><!--ScrollMode="X" DisableAnimations="True" Margin="0" DataTooltip="{x:Null}" Hoverable="False">-->
+            <charts:CartesianChart x:Name="chart" Series="{Binding ResultSeriesMappings.Values}">
+                <!--ScrollMode="X" DisableAnimations="True" Margin="0" DataTooltip="{x:Null}" Hoverable="False">-->
                 <!--<charts:CartesianChart.XAxes>
                     <charts:Axis></charts:Axis>
                 </charts:CartesianChart.XAxes>

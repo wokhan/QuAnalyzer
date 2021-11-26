@@ -24,7 +24,7 @@
             <Button Content="Add..." Click="btnNewSource_Click" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" />
             <Button Content="Import..." IsEnabled="False" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Import}"/>
         </WrapPanel>
-        <TreeView Grid.Row="2" Background="White" BorderThickness="0" TreeViewItem.Selected="TreeView_Selected" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static Application.Current}}" SelectedValuePath="Key" IsEnabled="{Binding CurrentSelectionLinked,Source={x:Static Application.Current}}">
+        <TreeView Grid.Row="2" Background="White" BorderThickness="0" TreeViewItem.Selected="TreeView_Selected" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static Application.Current}}" SelectedValuePath="Key">
             <TreeView.Resources>
                 <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Style.Triggers>

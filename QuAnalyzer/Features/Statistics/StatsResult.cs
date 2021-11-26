@@ -1,8 +1,6 @@
 ﻿using System.Linq;
 using System.Linq.Dynamic.Core;
 
-using Wokhan.Data.Providers.Bases;
-
 namespace QuAnalyzer.Features.Statistics
 {
 

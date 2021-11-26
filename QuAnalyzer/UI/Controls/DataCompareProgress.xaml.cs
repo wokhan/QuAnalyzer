@@ -3,14 +3,11 @@ using System.Windows.Controls;
 
 namespace QuAnalyzer.UI.Controls
 {
-
-    /// <summary>
-    /// Interaction logic for DataCompareProgressControl.xaml
-    /// </summary>
     public partial class DataCompareProgress : UserControl
     {
         public event RoutedEventHandler DetailsHandler;
         public event RoutedEventHandler CancelHandler;
+        public event RoutedEventHandler DeleteHandler;
 
         public DataCompareProgress()
         {
@@ -19,19 +16,17 @@ namespace QuAnalyzer.UI.Controls
 
         private void btnDetails_Click(object sender, RoutedEventArgs e)
         {
-            if (DetailsHandler is not null)
-            {
-                DetailsHandler(sender, e);
-            }
+            DetailsHandler?.Invoke(sender, e);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (CancelHandler is not null)
-            {
-                CancelHandler(sender, e);
-            }
+            CancelHandler?.Invoke(sender, e);
         }
 
+        public void btnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            DeleteHandler?.Invoke(sender, e);
+        }
     }
 }

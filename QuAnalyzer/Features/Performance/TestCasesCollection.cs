@@ -1,5 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
+
 using QuAnalyzer.Features.Monitoring;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

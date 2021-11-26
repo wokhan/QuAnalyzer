@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
@@ -164,15 +165,17 @@ namespace QuAnalyzer.Features.Comparison
             Contract.Requires(srcData is not null);
             Contract.Requires(trgData is not null);
 
-            var srcMissing = new List<T>();
-            var trgMissing = new List<T>();
-            var srcDiff = new List<T>();
-            var trgDiff = new List<T>();
-            var srcDups = new List<T>();
-            var trgDups = new List<T>();
-
             var srcPrev = default(T);
             var trgPrev = default(T);
+
+            f.Results.Source.Duplicates = new ObservableCollection<T>();
+            f.Results.Target.Duplicates = new ObservableCollection<T>();
+            f.Results.Source.Differences = new ObservableCollection<T>();
+            f.Results.Target.Differences = new ObservableCollection<T>();
+            f.Results.Source.Missing = new ObservableCollection<T>();
+            f.Results.Target.Missing = new ObservableCollection<T>();
+            f.Results.Source.PerfectDups = new ObservableCollection<T>();
+            f.Results.Target.PerfectDups = new ObservableCollection<T>();
 
             var scmp = new SequenceComparer(f.SourceKeys is not null ? f.SourceKeys.ToArray() : Enumerable.Range(0, f.SourceHeaders.Count).Select(i => i.ToString()).ToArray());
             // TODO : gen type
@@ -201,12 +204,12 @@ namespace QuAnalyzer.Features.Comparison
                     {
                         if (!samesrc && default(T) != srcPrev && sqc.Equals((IEnumerable<object>)srcPrev, (IEnumerable<object>)srcEnum.Current))
                         {
-                            srcDups.Add(srcEnum.Current);
+                            f.Results.Source.Duplicates.Add(srcEnum.Current);
                         }
 
                         if (!sametrg && default(T) != trgPrev && sqc.Equals((IEnumerable<object>)trgPrev, (IEnumerable<object>)trgEnum.Current))
                         {
-                            trgDups.Add(trgEnum.Current);
+                            f.Results.Target.Duplicates.Add(trgEnum.Current);
                         }
 
                         trgPrev = trgEnum.Current;
@@ -215,7 +218,7 @@ namespace QuAnalyzer.Features.Comparison
                         if (!issrc)
                         {
                             // add all remaining trgEnum to missing from src
-                            srcMissing.Add(trgEnum.Current);
+                            f.Results.Source.Missing.Add(trgEnum.Current);
                             istrg = trgEnum.MoveNext();
                             samesrc = true;
                             continue;
@@ -224,7 +227,7 @@ namespace QuAnalyzer.Features.Comparison
                         if (!istrg)
                         {
                             // add all remaining srcEnum to missing from trg
-                            trgMissing.Add(srcEnum.Current);
+                            f.Results.Target.Missing.Add(srcEnum.Current);
                             issrc = srcEnum.MoveNext();
                             sametrg = true;
                             continue;
@@ -239,20 +242,20 @@ namespace QuAnalyzer.Features.Comparison
                         }
                         else if (cmp > 0 && cmp < int.MaxValue)
                         {
-                            srcMissing.Add(trgEnum.Current);
+                            f.Results.Source.Missing.Add(trgEnum.Current);
                             istrg = trgEnum.MoveNext();
                             samesrc = true;
                         }
                         else if (cmp < 0)
                         {
-                            trgMissing.Add(srcEnum.Current);
+                            f.Results.Target.Missing.Add(srcEnum.Current);
                             issrc = srcEnum.MoveNext();
                             sametrg = true;
                         }
                         else if (cmp == int.MaxValue)
                         {
-                            srcDiff.Add(srcEnum.Current);
-                            trgDiff.Add(trgEnum.Current);
+                            f.Results.Source.Differences.Add(srcEnum.Current);
+                            f.Results.Target.Differences.Add(trgEnum.Current);
                             scannext = false;
                         }
                     }
@@ -260,14 +263,6 @@ namespace QuAnalyzer.Features.Comparison
             }
 
             setProgress(f, ProgressType.Done, 0, progressCallback);
-
-            f.Results.Source.Missing = srcMissing;
-            f.Results.Source.Differences = srcDiff;
-            f.Results.Source.Duplicates = srcDups;
-            f.Results.Target.Missing = trgMissing;
-            f.Results.Target.Differences = trgDiff;
-            f.Results.Target.Duplicates = trgDups;
-
         }
 
         public static void Compare<T>(ComparerStruct<T> f, IEnumerable<T> srcData, IEnumerable<T> trgData, Action<ComparerStruct<T>> progressCallback, CancellationToken token)
@@ -326,11 +321,15 @@ namespace QuAnalyzer.Features.Comparison
 
                 if (f.KeysComparer is not null)
                 {
-                    var differences = sourceOnly.Join(targetOnly, s => s, t => t, (s, t) => new { s, t }, f.KeysComparer).ToList();
+                    f.Results.Source.Differences = new ObservableCollection<T>();
+                    f.Results.Target.Differences = new ObservableCollection<T>();
 
-                    // Should be improved, dude.
-                    f.Results.Source.Differences = differences.Select(d => d.s).ToList();
-                    f.Results.Target.Differences = differences.Select(d => d.t).ToList();
+                    var differences = sourceOnly.Join(targetOnly, s => s, t => t, (s, t) => (s, t), f.KeysComparer);
+                    foreach (var diff in differences)
+                    {
+                        f.Results.Source.Differences.Add(diff.s);
+                        f.Results.Target.Differences.Add(diff.t);
+                    }
 
                     // Get source missing: check "source only" keys against "target only" keys
                     // If the key does not exist, the item is a really missing one.
@@ -372,7 +371,7 @@ namespace QuAnalyzer.Features.Comparison
             }
         }
 
-        private static List<T> RetrieveOnly<T>(List<T> a, List<T> b, ComparerStruct<T> f, Action<ComparerStruct<T>> progressCallback, ProgressType type)
+        private static IList<T> RetrieveOnly<T>(IList<T> a, IList<T> b, ComparerStruct<T> f, Action<ComparerStruct<T>> progressCallback, ProgressType type)
         {
             var ix = 0;
             return a.AsParallel()

@@ -16,7 +16,7 @@ namespace QuAnalyzer.UI.BindingConverters
             };
             cvs.GroupDescriptions.Add(new PropertyGroupDescription((string)parameter));
 
-            return cvs;
+            return cvs.View;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

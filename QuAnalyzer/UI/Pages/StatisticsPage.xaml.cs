@@ -1,10 +1,6 @@
-﻿using LiveChartsCore.SkiaSharpView.Drawing;
-using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
-
+﻿
 using QuAnalyzer.Features.Statistics;
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -12,7 +8,6 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 
 using Wokhan.Collections.Generic.Extensions;
-using Wokhan.Core.Extensions;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages
@@ -92,13 +87,13 @@ namespace QuAnalyzer.UI.Pages
         {
             Progress = 0;
             ComputedStats.Clear();
-            
+
             await Task.Run(async () =>
             {
                 Progress = -1;
 
                 var headers = prv.GetColumns(repo);
-                
+
                 var data = prv.GetQueryable(repo);
 
                 var results = headers.ToDictionary(h => h, h => new StatisticsHolder() { Name = h.Name, Source = data });

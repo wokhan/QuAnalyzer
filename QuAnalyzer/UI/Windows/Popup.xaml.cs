@@ -1,4 +1,5 @@
-﻿using MahApps.Metro.Controls;
+﻿
+using System.Windows;
 using System.Windows.Controls;
 
 namespace QuAnalyzer.UI.Windows
@@ -6,7 +7,7 @@ namespace QuAnalyzer.UI.Windows
     /// <summary>
     /// Interaction logic for ProviderPage.xaml
     /// </summary>
-    public partial class Popup : MetroWindow
+    public partial class Popup : Window
     {
         private Popup(Page content)
         {

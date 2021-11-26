@@ -1,5 +1,5 @@
-﻿using QuAnalyzer.Core.Helpers;
-using QuAnalyzer.Features.Monitoring;
+﻿using QuAnalyzer.Features.Monitoring;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

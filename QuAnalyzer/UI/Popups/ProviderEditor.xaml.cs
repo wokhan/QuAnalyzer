@@ -1,6 +1,6 @@
-﻿using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
+﻿
 using Microsoft.Win32;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+
 using Wokhan.Data.Providers;
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
@@ -21,9 +22,12 @@ namespace QuAnalyzer.UI.Pages
     /// </summary>
     public partial class ProviderEditor : Page
     {
+        public string MessageTitle { get; set; }
+        public string MessageContent { get; set; }
+
         private IDataProvider _currentProvider;
 
-        private MetroWindow _owner => (MetroWindow)Window.GetWindow(this);
+        private Window _owner => Window.GetWindow(this);
 
         public IDataProvider CurrentProvider
         {
@@ -44,7 +48,7 @@ namespace QuAnalyzer.UI.Pages
         }
 
         private int pageCount = 0;
-        private bool isNewProvider;
+        private readonly bool isNewProvider;
 
         public bool HasMultipleItems => (expParameters?.Count > 1);
 
@@ -64,6 +68,11 @@ namespace QuAnalyzer.UI.Pages
 
         public ObservableCollection<RepositoryView> Repositories { get; } = new ObservableCollection<RepositoryView>();
 
+        public ProviderEditor(string name) : this(DataProviders.CreateInstance(name, new Dictionary<string, object>()), true)
+        {
+
+        }
+
         public ProviderEditor(IDataProvider currentProvider, bool isNew = false)
         {
             Repositories.CollectionChanged += Repositories_CollectionChanged;
@@ -79,7 +88,7 @@ namespace QuAnalyzer.UI.Pages
             }
         }
 
-        void Repositories_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Repositories_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems is not null)
             {
@@ -113,7 +122,7 @@ namespace QuAnalyzer.UI.Pages
         {
             Contract.Requires(sender is not null);
 
-            if (((RadioButton)sender).IsChecked.Value)
+            if (((RadioButton)sender).IsChecked is true)
             {
                 CurrentProvider.SelectedGroups.Add(((RadioButton)sender).Name);
             }
@@ -126,7 +135,7 @@ namespace QuAnalyzer.UI.Pages
 
         private void save()
         {
-            ((IDataProvider)CurrentProvider).Repositories = Repositories.Where(r => r.Selected).ToDictionary(r => r.Key, r => r.Value);
+            CurrentProvider.Repositories = Repositories.Where(r => r.Selected).ToDictionary(r => r.Key, r => r.Value);
 
             if (!((App)Application.Current).CurrentProject.CurrentProviders.Contains(CurrentProvider))
             {
@@ -148,15 +157,16 @@ namespace QuAnalyzer.UI.Pages
             //lstProviders.SelectedItem = currentProvider;
         }
 
+        bool stopAction;
+
         private async void btnRepoRetr_Click(object sender, RoutedEventArgs e)
         {
-            var msg = await _owner.ShowProgressAsync("Please wait", "Retrieving repositories...", true);
+            MessageTitle = "Please wait";
+            MessageContent = "Retrieving repositories...";
 
             string res = null;
             try
             {
-                msg.SetIndeterminate();
-
                 await Task.Run(() =>
                 {
                     var reps = CurrentProvider.GetDefaultRepositories().OrderBy(r => r.Key).Select(r => new RepositoryView() { Key = r.Key, Value = r.Value, Selected = true });
@@ -164,14 +174,14 @@ namespace QuAnalyzer.UI.Pages
                     {
                         Dispatcher.Invoke(() => Repositories.Add(r));
 
-                        if (msg.IsCanceled)
+                        if (stopAction)
                         {
                             break;
                         }
                     }
                 });
 
-                await msg.CloseAsync();
+                MessageTitle = null;
             }
             catch (Exception exc)
             {
@@ -183,8 +193,7 @@ namespace QuAnalyzer.UI.Pages
 
             if (res is not null)
             {
-                await msg.CloseAsync();
-                await _owner.ShowMessageAsync("Unexpected error", res);
+                MessageTitle = "Unexpected error";
             }
             /*catch (Exception exc)
             {

@@ -20,7 +20,7 @@
             <Label Content="Select a provider type below and press Next to continue." />
         </Border>
         <ScrollViewer x:Name="gridProviders" Grid.Row="2">
-            <ListView Margin="5" Name="lstProvidersTypes">
+            <ListView Margin="5" Name="lstProvidersTypes" ItemsSource="{Binding ProvidersMan.Providers,Source={x:Static Application.Current},Converter={StaticResource collectionViewSourceCreator},ConverterParameter=Category}">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="2" IsItemsHost="True" />

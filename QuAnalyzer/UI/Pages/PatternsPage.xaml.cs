@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+
 using Wokhan.Collections.Generic.Extensions;
 
 namespace QuAnalyzer.UI.Pages
@@ -22,7 +23,7 @@ namespace QuAnalyzer.UI.Pages
         {
             InitializeComponent();
 
-            ((App)App.Current).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } }; 
+            ((App)App.Current).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
         }
 
         private async void UpdateSelection()

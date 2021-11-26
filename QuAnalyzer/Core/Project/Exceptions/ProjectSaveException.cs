@@ -15,7 +15,7 @@ namespace QuAnalyzer.Core.Project.Exceptions
         {
         }
 
-        protected ProjectSaveException(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext):base(serializationInfo, streamingContext)
+        protected ProjectSaveException(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) : base(serializationInfo, streamingContext)
         {
 
         }

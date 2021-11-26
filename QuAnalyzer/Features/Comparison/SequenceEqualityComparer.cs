@@ -6,10 +6,10 @@ namespace QuAnalyzer.Features.Comparison
 {
     public class SequenceEqualityComparer<T> : IEqualityComparer<IEnumerable<T>>
     {
-        private static IEqualityComparer<T> cmp = new SmartEqualityComparer<T>();// EqualityComparer<object>.Default;
+        private static readonly IEqualityComparer<T> cmp = new DBNullAwareEqualityComparer<T>();// EqualityComparer<object>.Default;
 
-        private int startFrom;
-        private int maxCount;
+        private readonly int startFrom;
+        private readonly int maxCount;
 
         public SequenceEqualityComparer(int startFrom = 0, int maxCount = int.MaxValue)
         {
@@ -28,7 +28,7 @@ namespace QuAnalyzer.Features.Comparison
         // To ensure that Equals is always called, you can return 0.
         public int GetHashCode(IEnumerable<T> obj)
         {
-            return obj.Skip(startFrom).Take(maxCount).Aggregate(17, (a, i) => a * 23 + (i is null || i is DBNull ? 0 : i.GetHashCode()));
+            return 0;// obj.Skip(startFrom).Take(maxCount).Aggregate(17, (a, i) => a * 23 + (i is null || i is DBNull ? 0 : i.GetHashCode()));
         }
     }
 }

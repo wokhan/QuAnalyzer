@@ -1,6 +1,7 @@
-﻿using System.Net.NetworkInformation;
+﻿
+using System.Net.NetworkInformation;
 
-namespace QuAnalyzer.Core.Helpers
+namespace QuAnalyzer.Features.Performance
 {
     public static class SimpleNetworkTests
     {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+
 using Wokhan.Core.ComponentModel;
 
 namespace QuAnalyzer.Features.Monitoring
@@ -44,7 +45,7 @@ namespace QuAnalyzer.Features.Monitoring
             Status = MonitoringStatus.NOT_STARTED;
         }
 
-        private int cnt = 0;
+        private readonly int cnt = 0;
 
         public void raiseAdd(ResultsClass r)
         {
@@ -57,7 +58,7 @@ namespace QuAnalyzer.Features.Monitoring
         }
 
 
-        private List<object> PrecedingStepsData = new List<object>();
+        private readonly List<object> PrecedingStepsData = new List<object>();
 
         public MonitoringItemInstance(MonitorItem monitorItem)
         {

@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers.Contracts;
 
@@ -34,7 +36,7 @@ namespace QuAnalyzer.Features.Comparison
 
         public string TargetRepository { get; set; }
 
-        public List<SimpleMap> AllMappings { get; set; } = new List<SimpleMap>();
+        public List<SimpleMap> AllMappings { get; set; } = new();
 
         private bool _isOrdered = false;
         public bool IsOrdered
@@ -46,5 +48,19 @@ namespace QuAnalyzer.Features.Comparison
         public SourcesMapper()
         {
         }
+
+        public SourcesMapper Clone()
+        {
+            return new SourcesMapper()
+            {
+                Name = this.Name,
+                Source = this.Source,
+                SourceRepository = this.SourceRepository,
+                Target = this.Target,
+                TargetRepository = this.TargetRepository,
+                AllMappings = new(this.AllMappings)
+            };
+        }
+
     }
 }

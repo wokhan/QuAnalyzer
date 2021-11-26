@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace QuAnalyzer.Features.Comparison
 {
-    public class SmartEqualityComparer<T> : IEqualityComparer<T>
+    public class DBNullAwareEqualityComparer<T> : IEqualityComparer<T>
     {
         public bool Equals(T x, T y)
         {

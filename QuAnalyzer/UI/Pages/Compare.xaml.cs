@@ -1,15 +1,16 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+﻿
 using Microsoft.Win32;
+
 using OfficeOpenXml;
-using QuAnalyzer.Core.Helpers;
+
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -17,8 +18,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Shell;
+
 using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Contracts;
 
@@ -29,89 +30,62 @@ namespace QuAnalyzer.UI.Pages
     /// </summary>
     public partial class Compare : Page
     {
-        public ObservableCollection<object[]> real { get; } = new ObservableCollection<object[]>();
+        public SourcesMapper SingleMap { get; } = new();
 
-        private readonly List<CancellationTokenSource> tokensources = new List<CancellationTokenSource>();
-
-        public SourcesMapper SingleMap { get; } = new SourcesMapper();
-
-        public class DiffClass
-        {
-            public object[] Values { get; set; }
-            public bool[] IsDiff { get; set; }
-        }
+        private int cpdCount = 0;
+        public ObservableCollection<ComparerStruct<object[]>> ComparisonInstances { get; } = new();
 
         public Compare()
         {
-            if (DesignerProperties.GetIsInDesignMode(this))
-            {
-                real.Add(new object[1] { "TEST" });
-            }
-
             InitializeComponent();
-
-            //ObservableCollection<object[]> real = new ObservableCollection<object[]>(cpd.Select(c => c.AsArray));
-
-            var cview = new ListCollectionView(real);
-            cview.GroupDescriptions.Add(new PropertyGroupDescription("[0]"));
-            allProgress.ItemsSource = cview;
         }
-
-        private int cpdCount = 0;
-        private readonly List<ComparerStruct<object[]>> cpd = new List<ComparerStruct<object[]>>();
+        
         private async void btnRun_Click(object sender, RoutedEventArgs e)
         {
+            if (lstMappings.SelectedItems.Count == 0)
+            {
+                return;
+            }
+
             prgGlobal.IsIndeterminate = true;
 
-            var localcpd = new List<ComparerStruct<object[]>>();
+            var newInstances = new List<ComparerStruct<object[]>>();
 
             var x = await GetComparerStruct().ConfigureAwait(true);
             foreach (var cp in x)
             {
-                /*var idx = real.Count(r => Regex.IsMatch((string)r[0], Regex.Escape(cp.Name) + @"(?:\s\(\d+\))?$")) / 2;
-                if (idx > 0)
-                {*/
                 cp.Name = $"[{cpdCount++}] {cp.Name}";
-                //}
 
-                localcpd.Add(cp);
-                cpd.Add(cp);
-                real.AddAll(cp.AsArray);
-                tokensources.Add(cp.TokenSource);
-                globalCount++;
+                newInstances.Add(cp);
+                ComparisonInstances.Add(cp);
+                ComparisonInstances.Add(cp);
             }
 
             prgGlobal.IsIndeterminate = false;
 
-            await Task.Run(() =>
-            {
-                Comparison.Run(localcpd, 0, 0, Progress, ((App)App.Current).CurrentProject.UseParallelism);
-            }).ConfigureAwait(false);
+            await Task.Run(() => Comparison.Run(newInstances, 0, 0, Progress, ((App)App.Current).CurrentProject.UseParallelism)).ConfigureAwait(false);
         }
 
         private async Task<ComparerStruct<object[]>[]> GetComparerStruct()
         {
-            if ((bool)btnToggleMode.IsChecked)
+            if (btnToggleMode.IsChecked is true)
             {
                 return await Task.Run(() => new[] { new ComparerStruct<object[]>(SingleMap) }).ConfigureAwait(false);
             }
 
             var mappers = lstMappings.SelectedItems.Cast<SourcesMapper>().ToList();
-            return await Task.Run(() => mappers.Select(s => new ComparerStruct<object[]>(s)).ToArray()).ConfigureAwait(false);
+            return await Task.Run(() => mappers.Select(mapper => new ComparerStruct<object[]>(mapper)).ToArray()).ConfigureAwait(false);
 
         }
 
-        private int globalCount;
-        private Dictionary<string, int> progressDC = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> progressDC = new();
         public void Progress(ComparerStruct<object[]> name)
         {
             try
             {
-                this.Dispatcher.Invoke(() => LocalProgress(name));
+                this.Dispatcher.InvokeAsync(() => LocalProgress(name));
             }
-#pragma warning disable CS0168 // La variable 'e' est déclarée, mais jamais utilisée
-            catch (TaskCanceledException e)
-#pragma warning restore CS0168 // La variable 'e' est déclarée, mais jamais utilisée
+            catch (TaskCanceledException)
             {
 
             }
@@ -130,7 +104,7 @@ namespace QuAnalyzer.UI.Pages
                 default:
                     progressDC[r.Name] = r.Results.LocalProgress;
 
-                    int currentProgress = (int)progressDC.Average(p => (int)p.Value);
+                    int currentProgress = (int)progressDC.Average(p => p.Value);
 
                     prgGlobal.Value = currentProgress;
 
@@ -148,31 +122,26 @@ namespace QuAnalyzer.UI.Pages
 
         public void btnDelete_Click(object sender, RoutedEventArgs e)
         {
-            Button src = (Button)sender;
+            var src = (Button)sender;
             var r = (ComparerStruct<object[]>)src.Tag;
 
             progressDC.Remove(r.Name);
-            real.Remove(real.First(re => r.Name.Equals((string)re[0])));
-            real.Remove(real.First(re => r.Name.Equals((string)re[0])));
+            ComparisonInstances.RemoveRange(ComparisonInstances.Where(re => r.Name.Equals((string)re.Name)));
         }
 
         public void btnCancel_Click(object sender, RoutedEventArgs e)
         {
-            Button src = (Button)sender;
+            var src = (Button)sender;
             var r = (ComparerStruct<object[]>)src.Tag;
 
             src.IsEnabled = false;
-
-            // tokensources[r.Name];
-            tokensources.Remove(r.TokenSource);
             r.TokenSource.Cancel(true);
-            //ts.Cancel(true);
         }
 
-        Dictionary<IDataComparer, Popup> openWindows = new Dictionary<IDataComparer, Popup>();
+        private readonly Dictionary<IDataComparer, Popup> openWindows = new Dictionary<IDataComparer, Popup>();
         public void btnDetails_Click(object sender, RoutedEventArgs e)
         {
-            Button src = (Button)sender;
+            var src = (Button)sender;
             var cmp = (IDataComparer)src.Tag;
             if (!openWindows.ContainsKey(cmp))
             {
@@ -185,77 +154,28 @@ namespace QuAnalyzer.UI.Pages
             openWindows[cmp].Activate();
         }
 
-        void dWin_Closed(object sender, EventArgs e)
+        private void dWin_Closed(object sender, EventArgs e)
         {
             openWindows.Remove(openWindows.Single(o => o.Value == sender).Key);
         }
 
-        //private void lstTrg_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    if (lstTrgRepo.Items.Count < 2)
-        //    {
-        //        lstSrcTrgRepo_SelectionChanged(null, null);
-        //    }
-        //}
-
-        //private void lstSrcTrgRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    if (lstTrgRepo.SelectedItem is not null && lstSrcRepo.SelectedItem is not null)
-        //    {
-        //        lstCustMappings.ItemsSource = ((App)App.Current).CurrentProject.SourceMapper.Where(c => c.Source == lstSrc.SelectedItem && c.SourceRepository == (string)lstSrcRepo.SelectedItem
-        //                                                                                && c.Target == lstTrg.SelectedItem && c.TargetRepository == (string)lstTrgRepo.SelectedItem);
-        //    }
-        //}
-
-        //private void spltResults_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        //{
-        //    var h = gridMain.RowDefinitions.First();
-        //    if (h.Height.Value == 0)
-        //    {
-        //        h.Height = GridLength.Auto;
-        //    }
-        //    else
-        //    {
-        //        h.Height = new GridLength(0);
-        //    }
-        //}
-
-        private void GlobalExportCSV_Click(object sender, RoutedEventArgs e)
-        {
-            var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = "Excel 2007 File|*.xlsx" };
-            if (dial.ShowDialog().Value)
-            {
-                allProgress.ExportAsXLSX();
-            }
-        }
-
-        private void GlobalExportHTML_Click(object sender, RoutedEventArgs e)
-        {
-            allProgress.ExportAsHTML();
-        }
-
-
-        private void GlobalCopy_Click(object sender, RoutedEventArgs e)
-        {
-            allProgress.CopyToClipboard();
-        }
-
+        
         private void GlobalReport_Click(object sender, RoutedEventArgs e)
         {
             var dial = new OpenFileDialog() { CheckFileExists = false, CheckPathExists = true, ValidateNames = false, FileName = "Pick a folder to save reports in. Existing files will be overwritten." };
-            if (!(bool)dial.ShowDialog())
+            if (dial.ShowDialog() is not true)
             {
                 return;
             }
 
-
             var folderPath = Directory.GetParent(dial.FileName);
-            StackPanel host = ((ModernMain)Window.GetWindow(this)).stackExports;
-            ((ModernMain)Window.GetWindow(this)).flyExports.IsOpen = true;
 
-            allProgress.ExportAsXLSX(folderPath + "\\Summary.xlsx", "Summary", host, SharedCallback.GetCallBackForExport(host, "Summary", null));
+            var app = (App)Application.Current;
+            var (host, callback, cancelTokenSummary) = app.AddTaskAndGetCallback("Exporting Summary");
+            
+            allProgress.ExportAsXLSX(folderPath + "\\Summary.xlsx", "Summary", host, callback, cancelTokenSummary);
 
-            foreach (var cmp in cpd.Where(c => c.Results.Progress == ProgressType.Done))
+            foreach (var cmp in ComparisonInstances.Where(c => c.Results.Progress == ProgressType.Done))
             {
                 /*if (!openWindows.ContainsKey(cmp))
                 {
@@ -269,17 +189,17 @@ namespace QuAnalyzer.UI.Pages
                 */
                 string name = String.Join("_", cmp.Name.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
 
-                string p = folderPath + "\\" + name + "_Details.xlsx";
+                string p = Path.Combine(folderPath.FullName, $"{name}_Details.xlsx");
 
                 var file = new FileInfo(p);
                 //if (cmp.Results.MergedDiff is not null)
-                var cb1 = SharedCallback.GetCallBackForExport(host, "Differences", file.Name);
-                var cb2 = SharedCallback.GetCallBackForExport(host, "Missing from source", file.Name);
-                var cb3 = SharedCallback.GetCallBackForExport(host, "Missing from target", file.Name);
-                var cb4 = SharedCallback.GetCallBackForExport(host, "Source duplicates", file.Name);
-                var cb5 = SharedCallback.GetCallBackForExport(host, "Target duplicates", file.Name);
-                var cb6 = SharedCallback.GetCallBackForExport(host, "Source clones", file.Name);
-                var cb7 = SharedCallback.GetCallBackForExport(host, "Target clones", file.Name);
+                var (_, cb1, cb1CancelToken) = app.AddTaskAndGetCallback($"Exporting Differences to {file.Name}");
+                var (_, cb2, cb2CancelToken) = app.AddTaskAndGetCallback($"Exporting Missing from source to {file.Name}");
+                var (_, cb3, cb3CancelToken) = app.AddTaskAndGetCallback($"Exporting Missing from target to {file.Name}");
+                var (_, cb4, cb4CancelToken) = app.AddTaskAndGetCallback($"Exporting Source duplicates to {file.Name}");
+                var (_, cb5, cb5CancelToken) = app.AddTaskAndGetCallback($"Exporting Target duplicates to {file.Name}");
+                var (_, cb6, cb6CancelToken) = app.AddTaskAndGetCallback($"Exporting Source clones to {file.Name}");
+                var (_, cb7, cb7CancelToken) = app.AddTaskAndGetCallback($"Exporting Target clones to {file.Name}");
 
                 Task.Run(() =>
                 {
@@ -321,7 +241,10 @@ namespace QuAnalyzer.UI.Pages
         }
 
 
-        private void btnNewPrv_Click(object sender, RoutedEventArgs e) => Popup.OpenNew(new MappingsEditor());
+        private void btnNewPrv_Click(object sender, RoutedEventArgs e)
+        {
+            Popup.OpenNew(new MappingsEditor());
+        }
 
         private void btnAuto_Click(object sender, RoutedEventArgs e)
         {
@@ -382,9 +305,5 @@ namespace QuAnalyzer.UI.Pages
             lstMappings.UnselectAll();
         }
 
-        private void btnError_Click(object sender, RoutedEventArgs e)
-        {
-            ((ModernMain)Window.GetWindow(this)).ShowMessageAsync("Error details", (string)((Button)sender).Tag, MessageDialogStyle.Affirmative, new MetroDialogSettings() { AnimateShow = true, AnimateHide = true });
-        }
     }
 }

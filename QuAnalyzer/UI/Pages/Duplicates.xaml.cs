@@ -135,7 +135,8 @@ namespace QuAnalyzer.UI.Pages
 
                 var attrExpr = LExpr.Expression.Lambda<Func<T, object[]>>(LExpr.Expression.NewArrayInit(typeof(object), atrs), param).Compile();
 
-                return src.Select(x => { if (x is null) { throw new Exception("Should never get there."); } return attrExpr(x); });
+                //return src.Select(x => { if (x is null) { throw new Exception("Should never get there."); } return attrExpr(x); });
+                return src.Select(x => attrExpr(x));
             }
         }
 
@@ -172,7 +173,7 @@ namespace QuAnalyzer.UI.Pages
                 var dataObjectArray = AsObjectCollection(data, KeepDuplicates ? headers : keys)
                                           .WithProgress(updateStatusLoad)
                                           .ToList();
-                
+
                 gridData.LoadingProgress = 1;
 
                 var keyComparer = new SequenceEqualityComparer<object>(0, keys.Length);

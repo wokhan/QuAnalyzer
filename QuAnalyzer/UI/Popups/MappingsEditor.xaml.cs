@@ -1,6 +1,5 @@
 ﻿using QuAnalyzer.Features.Comparison;
 
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -8,29 +7,14 @@ namespace QuAnalyzer.UI.Popups
 {
     public partial class MappingsEditor : Page
     {
-        private SourcesMapper initialMap;
-        private SourcesMapper currentMap;
+        private readonly SourcesMapper initialMap;
+        public SourcesMapper CurrentMap { get; private set; }
 
-        public MappingsEditor() : this(new SourcesMapper() { Name = "New mapping" })
+        public MappingsEditor(SourcesMapper map = null)
         {
+            initialMap = map ?? new SourcesMapper() { Name = "New mapping" };
+            CurrentMap = initialMap.Clone();
 
-        }
-
-        public MappingsEditor(SourcesMapper map)
-        {
-            initialMap = map;
-            currentMap = new SourcesMapper()
-            {
-                Name = map.Name,
-                Source = map.Source,
-                SourceRepository = map.SourceRepository,
-                Target = map.Target,
-                TargetRepository = map.TargetRepository,
-                AllMappings = new List<SimpleMap>(map.AllMappings)
-            };
-
-            this.DataContext = currentMap;
-            
             InitializeComponent();
         }
 
@@ -43,11 +27,11 @@ namespace QuAnalyzer.UI.Popups
             var projectMappers = ((App)App.Current).CurrentProject.SourceMapper;
             if (projectMappers.Contains(initialMap))
             {
-                projectMappers[projectMappers.IndexOf(initialMap)] = currentMap;
+                projectMappers[projectMappers.IndexOf(initialMap)] = CurrentMap;
             }
             else
             {
-                projectMappers.Add(currentMap);
+                projectMappers.Add(CurrentMap);
             }
             closeParent();
         }
