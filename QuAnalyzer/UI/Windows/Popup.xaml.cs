@@ -2,37 +2,36 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace QuAnalyzer.UI.Windows
+namespace QuAnalyzer.UI.Windows;
+
+/// <summary>
+/// Interaction logic for ProviderPage.xaml
+/// </summary>
+public partial class Popup : Window
 {
-    /// <summary>
-    /// Interaction logic for ProviderPage.xaml
-    /// </summary>
-    public partial class Popup : Window
+    private Popup(Page content)
     {
-        private Popup(Page content)
-        {
-            InitializeComponent();
+        InitializeComponent();
 
-            GoToPage(content);
-        }
+        GoToPage(content);
+    }
 
-        private void Container_Navigated(object sender, System.Windows.Navigation.NavigationEventArgs e)
-        {
-            this.Title = ((Page)e.Content).Title;
-        }
+    private void Container_Navigated(object sender, System.Windows.Navigation.NavigationEventArgs e)
+    {
+        this.Title = ((Page)e.Content).Title;
+    }
 
-        public void GoToPage(Page content)
-        {
-            container.Navigate(content);
-        }
+    public void GoToPage(Page content)
+    {
+        container.Navigate(content);
+    }
 
-        internal static Popup OpenNew(Page content)
-        {
-            var instance = new Popup(content);
-            instance.Show();
-            instance.Activate();
+    internal static Popup OpenNew(Page content)
+    {
+        var instance = new Popup(content);
+        instance.Show();
+        instance.Activate();
 
-            return instance;
-        }
+        return instance;
     }
 }

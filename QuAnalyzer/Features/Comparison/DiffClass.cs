@@ -1,8 +1,7 @@
-﻿namespace QuAnalyzer.Features.Comparison
+﻿namespace QuAnalyzer.Features.Comparison;
+
+public class DiffClass
 {
-    public class DiffClass
-    {
-        public object[] Values { get; set; }
-        public bool[] IsDiff { get; set; }
-    }
+    public object[] Values { get; set; }
+    public bool[] IsDiff { get; set; }
 }

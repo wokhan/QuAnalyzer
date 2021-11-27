@@ -3,37 +3,36 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace QuAnalyzer.UI.Popups
+namespace QuAnalyzer.UI.Popups;
+
+public partial class MappingsEditor : Page
 {
-    public partial class MappingsEditor : Page
+    private readonly SourcesMapper initialMap;
+    public SourcesMapper CurrentMap { get; private set; }
+
+    public MappingsEditor(SourcesMapper map = null)
     {
-        private readonly SourcesMapper initialMap;
-        public SourcesMapper CurrentMap { get; private set; }
+        initialMap = map ?? new SourcesMapper() { Name = "New mapping" };
+        CurrentMap = initialMap.Clone();
 
-        public MappingsEditor(SourcesMapper map = null)
+        InitializeComponent();
+    }
+
+
+    private void btnCancel_Click(object sender, RoutedEventArgs e) => closeParent();
+    private void closeParent() => Window.GetWindow(this).Close();
+
+    private void btnSave_Click(object sender, RoutedEventArgs e)
+    {
+        var projectMappers = ((App)App.Current).CurrentProject.SourceMapper;
+        if (projectMappers.Contains(initialMap))
         {
-            initialMap = map ?? new SourcesMapper() { Name = "New mapping" };
-            CurrentMap = initialMap.Clone();
-
-            InitializeComponent();
+            projectMappers[projectMappers.IndexOf(initialMap)] = CurrentMap;
         }
-
-
-        private void btnCancel_Click(object sender, RoutedEventArgs e) => closeParent();
-        private void closeParent() => Window.GetWindow(this).Close();
-
-        private void btnSave_Click(object sender, RoutedEventArgs e)
+        else
         {
-            var projectMappers = ((App)App.Current).CurrentProject.SourceMapper;
-            if (projectMappers.Contains(initialMap))
-            {
-                projectMappers[projectMappers.IndexOf(initialMap)] = CurrentMap;
-            }
-            else
-            {
-                projectMappers.Add(CurrentMap);
-            }
-            closeParent();
+            projectMappers.Add(CurrentMap);
         }
+        closeParent();
     }
 }

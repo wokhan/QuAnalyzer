@@ -1,11 +1,10 @@
-﻿namespace QuAnalyzer.Features.Monitoring
+﻿namespace QuAnalyzer.Features.Monitoring;
+
+public enum MonitoringStatus
 {
-    public enum MonitoringStatus
-    {
-        NOT_STARTED,
-        WAITING,
-        RUNNING,
-        DONE,
-        ABORTED
-    }
+    NOT_STARTED,
+    WAITING,
+    RUNNING,
+    DONE,
+    ABORTED
 }

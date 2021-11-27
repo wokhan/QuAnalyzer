@@ -1,11 +1,10 @@
-﻿namespace QuAnalyzer.Features.Monitoring
+﻿namespace QuAnalyzer.Features.Monitoring;
+
+public enum Status
 {
-    public enum Status
-    {
-        Pending,
-        Loading,
-        Success,
-        Failure,
-        Error
-    }
+    Pending,
+    Loading,
+    Success,
+    Failure,
+    Error
 }
