@@ -63,7 +63,7 @@
                         <Setter Property="RowHeaderTemplate">
                             <Setter.Value>
                                 <DataTemplate>
-                                    <CheckBox Margin="5,2" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=DataGridRow}}" />
+                                    <CheckBox Margin="5,2" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource AncestorType=DataGridRow}}" />
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
@@ -83,8 +83,8 @@
                                         <Style.Triggers>
                                             <MultiDataTrigger>
                                                 <MultiDataTrigger.Conditions>
-                                                    <Condition Binding="{Binding IsMouseOver,RelativeSource={RelativeSource Self}}" Value="True" />
-                                                    <Condition Binding="{Binding CanUserSort,RelativeSource={RelativeSource FindAncestor, AncestorType=DataGridColumnHeader}}" Value="True" />
+                                                    <Condition Binding="{Binding IsMouseOver,RelativeSource={x:Static RelativeSource.Self}}" Value="True" />
+                                                    <Condition Binding="{Binding CanUserSort,RelativeSource={RelativeSource AncestorType=DataGridColumnHeader}}" Value="True" />
                                                 </MultiDataTrigger.Conditions>
                                                 <Setter Property="Background" Value="{DynamicResource AccentColorBrush}" />
                                                 <Setter Property="TextElement.Foreground" Value="White" />

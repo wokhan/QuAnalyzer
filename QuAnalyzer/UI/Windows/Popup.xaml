@@ -12,7 +12,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <uicontrols:CustomWindowChrome Background="{Binding CurrentProject.AccentColor,Source={x:Static quanalyzer:App.Current}}" Height="35">
+        <uicontrols:CustomWindowChrome Background="{Binding CurrentProject.AccentColor,Source={x:Static quanalyzer:App.Instance}}" Height="35">
             <uicontrols:CustomWindowChrome.TitleStyle>
                 <Style TargetType="TextBlock">
                     <Setter Property="Typography.Capitals" Value="SmallCaps" />

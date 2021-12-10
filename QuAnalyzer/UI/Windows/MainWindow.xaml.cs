@@ -22,7 +22,7 @@ public partial class MainWindow
     {
         InitializeComponent();
 
-        ((App)Application.Current).Tasks.CollectionChanged += Tasks_CollectionChanged;
+        App.Instance.Tasks.CollectionChanged += Tasks_CollectionChanged;
 
         //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         //Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
@@ -82,7 +82,7 @@ public partial class MainWindow
     private void tabMenu_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         // Determines if the current tab requires a source selection (otherwise it will be disabled in the menu)
-        ((App)Application.Current).CurrentSelectionLinked = tabMenu.SelectedIndex < 4;
+        App.Instance.CurrentSelectionLinked = tabMenu.SelectedIndex < 4;
     }
 
     public void ShowAbout()
@@ -92,7 +92,7 @@ public partial class MainWindow
 
     private void btnMenuRecent_Click(object sender, RoutedEventArgs e)
     {
-        ((App)Application.Current).CurrentProject.Open((string)((MenuItem)sender).CommandParameter);
+        App.Instance.CurrentProject.Open((string)((MenuItem)sender).CommandParameter);
     }
 
     internal Task ShowProgress(string v1, string v2, bool v3)

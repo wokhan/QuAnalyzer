@@ -12,16 +12,10 @@
     <StartupObject>QuAnalyzer.App</StartupObject>
     <Nullable>warnings</Nullable>
   </PropertyGroup>
-  
   <ItemGroup>
-    <Compile Remove="Features\Comparison - Copy.cs" />
-    <Compile Remove="Features\ContractResolver.cs" />
-    <Compile Remove="UI\Controls\DataCompareDetail.xaml.cs" />
     <Compile Remove="UI\Pages\PerformancePage.xaml.cs" />
   </ItemGroup>
-  
   <ItemGroup>
-    <Page Remove="UI\Controls\DataCompareDetail.xaml" />
     <Page Remove="UI\Pages\PerformancePage.xaml" />
   </ItemGroup>
   
@@ -31,13 +25,11 @@
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="Wokhan.UI" Version="0.9.4-beta" />
     <PackageReference Include="EPPlus" Version="5.8.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.11.0" />
-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.1" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.13" />
     <PackageReference Include="System.Management" Version="5.0.0" />
-    <PackageReference Include="VirtualizingObservableCollection" Version="1.2.0" />
-    <PackageReference Include="Wokhan.Core" Version="0.9.3-beta" />
-    <PackageReference Include="Wokhan.Data.Providers" Version="1.2108.1001.242" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\QuAnalyzer.Features\QuAnalyzer.Features.csproj" />
   </ItemGroup>
 
   <ItemGroup>

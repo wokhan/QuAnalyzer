@@ -3,12 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:quanalyzer="clr-namespace:QuAnalyzer"
              mc:Ignorable="d" d:DesignWidth="350">
     <StackPanel Margin="0" HorizontalAlignment="Stretch" Background="WhiteSmoke" >
         <Label Content="About" Padding="5" Background="{DynamicResource AccentColorBrush}" FontWeight="Bold" />
-        <Label Content="{Binding ApplicationInfo, Source={x:Static Application.Current}, FallbackValue='Wokhan QuAnalyzer vX.X.X'}" Foreground="Black" Margin="10,0" />
-        <Label Content="{Binding Copyright, Source={x:Static Application.Current}, FallbackValue='Copyright notice'}" Foreground="Black" Margin="10,0" />
-        <Label Content="{Binding HelpLink, Source={x:Static Application.Current}, FallbackValue='Link'}" HorizontalContentAlignment="Right" Foreground="Black" Margin="10,0" />
+        <Label Content="{Binding ApplicationInfo, Source={x:Static quanalyzer:App.Instance}, FallbackValue='Wokhan QuAnalyzer vX.X.X'}" Foreground="Black" Margin="10,0" />
+        <Label Content="{Binding Copyright, Source={x:Static quanalyzer:App.Instance}, FallbackValue='Copyright notice'}" Foreground="Black" Margin="10,0" />
+        <Label Content="{Binding HelpLink, Source={x:Static quanalyzer:App.Instance}, FallbackValue='Link'}" HorizontalContentAlignment="Right" Foreground="Black" Margin="10,0" />
         <Label Content="External resources" Padding="5" Background="{DynamicResource AccentColorBrush}" FontWeight="Bold" />
         <TextBlock Foreground="Black" Margin="10,10" TextWrapping="Wrap">
             This project uses the following libraries:

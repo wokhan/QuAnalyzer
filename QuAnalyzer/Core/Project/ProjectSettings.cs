@@ -51,8 +51,8 @@ public class ProjectSettings : NotifierHelper
     [JsonIgnore]
     public SolidColorBrush AccentColor
     {
-        get { return (SolidColorBrush)App.Current.Resources["AccentColorBrush"]; }
-        set { App.Current.Resources["AccentColorBrush"] = value; }
+        get { return (SolidColorBrush)App.Instance.Resources["AccentColorBrush"]; }
+        set { App.Instance.Resources["AccentColorBrush"] = value; }
     }
 
     public ObservableCollection<IDataProvider> CurrentProviders { get; } = new();

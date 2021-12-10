@@ -14,7 +14,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -63,7 +62,7 @@ public partial class Compare : Page
 
         prgGlobal.IsIndeterminate = false;
 
-        await Task.Run(() => Comparison.Run(newInstances, 0, 0, Progress, ((App)App.Current).CurrentProject.UseParallelism)).ConfigureAwait(false);
+        await Task.Run(() => Comparison.Run(newInstances, 0, 0, Progress, ((App)App.Instance).CurrentProject.UseParallelism)).ConfigureAwait(false);
     }
 
     private async Task<ComparerStruct<object[]>[]> GetComparerStruct()
@@ -126,7 +125,7 @@ public partial class Compare : Page
         var r = (ComparerStruct<object[]>)src.Tag;
 
         progressDC.Remove(r.Name);
-        ComparisonInstances.RemoveRange(ComparisonInstances.Where(re => r.Name.Equals((string)re.Name)));
+        ComparisonInstances.RemoveRange(ComparisonInstances.Where(re => r.Name.Equals((string)re.Name)).ToList());
     }
 
     public void btnCancel_Click(object sender, RoutedEventArgs e)
@@ -170,7 +169,7 @@ public partial class Compare : Page
 
         var folderPath = Directory.GetParent(dial.FileName);
 
-        var app = (App)Application.Current;
+        var app = App.Instance;
         var (host, callback, cancelTokenSummary) = app.AddTaskAndGetCallback("Exporting Summary");
 
         allProgress.ExportAsXLSX(folderPath + "\\Summary.xlsx", "Summary", host, callback, cancelTokenSummary);
@@ -248,9 +247,9 @@ public partial class Compare : Page
 
     private void btnAuto_Click(object sender, RoutedEventArgs e)
     {
-        var allprv = ((App)App.Current).CurrentProject.CurrentProviders;
+        var allprv = ((App)App.Instance).CurrentProject.CurrentProviders;
 
-        var mapper = ((App)App.Current).CurrentProject.SourceMapper;
+        var mapper = ((App)App.Instance).CurrentProject.SourceMapper;
 
         mapper.Clear();
 
@@ -292,7 +291,7 @@ public partial class Compare : Page
 
     private void btnDeleteMapping_Click(object sender, RoutedEventArgs e)
     {
-        ((App)App.Current).CurrentProject.SourceMapper.Remove((SourcesMapper)((Button)sender).Tag);
+        ((App)App.Instance).CurrentProject.SourceMapper.Remove((SourcesMapper)((Button)sender).Tag);
     }
 
     private void btnSelectAll_Click(object sender, RoutedEventArgs e)

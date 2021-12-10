@@ -1,6 +1,4 @@
-﻿using QuAnalyzer.Core.Helpers;
-using QuAnalyzer.Generic.Extensions;
-using QuAnalyzer.UI.Windows;
+﻿using QuAnalyzer.Generic.Extensions;
 
 using System;
 using System.Collections;
@@ -128,7 +126,7 @@ public partial class ExtendedDataGridView : DataGrid, INotifyPropertyChanged
     private void GlobalExportCSV_Click(object sender, RoutedEventArgs e)
     {
         //TODO: Externalize (shouldn't be at the Control level)
-        var (host, callback, cancellationToken) = ((App)Application.Current).AddTaskAndGetCallback("Exporting data");
+        var (host, callback, cancellationToken) = App.Instance.AddTaskAndGetCallback("Exporting data");
         this.ExportAsXLSX(host: host, callback: callback, cancellationToken: cancellationToken);
     }
 

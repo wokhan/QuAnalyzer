@@ -10,7 +10,7 @@
       d:DesignWidth="820"
 	d:DesignHeight="610"
 	Title="Patterns"
-      DataContext="{Binding RelativeSource={RelativeSource Self}}">
+      DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}">
     <DockPanel>
         <WrapPanel Style="{StaticResource ToolBar}">
             <Button Click="btnUpdate_Click" Content="Update" ToolTip="Update now" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" />
@@ -33,7 +33,7 @@
                     <ListBox.Style>
                         <Style TargetType="ListBox">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
+                                <DataTrigger Binding="{Binding HasItems, RelativeSource={x:Static RelativeSource.Self}}" Value="False">
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate>
@@ -47,7 +47,7 @@
                     </ListBox.Style>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox Content="{Binding}" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" />
+                            <CheckBox Content="{Binding}" IsChecked="{Binding IsSelected,Mode=TwoWay,RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

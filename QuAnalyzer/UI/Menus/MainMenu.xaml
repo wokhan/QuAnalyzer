@@ -5,6 +5,7 @@
              xmlns:QuAnalyzerHelpers="clr-namespace:QuAnalyzer.Core.Helpers"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:quanalyzer="clr-namespace:QuAnalyzer"
              xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d" d:DesignWidth="600">
     <Grid>
@@ -46,11 +47,11 @@
             </Controls:DropDownButton>
             <Button ToolTip="About..." Click="btnAbout_Click" Content="{iconPacks:Material Kind=InformationOutline}" Foreground="Orange" FontSize="26" />
             <!--<MenuItem Header="_Options">
-                    <MenuItem IsCheckable="True" Header="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static Application.Current}, FallbackValue=True}"  />
+                    <MenuItem IsCheckable="True" Header="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static quanalyzer:App.Instance}, FallbackValue=True}"  />
                 </MenuItem>-->
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-            <TextBox MinWidth="200" FontSize="14" Foreground="Black" BorderThickness="1" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{Binding CurrentProject.Name, Source={x:Static Application.Current}, FallbackValue='Unamed project'}">
+            <TextBox MinWidth="200" FontSize="14" Foreground="Black" BorderThickness="1" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{Binding CurrentProject.Name, Source={x:Static quanalyzer:App.Instance}, FallbackValue='Unamed project'}">
                 <TextBox.Style>
                     <Style TargetType="TextBox">
                         <Setter Property="BorderBrush" Value="Transparent" />
@@ -68,7 +69,7 @@
                     </Style>
                 </TextBox.Style>
             </TextBox>
-            <ComboBox Background="Transparent" BorderThickness="0" ItemsSource="{Binding AvailableColors, Source={x:Static Application.Current}}" SelectedItem="{Binding CurrentProject.AccentColor,Source={x:Static Application.Current},Mode=TwoWay}" Width="Auto">
+            <ComboBox Background="Transparent" BorderThickness="0" ItemsSource="{Binding AvailableColors, Source={x:Static quanalyzer:App.Instance}}" SelectedItem="{Binding CurrentProject.AccentColor,Source={x:Static quanalyzer:App.Instance},Mode=TwoWay}" Width="Auto">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <Ellipse Fill="{Binding}" Width="16" Height="16" VerticalAlignment="Stretch" />

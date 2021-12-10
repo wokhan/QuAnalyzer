@@ -22,12 +22,12 @@ public partial class PatternsPage : Page
     {
         InitializeComponent();
 
-        ((App)App.Current).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
+        ((App)App.Instance).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
     }
 
     private async void UpdateSelection()
     {
-        var (prov, repo) = ((App)App.Current).CurrentSelection;
+        var (prov, repo) = ((App)App.Instance).CurrentSelection;
         var attr = (string)lstAttributes.SelectedValue;
 
         if (repo is not null && attr is null)
@@ -43,7 +43,7 @@ public partial class PatternsPage : Page
 
     private async Task Compute()
     {
-        var (prov, repo) = ((App)App.Current).CurrentSelection;
+        var (prov, repo) = ((App)App.Instance).CurrentSelection;
 
         var attr = (string)lstAttributes.SelectedValue;
 

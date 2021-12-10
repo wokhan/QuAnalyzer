@@ -2,6 +2,8 @@
 
 using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Core.Project;
+using QuAnalyzer.Features.Comparison;
+using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.UI.Windows;
 
 using System;
@@ -27,6 +29,7 @@ namespace QuAnalyzer;
 /// </summary>
 public partial class App : INotifyPropertyChanged
 {
+    public static App Instance => (App)Current;
 
     public List<SolidColorBrush> AvailableColors { get; } = new List<SolidColorBrush> {
             new SolidColorBrush(Color.FromRgb(0x41, 0xB1, 0xE1)),
@@ -74,6 +77,10 @@ public partial class App : INotifyPropertyChanged
         CurrentProject = new ProjectSettings() { Name = "Unamed project" };
         Performance = new ResourcesWatcher();
         ProvidersMan = new ProvidersManager();
+
+        //TODO: change to a static initializer
+        MonitorItem.Providers = Instance.CurrentProject.CurrentProviders;
+        SourcesMapper.Providers = Instance.CurrentProject.CurrentProviders;
 
         RegisterCommands();
 

@@ -147,7 +147,7 @@
                              Maximum="{TemplateBinding ScrollableHeight}"
                              Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
                              Value="{Binding VerticalOffset, Mode=OneWay, 
-                      RelativeSource={RelativeSource TemplatedParent}}"/>
+                      RelativeSource={x:Static RelativeSource.TemplatedParent}}"/>
 
                                                 <Grid Grid.Column="1"
                         Grid.Row="2">
@@ -164,7 +164,7 @@
                                Maximum="{TemplateBinding ScrollableWidth}"
                                Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
                                Value="{Binding HorizontalOffset, Mode=OneWay, 
-                        RelativeSource={RelativeSource TemplatedParent}}"/>
+                        RelativeSource={x:Static RelativeSource.TemplatedParent}}"/>
                                                 </Grid>
                                             </Grid>
                                         </ControlTemplate>
@@ -212,7 +212,7 @@
                                                     <DataGrid.Style>
                                                         <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
+                                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={x:Static RelativeSource.Self}}" Value="False">
                                                                     <Setter Property="Template">
                                                                         <Setter.Value>
                                                                             <ControlTemplate>
@@ -259,7 +259,7 @@
                                                     <ListBox.Style>
                                                         <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
+                                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={x:Static RelativeSource.Self}}" Value="False">
                                                                     <Setter Property="Template">
                                                                         <Setter.Value>
                                                                             <ControlTemplate>
@@ -298,7 +298,7 @@
                                                     <DataGrid.Style>
                                                         <Style TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={RelativeSource Self}}" Value="False">
+                                                                <DataTrigger Binding="{Binding HasItems,RelativeSource={x:Static RelativeSource.Self}}" Value="False">
                                                                     <Setter Property="Template">
                                                                         <Setter.Value>
                                                                             <ControlTemplate>

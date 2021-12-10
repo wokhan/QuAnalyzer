@@ -5,9 +5,10 @@
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:monitor="clr-namespace:QuAnalyzer.Features.Monitoring"
+      xmlns:monitor="clr-namespace:QuAnalyzer.Features.Monitoring;assembly=QuAnalyzer.Features"
+      xmlns:quanalyzer="clr-namespace:QuAnalyzer"
       mc:Ignorable="d" 
-      d:DesignWidth="388" DataContext="{Binding CurrentItem,RelativeSource={RelativeSource Self}}"
+      d:DesignWidth="388" DataContext="{Binding CurrentItem,RelativeSource={x:Static RelativeSource.Self}}"
       Title="{Binding Name,StringFormat='Monitoring settings - {0}',FallbackValue='New monitor'}"
       x:Name="myself">
     <Page.Resources>
@@ -58,7 +59,7 @@
             <Label Content="Name:" HorizontalAlignment="Left" />
             <TextBox Grid.Column="1" Grid.ColumnSpan="3" x:Name="txtName" Text="{Binding Name}" />
             <Label Grid.Row="1" Content="Provider:" />
-            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstSrc" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static Application.Current}}" VerticalAlignment="Top" SelectedItem="{Binding Provider}">
+            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstSrc" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static quanalyzer:App.Instance}}" VerticalAlignment="Top" SelectedItem="{Binding Provider}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <WrapPanel>
@@ -99,7 +100,7 @@
             <Label Grid.Row="7" Content="Filter:" />
             <TextBox Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3" x:Name="txtFilter" Text="{Binding Filter}" />
             <Label Grid.Row="8" Content="Preceding steps:" VerticalAlignment="Top" />
-            <ListBox Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static Application.Current}}" SelectionMode="Multiple">
+            <ListBox Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static quanalyzer:App.Instance}}" SelectionMode="Multiple">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>

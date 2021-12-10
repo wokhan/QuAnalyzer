@@ -62,7 +62,7 @@
                 </Style>
             </TabControl.Style>
             <TabItem x:Name="tabMapping" IsSelected="{Binding IsChecked,ElementName=btnToggleMode, Converter={StaticResource booleanNegator}}">
-                <DataGrid SelectionMode="Extended" ItemsSource="{Binding CurrentProject.SourceMapper, Source={x:Static quanalyzer:App.Current}}" ColumnWidth="18*" AutoGenerateColumns="False" x:Name="lstMappings" CanUserAddRows="False">
+                <DataGrid SelectionMode="Extended" ItemsSource="{Binding CurrentProject.SourceMapper, Source={x:Static quanalyzer:App.Instance}}" ColumnWidth="18*" AutoGenerateColumns="False" x:Name="lstMappings" CanUserAddRows="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Binding="{Binding Name}" Header="Mapping name" IsReadOnly="True" />
                         <DataGridTextColumn Binding="{Binding SourceName}" Header="Source" IsReadOnly="True" />

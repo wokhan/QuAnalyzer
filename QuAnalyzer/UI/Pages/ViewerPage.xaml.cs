@@ -1,7 +1,4 @@
-﻿using QuAnalyzer.UI.Windows;
-
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace QuAnalyzer.UI.Pages;
 
@@ -14,14 +11,14 @@ public partial class ViewerPage : Page
     {
         InitializeComponent();
 
-        ((App)App.Current).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
+        ((App)App.Instance).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
 
         UpdateSelection();
     }
 
     private void UpdateSelection()
     {
-        var (prov, repo) = ((App)App.Current).CurrentSelection;
+        var (prov, repo) = ((App)App.Instance).CurrentSelection;
         if (prov is not null && repo is not null)
         {
             gridData.CustomHeaders = prov.GetColumns(repo);

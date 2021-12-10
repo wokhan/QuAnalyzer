@@ -27,7 +27,7 @@ public partial class SourcesMenu : UserControl
 
     private void btnDeleteProvider_Click(object sender, RoutedEventArgs e)
     {
-        ((App)Application.Current).CurrentProject.CurrentProviders.Remove((IDataProvider)((Button)sender).Tag);
+        App.Instance.CurrentProject.CurrentProviders.Remove((IDataProvider)((Button)sender).Tag);
     }
 
     private void btnImportPrv_Click(object sender, RoutedEventArgs e)
@@ -35,7 +35,7 @@ public partial class SourcesMenu : UserControl
         var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = "QuAnalyzer Data Provider archive|*.qax" };
         if (dial.ShowDialog().Value)
         {
-            ((App)Application.Current).ProvidersMan.AddProvider(dial.FileName);
+            App.Instance.ProvidersMan.AddProvider(dial.FileName);
         }
     }
 
@@ -65,7 +65,7 @@ public partial class SourcesMenu : UserControl
         var provider = (IDataProvider)treeViewItem.Tag;
         var repository = (string)((TreeView)sender).SelectedValue;
 
-        ((App)Application.Current).CurrentSelection = (provider, repository);
+        App.Instance.CurrentSelection = (provider, repository);
 
     }
 }

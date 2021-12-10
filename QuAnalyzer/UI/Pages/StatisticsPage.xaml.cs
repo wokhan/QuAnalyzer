@@ -58,7 +58,7 @@ public partial class StatisticsPage : Page, INotifyPropertyChanged
         //LiveCharts.HasMapFor<Values>((v, point) => { point.PrimaryValue = v.Frequency; });
 
         //ComputedStats.CollectionChanged += ComputedStats_CollectionChanged;
-        ((App)App.Current).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
+        ((App)App.Instance).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
     }
 
     private void ComputedStats_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -69,7 +69,7 @@ public partial class StatisticsPage : Page, INotifyPropertyChanged
 
     private void UpdateSelection()
     {
-        var (prov, repo) = ((App)App.Current).CurrentSelection;
+        var (prov, repo) = ((App)App.Instance).CurrentSelection;
         if (prov is not null && btnAuto.IsChecked.Value)
         {
             Computedata(prov, repo);
@@ -78,7 +78,7 @@ public partial class StatisticsPage : Page, INotifyPropertyChanged
 
     private void btnCompute_Click(object sender, System.Windows.RoutedEventArgs e)
     {
-        var (prov, repo) = ((App)App.Current).CurrentSelection;
+        var (prov, repo) = ((App)App.Instance).CurrentSelection;
         Computedata(prov, repo);
     }
 

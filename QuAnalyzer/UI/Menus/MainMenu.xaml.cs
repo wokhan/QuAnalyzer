@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-
+﻿
 using QuAnalyzer.UI.Windows;
 
 using System.Windows;
@@ -19,7 +18,7 @@ public partial class MainMenu : UserControl
 
     private void btnMenuRecent_Click(object sender, RoutedEventArgs e)
     {
-        ((App)App.Current).CurrentProject.Open((string)((MenuItem)sender).CommandParameter);
+        ((App)App.Instance).CurrentProject.Open((string)((MenuItem)sender).CommandParameter);
     }
 
     private void btnAbout_Click(object sender, RoutedEventArgs e)

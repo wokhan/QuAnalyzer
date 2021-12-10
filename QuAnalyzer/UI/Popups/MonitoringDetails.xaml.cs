@@ -24,7 +24,7 @@ public partial class MonitoringDetails : Page
 
     public MonitoringDetails(MonitorItem monitorItem = null)
     {
-        initialItem = monitorItem ?? new MonitorItem() { Name = "Monitor #" + (((App)Application.Current).CurrentProject.MonitorItems.Count + 1) };
+        initialItem = monitorItem ?? new MonitorItem() { Name = "Monitor #" + (App.Instance.CurrentProject.MonitorItems.Count + 1) };
         CurrentItem = initialItem.Clone();
 
         InitializeComponent();
@@ -47,7 +47,7 @@ public partial class MonitoringDetails : Page
         CurrentItem.PrecedingSteps.AddAll(lstPrec.SelectedItems.Cast<MonitorItem>().Select(_ => KeyValuePair.Create(_, false)));
         CurrentItem.Attributes = String.Join(",", lstAttributes.SelectedItems.Cast<KeyValuePair<string, bool>>().Select(s => s.Key));
 
-        var projectMappers = ((App)App.Current).CurrentProject.MonitorItems;
+        var projectMappers = ((App)App.Instance).CurrentProject.MonitorItems;
         if (projectMappers.Contains(initialItem))
         {
             projectMappers[projectMappers.IndexOf(initialItem)] = CurrentItem;

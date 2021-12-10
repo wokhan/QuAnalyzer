@@ -197,7 +197,7 @@ public partial class Monitor : Page
 
     private void btnClear_Click(object sender, RoutedEventArgs e)
     {
-        ((App)Application.Current).CurrentProject.MonitorItems.Clear();
+        App.Instance.CurrentProject.MonitorItems.Clear();
     }
 
     private void btnCopy_Click(object sender, RoutedEventArgs e)
@@ -213,11 +213,11 @@ public partial class Monitor : Page
     private void btnDelete_Click(object sender, RoutedEventArgs e)
     {
         var mtoremove = (MonitorItem)((Button)sender).Tag;
-        foreach (var m in ((App)Application.Current).CurrentProject.MonitorItems.Where(m => m.PrecedingSteps.Any()))
+        foreach (var m in App.Instance.CurrentProject.MonitorItems.Where(m => m.PrecedingSteps.Any()))
         {
             m.PrecedingSteps.Remove(mtoremove);
         }
-        ((App)Application.Current).CurrentProject.MonitorItems.Remove(mtoremove);
+        App.Instance.CurrentProject.MonitorItems.Remove(mtoremove);
     }
 
     private void globalTimer_Tick(object sender, EventArgs e)

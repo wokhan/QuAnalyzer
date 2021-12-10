@@ -1,12 +1,13 @@
 ﻿<UserControl x:Class="QuAnalyzer.UI.Menus.SourcesMenu"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
-    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      xmlns:quanalyzer="clr-namespace:QuAnalyzer"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:local="clr-namespace:Wokhan.Data.Providers.Contracts;assembly=Wokhan.Data.Providers"
-    mc:Ignorable="d" d:DesignHeight="460">
+      mc:Ignorable="d" d:DesignHeight="460">
     <Grid Background="Gray">
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
@@ -24,7 +25,7 @@
             <Button Content="Add..." Click="btnNewSource_Click" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" />
             <Button Content="Import..." IsEnabled="False" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Import}"/>
         </WrapPanel>
-        <TreeView Grid.Row="2" Background="White" BorderThickness="0" TreeViewItem.Selected="TreeView_Selected" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static Application.Current}}" SelectedValuePath="Key">
+        <TreeView Grid.Row="2" Background="White" BorderThickness="0" TreeViewItem.Selected="TreeView_Selected" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static quanalyzer:App.Instance}}" SelectedValuePath="Key">
             <TreeView.Resources>
                 <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Style.Triggers>
@@ -41,7 +42,7 @@
             <TreeView.Style>
                 <Style TargetType="TreeView">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
+                        <DataTrigger Binding="{Binding HasItems, RelativeSource={x:Static RelativeSource.Self}}" Value="False">
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
@@ -73,7 +74,7 @@
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
-        <!--<ListView Visibility="Collapsed" BorderThickness="0" Grid.Row="2" Name="lstProviders" SelectedItem="{Binding CurrentSelection,Source={x:Static Application.Current}}" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
+        <!--<ListView Visibility="Collapsed" BorderThickness="0" Grid.Row="2" Name="lstProviders" SelectedItem="{Binding CurrentSelection,Source={x:Static quanalyzer:App.Instance}}" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
             <ListView.Resources>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
                     <Setter Property="Background" Value="Transparent" />
@@ -82,7 +83,7 @@
             <ItemsControl.Style>
                 <Style TargetType="ItemsControl" BasedOn="{StaticResource {x:Type ItemsControl}}">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
+                        <DataTrigger Binding="{Binding HasItems, RelativeSource={x:Static RelativeSource.Self}}" Value="False">
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
@@ -142,7 +143,7 @@
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding CurrentSelectionLinked,Source={x:Static Application.Current}}" Value="True">
+                                    <DataTrigger Binding="{Binding CurrentSelectionLinked,Source={x:Static quanalyzer:App.Instance}}" Value="True">
                                         <Setter Property="CornerRadius" Value="10,0,0,10" />
                                         <Setter Property="Margin" Value="5,0,5,5" />
                                     </DataTrigger>

@@ -8,6 +8,7 @@
     xmlns:helpers="clr-namespace:QuAnalyzer.Core.Helpers"
     xmlns:uicontrols="clr-namespace:Wokhan.UI.Xaml.Controls;assembly=Wokhan.UI" 
     xmlns:popups="clr-namespace:QuAnalyzer.UI.Popups"
+    xmlns:quanalyzer="clr-namespace:QuAnalyzer"
     Title="{Binding AppName,RelativeSource={x:Static RelativeSource.Self}}" 
     ResizeMode="CanResizeWithGrip"
     MinWidth="1030" MinHeight="600" Height="600" 
@@ -49,7 +50,7 @@
                     <Setter Property="Margin" Value="-3,-4,-3,-3" />
                     <!--<Style.Triggers>
                         <DataTrigger Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=TabItem,AncestorLevel=1}}" Value="True">
-                            <Setter Property="Source" Value="{Binding Tag,RelativeSource={RelativeSource Self}}" />
+                            <Setter Property="Source" Value="{Binding Tag,RelativeSource={x:Static RelativeSource.Self}}" />
                         </DataTrigger>
                     </Style.Triggers>-->
                 </Style>
@@ -97,7 +98,7 @@
             </StackPanel>
             <Border Background="LightGray" Grid.Row="2">
                 <ScrollViewer HorizontalScrollBarVisibility="Hidden">
-                    <ItemsControl ItemsSource="{Binding Tasks,Source={x:Static Application.Current}}">
+                    <ItemsControl ItemsSource="{Binding Tasks,Source={x:Static quanalyzer:App.Instance}}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type helpers:GlobalTask}">
                                 <StackPanel Margin="20,2,20,2">
@@ -113,13 +114,13 @@
         </Grid>
         <StatusBar Grid.Row="2" Grid.ColumnSpan="2" Height="25" Background="{DynamicResource AccentColorBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
             <StatusBarItem>
-                <TextBlock Text="{Binding CurrentProject.FilePath, Source={x:Static Application.Current},FallbackValue='No project has been loaded nor saved.'}" Background="Transparent" HorizontalAlignment="Right" Margin="0,0,20,0" />
+                <TextBlock Text="{Binding CurrentProject.FilePath, Source={x:Static quanalyzer:App.Instance},FallbackValue='No project has been loaded nor saved.'}" Background="Transparent" HorizontalAlignment="Right" Margin="0,0,20,0" />
             </StatusBarItem>
             <StatusBarItem HorizontalContentAlignment="Right">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="90" Text="{Binding Performance.MemoryUseFormatted, Source={x:Static Application.Current}, StringFormat='Memory: {0}',FallbackValue='Memory: -KB'}" Margin="0,0,20,0" />
-                    <TextBlock Width="60" Text="{Binding Performance.CPUUsage, Source={x:Static Application.Current}, StringFormat=CPU: {0}%,FallbackValue='CPU: -%'}" Margin="0,0,20,0" />
-                    <TextBlock Width="70" Text="{Binding Performance.ThreadsCount, Source={x:Static Application.Current}, StringFormat=Threads: {0},FallbackValue='Threads: -'}" Margin="0,0,20,0" />
+                    <TextBlock Width="90" Text="{Binding Performance.MemoryUseFormatted, Source={x:Static quanalyzer:App.Instance}, StringFormat='Memory: {0}',FallbackValue='Memory: -KB'}" Margin="0,0,20,0" />
+                    <TextBlock Width="60" Text="{Binding Performance.CPUUsage, Source={x:Static quanalyzer:App.Instance}, StringFormat=CPU: {0}%,FallbackValue='CPU: -%'}" Margin="0,0,20,0" />
+                    <TextBlock Width="70" Text="{Binding Performance.ThreadsCount, Source={x:Static quanalyzer:App.Instance}, StringFormat=Threads: {0},FallbackValue='Threads: -'}" Margin="0,0,20,0" />
                     <ToggleButton Name="btnTasks" IsChecked="False" BorderThickness="0" Margin="0,0,30,0" Padding="0">
                         <ToggleButton.Style>
                             <Style BasedOn="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" TargetType="ToggleButton">

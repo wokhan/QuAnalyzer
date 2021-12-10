@@ -9,6 +9,6 @@
       d:DesignHeight="600" d:DesignWidth="850"
       x:Name="thisWindow"
 	  Title="DataViewer"
-      DataContext="{Binding RelativeSource={RelativeSource Self}}">
+      DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}">
     <UC:ExtendedDataGridView x:Name="gridData" EnableAdvancedFilters="True" />
 </Page>

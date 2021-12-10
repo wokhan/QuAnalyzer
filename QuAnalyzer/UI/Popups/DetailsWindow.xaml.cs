@@ -1,6 +1,4 @@
-﻿using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
-
+﻿
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.UI.Controls;
 

@@ -5,7 +5,7 @@
         xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
         xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
         Title="{Binding Name,StringFormat='Comparison details - {0}'}" 
-        DataContext="{Binding CurrentMap,RelativeSource={RelativeSource Self}}"
+        DataContext="{Binding CurrentMap,RelativeSource={x:Static RelativeSource.Self}}"
         x:Name="me"
         MinWidth="700">
     <Grid>

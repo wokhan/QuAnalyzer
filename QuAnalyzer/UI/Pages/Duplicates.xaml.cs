@@ -46,14 +46,14 @@ public partial class Duplicates : Page, INotifyPropertyChanged
     {
         InitializeComponent();
 
-        ((App)App.Current).PropertyChanged += App_PropertyChanged;
+        ((App)App.Instance).PropertyChanged += App_PropertyChanged;
     }
 
     private void App_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(App.CurrentSelection))
         {
-            var (prov, repo) = ((App)App.Current).CurrentSelection;
+            var (prov, repo) = ((App)App.Instance).CurrentSelection;
             if (prov is not null)
             {
                 lstColumns.ItemsSource = prov.GetColumns(repo);
@@ -142,7 +142,7 @@ public partial class Duplicates : Page, INotifyPropertyChanged
 
     private async void btnRun_Click(object sender, RoutedEventArgs e)
     {
-        var (prov, repository) = ((App)App.Current).CurrentSelection;
+        var (prov, repository) = ((App)App.Instance).CurrentSelection;
 
         var allHeadersFu = prov.GetColumns(repository);
         string[] keys;

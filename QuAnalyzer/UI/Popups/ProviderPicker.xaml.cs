@@ -14,7 +14,7 @@ public partial class ProviderPicker : Page
 
     private void btnNewPrv_Click(object sender, RoutedEventArgs e)
     {
-        var providerName = $"{((DataProviderDefinition)lstProvidersTypes.SelectedItem).Name}#{((App)Application.Current).CurrentProject.CurrentProviders.Count}";
+        var providerName = $"{((DataProviderDefinition)lstProvidersTypes.SelectedItem).Name}#{App.Instance.CurrentProject.CurrentProviders.Count}";
 
         this.NavigationService.Navigate(new ProviderEditor(providerName));
     }

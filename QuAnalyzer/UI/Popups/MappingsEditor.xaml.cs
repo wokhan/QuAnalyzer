@@ -24,7 +24,7 @@ public partial class MappingsEditor : Page
 
     private void btnSave_Click(object sender, RoutedEventArgs e)
     {
-        var projectMappers = ((App)App.Current).CurrentProject.SourceMapper;
+        var projectMappers = ((App)App.Instance).CurrentProject.SourceMapper;
         if (projectMappers.Contains(initialMap))
         {
             projectMappers[projectMappers.IndexOf(initialMap)] = CurrentMap;

@@ -137,9 +137,9 @@ public partial class ProviderEditor : Page
     {
         CurrentProvider.Repositories = Repositories.Where(r => r.Selected).ToDictionary(r => r.Key, r => r.Value);
 
-        if (!((App)Application.Current).CurrentProject.CurrentProviders.Contains(CurrentProvider))
+        if (!App.Instance.CurrentProject.CurrentProviders.Contains(CurrentProvider))
         {
-            ((App)Application.Current).CurrentProject.CurrentProviders.Add(CurrentProvider);
+            App.Instance.CurrentProject.CurrentProviders.Add(CurrentProvider);
         }
         //((App)App.Current).CurrentProject.CurrentProviders[((App)App.Current).CurrentProject.CurrentProviders.IndexOf((IDataProvider)lstProviders.SelectedItem)] = CurrentProvider;
 
@@ -249,7 +249,7 @@ public partial class ProviderEditor : Page
         CurrentProvider = (IDataProvider)Activator.CreateInstance(DataProvider.AllProviders.First().Type);
         CurrentProvider.Name = "Provider #" + (lstProviders.Items.Count + 1);
 
-        ((App)Application.Current).CurrentProject.CurrentProviders.Add(CurrentProvider);
+        App.Current.CurrentProject.CurrentProviders.Add(CurrentProvider);
 
         fillProvider();
     }*/
@@ -261,7 +261,7 @@ public partial class ProviderEditor : Page
 
     private void btnDeleteProvider_Click(object sender, RoutedEventArgs e)
     {
-        ((App)Application.Current).CurrentProject.CurrentProviders.Remove((IDataProvider)((Button)sender).Tag);
+        App.Instance.CurrentProject.CurrentProviders.Remove((IDataProvider)((Button)sender).Tag);
     }
 
     private void btnDeleteRepo_Click(object sender, RoutedEventArgs e)

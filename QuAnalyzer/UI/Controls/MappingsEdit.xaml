@@ -43,7 +43,7 @@
             </Grid.RowDefinitions>
             <Label Content="SOURCE" Background="SteelBlue" Foreground="White" Grid.ColumnSpan="2" />
             <Label Content="Provider:" Grid.Row="1" VerticalAlignment="Center" />
-            <ComboBox x:Name="lstSrc" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static Application.Current}}" SelectedItem="{Binding Source}" ItemTemplate="{StaticResource AttributesTemplate}" />
+            <ComboBox x:Name="lstSrc" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static quanalyzer:App.Instance}}" SelectedItem="{Binding Source}" ItemTemplate="{StaticResource AttributesTemplate}" />
             <Label Content="Repository:" Grid.Row="2" VerticalAlignment="Center" />
             <ComboBox x:Name="lstSrcRepo" Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding Mapping.SourceRepository,ElementName=me}" SelectionChanged="lstSrcRepo_SelectionChanged" DataContext="{Binding SelectedItem, ElementName=lstSrc}"/>
         </Grid>
@@ -60,7 +60,7 @@
             </Grid.RowDefinitions>
             <Label Content="TARGET" Background="SteelBlue" Foreground="White" Grid.ColumnSpan="2" />
             <Label Content="Provider:" Grid.Row="1" VerticalAlignment="Center" />
-            <ComboBox x:Name="lstTrg" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static quanalyzer:App.Current}}" SelectedItem="{Binding Target}" ItemTemplate="{StaticResource AttributesTemplate}" />
+            <ComboBox x:Name="lstTrg" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static quanalyzer:App.Instance}}" SelectedItem="{Binding Target}" ItemTemplate="{StaticResource AttributesTemplate}" />
             <Label Content="Repository:" Grid.Row="2" VerticalAlignment="Center" />
             <ComboBox x:Name="lstTrgRepo" Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding Mapping.TargetRepository,ElementName=me}" SelectionChanged="lstTrgRepo_SelectionChanged" DataContext="{Binding SelectedItem, ElementName=lstTrg}"/>
         </Grid>

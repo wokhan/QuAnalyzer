@@ -10,7 +10,7 @@
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks" xmlns:skiasharpview="clr-namespace:LiveChartsCore.SkiaSharpView;assembly=LiveChartsCore.SkiaSharpView"
       mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="840"
       x:Name="me"
-      DataContext="{Binding RelativeSource={RelativeSource Self}}"
+      DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}"
 	Title="Statistics">
     <DockPanel Grid.Row="1" Grid.Column="1">
         <WrapPanel Style="{StaticResource ToolBar}">
