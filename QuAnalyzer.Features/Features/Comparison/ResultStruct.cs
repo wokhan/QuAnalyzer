@@ -8,15 +8,15 @@ public partial class ResultStruct<T> : ResultStructBase
     public ItemResult<T> Source { get; } = new ItemResult<T>();
     public ItemResult<T> Target { get; } = new ItemResult<T>();
 
+    public string[] MergedHeaders { get; private set; }
+
     public IEnumerable<DiffClass> MergedDiff { get; private set; } = null;
 
     public void InitDiff(IDataComparer r)
     {
         if (MergedDiff is null)
         {
-            MergedHeaders = r.SourceHeaders.Select((header, index) => (srcHeader: header, targetHeader: r.TargetHeaders[index]))
-                                           .Select(x => x.srcHeader + (x.srcHeader != x.targetHeader ? "/" + x.targetHeader : string.Empty))
-                                           .ToArray();
+            MergedHeaders = r.SourceHeaders.Zip(r.TargetHeaders, (src, trg) => src + (src != trg ? "/" + trg : String.Empty)).ToArray();
 
             IEnumerable<object[]> sortedMiss;
             if (Source.Differences is not null)
@@ -58,5 +58,4 @@ public partial class ResultStruct<T> : ResultStructBase
         }
     }
 
-    public string[] MergedHeaders { get; private set; }
 }

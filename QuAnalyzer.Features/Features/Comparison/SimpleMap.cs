@@ -1,10 +1,10 @@
 ﻿namespace QuAnalyzer.Features.Comparison;
 
-public class SimpleMap
+public struct SimpleMap
 {
     public string Source { get; set; } = String.Empty;
     public string Target { get; set; } = String.Empty;
-    public bool IsKey { get; set; }
+    public bool IsKey { get; set; } = false;
 
     public SimpleMap()
     {

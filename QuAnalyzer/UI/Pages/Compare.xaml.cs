@@ -32,7 +32,7 @@ public partial class Compare : Page
     public SourcesMapper SingleMap { get; } = new();
 
     private int cpdCount = 0;
-    public ObservableCollection<ComparerStruct<object[]>> ComparisonInstances { get; } = new();
+    public ObservableCollection<ComparerStruct<object[]>> ComparisonInstancesView { get; } = new();
 
     public Compare()
     {
@@ -56,13 +56,16 @@ public partial class Compare : Page
             cp.Name = $"[{cpdCount++}] {cp.Name}";
 
             newInstances.Add(cp);
-            ComparisonInstances.Add(cp);
-            ComparisonInstances.Add(cp);
+            // Adding it twice... because we need two rows in the table (...)
+            ComparisonInstancesView.Add(cp);
+            ComparisonInstancesView.Add(cp);
         }
 
         prgGlobal.IsIndeterminate = false;
 
-        await Task.Run(() => Comparison.Run(newInstances, 0, 0, Progress, ((App)App.Instance).CurrentProject.UseParallelism)).ConfigureAwait(false);
+        var callback = new Progress<ComparerStruct<object[]>>(Progress);
+
+        await Task.Run(() => Comparison.Run(newInstances, 0, 0, callback, ((App)App.Instance).CurrentProject.UseParallelism)).ConfigureAwait(false);
     }
 
     private async Task<ComparerStruct<object[]>[]> GetComparerStruct()
@@ -80,17 +83,17 @@ public partial class Compare : Page
     private readonly Dictionary<string, int> progressDC = new();
     public void Progress(ComparerStruct<object[]> name)
     {
-        try
+        //try
         {
             this.Dispatcher.InvokeAsync(() => LocalProgress(name));
         }
-        catch (TaskCanceledException)
+        //catch (TaskCanceledException)
         {
 
         }
     }
 
-    public void LocalProgress(ComparerStruct<object[]> r)
+    private void LocalProgress(ComparerStruct<object[]> r)
     {
         switch (r.Results.Progress)
         {
@@ -125,7 +128,7 @@ public partial class Compare : Page
         var r = (ComparerStruct<object[]>)src.Tag;
 
         progressDC.Remove(r.Name);
-        ComparisonInstances.RemoveRange(ComparisonInstances.Where(re => r.Name.Equals((string)re.Name)).ToList());
+        ComparisonInstancesView.RemoveRange(ComparisonInstancesView.Where(re => r.Name.Equals((string)re.Name)).ToList());
     }
 
     public void btnCancel_Click(object sender, RoutedEventArgs e)
@@ -174,7 +177,7 @@ public partial class Compare : Page
 
         allProgress.ExportAsXLSX(folderPath + "\\Summary.xlsx", "Summary", host, callback, cancelTokenSummary);
 
-        foreach (var cmp in ComparisonInstances.Where(c => c.Results.Progress == ProgressType.Done))
+        foreach (var cmp in ComparisonInstancesView.Where(c => c.Results.Progress == ProgressType.Done))
         {
             /*if (!openWindows.ContainsKey(cmp))
             {
@@ -247,9 +250,9 @@ public partial class Compare : Page
 
     private void btnAuto_Click(object sender, RoutedEventArgs e)
     {
-        var allprv = ((App)App.Instance).CurrentProject.CurrentProviders;
+        var allprv = App.Instance.CurrentProject.CurrentProviders;
 
-        var mapper = ((App)App.Instance).CurrentProject.SourceMapper;
+        var mapper = App.Instance.CurrentProject.SourceMapper;
 
         mapper.Clear();
 
@@ -291,7 +294,7 @@ public partial class Compare : Page
 
     private void btnDeleteMapping_Click(object sender, RoutedEventArgs e)
     {
-        ((App)App.Instance).CurrentProject.SourceMapper.Remove((SourcesMapper)((Button)sender).Tag);
+        App.Instance.CurrentProject.SourceMapper.Remove((SourcesMapper)((Button)sender).Tag);
     }
 
     private void btnSelectAll_Click(object sender, RoutedEventArgs e)

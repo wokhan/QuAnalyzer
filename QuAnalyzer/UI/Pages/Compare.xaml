@@ -15,7 +15,7 @@
       d:DesignHeight="607.375"
       Title="DataCompare">
     <Page.Resources>
-        <CollectionViewSource Source="{Binding ComparisonInstances}" x:Key="groupedViewSource">
+        <CollectionViewSource Source="{Binding ComparisonInstancesView}" x:Key="groupedViewSource">
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="Name" />
             </CollectionViewSource.GroupDescriptions>

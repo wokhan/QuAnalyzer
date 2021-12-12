@@ -10,38 +10,34 @@ namespace QuAnalyzer.Features.Comparison;
 
 public static class Comparison
 {
-    public static async Task Run<T>(IEnumerable<ComparerStruct<T>> comparerData, int nbSamplesCompared, int nbSamplesShown, Action<ComparerStruct<T>> progressCallback = null, bool useParallelism = true) where T : class
+    public static async Task Run<T>(IEnumerable<ComparerStruct<T>> comparerData, int nbSamplesCompared, int nbSamplesShown, IProgress<ComparerStruct<T>>? progressCallback = null, bool useParallelism = true) where T : class
     {
-        Contract.Requires(comparerData is not null);
-
-        if (progressCallback is null)
-        {
-            progressCallback = (s) => { };
-        }
+        var runner = new Runner<T>(progressCallback, nbSamplesShown, nbSamplesCompared);
 
         if (!useParallelism)
         {
-            var runner = new Runner<T>(progressCallback, nbSamplesShown, nbSamplesCompared);
-            var t = Task.Run(() => runner.Invoke(comparerData.First()));
+            //var t = Task.Run(() => runner.Invoke(comparerData.First()));
             foreach (var cd in comparerData)
             {
-                await t.ContinueWith(_ => runner.Invoke(cd));
+                //await t.ContinueWith(_ => runner.Invoke(cd));
+                await Task.Run(() => runner.Invoke(cd));
             }
         }
         else
         {
-            ParallelHelper.ForEach<ComparerStruct<T>, Runner<T>>(comparerData.ToArray(), new Runner<T>(progressCallback, nbSamplesShown, nbSamplesCompared));
+            ParallelHelper.ForEach<ComparerStruct<T>, Runner<T>>(comparerData.ToArray(), runner);
             //Task.WaitAll(comparerData.Select(cd => runForOne(cd, progressCallback)).ToArray());// AsParallel().Select(runForOne));
         }
     }
 
     private readonly struct Runner<T> : IInAction<ComparerStruct<T>> where T : class
     {
-        private readonly Action<ComparerStruct<T>> callback;
+        private readonly IProgress<ComparerStruct<T>>? callback;
+
         private readonly int nbSamplesShown;
         private readonly int nbSamplesCompared;
 
-        public Runner(Action<ComparerStruct<T>> callback, int nbSamplesShown, int nbSamplesCompared)
+        public Runner(IProgress<ComparerStruct<T>>? callback, int nbSamplesShown, int nbSamplesCompared)
         {
             this.callback = callback;
             this.nbSamplesShown = nbSamplesShown;
@@ -54,7 +50,7 @@ public static class Comparison
         }
 
         private async void InternalInvokeAsync(ComparerStruct<T> f)
-        { 
+        {
             try
             {
                 CancellationToken token = f.TokenSource.Token;
@@ -150,12 +146,12 @@ public static class Comparison
         });
     }
 
-    private static void SetProgress<T>(ComparerStruct<T> f, ProgressType progressType, int p, Action<ComparerStruct<T>> progressCallback)
+    private static void SetProgress<T>(ComparerStruct<T> f, ProgressType progressType, int p, IProgress<ComparerStruct<T>>? progressCallback)
     {
         f.Results.Progress = progressType;
         f.Results.SubProgress = p;
 
-        progressCallback?.Invoke(f);
+        progressCallback?.Report(f);
     }
 
 
@@ -181,7 +177,7 @@ public static class Comparison
     /// <param name="trgData"></param>
     /// <param name="progressCallback"></param>
     /// <param name="token"></param>
-    public static void CompareOrdered<T>(ComparerStruct<T> f, IEnumerable<T> srcData, IEnumerable<T> trgData, Action<ComparerStruct<T>> progressCallback, CancellationToken token) where T : class
+    public static void CompareOrdered<T>(ComparerStruct<T> f, IEnumerable<T> srcData, IEnumerable<T> trgData, IProgress<ComparerStruct<T>>? progressCallback, CancellationToken token) where T : class
     {
         Contract.Requires(srcData is not null);
         Contract.Requires(trgData is not null);
@@ -289,7 +285,7 @@ public static class Comparison
         SetProgress(f, ProgressType.Done, 0, progressCallback);
     }
 
-    public static void Compare<T>(ComparerStruct<T> f, IEnumerable<T> srcData, IEnumerable<T> trgData, Action<ComparerStruct<T>> progressCallback, CancellationToken token)
+    public static void Compare<T>(ComparerStruct<T> f, IEnumerable<T> srcData, IEnumerable<T> trgData, IProgress<ComparerStruct<T>>? progressCallback, CancellationToken token)
     {
         Contract.Requires(srcData is not null);
         Contract.Requires(trgData is not null);
@@ -395,7 +391,7 @@ public static class Comparison
         }
     }
 
-    private static IList<T> RetrieveOnly<T>(IList<T> a, IList<T> b, ComparerStruct<T> f, Action<ComparerStruct<T>> progressCallback, ProgressType type)
+    private static IList<T> RetrieveOnly<T>(IList<T> a, IList<T> b, ComparerStruct<T> f, IProgress<ComparerStruct<T>> progressCallback, ProgressType type)
     {
         var ix = 0;
         return a.AsParallel()

@@ -82,7 +82,7 @@ public partial class MappingsEdit : UserControl
 
     private void btnMapPos_Click(object sender, RoutedEventArgs e)
     {
-        Mapping.AllMappings.ReplaceAll(SourceAttributes.Take(TargetAttributes.Count).Select((s, i) => new SimpleMap(s, TargetAttributes[i])));
+        Mapping.AllMappings.ReplaceAll(SourceAttributes.Take(TargetAttributes.Count).Zip(TargetAttributes, (s, i) => new SimpleMap(s, i)));
         gridMappings.Items.Refresh();
     }
 }

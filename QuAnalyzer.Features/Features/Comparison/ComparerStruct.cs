@@ -174,6 +174,6 @@ public class ComparerStruct<T> : IDataComparer
 
     private static IEnumerable<object[]> ConvertType(IEnumerable<IEnumerable<object>> src, Type[] types)
     {
-        return src.Select(c => c.Select((a, i) => a.SafeConvert(types[i])).ToArray());
+        return src.Select(c => c.Zip(types, (a, t) => a.SafeConvert(t)).ToArray());
     }
 }
