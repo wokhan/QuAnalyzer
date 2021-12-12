@@ -68,7 +68,7 @@ public static class DataGridExtensions
         }
     }*/
 
-    public static void ExportAsXLSX(this DataGrid grid, string path = null, string worksheetName = null, Panel host = null, Action<double> callback = null, CancellationTokenSource cancellationToken = null)
+    public static void ExportAsXLSX(this DataGrid grid, string path = null, string worksheetName = null, Panel host = null, IProgress<double> progress = null, CancellationTokenSource cancellationToken = null)
     {
         //var canceled = false;
         //try
@@ -90,7 +90,7 @@ public static class DataGridExtensions
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (var xl = new ExcelPackage(new FileInfo(path)))
             {
-                if (xl.AddWorksheetFromDataGrid(grid, worksheetName, host, callback, cancellationToken))
+                if (xl.AddWorksheetFromDataGrid(grid, worksheetName, host, progress, cancellationToken))
                 {
                     xl.Save();
                 }

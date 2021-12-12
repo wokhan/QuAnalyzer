@@ -152,21 +152,21 @@ public partial class App : INotifyPropertyChanged
     /// </summary>
     /// <param name="title"></param>
     /// <returns></returns>
-    internal (Panel host, Action<double>, CancellationTokenSource) AddTaskAndGetCallback(string title)
+    internal (Panel host, IProgress<double> progress, CancellationTokenSource cancelationToken) AddTaskAndGetCallback(string title)
     {
-        var window = ((MainWindow)this.MainWindow);
+        var window = (MainWindow)this.MainWindow;
 
         var task = new GlobalTask() { Title = title };
 
         return (window.stackExports,
-                i =>
+                new Progress<double>(i =>
                 {
                     if (task.Progress is null)
                     {
                         Tasks.Add(task);
                     }
                     task.Progress = i;
-                },
+                }),
                 task.CancellationTokenSource
         );
     }

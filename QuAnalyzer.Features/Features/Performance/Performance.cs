@@ -7,7 +7,7 @@ namespace QuAnalyzer.Features.Performance;
 
 public static class Performance
 {
-    public static void Run(TestCasesCollection testsCollection, int occurence, int burstOccurences, int threads, Action<ResultsClass> callback = null)
+    public static void Run(TestCasesCollection testsCollection, int occurence, int burstOccurences, int threads, IProgress<ResultsClass>? progress = null)
     {
         if (burstOccurences <= 0)
         {
@@ -34,7 +34,7 @@ public static class Performance
                       //.WithExecutionMode(ParallelExecutionMode.ForceParallelism)
                       .WithDegreeOfParallelism(threads / testsCollection.TestCases.Count)
                       //.WithMergeOptions(ParallelMergeOptions.NotBuffered)
-                      .ForAll(x => NewMethod(testsCollection, occurence, callback, x));
+                      .ForAll(x => RunForOne(testsCollection, occurence, progress, x));
         }
         finally
         {
@@ -43,7 +43,7 @@ public static class Performance
         }
     }
 
-    private static void NewMethod(TestCasesCollection testsCollection, int occurence, Action<ResultsClass> callback, int x)
+    private static void RunForOne(TestCasesCollection testsCollection, int occurence, IProgress<ResultsClass>? callback, int x)
     {
         IList<Dictionary<string, string>> values = null;
         if (testsCollection.ValuesSet is not null)// && tests.DistinctParallelValues)
@@ -65,7 +65,7 @@ public static class Performance
                        Values = values
                    };
 
-                   callback?.Invoke(r);
+                   callback?.Report(r);
 
                    var sw = Stopwatch.StartNew();
                    try

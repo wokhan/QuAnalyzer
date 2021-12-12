@@ -137,7 +137,7 @@ public partial class Monitor : Page
 
 
         //TODO : Values !!!!
-        await Task.Run(() => Performance.Run(new TestCasesCollection() { TestCases = monitorInstances }, globalPerfCounter++, (int)Occurences.Value, (int)MaxParallel.Value, monitor_OnAdd)).ConfigureAwait(false);
+        await Task.Run(() => Performance.Run(new TestCasesCollection() { TestCases = monitorInstances }, globalPerfCounter++, (int)Occurences.Value, (int)MaxParallel.Value, new Progress<ResultsClass>(monitor_OnAdd))).ConfigureAwait(false);
 
     }
 
@@ -170,7 +170,7 @@ public partial class Monitor : Page
         List<Dictionary<string, string>> values = null;
 
         //TODO : Values !!!!
-        await Task.Run(() => Performance.Run(new TestCasesCollection() { TestCases = new[] { monitorInstance }, ValuesSet = values }, cnt++, 1, 1, monitor_OnAdd)).ConfigureAwait(false);
+        await Task.Run(() => Performance.Run(new TestCasesCollection() { TestCases = new[] { monitorInstance }, ValuesSet = values }, cnt++, 1, 1, new Progress<ResultsClass>(monitor_OnAdd))).ConfigureAwait(false);
 
         monitorInstance.Status = MonitoringStatus.DONE;
     }

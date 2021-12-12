@@ -26,7 +26,7 @@ namespace QuAnalyzer.UI.Controls;
 /// </summary>
 public partial class ExtendedDataGridView : DataGrid, INotifyPropertyChanged
 {
-    public Action<double> ExportProgressCallback { get; set; }
+    public IProgress<double> ExportProgressCallback { get; set; }
 
     public IEnumerable<string> DemoItems { get; } = new[] { "Item #1", "Item #2" };
 
@@ -126,8 +126,8 @@ public partial class ExtendedDataGridView : DataGrid, INotifyPropertyChanged
     private void GlobalExportCSV_Click(object sender, RoutedEventArgs e)
     {
         //TODO: Externalize (shouldn't be at the Control level)
-        var (host, callback, cancellationToken) = App.Instance.AddTaskAndGetCallback("Exporting data");
-        this.ExportAsXLSX(host: host, callback: callback, cancellationToken: cancellationToken);
+        var (host, progress, cancellationToken) = App.Instance.AddTaskAndGetCallback("Exporting data");
+        this.ExportAsXLSX(host: host, progress: progress, cancellationToken: cancellationToken);
     }
 
     private void GlobalExportHTML_Click(object sender, RoutedEventArgs e)

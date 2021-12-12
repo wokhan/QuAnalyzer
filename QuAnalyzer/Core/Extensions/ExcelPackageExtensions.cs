@@ -20,7 +20,7 @@ namespace QuAnalyzer.Generic.Extensions;
 public static class ExcelPackageExtensions
 {
 
-    public static void AddWorksheet<T>(this ExcelPackage xl, IEnumerable<T> src, IList<string> headers, int keysCount, string worksheetName, Func<T, int, string, ExcelStyle, object> GetValueSetStyle, Action<double> callback = null)
+    public static void AddWorksheet<T>(this ExcelPackage xl, IEnumerable<T> src, IList<string> headers, int keysCount, string worksheetName, Func<T, int, string, ExcelStyle, object> GetValueSetStyle, IProgress<double> progress = null)
     {
         var sheet = xl.Workbook.Worksheets[worksheetName ?? "Report"];
         if (sheet is not null)
@@ -44,7 +44,7 @@ public static class ExcelPackageExtensions
         foreach (var x in src)
         {
             j++;
-            callback?.Invoke((double)(j - 2) / cnt);
+            progress?.Report((double)(j - 2) / cnt);
 
             for (var k = 1; k <= headers.Count; k++)
             {
@@ -52,13 +52,13 @@ public static class ExcelPackageExtensions
             }
         }
 
-        callback?.Invoke(1);
+        progress?.Report(1);
     }
 
 
     private static readonly Color NO_COLOR = Color.FromArgb(255, 255, 255, 255);
 
-    public static bool AddWorksheetFromDataGrid(this ExcelPackage xl, DataGrid grid, string worksheetName, Panel host = null, Action<double> callback = null, System.Threading.CancellationTokenSource cancellationToken = null)
+    public static bool AddWorksheetFromDataGrid(this ExcelPackage xl, DataGrid grid, string worksheetName, Panel host = null, IProgress<double> progress = null, System.Threading.CancellationTokenSource cancellationToken = null)
     {
         var gridClone = new DataGrid()
         {
@@ -142,7 +142,7 @@ public static class ExcelPackageExtensions
                     row = (DataGridRow)gridClone.ItemContainerGenerator.ContainerFromIndex(j - 2);
                 }
 
-                callback?.Invoke((j - 1.0) / gridClone.Items.Count);
+                progress?.Report((j - 1.0) / gridClone.Items.Count);
 
                 DoEvents();
 
@@ -179,7 +179,7 @@ public static class ExcelPackageExtensions
 
             }
 
-            callback?.Invoke(1);
+            progress?.Report(1);
         }
         catch { }
         finally
@@ -190,7 +190,7 @@ public static class ExcelPackageExtensions
         return false;
     }
 
-    public static void ExportAsXLSX<T>(this IEnumerable<T> src, string[] headers, int keysCount, string worksheetName, Func<T, int, string, ExcelStyle, object> GetValueSetStyle, string path = null, Action<double> callback = null)
+    public static void ExportAsXLSX<T>(this IEnumerable<T> src, string[] headers, int keysCount, string worksheetName, Func<T, int, string, ExcelStyle, object> GetValueSetStyle, string path = null, IProgress<double> progress = null)
     {
         if (path is null)
         {
@@ -206,7 +206,7 @@ public static class ExcelPackageExtensions
         }
 
         using var xl = new ExcelPackage(new FileInfo(path));
-        xl.AddWorksheet(src, headers, keysCount, worksheetName, GetValueSetStyle, callback);
+        xl.AddWorksheet(src, headers, keysCount, worksheetName, GetValueSetStyle, progress);
         xl.Save();
     }
 
