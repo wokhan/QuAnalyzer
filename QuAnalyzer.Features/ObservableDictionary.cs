@@ -55,8 +55,8 @@ public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INot
         base.Add(key, value);
 
         NotifyCollectionChanged(NotifyCollectionChangedAction.Add, (key, value));
-        //NotifyPropertyChanged(nameof(Keys));
-        //NotifyPropertyChanged(nameof(Values));
+        NotifyPropertyChanged(nameof(Keys));
+        NotifyPropertyChanged(nameof(Values));
     }
 
     public new void Remove(TKey key)
@@ -64,16 +64,15 @@ public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INot
         base.Remove(key);
 
         NotifyCollectionChanged(NotifyCollectionChangedAction.Reset);
-        //NotifyPropertyChanged(nameof(Keys));
-        //NotifyPropertyChanged(nameof(Values));
-
+        NotifyPropertyChanged(nameof(Keys));
+        NotifyPropertyChanged(nameof(Values));
     }
 
     public void Refresh()
     {
         NotifyCollectionChanged(NotifyCollectionChangedAction.Reset);
-        //NotifyPropertyChanged(nameof(Keys));
-        //NotifyPropertyChanged(nameof(Values));
+        NotifyPropertyChanged(nameof(Keys));
+        NotifyPropertyChanged(nameof(Values));
     }
 
     public new void Clear()
@@ -81,8 +80,8 @@ public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INot
         base.Clear();
 
         NotifyCollectionChanged(NotifyCollectionChangedAction.Reset);
-        //NotifyPropertyChanged(nameof(Keys));
-        //NotifyPropertyChanged(nameof(Values));
+        NotifyPropertyChanged(nameof(Keys));
+        NotifyPropertyChanged(nameof(Values));
     }
 
     public new TValue this[TKey key]
@@ -93,14 +92,18 @@ public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INot
             var oldvalue = base[key];
             base[key] = value;
             NotifyCollectionChanged(NotifyCollectionChangedAction.Replace, (key, value), (key, oldvalue));
-            // NotifyPropertyChanged(nameof(Values));
+            NotifyPropertyChanged(nameof(Values));
 
         }
     }
 
     protected void NotifyCollectionChanged(NotifyCollectionChangedAction action, object? item = null, object? oldItem = null)
     {
-        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, item, oldItem));
+        if (action == NotifyCollectionChangedAction.Replace)
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, item, oldItem));
+
+        if (action == NotifyCollectionChangedAction.Add || action == NotifyCollectionChangedAction.Remove)
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, item));
     }
 
 

@@ -97,7 +97,7 @@ public partial class DetailsWindow : Page
                     Value = true,
                     Binding = new Binding("IsDiff[" + (i + 1) + "]")
                 };
-                trigger.Setters.Add(new Setter(DataGridCell.ForegroundProperty, Brushes.Red));
+                trigger.Setters.Add(new Setter(Control.ForegroundProperty, Brushes.Red));
 
                 style.Triggers.Add(trigger);
 

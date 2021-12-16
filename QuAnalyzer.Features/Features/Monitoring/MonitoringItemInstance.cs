@@ -8,19 +8,19 @@ public partial class MonitoringItemInstance : ObservableObject
 {
     [ObservableProperty]
     private MonitoringStatus status;
-
+   
     public event Action<MonitoringItemInstance, ResultsClass>? OnResult;
     public event Action<MonitoringItemInstance, ResultsClass>? OnAdd;
 
-    public MonitorItem monitorItem { get; private set; }
+    public MonitorItem MonitorItem { get; private set; }
 
     public int InstanceId { get; set; }
-    public string Name => monitorItem.Name;
+    public string Name => MonitorItem.Name;
 
-    public ObservableCollection<ResultsClass> Results { get; } = new ObservableCollection<ResultsClass>();
+    public ObservableCollection<ResultsClass> Results { get; } = new();
 
     public List<MonitoringItemInstance> PrecedingStepsInstances { get; set; }
-    public bool AllPrecedingStepsDone { get; internal set; }
+    public bool AllPrecedingStepsDone { get; internal set; } = true;
 
     private void preceding_Done(MonitoringItemInstance source, ResultsClass obj)
     {
@@ -55,13 +55,14 @@ public partial class MonitoringItemInstance : ObservableObject
 
     public MonitoringItemInstance(MonitorItem monitorItem)
     {
-        this.monitorItem = monitorItem;
+        this.MonitorItem = monitorItem;
 
     }
 
     public void AttachPrecedingStepInstances(IEnumerable<MonitoringItemInstance> steps)
     {
         this.PrecedingStepsInstances = steps.ToList();
+        this.AllPrecedingStepsDone = this.PrecedingStepsInstances.Count == 0;
         foreach (var m in PrecedingStepsInstances)
         {
             m.OnResult += preceding_Done;

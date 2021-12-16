@@ -5,6 +5,6 @@ public enum Status
     Pending,
     Loading,
     Success,
-    Failure,
+    //Failure,
     Error
 }

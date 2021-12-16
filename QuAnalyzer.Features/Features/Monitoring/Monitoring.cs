@@ -1,11 +1,9 @@
-﻿using QuAnalyzer.Features.Monitoring;
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq.Dynamic.Core;
 
-namespace QuAnalyzer.Features.Performance;
+namespace QuAnalyzer.Features.Monitoring;
 
-public static class Performance
+public static class Monitoring
 {
     public static void Run(TestCasesCollection testsCollection, int occurence, int burstOccurences, int threads, IProgress<ResultsClass>? progress = null)
     {
@@ -17,7 +15,7 @@ public static class Performance
         {
             threads = 1;
         }
-     
+
         //TODO: use ParallelHelper from Community Toolkit
         int prevThreads, prevPorts;
         ThreadPool.GetMinThreads(out prevThreads, out prevPorts);
@@ -51,31 +49,29 @@ public static class Performance
             values = (testsCollection.Selector ?? ValueSelectors.SequentialSelector).Invoke(testsCollection.ValuesSet, x);
         }
         testsCollection.TestCases
-               .Select((test, ix) => (test, ix))
+               .Select((test, ix) => (test, results: new ResultsClass()
+               {
+                   Id = $"{occurence}.{x}.{ix}",
+                   Name = test.Name,
+                   //Index = x,
+                   Status = Status.Pending,
+                   Values = values
+               }))
                .AsParallel()
                .WithDegreeOfParallelism(testsCollection.TestCases.Count)
-               .ForAll(a =>
+               .ForAll(testWithResults =>
                {
-                   var r = new ResultsClass()
-                   {
-                       Id = $"{occurence}.{x}.{a.ix}",
-                       Name = a.test.Name,
-                       //Index = x,
-                       Status = Status.Loading,
-                       Values = values
-                   };
-
-                   callback?.Report(r);
+                   callback?.Report(testWithResults.results);
 
                    var sw = Stopwatch.StartNew();
                    try
                    {
-                       var monitorItem = a.test.monitorItem;
+                       var monitorItem = testWithResults.test.MonitorItem;
                        switch (monitorItem.Type)
                        {
                            case MonitoringModes.PING:
-                               r.Data = null;
-                               r.Duration.Add(nameof(MonitoringModes.PING), SimpleNetworkTests.Ping(monitorItem.Provider.Host));
+                               testWithResults.results.Data = null;
+                               testWithResults.results.Duration.Add(nameof(MonitoringModes.PING), SimpleNetworkTests.Ping(monitorItem.Provider.Host));
                                break;
 
                            case MonitoringModes.CHECKVAL:
@@ -83,43 +79,45 @@ public static class Performance
                                {
                                    throw new NullReferenceException($"The {nameof(monitorItem.Attributes)} attribute must not be null.");
                                }
-                               var q = monitorItem.GetData(values, r.Duration);
+                               var q = monitorItem.GetData(values, testWithResults.results.Duration);
                                if (!string.IsNullOrEmpty(monitorItem.Filter))
                                {
                                    q = q.Where(monitorItem.Filter);
                                }
                                // Removed new(attribute)
-                               r.Data = q.Select(monitorItem.Attributes).AsEnumerable().ToList();
+                               testWithResults.results.Status = Status.Loading;
+                               testWithResults.results.Data = q.Select(monitorItem.Attributes).AsEnumerable().ToList();
                                break;
 
                            case MonitoringModes.COUNTALL:
-                               var qc = monitorItem.GetData(values, r.Duration);
+                               var qc = monitorItem.GetData(values, testWithResults.results.Duration);
                                if (!string.IsNullOrEmpty(monitorItem.Filter))
                                {
                                    qc = qc.Where(monitorItem.Filter);
                                }
-                               r.Data = new { Count = qc.Count() };
+                               testWithResults.results.Status = Status.Loading;
+                               testWithResults.results.Data = new { Count = qc.Count() };
                                break;
 
                            default:
-                               r.Data = null;
+                               testWithResults.results.Data = null;
                                break;
                        }
 
-                       r.Status = Status.Success;
+                       testWithResults.results.Status = Status.Success;
                    }
                    catch (Exception e)
                    {
-                       r.Data = e;
-                       r.Status = Status.Error;
+                       testWithResults.results.Data = e;
+                       testWithResults.results.Status = Status.Error;
                    }
                    finally
                    {
                        sw.Stop();
                    }
 
-                   r.Duration.Add("_TOTAL_DEFAULT", sw.ElapsedMilliseconds);
-                   r.End = r.LastCheck.AddMilliseconds(sw.ElapsedMilliseconds);
+                   testWithResults.results.Duration.Add("_TOTAL_DEFAULT", sw.ElapsedMilliseconds);
+                   testWithResults.results.End = testWithResults.results.LastCheck.AddMilliseconds(sw.ElapsedMilliseconds);
 
                });
     }

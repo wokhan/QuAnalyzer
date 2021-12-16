@@ -34,6 +34,7 @@ public class ComparerStruct<T> : IDataComparer
         TokenSource = new CancellationTokenSource();
     }
 
+    //TODO: compare to Wokhan's AsObjectCollection (and rename it...)
     public static IEnumerable<object[]> ToObjectArrays(IEnumerable src, params string[] attributes)
     {
         var innertype = src.GetInnerType();
@@ -163,6 +164,7 @@ public class ComparerStruct<T> : IDataComparer
         if (false)
         {
 #pragma warning disable CS0162 // Code inaccessible détecté
+            //TODO: Date only ?!
             return src.Select(c => c.Select(a => a is DBNull ? null : a is DateTime ? ((DateTime)a).Date : a).ToArray());
 #pragma warning restore CS0162 // Code inaccessible détecté
         }

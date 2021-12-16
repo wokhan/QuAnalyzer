@@ -67,6 +67,9 @@ public partial class MonitorItem : ObservableObject
 
     public string Attributes { get; set; } = "";
 
+    [ObservableProperty]
+    public MonitoringStatus status;
+
     public MonitoringItemInstance CreateInstance()
     {
         return new MonitoringItemInstance(this);

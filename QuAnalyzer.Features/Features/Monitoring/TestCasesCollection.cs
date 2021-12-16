@@ -1,8 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
 
-using QuAnalyzer.Features.Monitoring;
-
-namespace QuAnalyzer.Features.Performance;
+namespace QuAnalyzer.Features.Monitoring;
 
 public class TestCasesCollection
 {
@@ -12,7 +10,7 @@ public class TestCasesCollection
 
     public async void Init(string expr)
     {
-        this.ValuesSet = (List<Dictionary<string, string>>)await CSharpScript.EvaluateAsync(expr).ConfigureAwait(false);
+        ValuesSet = (List<Dictionary<string, string>>)await CSharpScript.EvaluateAsync(expr).ConfigureAwait(false);
     }
 
     public ValueSelectors.Selector Selector { get; set; }
@@ -23,16 +21,16 @@ public class TestCasesCollection
     {
         get
         {
-            var tests = this.TestCases.Where(t => t.Name == n).ToList();
+            var tests = TestCases.Where(t => t.Name == n).ToList();
             if (!tests.Any())
             {
                 throw new IndexOutOfRangeException($"Configuration '{n}' does not exist for this TestCasesCollection instance.");
             }
             return new TestCasesCollection()
             {
-                Name = this.Name,
-                ValuesSet = this.ValuesSet,
-                Selector = this.Selector,
+                Name = Name,
+                ValuesSet = ValuesSet,
+                Selector = Selector,
                 TestCases = tests
             };
         }

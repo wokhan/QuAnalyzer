@@ -165,21 +165,24 @@ public partial class Duplicates : Page, INotifyPropertyChanged
 
             var data = prov.GetQueryable(repository);//.Select<dynamic>(headers);
 
-                gridData.LoadingProgress = -1;
+            gridData.LoadingProgress = -1;
 
-                //TODO: move
-                //TODO: performance is now awful?! Use proxy object instead?
-                void updateStatusLoad(double i) => Dispatcher.InvokeAsync(() => gridData.Status = $"Parsed {i} entries");
-            var dataObjectArray = AsObjectCollection(data, KeepDuplicates ? headers : keys)
+            //TODO: move
+            //TODO: performance is now awful?! Use proxy object instead?
+            void updateStatusLoad(double i) => Dispatcher.InvokeAsync(() => gridData.Status = $"Parsed {i} entries");
+
+
+            var dataObjectArray = ComparerStruct<object[]>.ToObjectArrays(data)
+            //var dataObjectArray = AsObjectCollection(data, KeepDuplicates ? headers : keys)
                                       .WithProgress(updateStatusLoad)
                                       .ToList();
-
+           
             gridData.LoadingProgress = 1;
 
             var keyComparer = new SequenceEqualityComparer<object>(0, keys.Length);
 
-                //TODO: check
-                void updateStatusCheck(double i) { Dispatcher.InvokeAsync(() => gridData.Status = $"Checked {i} entries"); gridData.LoadingProgress = (int)(i * 100 / dataObjectArray.Count); }
+            //TODO: check
+            void updateStatusCheck(double i) { Dispatcher.InvokeAsync(() => gridData.Status = $"Checked {i} entries"); gridData.LoadingProgress = (int)(i * 100 / dataObjectArray.Count); }
             var ret = Comparison.InitiateDuplicates(dataObjectArray.WithProgress(updateStatusCheck), keyComparer, new SequenceEqualityComparer<object>()).Duplicates;
 
             if (!KeepDuplicates)
@@ -190,9 +193,9 @@ public partial class Duplicates : Page, INotifyPropertyChanged
             Dispatcher.InvokeAsync(() =>
             {
                 displayData(ret, headers, keys.Length);
-                    //gridData.ItemsSource = ret.Duplicates;
-                    //gridData.Columns.Single(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
-                });
+                //gridData.ItemsSource = ret.Duplicates;
+                //gridData.Columns.Single(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
+            });
 
             gridData.LoadingProgress = 100;
         }).ConfigureAwait(false);

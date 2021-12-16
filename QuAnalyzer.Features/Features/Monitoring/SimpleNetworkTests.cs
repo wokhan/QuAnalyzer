@@ -1,7 +1,7 @@
 ﻿
 using System.Net.NetworkInformation;
 
-namespace QuAnalyzer.Features.Performance;
+namespace QuAnalyzer.Features.Monitoring;
 
 public static class SimpleNetworkTests
 {

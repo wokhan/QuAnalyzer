@@ -26,10 +26,10 @@ public partial class ResultsClass : ObservableObject
     private bool isSelected;
     
     [ObservableProperty]
-    private object data;
+    private object? data;
     
     public string Name { get; internal set; }
     public string Id { get; internal set; }
     //public int Index { get; internal set; }
-    public IList<Dictionary<string, string>> Values { get; internal set; }
+    public IList<Dictionary<string, string>>? Values { get; internal set; }
 }

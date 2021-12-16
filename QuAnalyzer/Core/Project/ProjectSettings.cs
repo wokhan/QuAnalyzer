@@ -6,7 +6,6 @@ using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Core.Project.Exceptions;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Monitoring;
-using QuAnalyzer.Features.Performance;
 
 using System;
 using System.Collections.ObjectModel;

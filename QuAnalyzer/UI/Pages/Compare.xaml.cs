@@ -65,7 +65,7 @@ public partial class Compare : Page
 
         var callback = new Progress<ComparerStruct<object[]>>(Progress);
 
-        await Task.Run(() => Comparison.Run(newInstances, 0, 0, callback, ((App)App.Instance).CurrentProject.UseParallelism)).ConfigureAwait(false);
+        await Task.Run(() => Comparison.Run(newInstances, 0, 0, callback, App.Instance.CurrentProject.UseParallelism)).ConfigureAwait(false);
     }
 
     private async Task<ComparerStruct<object[]>[]> GetComparerStruct()
@@ -81,30 +81,19 @@ public partial class Compare : Page
     }
 
     private readonly Dictionary<string, int> progressDC = new();
-    public void Progress(ComparerStruct<object[]> name)
+    
+    public void Progress(ComparerStruct<object[]> comparer)
     {
-        //try
-        {
-            this.Dispatcher.InvokeAsync(() => LocalProgress(name));
-        }
-        //catch (TaskCanceledException)
-        {
-
-        }
-    }
-
-    private void LocalProgress(ComparerStruct<object[]> r)
-    {
-        switch (r.Results.Progress)
+        switch (comparer.Results.Progress)
         {
             case ProgressType.Failed:
             case ProgressType.Canceling:
-                progressDC.Remove(r.Name);
+                progressDC.Remove(comparer.Name);
                 break;
 
             case ProgressType.Done:
             default:
-                progressDC[r.Name] = r.Results.LocalProgress;
+                progressDC[comparer.Name] = comparer.Results.LocalProgress;
 
                 int currentProgress = (int)progressDC.Average(p => p.Value);
 

@@ -14,7 +14,7 @@ public class PerformanceTests
         var item = new MonitorItem() { Type = "COUNTALL", RunWhenStarted = true, Provider = new RandomDataProvider(), Repository = "Address book" };
         var instance = new MonitoringItemInstance(item);
 
-        Performance.Run(new TestCasesCollection() { TestCases = new[] { instance } }, 1, 1, 1);
+        Monitoring.Run(new TestCasesCollection() { TestCases = new[] { instance } }, 1, 1, 1);
 
         Assert.Equal(MonitoringStatus.DONE, instance.Status);
     }

@@ -53,13 +53,13 @@
                 <DataGridTextColumn Header="Interval" Binding="{Binding Interval}" />
                 <DataGridCheckBoxColumn Header="Run when started" Binding="{Binding RunWhenStarted}" />
                 <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" />
-                <DataGridTemplateColumn>
+                <DataGridTemplateColumn Width="100">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <WrapPanel>
+                            <StackPanel Orientation="Horizontal">
                                 <Button Name="btnEditMapping" Tag="{Binding}" Click="btnEdit_Click" Foreground="Blue" Content="{iconPacks:Material Kind=Pencil}" />
                                 <Button Name="btnDelete" Click="btnDelete_Click" Tag="{Binding}" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
-                            </WrapPanel>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
