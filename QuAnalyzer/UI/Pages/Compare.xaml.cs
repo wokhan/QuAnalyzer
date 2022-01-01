@@ -32,7 +32,7 @@ public partial class Compare : Page
     public SourcesMapper SingleMap { get; } = new();
 
     private int cpdCount = 0;
-    public ObservableCollection<ComparerStruct<object[]>> ComparisonInstancesView { get; } = new();
+    public ObservableCollection<ComparerDefinition<object[]>> ComparisonInstancesView { get; } = new();
 
     public Compare()
     {
@@ -48,41 +48,29 @@ public partial class Compare : Page
 
         prgGlobal.IsIndeterminate = true;
 
-        var newInstances = new List<ComparerStruct<object[]>>();
+        var newInstances = new List<ComparerDefinition<object[]>>();
 
-        var x = await GetComparerStruct().ConfigureAwait(true);
-        foreach (var cp in x)
+        foreach (SourcesMapper mapper in btnToggleMode.IsChecked is true ? new[] { SingleMap } : lstMappings.SelectedItems)
         {
+            var cp = await ComparerDefinition<object[]>.CreateAsync(mapper).ConfigureAwait(true);
+
             cp.Name = $"[{cpdCount++}] {cp.Name}";
 
-            newInstances.Add(cp);
             // Adding it twice... because we need two rows in the table (...)
             ComparisonInstancesView.Add(cp);
             ComparisonInstancesView.Add(cp);
-        }
 
+            newInstances.Add(cp);
+        }
+        
         prgGlobal.IsIndeterminate = false;
 
-        var callback = new Progress<ComparerStruct<object[]>>(Progress);
-
-        await Task.Run(() => Comparison.Run(newInstances, 0, 0, callback, App.Instance.CurrentProject.UseParallelism)).ConfigureAwait(false);
-    }
-
-    private async Task<ComparerStruct<object[]>[]> GetComparerStruct()
-    {
-        if (btnToggleMode.IsChecked is true)
-        {
-            return await Task.Run(() => new[] { new ComparerStruct<object[]>(SingleMap) }).ConfigureAwait(false);
-        }
-
-        var mappers = lstMappings.SelectedItems.Cast<SourcesMapper>().ToList();
-        return await Task.Run(() => mappers.Select(mapper => new ComparerStruct<object[]>(mapper)).ToArray()).ConfigureAwait(false);
-
+        await Comparison.RunAsync(newInstances, 0, 0, new Progress<ComparerDefinition<object[]>>(Progress), App.Instance.CurrentProject.UseParallelism).ConfigureAwait(false);
     }
 
     private readonly Dictionary<string, int> progressDC = new();
-    
-    public void Progress(ComparerStruct<object[]> comparer)
+
+    public void Progress(ComparerDefinition<object[]> comparer)
     {
         switch (comparer.Results.Progress)
         {
@@ -114,7 +102,7 @@ public partial class Compare : Page
     public void btnDelete_Click(object sender, RoutedEventArgs e)
     {
         var src = (Button)sender;
-        var r = (ComparerStruct<object[]>)src.Tag;
+        var r = (ComparerDefinition<object[]>)src.Tag;
 
         progressDC.Remove(r.Name);
         ComparisonInstancesView.RemoveRange(ComparisonInstancesView.Where(re => r.Name.Equals((string)re.Name)).ToList());
@@ -123,17 +111,17 @@ public partial class Compare : Page
     public void btnCancel_Click(object sender, RoutedEventArgs e)
     {
         var src = (Button)sender;
-        var r = (ComparerStruct<object[]>)src.Tag;
+        var r = (ComparerDefinition<object[]>)src.Tag;
 
         src.IsEnabled = false;
         r.TokenSource.Cancel(true);
     }
 
-    private readonly Dictionary<IDataComparer, Popup> openWindows = new Dictionary<IDataComparer, Popup>();
+    private readonly Dictionary<ComparerDefinition<object[]>, Popup> openWindows = new();
     public void btnDetails_Click(object sender, RoutedEventArgs e)
     {
         var src = (Button)sender;
-        var cmp = (IDataComparer)src.Tag;
+        var cmp = (ComparerDefinition<object[]>)src.Tag;
         if (!openWindows.ContainsKey(cmp))
         {
             var dWin = Popup.OpenNew(new DetailsWindow(cmp));
@@ -199,33 +187,33 @@ public partial class Compare : Page
                     cmp.Results.InitDiff(cmp);
                     xl.AddWorksheet(cmp.Results.MergedDiff, cmp.Results.MergedHeaders.Prepend("Name").ToArray(), cmp.SourceKeys.Count, "Differences", (x, i, h, s) => { if (x.IsDiff[i]) { s.Font.Color.SetColor(System.Drawing.Color.Red); } return x.Values[i]; }, cb1);
 
-                        //if (cmp.Results.Source.Missing is not null)
-                        xl.AddWorksheet(cmp.Results.Source.Missing.Cast<object[]>(), cmp.SourceHeaders, cmp.SourceKeys.Count, "Missing from source", (x, i, h, s) => x[i], cb2);
+                    //if (cmp.Results.Source.Missing is not null)
+                    xl.AddWorksheet(cmp.Results.Source.Missing.Cast<object[]>(), cmp.SourceHeaders, cmp.SourceKeys.Count, "Missing from source", (x, i, h, s) => x[i], cb2);
 
-                        //if (dgMissingTarget.ItemsSource is not null)
-                        xl.AddWorksheet(cmp.Results.Target.Missing.Cast<object[]>(), cmp.TargetHeaders, 0, "Missing from target", (x, i, h, s) => x[i], cb3);
+                    //if (dgMissingTarget.ItemsSource is not null)
+                    xl.AddWorksheet(cmp.Results.Target.Missing.Cast<object[]>(), cmp.TargetHeaders, 0, "Missing from target", (x, i, h, s) => x[i], cb3);
 
-                        //if (dgSourceDups.ItemsSource is not null)
-                        xl.AddWorksheet(cmp.Results.Source.Duplicates.Cast<object[]>(), cmp.SourceHeaders, 0, "Source duplicates", (x, i, h, s) => x[i], cb4);
+                    //if (dgSourceDups.ItemsSource is not null)
+                    xl.AddWorksheet(cmp.Results.Source.Duplicates.Cast<object[]>(), cmp.SourceHeaders, 0, "Source duplicates", (x, i, h, s) => x[i], cb4);
 
-                        //if (dgTargetDups.ItemsSource is not null)
-                        xl.AddWorksheet(cmp.Results.Target.Duplicates.Cast<object[]>(), cmp.TargetHeaders, 0, "Target duplicates", (x, i, h, s) => x[i], cb5);
+                    //if (dgTargetDups.ItemsSource is not null)
+                    xl.AddWorksheet(cmp.Results.Target.Duplicates.Cast<object[]>(), cmp.TargetHeaders, 0, "Target duplicates", (x, i, h, s) => x[i], cb5);
 
-                        //if (dgSourcePerfectDups.ItemsSource is not null)
-                        xl.AddWorksheet(cmp.Results.Source.PerfectDups.Cast<object[]>(), cmp.SourceHeaders, 0, "Source clones", (x, i, h, s) => x[i], cb6);
+                    //if (dgSourcePerfectDups.ItemsSource is not null)
+                    xl.AddWorksheet(cmp.Results.Source.PerfectDups.Cast<object[]>(), cmp.SourceHeaders, 0, "Source clones", (x, i, h, s) => x[i], cb6);
 
-                        //if (dgTargetPerfectDups.ItemsSource is not null)
-                        xl.AddWorksheet(cmp.Results.Target.PerfectDups.Cast<object[]>(), cmp.TargetHeaders, 0, "Target clones", (x, i, h, s) => x[i], cb7);
+                    //if (dgTargetPerfectDups.ItemsSource is not null)
+                    xl.AddWorksheet(cmp.Results.Target.PerfectDups.Cast<object[]>(), cmp.TargetHeaders, 0, "Target clones", (x, i, h, s) => x[i], cb7);
 
-                        //xl.AddWorksheet(dgDiff, "Differences");
-                        //xl.AddWorksheet(dgMissingSource, "Missing from source");
-                        //xl.AddWorksheet(dgMissingTarget, "Missing from target");
-                        //xl.AddWorksheet(dgSourceDups, "Source duplicates");
-                        //xl.AddWorksheet(dgTargetDups, "Target duplicates");
-                        //xl.AddWorksheet(dgSourcePerfectDups, "Source clones");
-                        //xl.AddWorksheet(dgTargetPerfectDups, "Target clones");
+                    //xl.AddWorksheet(dgDiff, "Differences");
+                    //xl.AddWorksheet(dgMissingSource, "Missing from source");
+                    //xl.AddWorksheet(dgMissingTarget, "Missing from target");
+                    //xl.AddWorksheet(dgSourceDups, "Source duplicates");
+                    //xl.AddWorksheet(dgTargetDups, "Target duplicates");
+                    //xl.AddWorksheet(dgSourcePerfectDups, "Source clones");
+                    //xl.AddWorksheet(dgTargetPerfectDups, "Target clones");
 
-                        xl.Save();
+                    xl.Save();
                 }
             });
         }

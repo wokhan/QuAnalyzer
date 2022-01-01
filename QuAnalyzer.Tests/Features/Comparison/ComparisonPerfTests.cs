@@ -16,7 +16,7 @@ public class ComparisonPerfTests : ComparisonTests
         var nbSamplesShown = -1;
         var nbSamplesCompared = -1;
 
-        await Comparison.Run(new[] { comparer }, nbSamplesCompared, nbSamplesShown);
+        await Comparison.RunAsync(new[] { comparer }, nbSamplesCompared, nbSamplesShown);
     }
 
 }

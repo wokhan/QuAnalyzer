@@ -31,20 +31,20 @@
             <TabItem x:Name="tabDiff" Header="DIFFERENCES" ext:CustomAdorner.PreserveTemplate="True" ext:CustomAdorner.Image="{iconPacks:Material Kind=VectorDifference}">
                 <Border>
                     <DockPanel>
-                        <!--DataContext="{Binding DataContext,ElementName=me}">-->
                         <DockPanel.Resources>
                             <Style TargetType="DataGridRow">
+                                <Setter Property="Background" Value="White" />
                                 <Style.Triggers>
                                     <Trigger Property="ItemsControl.AlternationIndex" Value="2">
-                                        <Setter Property="Background" Value="#EEE"></Setter>
+                                        <Setter Property="Background" Value="#EEE" />
                                     </Trigger>
                                     <Trigger Property="ItemsControl.AlternationIndex" Value="3">
-                                        <Setter Property="Background" Value="#EEE"></Setter>
+                                        <Setter Property="Background" Value="#EEE" />
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
                         </DockPanel.Resources>
-                        <UC:ExtendedDataGridView x:Name="dgDiff" AlternatingRowBackground="White" AlternationCount="4" IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView x:Name="dgDiff" AlternationCount="4" IsReadOnly="True" FrozenColumnCount="1" />
                     </DockPanel>
                 </Border>
             </TabItem>

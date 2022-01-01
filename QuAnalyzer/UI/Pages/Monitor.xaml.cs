@@ -29,9 +29,9 @@ public partial class Monitor : Page
     private long startDate;
     private DispatcherTimer globalTimer;
     private List<DispatcherTimer> timers = new();
-    private Dictionary<MonitorItem, (MonitoringItemInstance Item, int Index)> instances;
+    private Dictionary<TestDefinition, (TestCase Item, int Index)> instances;
 
-    public static ObservableCollection<ResultsClass> MonitorResultsView { get; } = new();
+    public static ObservableCollection<TestResults> MonitorResultsView { get; } = new();
 
     public ObservableDictionary<string, ISeries[]> ResultSeriesMappings { get; } = new();
     public double? Occurences { get; set; } = 10;
@@ -49,7 +49,7 @@ public partial class Monitor : Page
     {
         if (e.Action == NotifyCollectionChangedAction.Add)
         {
-            var results = e.NewItems.Cast<ResultsClass>().ToList();
+            var results = e.NewItems.Cast<TestResults>().ToList();
             results.ForEach(t =>
             {
                 var serie = ResultSeriesMappings[t.Name][0];
@@ -71,7 +71,7 @@ public partial class Monitor : Page
             return;
         }
 
-        var mitems = gridSteps.SelectedItems.Cast<MonitorItem>();
+        var mitems = gridSteps.SelectedItems.Cast<TestDefinition>();
 
         btnStart.IsEnabled = false;
         btnStop.IsEnabled = true;
@@ -108,21 +108,21 @@ public partial class Monitor : Page
     private async void globalCompTimer_Tick(object sender, EventArgs e)
     {
         var timer = (DispatcherTimer)sender;
-        var monitors = (MonitorItem[])timer.Tag;
+        var monitors = (TestDefinition[])timer.Tag;
 
         var monitorInstances = monitors.Select(m => m.CreateInstance()).ToList();
 
-        var progress = new Progress<ResultsClass>(monitor_OnAdd);
+        var progress = new Progress<TestResults>(monitor_OnAdd);
 
         //TODO : Values !!!!
-        await Task.Run(() => Monitoring.Run(new TestCasesCollection() { TestCases = monitorInstances }, globalPerfCounter++, (int)Occurences.Value, (int)MaxParallel.Value, progress)).ConfigureAwait(false);
+        await Monitoring.RunAsync(new TestCasesCollection() { TestCases = monitorInstances }, globalPerfCounter++, (int)Occurences.Value, (int)MaxParallel.Value, progress).ConfigureAwait(false);
 
     }
 
     private async void Timer_Tick(object sender, EventArgs e)
     {
         var timer = (DispatcherTimer)sender;
-        var monitor = (MonitorItem)timer.Tag;
+        var monitor = (TestDefinition)timer.Tag;
 
         var (monitorInstance, cnt) = instances[monitor];
         if (monitorInstance.Status == MonitoringStatus.DONE)
@@ -149,23 +149,23 @@ public partial class Monitor : Page
 
         List<Dictionary<string, string>> values = null;
 
-        var progress = new Progress<ResultsClass>(monitor_OnAdd);
+        var progress = new Progress<TestResults>(monitor_OnAdd);
         //TODO : Values !!!!
-        await Task.Run(() => Monitoring.Run(new TestCasesCollection() { TestCases = new[] { monitorInstance }, ValuesSet = values }, cnt++, 1, 1, progress)).ConfigureAwait(false);
+        await Monitoring.RunAsync(new TestCasesCollection() { TestCases = { monitorInstance }, ValuesSet = values }, cnt++, 1, 1, progress).ConfigureAwait(false);
 
         monitorInstance.Status = MonitoringStatus.DONE;
     }
 
     private void UpdateStatus(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MonitoringItemInstance.Status))
+        if (e.PropertyName == nameof(TestCase.Status))
         {
-            var instance = (MonitoringItemInstance)sender;
-            instance.MonitorItem.Status = instance.Status;
+            var instance = (TestCase)sender;
+            instance.Definition.Status = instance.Status;
         }
     }
 
-    private void InitChart(IEnumerable<MonitorItem> mitems)
+    private void InitChart(IEnumerable<TestDefinition> mitems)
     {
         ResultSeriesMappings.AddAll(mitems.ToDictionary(t => t.Name, t => new ISeries[] {
                     new StepLineSeries<DateTimePoint>() { ScalesYAt = 1, Name = t.Name + " (Freq)", Values = new ObservableCollection<DateTimePoint>() },
@@ -173,7 +173,7 @@ public partial class Monitor : Page
                 }));
     }
 
-    private void monitor_OnAdd(ResultsClass results)
+    private void monitor_OnAdd(TestResults results)
     {
         MonitorResultsView.Add(results);
         gridResults.ScrollIntoView(results);
@@ -186,7 +186,7 @@ public partial class Monitor : Page
 
     private void btnClear_Click(object sender, RoutedEventArgs e)
     {
-        App.Instance.CurrentProject.MonitorItems.Clear();
+        App.Instance.CurrentProject.TestDefinitions.Clear();
     }
 
     private void btnCopy_Click(object sender, RoutedEventArgs e)
@@ -196,17 +196,17 @@ public partial class Monitor : Page
 
     private void btnEdit_Click(object sender, RoutedEventArgs e)
     {
-        Popup.OpenNew(new MonitoringDetails((MonitorItem)((Button)sender).Tag));
+        Popup.OpenNew(new MonitoringDetails((TestDefinition)((Button)sender).Tag));
     }
 
     private void btnDelete_Click(object sender, RoutedEventArgs e)
     {
-        var mtoremove = (MonitorItem)((Button)sender).Tag;
-        foreach (var m in App.Instance.CurrentProject.MonitorItems)//.Where(m => m.PrecedingSteps.Any()))
+        var mtoremove = (TestDefinition)((Button)sender).Tag;
+        foreach (var m in App.Instance.CurrentProject.TestDefinitions)//.Where(m => m.PrecedingSteps.Any()))
         {
             m.PrecedingSteps.Remove(mtoremove);
         }
-        App.Instance.CurrentProject.MonitorItems.Remove(mtoremove);
+        App.Instance.CurrentProject.TestDefinitions.Remove(mtoremove);
     }
 
     private void globalTimer_Tick(object sender, EventArgs e)

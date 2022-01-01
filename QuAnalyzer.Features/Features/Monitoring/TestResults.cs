@@ -3,9 +3,9 @@ using Microsoft.Toolkit.Mvvm.ComponentModel;
 
 namespace QuAnalyzer.Features.Monitoring;
 
-public partial class ResultsClass : ObservableObject
+public partial class TestResults : ObservableObject
 {
-    public MonitorItem Step { get; set; }
+    public TestDefinition Step { get; set; }
 
     public bool IsOK { get; set; }
     public DateTimeOffset LastCheck { get; } = DateTimeOffset.Now;

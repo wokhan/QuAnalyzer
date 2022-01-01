@@ -4,25 +4,27 @@ using System.Collections.ObjectModel;
 
 namespace QuAnalyzer.Features.Monitoring;
 
-public partial class MonitoringItemInstance : ObservableObject
+public partial class TestCase : ObservableObject
 {
     [ObservableProperty]
     private MonitoringStatus status;
-   
-    public event Action<MonitoringItemInstance, ResultsClass>? OnResult;
-    public event Action<MonitoringItemInstance, ResultsClass>? OnAdd;
 
-    public MonitorItem MonitorItem { get; private set; }
+    public event Action<TestCase, TestResults>? OnResult;
+    public event Action<TestCase, TestResults>? OnAdd;
+
+    public TestDefinition Definition { get; private set; }
 
     public int InstanceId { get; set; }
-    public string Name => MonitorItem.Name;
+    public string Name => Definition.Name;
 
-    public ObservableCollection<ResultsClass> Results { get; } = new();
+    public ObservableCollection<TestResults> Results { get; } = new();
 
-    public List<MonitoringItemInstance> PrecedingStepsInstances { get; set; }
+    public List<TestCase> PrecedingStepsInstances { get; private set; } = new();
+    private readonly List<object> PrecedingStepsData = new();
+
     public bool AllPrecedingStepsDone { get; internal set; } = true;
 
-    private void preceding_Done(MonitoringItemInstance source, ResultsClass obj)
+    private void preceding_Done(TestCase source, TestResults obj)
     {
         PrecedingStepsInstances.Remove(source);
         PrecedingStepsData.Add(obj.Data);
@@ -40,26 +42,25 @@ public partial class MonitoringItemInstance : ObservableObject
 
     private readonly int cnt = 0;
 
-    public void raiseAdd(ResultsClass r)
+    public void raiseAdd(TestResults r)
     {
         OnAdd?.Invoke(this, r);
     }
 
-    public void raiseResult(ResultsClass r)
+    public void raiseResult(TestResults r)
     {
         OnResult?.Invoke(this, r);
     }
 
 
-    private readonly List<object> PrecedingStepsData = new List<object>();
 
-    public MonitoringItemInstance(MonitorItem monitorItem)
+    public TestCase(TestDefinition TestDefinition)
     {
-        this.MonitorItem = monitorItem;
+        this.Definition = TestDefinition;
 
     }
 
-    public void AttachPrecedingStepInstances(IEnumerable<MonitoringItemInstance> steps)
+    public void AttachPrecedingStepInstances(IEnumerable<TestCase> steps)
     {
         this.PrecedingStepsInstances = steps.ToList();
         this.AllPrecedingStepsDone = this.PrecedingStepsInstances.Count == 0;

@@ -1,6 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 
+using QuAnalyzer.Features.Comparison.Comparers;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +54,7 @@ public class ComparisonTests
         var nbSamplesShown = -1;
         var nbSamplesCompared = -1;
 
-        await Comparison.Run(new[] { comparer }, nbSamplesCompared, nbSamplesShown);
+        await Comparison.RunAsync(new[] { comparer }, nbSamplesCompared, nbSamplesShown);
 
         Assert.Equal(expMatches, comparer.Results.MatchingCount);
         Assert.Equal(expSrcDiffs, comparer.Results.Source.Differences.Count);
@@ -64,9 +66,9 @@ public class ComparisonTests
     }
 
     
-    protected static ComparerStruct<object[]> GetComparer(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData)
+    protected static ComparerDefinition<object[]> GetComparer(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData)
     {
-        return new ComparerStruct<object[]>()
+        return new ComparerDefinition<object[]>()
         {
             GetSourceData = () => sourceData,
             GetTargetData = () => targetData,

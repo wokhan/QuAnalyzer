@@ -44,7 +44,7 @@
             <!--<Rectangle />
             <ToggleButton Content="Enable chart" ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" ext:CustomAdorner.Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />-->
         </WrapPanel>
-        <DataGrid Grid.Row="1" SelectionMode="Extended" VirtualizingPanel.ScrollUnit="Pixel" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static quanalyzer:App.Instance}}" x:Name="gridSteps" AutoGenerateColumns="False" ColumnWidth="18*" IsReadOnly="True">
+        <DataGrid Grid.Row="1" SelectionMode="Extended" VirtualizingPanel.ScrollUnit="Pixel" ItemsSource="{Binding CurrentProject.TestDefinitions, Source={x:Static quanalyzer:App.Instance}}" x:Name="gridSteps" AutoGenerateColumns="False" ColumnWidth="18*" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                 <DataGridComboBoxColumn Header="Provider" x:Name="lstDataProviders" MinWidth="150" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static quanalyzer:App.Instance}}" DisplayMemberPath="Name" SelectedValueBinding="{Binding Provider}" />
@@ -102,7 +102,7 @@
                             </StackPanel>
                             <Label Grid.Column="1" Content="Preceding steps:" />
                             -->
-            <!--<DataGrid Grid.Row="2" Grid.Column="1" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static quanalyzer:App.Instance}}">
+            <!--<DataGrid Grid.Row="2" Grid.Column="1" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.TestDefinitions, Source={x:Static quanalyzer:App.Instance}}">
                                 <DataGridCheckBoxColumn Header="Select" Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=DataGridRow}}" />
                                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                                 <DataGridTemplateColumn>

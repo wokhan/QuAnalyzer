@@ -79,7 +79,7 @@ public partial class App : INotifyPropertyChanged
         ProvidersMan = new ProvidersManager();
 
         //TODO: change to a static initializer
-        MonitorItem.Providers = Instance.CurrentProject.CurrentProviders;
+        TestDefinition.Providers = Instance.CurrentProject.CurrentProviders;
         SourcesMapper.Providers = Instance.CurrentProject.CurrentProviders;
 
         RegisterCommands();

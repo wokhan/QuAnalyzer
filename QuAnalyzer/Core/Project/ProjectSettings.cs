@@ -55,9 +55,9 @@ public class ProjectSettings : NotifierHelper
     }
 
     public ObservableCollection<IDataProvider> CurrentProviders { get; } = new();
-    public ObservableCollection<MonitorItem> MonitorItems { get; } = new();
+    public ObservableCollection<TestDefinition> TestDefinitions { get; } = new();
     public ObservableCollection<SourcesMapper> SourceMapper { get; } = new();
-    public ObservableCollection<TestCasesCollection> PerformanceItems { get; } = new();
+    //public ObservableCollection<TestCasesCollection> PerformanceItems { get; } = new();
 
     internal void Open(string p)
     {
@@ -75,7 +75,7 @@ public class ProjectSettings : NotifierHelper
             this.Name = restProject.Name;
             this.CurrentProviders.ReplaceAll(restProject.CurrentProviders);
             this.SourceMapper.ReplaceAll(restProject.SourceMapper);
-            this.MonitorItems.ReplaceAll(restProject.MonitorItems);
+            this.TestDefinitions.ReplaceAll(restProject.TestDefinitions);
 
             this.FilePath = p;
 

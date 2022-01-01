@@ -8,13 +8,13 @@ using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.Features.Monitoring;
 
-public partial class MonitorItem : ObservableObject
+public partial class TestDefinition : ObservableObject
 {
     public static ObservableCollection<IDataProvider>? Providers { get; set; }
 
     public bool RunWhenStarted { get; set; }
 
-    public ObservableDictionary<MonitorItem, bool> PrecedingSteps { get; private set; } = new();
+    public ObservableDictionary<TestDefinition, bool> PrecedingSteps { get; private set; } = new();
 
     public List<string> AttributesList => Attributes.Split(',').ToList();
 
@@ -39,7 +39,7 @@ public partial class MonitorItem : ObservableObject
         }
     }
 
-    public string Repository { get; set; }
+    public string? Repository { get; set; }
 
     // TODO: Why?
     //public Func<IList<Dictionary<string, string>>, Dictionary<string, long>, IQueryable> GetData => (values, statsBag) => Provider.GetQueryable(Repository, values, statsBag);
@@ -48,16 +48,16 @@ public partial class MonitorItem : ObservableObject
         return Provider.GetQueryable(Repository, values, statsBag);
     }
 
-    public string Filter { get; set; }
+    public string? Filter { get; set; }
 
     [ObservableProperty]
     private int interval;
 
     [ObservableProperty]
-    private string type;
+    private string type = MonitoringModes.PING;
 
 
-    //public void AttachEvent(Action<ResultsClass> monitor_OnAdd, Action<ResultsClass> monitor_OnResult)
+    //public void AttachEvent(Action<TestResults> monitor_OnAdd, Action<TestResults> monitor_OnResult)
     //{
     //    OnAdd -= monitor_OnAdd;
     //    OnAdd += monitor_OnAdd;
@@ -70,12 +70,12 @@ public partial class MonitorItem : ObservableObject
     [ObservableProperty]
     public MonitoringStatus status;
 
-    public MonitoringItemInstance CreateInstance()
+    public TestCase CreateInstance()
     {
-        return new MonitoringItemInstance(this);
+        return new TestCase(this);
     }
 
-    public MonitorItem Clone()
+    public TestDefinition Clone()
     {
         return new()
         {

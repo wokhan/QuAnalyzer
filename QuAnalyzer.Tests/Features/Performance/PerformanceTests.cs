@@ -11,10 +11,10 @@ public class PerformanceTests
     [Fact()]
     public void RunTest()
     {
-        var item = new MonitorItem() { Type = "COUNTALL", RunWhenStarted = true, Provider = new RandomDataProvider(), Repository = "Address book" };
-        var instance = new MonitoringItemInstance(item);
+        var item = new TestDefinition() { Type = "COUNTALL", RunWhenStarted = true, Provider = new RandomDataProvider(), Repository = "Address book" };
+        var instance = new TestCase(item);
 
-        Monitoring.Run(new TestCasesCollection() { TestCases = new[] { instance } }, 1, 1, 1);
+        Monitoring.Run(new TestCasesCollection() { TestCases = { instance } }, 1, 1, 1);
 
         Assert.Equal(MonitoringStatus.DONE, instance.Status);
     }

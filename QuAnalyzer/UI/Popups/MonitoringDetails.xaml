@@ -100,7 +100,7 @@
             <Label Grid.Row="7" Content="Filter:" />
             <TextBox Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3" x:Name="txtFilter" Text="{Binding Filter}" />
             <Label Grid.Row="8" Content="Preceding steps:" VerticalAlignment="Top" />
-            <ListBox Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.MonitorItems, Source={x:Static quanalyzer:App.Instance}}" SelectionMode="Multiple">
+            <ListBox Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.TestDefinitions, Source={x:Static quanalyzer:App.Instance}}" SelectionMode="Multiple">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>

@@ -5,26 +5,25 @@ namespace QuAnalyzer.Features.Monitoring;
 public class TestCasesCollection
 {
     public string Name { get; set; }
-    public List<Dictionary<string, string>> ValuesSet { get; set; }
+    public IList<TestCase> TestCases { get; set; } = new List<TestCase>();
+    public List<Dictionary<string, string>>? ValuesSet { get; set; }
     public string ValuesSetExpr { set => Init(value); }
+    public ValueSelectors.Selector Selector { get; set; } = ValueSelectors.SequentialSelector;
+    public bool DistinctParallelValues { get; set; }
 
     public async void Init(string expr)
     {
         ValuesSet = (List<Dictionary<string, string>>)await CSharpScript.EvaluateAsync(expr).ConfigureAwait(false);
     }
 
-    public ValueSelectors.Selector Selector { get; set; }
-    public IList<MonitoringItemInstance> TestCases { get; set; }
-    public bool DistinctParallelValues { get; set; }
-
-    public TestCasesCollection this[string n]
+    public TestCasesCollection this[string name]
     {
         get
         {
-            var tests = TestCases.Where(t => t.Name == n).ToList();
+            var tests = TestCases.Where(testcase => testcase.Name == name).ToList();
             if (!tests.Any())
             {
-                throw new IndexOutOfRangeException($"Configuration '{n}' does not exist for this TestCasesCollection instance.");
+                throw new IndexOutOfRangeException($"Configuration '{name}' does not exist for this TestCasesCollection instance.");
             }
             return new TestCasesCollection()
             {

@@ -1,5 +1,7 @@
 ﻿using Microsoft.CSharp.RuntimeBinder;
 
+using QuAnalyzer.Features.Comparison.Comparers;
+
 using System.Collections;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
@@ -10,7 +12,7 @@ using Wokhan.Core.Extensions;
 
 namespace QuAnalyzer.Features.Comparison;
 
-public class ComparerStruct<T> : IDataComparer
+public class ComparerDefinition<T>
 {
     public string Name { get; set; }
     public string SourceName { get; set; }
@@ -20,19 +22,14 @@ public class ComparerStruct<T> : IDataComparer
     public IList<string> SourceHeaders { get; set; }
     public IList<string> TargetHeaders { get; set; }
     public bool IsOrdered { get; set; }
-    public CancellationTokenSource TokenSource { get; private set; }
+    public CancellationTokenSource TokenSource { get; } = new CancellationTokenSource();
 
     public IEqualityComparer<T> Comparer { get; set; }
-    public IEqualityComparer<T> KeysComparer { get; set; }
+    public IEqualityComparer<T>? KeysComparer { get; set; }
     public Func<IEnumerable<T>> GetSourceData { get; set; }
     public Func<IEnumerable<T>> GetTargetData { get; set; }
 
-    public ResultStruct<T> Results { get; } = new ResultStruct<T>();
-
-    public ComparerStruct()
-    {
-        TokenSource = new CancellationTokenSource();
-    }
+    public ComparisonResult<T> Results { get; } = new ComparisonResult<T>();
 
     //TODO: compare to Wokhan's AsObjectCollection (and rename it...)
     public static IEnumerable<object[]> ToObjectArrays(IEnumerable src, params string[] attributes)
@@ -87,8 +84,16 @@ public class ComparerStruct<T> : IDataComparer
         }
     }
 
+    public ComparerDefinition()
+    {
+    }
 
-    public ComparerStruct(SourcesMapper s) : this()//, IEqualityComparer<T> comparer, Func<string[], IEqualityComparer<T>> getComparerForKeys, Func<IQueryable<dynamic>, List<string>, IEnumerable<object[]>> transform)
+    public static async Task<ComparerDefinition<T>> CreateAsync(SourcesMapper s)
+    {
+        return await Task.Run(() => new ComparerDefinition<T>(s));
+    }
+
+    private ComparerDefinition(SourcesMapper s)//, IEqualityComparer<T> comparer, Func<string[], IEqualityComparer<T>> getComparerForKeys, Func<IQueryable<dynamic>, List<string>, IEnumerable<object[]>> transform)
     {
         var fieldsSrc = s.AllMappings.Select(m => m.Source).ToList();
         var fieldsTrg = s.AllMappings.Select(m => m.Target).ToList();

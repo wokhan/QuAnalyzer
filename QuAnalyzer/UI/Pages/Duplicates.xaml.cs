@@ -1,4 +1,5 @@
 ﻿using QuAnalyzer.Features.Comparison;
+using QuAnalyzer.Features.Comparison.Comparers;
 
 using System;
 using System.Collections;
@@ -172,7 +173,7 @@ public partial class Duplicates : Page, INotifyPropertyChanged
             void updateStatusLoad(double i) => Dispatcher.InvokeAsync(() => gridData.Status = $"Parsed {i} entries");
 
 
-            var dataObjectArray = ComparerStruct<object[]>.ToObjectArrays(data)
+            var dataObjectArray = ComparerDefinition<object[]>.ToObjectArrays(data)
             //var dataObjectArray = AsObjectCollection(data, KeepDuplicates ? headers : keys)
                                       .WithProgress(updateStatusLoad)
                                       .ToList();

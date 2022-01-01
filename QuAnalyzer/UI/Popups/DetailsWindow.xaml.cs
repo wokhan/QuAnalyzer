@@ -21,7 +21,7 @@ public partial class DetailsWindow : Page
 {
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public IDataComparer Comparer { get; private set; }
+    public ComparerDefinition<object[]> Comparer { get; private set; }
 
     protected void NotifyPropertyChanged(string propertyName)
     {
@@ -35,7 +35,7 @@ public partial class DetailsWindow : Page
         set { _gridDiffExported = value; NotifyPropertyChanged("GridDiffExported"); }
     }*/
 
-    public DetailsWindow(IDataComparer comparer)
+    public DetailsWindow(ComparerDefinition<object[]> comparer)
     {
         Comparer = comparer;
 
@@ -44,9 +44,9 @@ public partial class DetailsWindow : Page
         InitGrids(comparer);
     }
 
-    private void InitGrids(IDataComparer r)
+    private void InitGrids(ComparerDefinition<object[]> r)
     {
-        var results = (ResultStruct<object[]>)((dynamic)r).Results;
+        var results = r.Results;
 
         results.InitDiff(r);
 
@@ -62,13 +62,13 @@ public partial class DetailsWindow : Page
         displayData(dgTargetPerfectDups, results.Target.PerfectDups, r.TargetHeaders.ToArray(), r.TargetKeys.Count);
     }
 
-    private void displayDiffData(ExtendedDataGridView gridData, IEnumerable<DiffClass> data, string[] headers, int keysCount)
+    private void displayDiffData(ExtendedDataGridView gridData, IEnumerable<Diff> data, string[] headers, int keysCount)
     {
         gridData.Columns.Clear();
 
         gridData.AutoGenerateColumns = false;
 
-        gridData.Columns.Add(new DataGridTextColumn() { Header = "Origin", Binding = new Binding("Values[0]") });
+        gridData.Columns.Add(new DataGridTextColumn() { Header = "Origin", Binding = new Binding(nameof(Diff.Source)) });
 
         if (data is not null && data.Any())
         {
@@ -79,29 +79,27 @@ public partial class DetailsWindow : Page
 
             for (int i = 0; i < headers.Length; i++)
             {
+                var trigger = new DataTrigger()
+                {
+                    Value = true,
+                    Binding = new Binding($"{nameof(Diff.IsDiff)}[{i}]"),
+                    Setters = { new Setter(Control.ForegroundProperty, Brushes.Red) }
+                };
+                
+                var style = new Style()
+                {
+                    TargetType = typeof(DataGridCell),
+                    BasedOn = gridData.CellStyle, 
+                    Triggers = { trigger }
+                };
+
                 var col = new DataGridTextColumn()
                 {
                     Header = headers[i],
-                    Binding = new Binding("Values[" + (i + 1) + "]"),
-                    FontWeight = (i < keysCount ? FontWeights.Bold : FontWeights.Normal)
+                    Binding = new Binding($"{nameof(Diff.Values)}[{i}]"),
+                    FontWeight = (i < keysCount ? FontWeights.Bold : FontWeights.Normal),
+                    CellStyle = style
                 };
-
-                Style style = new Style
-                {
-                    TargetType = typeof(DataGridCell),
-                    BasedOn = gridData.CellStyle
-                };
-
-                DataTrigger trigger = new DataTrigger
-                {
-                    Value = true,
-                    Binding = new Binding("IsDiff[" + (i + 1) + "]")
-                };
-                trigger.Setters.Add(new Setter(Control.ForegroundProperty, Brushes.Red));
-
-                style.Triggers.Add(trigger);
-
-                col.CellStyle = style;
 
                 gridData.Columns.Add(col);
             }

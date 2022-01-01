@@ -1,4 +1,4 @@
-﻿namespace QuAnalyzer.Features.Comparison;
+﻿namespace QuAnalyzer.Features.Comparison.Comparers;
 
 public class DBNullAwareEqualityComparer<T> : IEqualityComparer<T>
 {

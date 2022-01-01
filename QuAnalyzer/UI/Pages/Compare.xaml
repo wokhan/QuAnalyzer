@@ -6,7 +6,7 @@
       xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
       xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
       xmlns:local="clr-namespace:QuAnalyzer.UI.Pages"
-      xmlns:quanalyzer="clr-namespace:QuAnalyzer" xmlns:comparison="clr-namespace:QuAnalyzer.Features.Comparison"
+      xmlns:quanalyzer="clr-namespace:QuAnalyzer"
       x:Class="QuAnalyzer.UI.Pages.Compare"
       x:Name="me"
       DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}"

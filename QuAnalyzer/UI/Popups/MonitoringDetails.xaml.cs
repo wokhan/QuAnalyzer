@@ -17,14 +17,14 @@ namespace QuAnalyzer.UI.Popups;
 public partial class MonitoringDetails : Page
 {
 
-    private readonly MonitorItem initialItem;
-    public MonitorItem CurrentItem { get; set; }
+    private readonly TestDefinition initialItem;
+    public TestDefinition CurrentItem { get; set; }
 
     private Window _owner => Window.GetWindow(this);
 
-    public MonitoringDetails(MonitorItem monitorItem = null)
+    public MonitoringDetails(TestDefinition TestDefinition = null)
     {
-        initialItem = monitorItem ?? new MonitorItem() { Name = "Monitor #" + (App.Instance.CurrentProject.MonitorItems.Count + 1) };
+        initialItem = TestDefinition ?? new TestDefinition() { Name = "Monitor #" + (App.Instance.CurrentProject.TestDefinitions.Count + 1) };
         CurrentItem = initialItem.Clone();
 
         InitializeComponent();
@@ -44,10 +44,10 @@ public partial class MonitoringDetails : Page
 
     private void btnSave_Click(object sender, RoutedEventArgs e)
     {
-        CurrentItem.PrecedingSteps.AddAll(lstPrec.SelectedItems.Cast<MonitorItem>().Select(_ => KeyValuePair.Create(_, false)));
+        CurrentItem.PrecedingSteps.AddAll(lstPrec.SelectedItems.Cast<TestDefinition>().Select(_ => KeyValuePair.Create(_, false)));
         CurrentItem.Attributes = String.Join(",", lstAttributes.SelectedItems.Cast<KeyValuePair<string, bool>>().Select(s => s.Key));
 
-        var projectMappers = ((App)App.Instance).CurrentProject.MonitorItems;
+        var projectMappers = ((App)App.Instance).CurrentProject.TestDefinitions;
         if (projectMappers.Contains(initialItem))
         {
             projectMappers[projectMappers.IndexOf(initialItem)] = CurrentItem;

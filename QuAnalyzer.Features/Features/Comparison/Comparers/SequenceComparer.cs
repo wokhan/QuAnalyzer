@@ -1,4 +1,6 @@
-﻿namespace QuAnalyzer.Features.Comparison;
+﻿using QuAnalyzer.Features.Comparison;
+
+namespace QuAnalyzer.Features.Comparison.Comparers;
 
 public class SequenceComparer : IComparer<IEnumerable<object>>
 {

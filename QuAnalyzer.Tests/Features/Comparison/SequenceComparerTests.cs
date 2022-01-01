@@ -1,7 +1,8 @@
 ﻿using Xunit;
 using System.Collections.Generic;
+using QuAnalyzer.Features.Comparison.Comparers;
 
-namespace QuAnalyzer.Features.Comparison.Tests;
+namespace QuAnalyzer.Features.Comparison.Comparers.Tests;
 
 public class SequenceComparerTests
 {
