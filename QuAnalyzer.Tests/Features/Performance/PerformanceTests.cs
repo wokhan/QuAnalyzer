@@ -9,13 +9,13 @@ namespace QuAnalyzer.Features.Performance.Tests;
 public class PerformanceTests
 {
     [Fact()]
-    public void RunTest()
+    public async void RunTest()
     {
         var item = new TestDefinition() { Type = "COUNTALL", RunWhenStarted = true, Provider = new RandomDataProvider(), Repository = "Address book" };
-        var instance = new TestCase(item);
+        var instance = item.CreateInstance();
 
-        Monitoring.Run(new TestCasesCollection() { TestCases = { instance } }, 1, 1, 1);
-
-        Assert.Equal(MonitoringStatus.DONE, instance.Status);
+        await Monitoring.Monitoring.RunAsync(new TestCasesCollection() { TestCases = { instance } }, 1, 1, 1);
+        
+        Assert.Equal(TestCaseStatus.DONE, instance.Status);
     }
 }

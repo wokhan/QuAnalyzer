@@ -86,7 +86,7 @@ public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INot
 
     public new TValue this[TKey key]
     {
-        get { return base[key]; }
+        get => base[key];
         set
         {
             var oldvalue = base[key];

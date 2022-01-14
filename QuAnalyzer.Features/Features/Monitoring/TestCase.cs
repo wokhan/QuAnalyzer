@@ -7,7 +7,7 @@ namespace QuAnalyzer.Features.Monitoring;
 public partial class TestCase : ObservableObject
 {
     [ObservableProperty]
-    private MonitoringStatus status;
+    private TestCaseStatus status;
 
     public event Action<TestCase, TestResults>? OnResult;
     public event Action<TestCase, TestResults>? OnAdd;
@@ -37,10 +37,8 @@ public partial class TestCase : ObservableObject
 
     public void Stop()
     {
-        Status = MonitoringStatus.NOT_STARTED;
+        Status = TestCaseStatus.NOT_STARTED;
     }
-
-    private readonly int cnt = 0;
 
     public void raiseAdd(TestResults r)
     {
@@ -52,12 +50,9 @@ public partial class TestCase : ObservableObject
         OnResult?.Invoke(this, r);
     }
 
-
-
-    public TestCase(TestDefinition TestDefinition)
+    internal TestCase(TestDefinition TestDefinition)
     {
         this.Definition = TestDefinition;
-
     }
 
     public void AttachPrecedingStepInstances(IEnumerable<TestCase> steps)

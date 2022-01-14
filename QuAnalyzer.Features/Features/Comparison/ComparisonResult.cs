@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.ObjectModel;
+
 using Wokhan.Collections.Generic.Extensions;
 
 namespace QuAnalyzer.Features.Comparison;
@@ -26,14 +28,27 @@ public partial class ComparisonResult<T> : ResultStructBase
             var allFalse = new bool[MergedHeaders.Length];
             MergedDiff = sortedSrc.Zip(sortedTrg)
                                    .SelectMany(x => new[] {
-                                       new Diff() { Source = definition.SourceName, Values = x.First },
-                                       new Diff() {
-                                           Source = definition.TargetName, 
-                                           Values = x.Second, 
-                                           IsDiff = hasKeys && !x.First.Take(definition.SourceKeys.Count).SequenceEqual(x.Second.Take(definition.SourceKeys.Count))
+                                       new Diff(Source: definition.SourceName, Values: x.First),
+                                       new Diff(
+                                           Source: definition.TargetName, 
+                                           Values: x.Second, 
+                                           IsDiff: hasKeys && !x.First.Take(definition.SourceKeys.Count).SequenceEqual(x.Second.Take(definition.SourceKeys.Count))
                                                        ? allFalse
-                                                       : x.First.Zip(x.Second, (a, b) => !Equals(a, b)).ToArray() }
+                                                       : x.First.Zip(x.Second, (a, b) => !Equals(a, b)).ToArray()
+                                       )
                                     });
         }
+    }
+
+    public void InitCollections(Func<IList<T>> collectionCtor)
+    {
+        Source.Differences = collectionCtor();
+        Target.Differences = collectionCtor();
+        Source.Missing = collectionCtor();
+        Target.Missing = collectionCtor();
+        Source.Duplicates = collectionCtor();
+        Target.Duplicates = collectionCtor();
+        Source.PerfectDups = collectionCtor();
+        Target.PerfectDups = collectionCtor();
     }
 }

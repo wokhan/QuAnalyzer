@@ -125,7 +125,7 @@ public partial class Monitor : Page
         var monitor = (TestDefinition)timer.Tag;
 
         var (monitorInstance, cnt) = instances[monitor];
-        if (monitorInstance.Status == MonitoringStatus.DONE)
+        if (monitorInstance.Status == TestCaseStatus.DONE)
         {
             monitorInstance.PropertyChanged -= UpdateStatus;
             monitorInstance = monitor.CreateInstance();
@@ -134,18 +134,18 @@ public partial class Monitor : Page
             instances[monitor] = (monitorInstance, cnt++);
             monitorInstance.AttachPrecedingStepInstances(monitor.PrecedingSteps.Select(step => instances[step.Key].Item));
         }
-        else if (monitorInstance.Status == MonitoringStatus.RUNNING)
+        else if (monitorInstance.Status == TestCaseStatus.RUNNING)
         {
             return;
         }
 
         if (!monitorInstance.AllPrecedingStepsDone)
         {
-            monitorInstance.Status = MonitoringStatus.WAITING;
+            monitorInstance.Status = TestCaseStatus.WAITING;
             return;
         }
 
-        monitorInstance.Status = MonitoringStatus.RUNNING;
+        monitorInstance.Status = TestCaseStatus.RUNNING;
 
         List<Dictionary<string, string>> values = null;
 
@@ -153,7 +153,7 @@ public partial class Monitor : Page
         //TODO : Values !!!!
         await Monitoring.RunAsync(new TestCasesCollection() { TestCases = { monitorInstance }, ValuesSet = values }, cnt++, 1, 1, progress).ConfigureAwait(false);
 
-        monitorInstance.Status = MonitoringStatus.DONE;
+        monitorInstance.Status = TestCaseStatus.DONE;
     }
 
     private void UpdateStatus(object sender, PropertyChangedEventArgs e)

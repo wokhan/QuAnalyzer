@@ -15,7 +15,22 @@ public class SequenceEqualityComparer<T> : IEqualityComparer<IEnumerable<T>>
 
     public bool Equals(IEnumerable<T>? x, IEnumerable<T>? y)
     {
-        return x.Skip(startFrom).Take(maxCount).SequenceEqual(y.Skip(startFrom).Take(maxCount), cmp);
+        if (x is null)
+        {
+            return y is null;
+        }
+
+        if (y is null)
+        {
+            return x is null;
+        }
+
+        if (startFrom != 0 || maxCount != int.MaxValue)
+        {
+            return x.Skip(startFrom).Take(maxCount).SequenceEqual(y.Skip(startFrom).Take(maxCount), cmp);
+        }
+
+        return x.SequenceEqual(y, cmp);
     }
 
     // Computes an aggregated Hash Code to speed up comparison process.

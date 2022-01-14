@@ -43,7 +43,7 @@ public partial class TestDefinition : ObservableObject
 
     // TODO: Why?
     //public Func<IList<Dictionary<string, string>>, Dictionary<string, long>, IQueryable> GetData => (values, statsBag) => Provider.GetQueryable(Repository, values, statsBag);
-    public IQueryable GetData(IList<Dictionary<string, string>> values, Dictionary<string, long> statsBag)
+    public IQueryable GetData(IList<Dictionary<string, string>>? values, Dictionary<string, long> statsBag)
     {
         return Provider.GetQueryable(Repository, values, statsBag);
     }
@@ -68,7 +68,7 @@ public partial class TestDefinition : ObservableObject
     public string Attributes { get; set; } = "";
 
     [ObservableProperty]
-    public MonitoringStatus status;
+    public TestCaseStatus status;
 
     public TestCase CreateInstance()
     {

@@ -1,48 +1,59 @@
-﻿using QuAnalyzer.Features.Comparison;
+﻿namespace QuAnalyzer.Features.Comparison.Comparers;
 
-namespace QuAnalyzer.Features.Comparison.Comparers;
-
-public class SequenceComparer : IComparer<IEnumerable<object>>
+/// TODO: Review and improve, I don't like the current implementation
+/// Maybe I should check the keys first, if equals, go on until it fails (or continue if not)
+/// A perf test is required here to pick the best implementation.
+public class SequenceComparer<T> : IComparer<IEnumerable<T>>
 {
-    private static readonly SequenceEqualityComparer<object> seqComparer = new();
-    private readonly string[]? keys;
-
+    private static readonly SequenceEqualityComparer<T> fullComparer = new();
+    private readonly SequenceEqualityComparer<T> keysComparer;
+    
     public SequenceComparer()
     {
-        keys = null;
+        keysComparer = new();
     }
 
-    public SequenceComparer(params string[] keys)
+    public SequenceComparer(int? keyFieldsCount = null)
     {
-        this.keys = keys;
+        if (keyFieldsCount is null)
+        {
+            keysComparer = new();
+        }
+        else
+        {
+            keysComparer = new(0, (int)keyFieldsCount);
+        }
     }
 
-    public int Compare(IEnumerable<object>? x, IEnumerable<object>? y)
+    public int Compare(IEnumerable<T>? x, IEnumerable<T>? y)
     {
-        if (seqComparer.Equals(x, y))
+        switch (x)
+        {
+            case null when y is null:
+                return 0;
+            case not null when y is null:
+                return 1;
+            case null when y is not null:
+                return -1;
+        }
+
+        if (fullComparer.Equals(x, y))
         {
             return 0;
         }
 
-        if (seqComparer.Equals(keys.Zip(x, (_, x) => x), keys.Zip(x, (_, x) => x)))
+        // If there is a difference, but not regarding the keys: values are different, so we check that first
+        if (keysComparer is not null && keysComparer.Equals(x, y))
         {
             return int.MaxValue;
         }
 
-        /*
-        var id = keys.Select((k, i) => i)
-                   .SkipWhile(i => x.ElementAt(i).Equals(y.ElementAt(i)))
-                   .First();
-
-        var xi = x.ElementAt(id);
-        var yi = y.ElementAt(id);
-        */
-        var (_, xi, yi) = keys.Zip(x, y)
-                              .First(xy => !xy.Second.Equals(xy.Third));
+        // Else if the keys are different (or if there are no keys), we check the first different item
+        var (xi, yi) = x.Zip(y).First(xy => !xy.First.Equals(xy.Second));
 
         if (xi is string sxi)
         {
-            return string.CompareOrdinal(sxi, (string)yi);
+            return string.CompareOrdinal(sxi, yi as string);
         }
 
         return ((IComparable)xi).CompareTo((IComparable)yi);

@@ -1,6 +1,6 @@
 ﻿namespace QuAnalyzer.Features.Monitoring;
 
-public enum Status
+public enum TestResultStatus
 {
     Pending,
     Loading,

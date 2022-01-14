@@ -11,7 +11,7 @@ public partial class TestResults : ObservableObject
     public DateTimeOffset LastCheck { get; } = DateTimeOffset.Now;
 
     [ObservableProperty]
-    private Status status;
+    private TestResultStatus status;
     
     public DateTimeOffset End { get; set; }
 

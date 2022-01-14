@@ -1,6 +1,6 @@
 ﻿namespace QuAnalyzer.Features.Monitoring;
 
-public enum MonitoringStatus
+public enum TestCaseStatus
 {
     NOT_STARTED,
     WAITING,

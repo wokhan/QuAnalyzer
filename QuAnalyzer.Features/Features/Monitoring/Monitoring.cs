@@ -46,18 +46,19 @@ public static class Monitoring
 
     private static void RunForOne(TestCasesCollection testsCollection, int occurence, IProgress<TestResults>? callback, int x)
     {
-        IList<Dictionary<string, string>> values = null;
+        IList<Dictionary<string, string>>? values = null;
         if (testsCollection.ValuesSet is not null)// && tests.DistinctParallelValues)
         {
             values = testsCollection.Selector(testsCollection.ValuesSet, x);
         }
+
         testsCollection.TestCases
                .Select((test, ix) => (test, results: new TestResults()
                {
                    Id = $"{occurence}.{x}.{ix}",
                    Name = test.Name,
                    //Index = x,
-                   Status = Status.Pending,
+                   Status = TestResultStatus.Pending,
                    Values = values
                }))
                .AsParallel()
@@ -69,36 +70,36 @@ public static class Monitoring
                    var sw = Stopwatch.StartNew();
                    try
                    {
-                       var TestDefinition = testWithResults.test.Definition;
-                       switch (TestDefinition.Type)
+                       var definition = testWithResults.test.Definition;
+                       switch (definition.Type)
                        {
                            case MonitoringModes.PING:
                                testWithResults.results.Data = null;
-                               testWithResults.results.Duration.Add(nameof(MonitoringModes.PING), SimpleNetworkTests.Ping(TestDefinition.Provider.Host));
+                               testWithResults.results.Duration.Add(nameof(MonitoringModes.PING), SimpleNetworkTests.Ping(definition.Provider.Host));
                                break;
 
                            case MonitoringModes.CHECKVAL:
-                               if (string.IsNullOrEmpty(TestDefinition.Attributes))
+                               if (string.IsNullOrEmpty(definition.Attributes))
                                {
-                                   throw new NullReferenceException($"The {nameof(TestDefinition.Attributes)} attribute must not be null.");
+                                   throw new NullReferenceException($"The {nameof(definition.Attributes)} attribute must not be null.");
                                }
-                               var q = TestDefinition.GetData(values, testWithResults.results.Duration);
-                               if (!string.IsNullOrEmpty(TestDefinition.Filter))
+                               var q = definition.GetData(values, testWithResults.results.Duration);
+                               if (!string.IsNullOrEmpty(definition.Filter))
                                {
-                                   q = q.Where(TestDefinition.Filter);
+                                   q = q.Where(definition.Filter);
                                }
                                // Removed new(attribute)
-                               testWithResults.results.Status = Status.Loading;
-                               testWithResults.results.Data = q.Select(TestDefinition.Attributes).AsEnumerable().ToList();
+                               testWithResults.results.Status = TestResultStatus.Loading;
+                               testWithResults.results.Data = q.Select(definition.Attributes).AsEnumerable().ToList();
                                break;
 
                            case MonitoringModes.COUNTALL:
-                               var qc = TestDefinition.GetData(values, testWithResults.results.Duration);
-                               if (!string.IsNullOrEmpty(TestDefinition.Filter))
+                               var qc = definition.GetData(values, testWithResults.results.Duration);
+                               if (!string.IsNullOrEmpty(definition.Filter))
                                {
-                                   qc = qc.Where(TestDefinition.Filter);
+                                   qc = qc.Where(definition.Filter);
                                }
-                               testWithResults.results.Status = Status.Loading;
+                               testWithResults.results.Status = TestResultStatus.Loading;
                                testWithResults.results.Data = new { Count = qc.Count() };
                                break;
 
@@ -107,12 +108,12 @@ public static class Monitoring
                                break;
                        }
 
-                       testWithResults.results.Status = Status.Success;
+                       testWithResults.results.Status = TestResultStatus.Success;
                    }
                    catch (Exception e)
                    {
                        testWithResults.results.Data = e;
-                       testWithResults.results.Status = Status.Error;
+                       testWithResults.results.Status = TestResultStatus.Error;
                    }
                    finally
                    {

@@ -1,6 +1,6 @@
 ﻿using Xunit;
 using System.Collections.Generic;
-using QuAnalyzer.Features.Comparison.Comparers;
+using QuAnalyzer.Features.Comparison.Tests;
 
 namespace QuAnalyzer.Features.Comparison.Comparers.Tests;
 
@@ -8,10 +8,10 @@ public class SequenceComparerTests
 {
 
     [Theory()]
-    [InlineData(new[] { "a", "b", "c" }, new[] { "a", "b", "c" })]
-    public void CompareTest(IEnumerable<object> x, IEnumerable<object> y)
+    [ClassData(typeof(TestDataRowGenerator))]
+    public void CompareEqualTest(IEnumerable<object> x, IEnumerable<object> y)
     {
-        var comparer = new SequenceComparer();
+        var comparer = new SequenceComparer<object>();
         Assert.Equal(0, comparer.Compare(x, y));
     }
 }

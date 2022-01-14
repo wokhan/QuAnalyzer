@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace QuAnalyzer.Features.Comparison.Tests;
+namespace QuAnalyzer.Features.Comparison.Comparers.Tests;
 
 public class SequenceEqualityComparerTests
 {

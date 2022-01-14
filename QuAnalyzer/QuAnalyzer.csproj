@@ -24,8 +24,8 @@
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="Wokhan.UI" Version="0.9.4-beta" />
-    <PackageReference Include="EPPlus" Version="5.8.0" />
-    <PackageReference Include="System.Management" Version="5.0.0" />
+    <PackageReference Include="EPPlus" Version="5.8.4" />
+    <PackageReference Include="System.Management" Version="6.0.0" />
   </ItemGroup>
   
   <ItemGroup>
