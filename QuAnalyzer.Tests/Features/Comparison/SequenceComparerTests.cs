@@ -11,7 +11,7 @@ public class SequenceComparerTests
     [ClassData(typeof(TestDataRowGenerator))]
     public void CompareEqualTest(IEnumerable<object> x, IEnumerable<object> y)
     {
-        var comparer = new SequenceComparer<object>();
+        var comparer = new SequenceComparer<IEnumerable<object>, object>();
         Assert.Equal(0, comparer.Compare(x, y));
     }
 }

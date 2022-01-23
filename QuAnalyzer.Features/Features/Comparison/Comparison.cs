@@ -6,7 +6,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
-using System.Xml.Linq;
 
 using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Core.Extensions;
@@ -80,8 +79,8 @@ public static class Comparison
                         SetProgress(definition, ProgressType.GettingSamples, 0, callback);
 
                         var samples = GetSamples(nbSamplesShown, srcData, trgData);
-                        r.Source.Samples = samples.First();
-                        r.Target.Samples = samples.Last();
+                        r.Source.Samples = samples[0];
+                        r.Target.Samples = samples[1];
 
                         SetProgress(definition, ProgressType.GettingSamples, 15, callback);
                     }
@@ -91,8 +90,8 @@ public static class Comparison
                         SetProgress(definition, ProgressType.Filtering, 0, callback);
 
                         var samples = GetSamples(nbSamplesCompared, srcData, trgData);
-                        srcData = samples.First();
-                        trgData = samples.Last();
+                        srcData = samples[0];
+                        trgData = samples[1];
 
                         SetProgress(definition, ProgressType.Filtering, 15, callback);
                     }
@@ -147,14 +146,14 @@ public static class Comparison
         progressCallback?.Report(f);
     }
 
-    //TODO: What about unordered collections?!
-    public static T[][] GetSamples<T>(int nbSamples, params IEnumerable<T>[] collections)
+    //TODO: What about unordered collections? BTW, looks really unoptimized to me
+    public static T?[][] GetSamples<T>(int nbSamples, params IEnumerable<T>[] collections)
     {
         var rdm = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
         var min = collections.Min(c => c.Count());
         nbSamples = Math.Min(min, nbSamples);
 
-        var rdmIdxs = new byte[nbSamples].Select(i => rdm.Next(min)).ToArray();
+        var rdmIdxs = Enumerable.Range(0, nbSamples).Select(_ => rdm.Next(min)).ToArray();
 
         return collections.Select(c => rdmIdxs.Select(i => c.ElementAtOrDefault(i)).ToArray()).ToArray();
     }
@@ -178,14 +177,12 @@ public static class Comparison
 
         f.Results.InitCollections(() => new ObservableCollection<T>());
 
-        var seqComparer = new SequenceComparer<object>(f.SourceKeys?.Count);// ?? f.SourceHeaders?.Count);
-
-        var dupKeyComparer = new SequenceEqualityComparer<object>(0, f.SourceKeys?.Count ?? int.MaxValue);
+        IEqualityComparer<IEnumerable<object>> dupKeyComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(0, f.SourceKeys?.Count ?? int.MaxValue);
         //TODO : key comparison
-        SequenceEqualityComparer<object>? dupRemComparer = null;
+        IEqualityComparer<IEnumerable<object>>? dupRemComparer = null;
         if (f.SourceKeys is not null)
         {
-            dupRemComparer = new SequenceEqualityComparer<object>(f.SourceKeys.Count);
+            dupRemComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(f.SourceKeys.Count);
         }
 
         using var srcEnum = srcData.GetEnumerator();
@@ -200,8 +197,8 @@ public static class Comparison
         var issrc = srcEnum.MoveNext();
         var istrg = trgEnum.MoveNext();
 
-        var keepGoing = true;
-
+        var keepGoing = issrc || istrg;
+        
         while (keepGoing)
         {
             if (advanceSource && issrc)
@@ -210,9 +207,12 @@ public static class Comparison
             if (advanceTarget && istrg)
                 CheckDuplicate(f.Results.Target, trgPrev, trgEnum.Current, dupKeyComparer, dupRemComparer);
 
-            var cmp = seqComparer.Compare((IEnumerable<object>)srcEnum.Current, (IEnumerable<object>)trgEnum.Current);
+            srcPrev = srcEnum.Current;
+            trgPrev = trgEnum.Current;
 
-            switch (cmp)
+            var compResult = f.Comparer.Compare(srcEnum.Current, trgEnum.Current);
+
+            switch (compResult)
             {
                 case 0:
                     f.Results.MatchingCount++;
@@ -242,16 +242,37 @@ public static class Comparison
                     break;
             }
 
-            trgPrev = trgEnum.Current;
-            srcPrev = srcEnum.Current;
+            keepGoing = false;
 
-            keepGoing = (advanceSource && (issrc = srcEnum.MoveNext()));
-            keepGoing = (advanceTarget && (istrg = trgEnum.MoveNext())) || keepGoing;
+            if (advanceSource)
+            {
+                issrc = srcEnum.MoveNext();
+            }
+            
+            if (advanceTarget)
+            {
+                istrg = trgEnum.MoveNext();
+            }
+
+            keepGoing = issrc && istrg;
+        }
+
+        // We reached the end of either enumeration: every other records are missing.
+        while (issrc)
+        {
+            f.Results.Target.Missing.Add(srcEnum.Current);
+            issrc = srcEnum.MoveNext();
+        }
+
+        while (istrg)
+        {
+            f.Results.Source.Missing.Add(trgEnum.Current);
+            istrg = trgEnum.MoveNext();
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void CheckDuplicate<T>(ItemResult<T> f, T? previous, T? current, SequenceEqualityComparer<object> sqcKeysOrAll, SequenceEqualityComparer<object>? sqcRemaining) where T : class
+    private static void CheckDuplicate<T>(ItemResult<T> f, T? previous, T? current, IEqualityComparer<IEnumerable<object>> sqcKeysOrAll, IEqualityComparer<IEnumerable<object>>? sqcRemaining) where T : class
     {
         if (default(T) != previous && sqcKeysOrAll.Equals((IEnumerable<object>)previous, (IEnumerable<object>)current))
         {
@@ -265,144 +286,26 @@ public static class Comparison
         }
     }
 
-
-    // TODO: review as this is totally absolutely inefficient... Maybe force order when it's not already ordered?
-    // It will use more memory and will require a full data load, but is this really an issue since we're iterating multiple time over source and target collection anyway...
-    //public static void Compare<T>(ComparerDefinition<T> f, IEnumerable<T> srcData, IEnumerable<T> trgData, IProgress<ComparerDefinition<T>>? progressCallback, CancellationToken token)
-    //{
-    //    Contract.Requires(srcData is not null);
-    //    Contract.Requires(trgData is not null);
-
-    //    var countA = f.Results.Source.Count;
-    //    var countB = f.Results.Target.Count;
-
-    //    if (countA == 0)
-    //    {
-    //        f.Results.Source.Missing = trgData.ToList();
-    //        f.Results.MatchingCount = 0;
-    //        InitiateDuplicates(trgData, f.Results.Target, f.KeysComparer, f.Comparer);
-    //        return;
-    //    }
-
-    //    if (countB == 0)
-    //    {
-    //        f.Results.Target.Missing = srcData.ToList();
-    //        f.Results.MatchingCount = 0;
-    //        InitiateDuplicates(srcData, f.Results.Source, f.KeysComparer, f.Comparer);
-    //        return;
-    //    }
-
-    //    ParallelQuery<T> srcPrl = srcData.AsParallel();
-    //    ParallelQuery<T> trgPrl = trgData.AsParallel();
-
-    //    InitiateDuplicates(srcData, f.Results.Source, f.KeysComparer, f.Comparer);
-    //    InitiateDuplicates(trgData, f.Results.Target, f.KeysComparer, f.Comparer);
-
-    //    //progressCallback(cName, ProgressType.Comparing, 0);
-    //    var i = 0;
-    //    var matchingItems = srcPrl.WithProgress(i => SetProgress(f, ProgressType.Comparing, (int)(i * 20 / countA), progressCallback))
-    //                              .Intersect(trgPrl, f.Comparer)
-    //                              .ToList()
-    //                              .AsParallel();
-
-    //    f.Results.MatchingCount = matchingItems.Count();
-
-    //    if (countA != f.Results.MatchingCount || countB != f.Results.MatchingCount)
-    //    {
-    //        // Rem matches from source
-    //        var filteredA = srcPrl.Except(matchingItems, f.Comparer).ToList();
-
-    //        // Rem matches from target
-    //        var filteredB = trgPrl.Except(matchingItems, f.Comparer).ToList();
-
-    //        // Get items only in source = get items missing from the target
-    //        var sourceOnly = RetrieveOnly(filteredA, filteredB, f, progressCallback, ProgressType.CheckingSourceOnly);
-
-    //        // Get items only in target = get items missing from the source
-    //        var targetOnly = RetrieveOnly(filteredB, filteredA, f, progressCallback, ProgressType.CheckingTargetOnly);
-
-    //        if (f.KeysComparer is not null)
-    //        {
-    //            f.Results.Source.Differences = new ObservableCollection<T>();
-    //            f.Results.Target.Differences = new ObservableCollection<T>();
-
-    //            var differences = sourceOnly.Join(targetOnly, s => s, t => t, (s, t) => (s, t), f.KeysComparer);
-    //            foreach (var diff in differences)
-    //            {
-    //                f.Results.Source.Differences.Add(diff.s);
-    //                f.Results.Target.Differences.Add(diff.t);
-    //            }
-
-    //            // Get source missing: check "source only" keys against "target only" keys
-    //            // If the key does not exist, the item is a really missing one.
-    //            f.Results.Source.Missing = RetrieveOnly(targetOnly, f.Results.Target.Differences, f, progressCallback, ProgressType.CheckingSourceMissing);//targetOnly.Except(f.Results.Target.Differences, f.Comparer).ToList();
-    //                                                                                                                                                       // Get target missing: check "target only" keys against "source only" keys
-    //            f.Results.Target.Missing = RetrieveOnly(sourceOnly, f.Results.Source.Differences, f, progressCallback, ProgressType.CheckingTargetMissing); //sourceOnly.Except(f.Results.Source.Differences, f.Comparer).ToList();
-    //        }
-    //        else
-    //        {
-    //            f.Results.Source.Missing = f.Results.Source.Differences = targetOnly;
-    //            f.Results.Target.Missing = f.Results.Target.Differences = sourceOnly;
-    //        }
-    //    }
-    //    else
-    //    {
-    //        //SetProgress(f, ProgressType.Comparing, 55, progressCallback);
-    //        SetProgress(f, ProgressType.Done, 0, progressCallback);
-    //    }
-    //}
-
-    public static ItemResult<T> GetDuplicates<T>(IEnumerable<T> data, IList<string>? keys) where T : class
+    public static ItemResult<T> GetDuplicates<T>(IEnumerable<T> data, IList<string>? keys, bool keysOnly = false) where T : class
     {
         ItemResult<T> ret = new();
 
-        var seqComparer = new SequenceComparer<object>(keys?.Count);// ?? f.SourceHeaders?.Count);
-        var seqEqComparer = new SequenceEqualityComparer<object>();
+        IEqualityComparer<IEnumerable<object>> dupKeyComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(0, keys?.Count ?? int.MaxValue);
         //TODO : key comparison
-        SequenceEqualityComparer<object>? seqRemEqComparer = null;
-        if (keys is not null)
+        IEqualityComparer<IEnumerable<object>>? dupRemComparer = null;
+        if (!keysOnly && keys is not null)
         {
-            seqRemEqComparer = new SequenceEqualityComparer<object>(keys.Count);
+            dupRemComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(keys.Count);
         }
 
         var prev = default(T);
-        foreach(var item in data)
+        var enumerator = data.GetEnumerator();
+        while (enumerator.MoveNext())
         {
-            CheckDuplicate(ret, prev, item, seqEqComparer, seqRemEqComparer);
+            CheckDuplicate(ret, prev, enumerator.Current, dupKeyComparer, dupRemComparer);
+            prev = enumerator.Current;
         }
 
         return ret;
     }
-
-    public static ItemResult<T> InitiateDuplicates<T>(IEnumerable<T> srcData, IEqualityComparer<T> keyComparer, IEqualityComparer<T> comparer)
-    {
-        var ret = new ItemResult<T>();
-
-        InitiateDuplicates(srcData, ret, keyComparer, comparer);
-
-        return ret;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void InitiateDuplicates<T>(IEnumerable<T> srcData, ItemResult<T> itemResult, IEqualityComparer<T> keysComparer, IEqualityComparer<T> comparer)
-    {
-        if (keysComparer is null)
-        {
-            itemResult.PerfectDups = srcData.GroupBy(x => x, comparer).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
-        }
-        else
-        {
-            itemResult.Duplicates = srcData.GroupBy(x => x, keysComparer).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
-            itemResult.PerfectDups = itemResult.Duplicates.GroupBy(x => x, comparer).Where(g => g.Count() > 1).SelectMany(g => g).ToList();
-        }
-    }
-
-    //private static IList<T> RetrieveOnly<T>(IList<T> a, IList<T> b, ComparerDefinition<T> f, IProgress<ComparerDefinition<T>> progressCallback, ProgressType type)
-    //{
-    //    var ix = 0;
-    //    return a.AsParallel()
-    //            .WithProgress(p => SetProgress(f, type, (int)(p * 10 / a.Count), progressCallback))
-    //            .Except(b.AsParallel(), f.Comparer)
-    //            .ToList();
-    //}
 }

@@ -180,16 +180,16 @@ public partial class Duplicates : Page, INotifyPropertyChanged
            
             gridData.LoadingProgress = 1;
 
-            var keyComparer = new SequenceEqualityComparer<object>(0, keys.Length);
+            var keyComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(0, keys.Length);
 
             //TODO: check
             void updateStatusCheck(double i) { Dispatcher.InvokeAsync(() => gridData.Status = $"Checked {i} entries"); gridData.LoadingProgress = (int)(i * 100 / dataObjectArray.Count); }
-            var ret = Comparison.InitiateDuplicates(dataObjectArray.WithProgress(updateStatusCheck), keyComparer, new SequenceEqualityComparer<object>()).Duplicates;
+            var ret = Comparison.GetDuplicates(dataObjectArray.WithProgress(updateStatusCheck), keys, true).Duplicates;
 
-            if (!KeepDuplicates)
-            {
-                ret = ret.Distinct(keyComparer).ToList();
-            }
+            //if (!KeepDuplicates)
+            //{
+            //    ret = ret.Distinct(keyComparer).ToList();
+            //}
 
             Dispatcher.InvokeAsync(() =>
             {

@@ -1,13 +1,15 @@
-﻿namespace QuAnalyzer.Features.Comparison.Comparers;
+﻿using System.Collections.Generic;
+
+namespace QuAnalyzer.Features.Comparison.Comparers;
 
 /// TODO: Review and improve, I don't like the current implementation
 /// Maybe I should check the keys first, if equals, go on until it fails (or continue if not)
 /// A perf test is required here to pick the best implementation.
-public class SequenceComparer<T> : IComparer<IEnumerable<T>>
+public class SequenceComparer<T, TInner> : IComparer<T> where T : IEnumerable<TInner>
 {
-    private static readonly SequenceEqualityComparer<T> fullComparer = new();
-    private readonly SequenceEqualityComparer<T> keysComparer;
-    
+    private static readonly SequenceEqualityComparer<T, TInner> fullComparer = new();
+    private readonly SequenceEqualityComparer<T, TInner> keysComparer;
+
     public SequenceComparer()
     {
         keysComparer = new();
@@ -17,7 +19,7 @@ public class SequenceComparer<T> : IComparer<IEnumerable<T>>
     {
         if (keyFieldsCount is null)
         {
-            keysComparer = new();
+            keysComparer = SequenceEqualityComparer<T, TInner>.Default;
         }
         else
         {
@@ -25,7 +27,7 @@ public class SequenceComparer<T> : IComparer<IEnumerable<T>>
         }
     }
 
-    public int Compare(IEnumerable<T>? x, IEnumerable<T>? y)
+    public int Compare(T? x, T? y)
     {
         switch (x)
         {
@@ -49,13 +51,18 @@ public class SequenceComparer<T> : IComparer<IEnumerable<T>>
         }
 
         // Else if the keys are different (or if there are no keys), we check the first different item
-        var (xi, yi) = x.Zip(y).First(xy => !xy.First.Equals(xy.Second));
+        var (xi, yi, index) = x.Zip(y, Enumerable.Range(0, x.Count())).First(xy => !xy.First.Equals(xy.Second));
 
+        int internalResult = 0;
         if (xi is string sxi)
         {
-            return string.CompareOrdinal(sxi, yi as string);
+            internalResult = string.CompareOrdinal(sxi, yi as string);
+        }
+        else
+        {
+            internalResult = ((IComparable)xi).CompareTo((IComparable)yi);
         }
 
-        return ((IComparable)xi).CompareTo((IComparable)yi);
+        return Math.Sign(internalResult) * (index + 1);
     }
 }

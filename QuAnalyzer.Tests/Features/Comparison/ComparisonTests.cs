@@ -1,24 +1,31 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 
-using QuAnalyzer.Features.Comparison.Comparers;
+using QuAnalyzer.Tests.Features.Comparison;
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Xunit;
+using Xunit.Abstractions;
 
 namespace QuAnalyzer.Features.Comparison.Tests;
 
 public class ComparisonTests
 {
-    
+    private readonly ITestOutputHelper output;
+
+    public ComparisonTests(ITestOutputHelper output)
+    {
+        this.output = output;
+    }
+
     [Theory()]
     [ClassData(typeof(TestDataForCompare))]
     public void RunTest(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData, int expMatches, int expSrcDiffs, int expTrgDiffs, int expSrcDups, int expTrgDups, int expSrcMissing, int expTrgMissing)
     {
-        var comparer = GetComparer(sourceData, targetData);
+        var comparer = SharedHelper.GetComparer(sourceData, targetData);
 
         var nbSamplesShown = -1;
         var nbSamplesCompared = -1;
@@ -34,18 +41,6 @@ public class ComparisonTests
         //Assert.Equal(expTrgDups, comparer.Results.Target.Duplicates.Count);
         Assert.Equal(expSrcMissing, comparer.Results.Source.Missing.Count);
         Assert.Equal(expTrgMissing, comparer.Results.Target.Missing.Count);
-    }
-
-    
-    protected static ComparerDefinition<object[]> GetComparer(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData)
-    {
-        return new ComparerDefinition<object[]>()
-        {
-            GetSourceData = () => sourceData,
-            GetTargetData = () => targetData,
-            IsOrdered = true,
-            Comparer = new SequenceEqualityComparer<object>()
-        };
     }
 
     [Theory()]
@@ -84,7 +79,7 @@ public class ComparisonTests
     [Fact()]
     public void RunBenchmark()
     {
-        var report = BenchmarkRunner.Run(typeof(ComparisonPerfTests));
-        Console.Write(report.ToString());
+        var report = BenchmarkRunner.Run(typeof(ComparisonPerfTests), DefaultConfig.Instance.WithOptions(ConfigOptions.DisableOptimizationsValidator));
+        output.WriteLine(report.Table.ToString());
     }
 }

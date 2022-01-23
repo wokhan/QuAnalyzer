@@ -6,8 +6,8 @@ namespace QuAnalyzer.Features.Comparison.Tests;
 
 internal class TestDataForCompare : IEnumerable<object[]>
 {
-    private readonly int COUNT = 1000;
-    private readonly int NB_DIFFERENCES = 200;
+    private readonly int COUNT = 2;
+    private readonly int NB_DIFFERENCES = 1;
     private readonly int NB_ITERATION = 20;
 
     private readonly IList<object[]> allData = new List<object[]>();

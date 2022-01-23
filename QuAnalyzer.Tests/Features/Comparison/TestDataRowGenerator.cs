@@ -21,37 +21,50 @@ internal class TestDataRowGenerator : IEnumerable<object[]>
     public int SourceMissing { get; internal set; }
     public int TargetMissing { get; internal set; }
 
-    private int nbDifferences;
-
     public TestDataRowGenerator() : this(1, 1) { }
 
     public TestDataRowGenerator(int count, int nbDifferences)
     {
-        this.nbDifferences = nbDifferences;
-        
-        SourceData = DummyPersons.Data.Take(count).OrderByMany(5).ToList();
+        IEnumerable<object[]> data = new List<object[]>();
+        int cpt = 0;
+        while (count - data.Count() > 0)
+        {
+            data = data.Concat(DummyPersons.Data.Take(count).Select(person => new [] { person[0] + "_" + cpt, person[1], person[2], person[3], person[4] }).ToList());
+        }
+
+        SourceData = data.OrderByMany(5).ToList();
         Matches = SourceData.Count;
 
-        TargetData = DummyPersons.Data.Take(count).Select(Alter).OrderByMany(5).ToList();
+        TargetData = new List<object[]>(SourceData);
+        Alter(nbDifferences);
     }
 
     private readonly Random rnd = new();
-    private int lastDifferentIndex;
-    private int currentDiffIndex;
 
-    private object[] Alter(object[] d)
+    private void Alter(int nbDifferences)
     {
-        if (currentDiffIndex < nbDifferences)
+        var currentDiffIndex = 0;
+        var alreadyUpdated = new List<int>(nbDifferences);
+
+        int index;
+
+        while (currentDiffIndex < nbDifferences)
         {
-            lastDifferentIndex = rnd.Next(lastDifferentIndex, SourceData.Count);
+            do
+            {
+                index = rnd.Next(0, TargetData.Count);
+            } while (alreadyUpdated.Contains(index));
+
+            alreadyUpdated.Add(index);
+
             Matches--;
             SourceMissing++;
             TargetMissing++;
 
-            return DummyAlteredPersons.Data[currentDiffIndex++ % DummyAlteredPersons.Data.Count];
-        }
+            TargetData[index] = DummyAlteredPersons.Data[currentDiffIndex % DummyAlteredPersons.Data.Count];
 
-        return (object[])d.Clone();
+            currentDiffIndex++;
+        }
     }
 
     //TODO : change to avoid zipping everytime? Not really that important for testing though.

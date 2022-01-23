@@ -24,8 +24,9 @@ public class ComparerDefinition<T>
     public bool IsOrdered { get; set; }
     public CancellationTokenSource TokenSource { get; } = new CancellationTokenSource();
 
-    public IEqualityComparer<T> Comparer { get; set; }
-    public IEqualityComparer<T>? KeysComparer { get; set; }
+    //TODO: should be IComparer<T>... to be refactored (has some side effects obv.)
+    public IComparer<T> Comparer { get; init; } //= Comparer<T>.Default;
+    public IEqualityComparer<T>? KeysComparer { get; set; } = EqualityComparer<T>.Default;
     public Func<IEnumerable<T>> GetSourceData { get; set; }
     public Func<IEnumerable<T>> GetTargetData { get; set; }
 
@@ -138,8 +139,8 @@ public class ComparerDefinition<T>
         TargetHeaders = fieldsTrg;
         SourceKeys = srcKeys;
         TargetKeys = trgKeys;
-        Comparer = (IEqualityComparer<T>)new SequenceEqualityComparer<object>();
-        //KeysComparer = (IEqualityComparer<T>)(srcKeys is not null ? new SequenceEqualityComparer<object>(0, srcKeys.Length) : null);
+        Comparer = (IComparer<T>)SequenceEqualityComparer<IEnumerable<object>, object>.Default;
+        KeysComparer = (IEqualityComparer<T>)new SequenceEqualityComparer<IEnumerable<object>, object>(0, SourceKeys?.Count ?? int.MaxValue);
         //KeysComparer = (IEqualityComparer<T>)new SequenceComparer(srcKeys is not null ? srcKeys.ToArray() : Enumerable.Range(0, fieldsSrc.Count).Select(i => i.ToString()).ToArray());
         GetSourceData = () => (IEnumerable<T>)normalizeTypes(Transform(srcDataGetter, fieldsSrc), allTypesTrg); //.Select(r => allIdxSr.Select(i => r[i]).ToArray()),
         GetTargetData = () => (IEnumerable<T>)normalizeTypes(Transform(trgDataGetter, fieldsTrg), allTypesTrg);//.Select(r => allIdxTr.Select(i => r[i]).ToArray())

@@ -1,22 +1,34 @@
 ﻿using BenchmarkDotNet.Attributes;
 
-using System.Collections.Generic;
-using System.Linq;
+using QuAnalyzer.Tests.Features.Comparison;
 
 namespace QuAnalyzer.Features.Comparison.Tests;
 
-public class ComparisonPerfTests : ComparisonTests
+public class ComparisonPerfTests
 {
-    //[Benchmark]
-    //public async void RunPerfTest()
-    //{
-    //    var firstData = Data1.First();
-    //    var comparer = GetComparer((IEnumerable<object[]>)firstData[0], (IEnumerable<object[]>)firstData[1]);
+    private TestDataRowGenerator data = new TestDataRowGenerator(100000, 7000);
 
-    //    var nbSamplesShown = -1;
-    //    var nbSamplesCompared = -1;
+    [Benchmark]
+    public void UsingLegacyComparer()
+    {
+        var comparer = SharedHelper.GetComparer(data.SourceData, data.TargetData);
 
-    //    await Comparison.RunAsync(new[] { comparer }, nbSamplesCompared, nbSamplesShown);
-    //}
+        var nbSamplesShown = -1;
+        var nbSamplesCompared = -1;
+
+        Comparison.Run(new[] { comparer }, nbSamplesCompared, nbSamplesShown);
+    }
+
+    [Benchmark]
+    public void UsingNewComparer()
+    {
+        var comparer = SharedHelper.GetComparer(data.SourceData, data.TargetData, true);
+
+        var nbSamplesShown = -1;
+        var nbSamplesCompared = -1;
+
+        Comparison.Run(new[] { comparer }, nbSamplesCompared, nbSamplesShown);
+    }
+
 
 }

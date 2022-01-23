@@ -65,7 +65,8 @@ public partial class Compare : Page
         
         prgGlobal.IsIndeterminate = false;
 
-        await Task.Run(() => Comparison.Run(newInstances, 0, 0, new Progress<ComparerDefinition<object[]>>(Progress), App.Instance.CurrentProject.UseParallelism));
+        var callback = new Progress<ComparerDefinition<object[]>>(Progress);
+        await Task.Run(() => Comparison.Run(newInstances, 0, 0, callback, App.Instance.CurrentProject.UseParallelism));
     }
 
     private readonly Dictionary<string, int> progressDC = new();
