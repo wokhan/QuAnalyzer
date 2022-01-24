@@ -165,7 +165,7 @@ public partial class Duplicates : Page, INotifyPropertyChanged
             gridData.Status = "Loading data...";
 
             var data = prov.GetQueryable(repository);//.Select<dynamic>(headers);
-
+            
             gridData.LoadingProgress = -1;
 
             //TODO: move
@@ -173,23 +173,20 @@ public partial class Duplicates : Page, INotifyPropertyChanged
             void updateStatusLoad(double i) => Dispatcher.InvokeAsync(() => gridData.Status = $"Parsed {i} entries");
 
 
-            var dataObjectArray = ComparerDefinition<object[]>.ToObjectArrays(data)
-            //var dataObjectArray = AsObjectCollection(data, KeepDuplicates ? headers : keys)
-                                      .WithProgress(updateStatusLoad)
-                                      .ToList();
+            //var dataObjectArray = ComparerDefinition<object[]>.ToObjectArrays(data)
+            IEnumerable<object> dataObjectArray = AsObjectCollection(data, KeepDuplicates ? headers : keys)
+                                      .OrderByAll()
+                                      .WithProgress(updateStatusLoad);
            
-            gridData.LoadingProgress = 1;
+            gridData.LoadingProgress = -1;
+
+            var ret = Comparison.GetDuplicates(dataObjectArray, keys, (IComparer<object>)SequenceEqualityComparer<IEnumerable<object>, object>.Default, true).Duplicates;
 
             var keyComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(0, keys.Length);
-
-            //TODO: check
-            void updateStatusCheck(double i) { Dispatcher.InvokeAsync(() => gridData.Status = $"Checked {i} entries"); gridData.LoadingProgress = (int)(i * 100 / dataObjectArray.Count); }
-            var ret = Comparison.GetDuplicates(dataObjectArray.WithProgress(updateStatusCheck), keys, true).Duplicates;
-
-            //if (!KeepDuplicates)
-            //{
-            //    ret = ret.Distinct(keyComparer).ToList();
-            //}
+            if (!KeepDuplicates)
+            {
+                ret = ret.Distinct((IEqualityComparer<object>)keyComparer).ToList();
+            }
 
             Dispatcher.InvokeAsync(() =>
             {

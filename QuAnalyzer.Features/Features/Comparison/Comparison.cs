@@ -130,7 +130,7 @@ public static class Comparison
             var res = tr.Select((a, i) => { token.ThrowIfCancellationRequested(); item.Count = i + 1; return a; }); //.ToList();
             if (!f.IsOrdered)
             {
-                res = res.OrderByAll().ToList();
+                res = res.OrderByAll();//.ToList();
             }
             start.Stop();
             item.LoadingTime = start.ElapsedMilliseconds;
@@ -178,12 +178,12 @@ public static class Comparison
         f.Results.InitCollections(() => new ObservableCollection<T>());
 
         IEqualityComparer<IEnumerable<object>> dupKeyComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(0, f.SourceKeys?.Count ?? int.MaxValue);
-        //TODO : key comparison
-        IEqualityComparer<IEnumerable<object>>? dupRemComparer = null;
-        if (f.SourceKeys is not null)
-        {
-            dupRemComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(f.SourceKeys.Count);
-        }
+        ////TODO : key comparison
+        //IEqualityComparer<IEnumerable<object>>? dupRemComparer = null;
+        //if (f.SourceKeys is not null)
+        //{
+        //    dupRemComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(f.SourceKeys.Count);
+        //}
 
         using var srcEnum = srcData.GetEnumerator();
         using var trgEnum = trgData.GetEnumerator();
@@ -198,14 +198,14 @@ public static class Comparison
         var istrg = trgEnum.MoveNext();
 
         var keepGoing = issrc || istrg;
-        
+
         while (keepGoing)
         {
             if (advanceSource && issrc)
-                CheckDuplicate(f.Results.Source, srcPrev, srcEnum.Current, dupKeyComparer, dupRemComparer);
+                CheckDuplicate(f.Results.Source, srcPrev, srcEnum.Current, f.Comparer, f.SourceKeys?.Count);
 
             if (advanceTarget && istrg)
-                CheckDuplicate(f.Results.Target, trgPrev, trgEnum.Current, dupKeyComparer, dupRemComparer);
+                CheckDuplicate(f.Results.Target, trgPrev, trgEnum.Current, f.Comparer, f.SourceKeys?.Count);
 
             srcPrev = srcEnum.Current;
             trgPrev = trgEnum.Current;
@@ -248,7 +248,7 @@ public static class Comparison
             {
                 issrc = srcEnum.MoveNext();
             }
-            
+
             if (advanceTarget)
             {
                 istrg = trgEnum.MoveNext();
@@ -272,37 +272,42 @@ public static class Comparison
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void CheckDuplicate<T>(ItemResult<T> f, T? previous, T? current, IEqualityComparer<IEnumerable<object>> sqcKeysOrAll, IEqualityComparer<IEnumerable<object>>? sqcRemaining) where T : class
+    private static void CheckDuplicate<T>(ItemResult<T> f, T? previous, T? current, IComparer<T> comparer, int? keyCount) where T : class
     {
-        if (default(T) != previous && sqcKeysOrAll.Equals((IEnumerable<object>)previous, (IEnumerable<object>)current))
+        if (previous is default(T))
+        {
+            return;
+        }
+
+        var comparison = comparer.Compare(previous, current);
+        if (keyCount is not null && Math.Abs(comparison) > keyCount)
         {
             f.Duplicates.Add(current);
+        }
 
-            //TODO: Maybe check if PerfectDups should be used instead of Duplicates when no keys have been specified?
-            if (sqcRemaining is not null && sqcRemaining.Equals((IEnumerable<object>)previous, (IEnumerable<object>)current))
-            {
-                f.PerfectDups.Add(current);
-            }
+        if (comparison == 0)
+        {
+            f.PerfectDups.Add(current);
         }
     }
 
-    public static ItemResult<T> GetDuplicates<T>(IEnumerable<T> data, IList<string>? keys, bool keysOnly = false) where T : class
+    public static ItemResult<T> GetDuplicates<T>(IEnumerable<T> data, IList<string>? keys, IComparer<T> comparer, bool keysOnly = false) where T : class
     {
         ItemResult<T> ret = new();
 
-        IEqualityComparer<IEnumerable<object>> dupKeyComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(0, keys?.Count ?? int.MaxValue);
-        //TODO : key comparison
-        IEqualityComparer<IEnumerable<object>>? dupRemComparer = null;
-        if (!keysOnly && keys is not null)
-        {
-            dupRemComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(keys.Count);
-        }
+        //IEqualityComparer<IEnumerable<object>> dupKeyComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(0, keys?.Count ?? int.MaxValue);
+        ////TODO : key comparison
+        //IEqualityComparer<IEnumerable<object>>? dupRemComparer = null;
+        //if (!keysOnly && keys is not null)
+        //{
+        //    dupRemComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(keys.Count);
+        //}
 
         var prev = default(T);
-        var enumerator = data.GetEnumerator();
+        using var enumerator = data.GetEnumerator();
         while (enumerator.MoveNext())
         {
-            CheckDuplicate(ret, prev, enumerator.Current, dupKeyComparer, dupRemComparer);
+            CheckDuplicate(ret, prev, enumerator.Current, comparer, keys?.Count);
             prev = enumerator.Current;
         }
 

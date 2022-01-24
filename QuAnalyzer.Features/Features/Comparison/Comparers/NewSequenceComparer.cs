@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace QuAnalyzer.Features.Comparison.Comparers;
+﻿namespace QuAnalyzer.Features.Comparison.Comparers;
 
 /// TODO: Review and improve, I don't like the current implementation
 /// Maybe I should check the keys first, if equals, go on until it fails (or continue if not)

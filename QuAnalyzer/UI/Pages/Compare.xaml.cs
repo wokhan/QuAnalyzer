@@ -4,11 +4,13 @@ using Microsoft.Win32;
 using OfficeOpenXml;
 
 using QuAnalyzer.Features.Comparison;
+using QuAnalyzer.Features.Comparison.Comparers;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -49,10 +51,12 @@ public partial class Compare : Page
         prgGlobal.IsIndeterminate = true;
 
         var newInstances = new List<ComparerDefinition<object[]>>();
+        var comparer = (IComparer<object>)SequenceEqualityComparer<IEnumerable<object>, object>.Default;
+        IEnumerable<object[]> map(IQueryable sourceQuery, List<string> fields) => sourceQuery.AsObjectCollection(fields.ToArray());
 
         foreach (SourcesMapper mapper in btnToggleMode.IsChecked is true ? new[] { SingleMap } : lstMappings.SelectedItems)
         {
-            var cp = await ComparerDefinition<object[]>.CreateAsync(mapper).ConfigureAwait(true);
+            var cp = await ComparerDefinition<object[]>.CreateAsync(mapper, comparer, map).ConfigureAwait(true);
 
             cp.Name = $"[{cpdCount++}] {cp.Name}";
 
@@ -62,7 +66,7 @@ public partial class Compare : Page
 
             newInstances.Add(cp);
         }
-        
+
         prgGlobal.IsIndeterminate = false;
 
         var callback = new Progress<ComparerDefinition<object[]>>(Progress);
