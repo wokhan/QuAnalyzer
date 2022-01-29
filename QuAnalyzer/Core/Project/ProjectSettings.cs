@@ -7,12 +7,8 @@ using QuAnalyzer.Core.Project.Exceptions;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Monitoring;
 
-using System;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Windows.Media;
 
-using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers.Contracts;
 

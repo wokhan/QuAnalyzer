@@ -2,13 +2,6 @@
 
 using OfficeOpenXml;
 
-using System;
-using System.IO;
-using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-
 namespace QuAnalyzer.Generic.Extensions;
 
 public static class DataGridExtensions
@@ -87,7 +80,7 @@ public static class DataGridExtensions
             }
 
             //Dispatcher.CurrentDispatcher.Invoke(() => { }, DispatcherPriority.Render);
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             using (var xl = new ExcelPackage(new FileInfo(path)))
             {
                 if (xl.AddWorksheetFromDataGrid(grid, worksheetName, host, progress, cancellationToken))

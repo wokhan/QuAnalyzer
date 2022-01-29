@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace QuAnalyzer.Tests.DummyData;
+﻿namespace QuAnalyzer.Tests.DummyData;
 
 internal class DummyAlteredPersons
 {

@@ -6,17 +6,7 @@ using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.UI.Windows;
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Globalization;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 
 using Wokhan.Data.Providers.Contracts;

@@ -1,6 +1,6 @@
-﻿using Xunit;
-using System.Collections.Generic;
-using QuAnalyzer.Features.Comparison.Tests;
+﻿using QuAnalyzer.Features.Comparison.Tests;
+
+using Xunit;
 
 namespace QuAnalyzer.Features.Comparison.Comparers.Tests;
 

@@ -1,8 +1,6 @@
 ﻿
+using System.Collections;
 using System.Linq.Dynamic.Core;
-
-using Wokhan.Collections.Generic.Extensions;
-using Wokhan.Core.Extensions;
 
 namespace QuAnalyzer.Features.Comparison;
 
@@ -18,7 +16,10 @@ public class ComparerDefinition<T>
     public bool IsOrdered { get; set; }
     public CancellationTokenSource TokenSource { get; } = new CancellationTokenSource();
     public IComparer<T> Comparer { get; set; }
+
+    //TODO: check if directly using an IEnumerable wouldn't be alright (only exception I see is if data has to be fully retrieved before the enumeration takes place)
     public Func<IEnumerable<T>> GetSourceData { get; set; }
+    //TODO: <see cref=GetSourceData>
     public Func<IEnumerable<T>> GetTargetData { get; set; }
     public ComparisonResult<T> Results { get; } = new ComparisonResult<T>();
 
@@ -26,12 +27,12 @@ public class ComparerDefinition<T>
     {
     }
 
-    public static async Task<ComparerDefinition<T>> CreateAsync(SourcesMapper s, IComparer<T> comparer, Func<IQueryable, List<string>, IEnumerable<T>> mapFunc)
+    public static async Task<ComparerDefinition<T>> CreateAsync(SourcesMapper s, IComparer<T> comparer, Func<IQueryable, List<string>, IEnumerable<T>> mapFunc, Func<IEnumerable, Type[], IEnumerable<T>>? converter = null)
     {
         return await Task.Run(() => new ComparerDefinition<T>(s, comparer, mapFunc));
     }
 
-    private ComparerDefinition(SourcesMapper s, IComparer<T> comparer, Func<IQueryable, List<string>, IEnumerable<T>> mapFunc)
+    private ComparerDefinition(SourcesMapper s, IComparer<T> comparer, Func<IQueryable, List<string>, IEnumerable<T>> mapFunc, Func<IEnumerable, Type[], IEnumerable<T>>? converter = null)
     {
         var fieldsSrc = s.AllMappings.Select(m => m.Source).ToList();
         var fieldsTrg = s.AllMappings.Select(m => m.Target).ToList();
@@ -76,24 +77,18 @@ public class ComparerDefinition<T>
         TargetKeys = trgKeys;
         Comparer = comparer ?? Comparer<T>.Default;
 
-        //TODO: You broke it, bob. Now fix it.
-        //if (!allTypesSrc.SequenceEqual(allTypesTrg))
-        //{
-        //    GetSourceData = () => (IEnumerable<T>)ConvertType(mapFunc(srcDataGetter, fieldsSrc), allTypesTrg);
-        //    GetTargetData = () => (IEnumerable<T>)ConvertType(mapFunc(trgDataGetter, fieldsTrg), allTypesTrg);
-        //}
-        //else
+        if (!allTypesSrc.SequenceEqual(allTypesTrg))
+        {
+            ArgumentNullException.ThrowIfNull(converter);
+
+            GetSourceData = () => converter(mapFunc(srcDataGetter, fieldsSrc), allTypesTrg);
+            GetTargetData = () => converter(mapFunc(trgDataGetter, fieldsTrg), allTypesTrg);
+        }
+        else
         {
             GetSourceData = () => mapFunc(srcDataGetter, fieldsSrc);
             GetTargetData = () => mapFunc(trgDataGetter, fieldsTrg);
         }
         IsOrdered = s.IsOrdered;
-    }
-
-
-    //TODO: move to be under the caller's responsibility
-    private static IEnumerable<object[]> ConvertType(IEnumerable<IEnumerable<object>> src, Type[] types)
-    {
-        return src.Select(c => c.Zip(types, (a, t) => a.SafeConvert(t)).ToArray());
     }
 }

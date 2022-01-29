@@ -1,8 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Threading;
+﻿using System.Windows.Threading;
 
-using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers.Bases;
 

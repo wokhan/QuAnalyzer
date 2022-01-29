@@ -1,8 +1,4 @@
-﻿
-using System.Windows;
-using System.Windows.Controls;
-
-namespace QuAnalyzer.UI.Windows;
+﻿namespace QuAnalyzer.UI.Windows;
 
 /// <summary>
 /// Interaction logic for ProviderPage.xaml

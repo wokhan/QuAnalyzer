@@ -1,6 +1,4 @@
 ﻿
-using System.Threading;
-
 using Wokhan.ComponentModel.Extensions;
 using Wokhan.Core.ComponentModel;
 

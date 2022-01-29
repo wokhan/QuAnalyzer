@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace QuAnalyzer.Core.Project.Exceptions;
+﻿namespace QuAnalyzer.Core.Project.Exceptions;
 
 [Serializable]
 public class ProjectLoadException : Exception

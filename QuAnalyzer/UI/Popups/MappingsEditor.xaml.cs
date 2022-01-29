@@ -1,8 +1,5 @@
 ﻿using QuAnalyzer.Features.Comparison;
 
-using System.Windows;
-using System.Windows.Controls;
-
 namespace QuAnalyzer.UI.Popups;
 
 public partial class MappingsEditor : Page

@@ -1,17 +1,7 @@
 ﻿using QuAnalyzer.Generic.Extensions;
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using System.Windows.Threading;
 
 using Wokhan.ComponentModel.Extensions;
@@ -229,12 +219,12 @@ public partial class ExtendedDataGridView : DataGrid, INotifyPropertyChanged
 
             query = query.AggregateBy(Grouping, Compute.Where(c => c.Aggregate is not null).ToDictionary(c => c.Attribute, c => c.Aggregate));
             {
-                    /*if (!prov.IsDirectlyBindable)
-                    {
-                        dispHeaders = allHeaders.Keys.ToList();
+                /*if (!prov.IsDirectlyBindable)
+                {
+                    dispHeaders = allHeaders.Keys.ToList();
 
-                        Dispatcher.Invoke(GenHeaders);
-                    }*/
+                    Dispatcher.Invoke(GenHeaders);
+                }*/
             }
 
             LoadingProgress = 0;
@@ -246,10 +236,10 @@ public partial class ExtendedDataGridView : DataGrid, INotifyPropertyChanged
             }
 
             IEnumerable virtualizedData;
-                //TODO: temporary workaround since Object[] collections are not supported by AsVirtualized yet.
-                // One could wonder WHY I'm using object[] collections for a start, but tbh I don't remember.
-                // Performance was probably worse with dynamically typed collections?
-                try
+            //TODO: temporary workaround since Object[] collections are not supported by AsVirtualized yet.
+            // One could wonder WHY I'm using object[] collections for a start, but tbh I don't remember.
+            // Performance was probably worse with dynamically typed collections?
+            try
             {
                 virtualizedData = query.AsVirtualized();
             }

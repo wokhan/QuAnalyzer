@@ -4,9 +4,6 @@ using BenchmarkDotNet.Running;
 
 using QuAnalyzer.Tests.Features.Comparison;
 
-using System.Collections.Generic;
-using System.Linq;
-
 using Xunit;
 using Xunit.Abstractions;
 

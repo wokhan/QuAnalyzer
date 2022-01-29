@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-
+﻿
 using Xunit;
 
 namespace QuAnalyzer.Features.Statistics.Tests;

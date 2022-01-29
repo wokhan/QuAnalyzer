@@ -4,14 +4,6 @@ using LiveChartsCore.SkiaSharpView;
 
 using QuAnalyzer.Features.Statistics;
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Windows;
-
-using Wokhan.Collections.Generic.Extensions;
-
 namespace QuAnalyzer.UI.Pages;
 
 public class DynamicSeriesWrapper : Freezable

@@ -1,6 +1,5 @@
-﻿using QuAnalyzer.Features.Comparison.Comparers;
-using QuAnalyzer.Features.Comparison;
-using System.Collections.Generic;
+﻿using QuAnalyzer.Features.Comparison;
+using QuAnalyzer.Features.Comparison.Comparers;
 
 namespace QuAnalyzer.Tests.Features.Comparison;
 

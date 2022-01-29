@@ -15,7 +15,7 @@ public class PerformanceTests
         var instance = item.CreateInstance();
 
         await Monitoring.Monitoring.RunAsync(new TestCasesCollection() { TestCases = { instance } }, 1, 1, 1);
-        
+
         Assert.Equal(TestCaseStatus.DONE, instance.Status);
     }
 }

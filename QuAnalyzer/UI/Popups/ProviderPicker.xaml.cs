@@ -1,6 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-
+﻿
 using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer.UI.Pages;

@@ -2,11 +2,6 @@
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.UI.Controls;
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -85,11 +80,11 @@ public partial class DetailsWindow : Page
                     Binding = new Binding($"{nameof(Diff.IsDiff)}[{i}]"),
                     Setters = { new Setter(Control.ForegroundProperty, Brushes.Red) }
                 };
-                
+
                 var style = new Style()
                 {
                     TargetType = typeof(DataGridCell),
-                    BasedOn = gridData.CellStyle, 
+                    BasedOn = gridData.CellStyle,
                     Triggers = { trigger }
                 };
 

@@ -1,13 +1,6 @@
 ﻿
 using QuAnalyzer.Features.Statistics;
 
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-
-using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages;

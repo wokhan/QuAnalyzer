@@ -1,22 +1,11 @@
 ﻿using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Comparers;
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics.Contracts;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Threading;
 
-using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Bases;
 
 using LExpr = System.Linq.Expressions;
@@ -165,7 +154,7 @@ public partial class Duplicates : Page, INotifyPropertyChanged
             gridData.Status = "Loading data...";
 
             var data = prov.GetQueryable(repository);//.Select<dynamic>(headers);
-            
+
             gridData.LoadingProgress = -1;
 
             //TODO: move
@@ -177,7 +166,7 @@ public partial class Duplicates : Page, INotifyPropertyChanged
             IEnumerable<object> dataObjectArray = AsObjectCollection(data, KeepDuplicates ? headers : keys)
                                       .OrderByAll()
                                       .WithProgress(updateStatusLoad);
-           
+
             gridData.LoadingProgress = -1;
 
             var ret = Comparison.GetDuplicates(dataObjectArray, keys, (IComparer<object>)SequenceEqualityComparer<IEnumerable<object>, object>.Default, true).Duplicates;

@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 
 using OfficeOpenXml;
 
@@ -9,19 +8,9 @@ using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Shell;
 
-using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages;
@@ -52,11 +41,10 @@ public partial class Compare : Page
 
         var newInstances = new List<ComparerDefinition<object[]>>();
         var comparer = (IComparer<object>)SequenceEqualityComparer<IEnumerable<object>, object>.Default;
-        IEnumerable<object[]> map(IQueryable sourceQuery, List<string> fields) => sourceQuery.AsObjectCollection(fields.ToArray());
 
         foreach (SourcesMapper mapper in btnToggleMode.IsChecked is true ? new[] { SingleMap } : lstMappings.SelectedItems)
         {
-            var cp = await ComparerDefinition<object[]>.CreateAsync(mapper, comparer, map).ConfigureAwait(true);
+            var cp = await ComparerDefinition<object[]>.CreateAsync(mapper, comparer, Map, Convert).ConfigureAwait(true);
 
             cp.Name = $"[{cpdCount++}] {cp.Name}";
 
@@ -71,6 +59,16 @@ public partial class Compare : Page
 
         var callback = new Progress<ComparerDefinition<object[]>>(Progress);
         await Task.Run(() => Comparison.Run(newInstances, 0, 0, callback, App.Instance.CurrentProject.UseParallelism));
+    }
+
+    private static IEnumerable<object[]> Convert(IEnumerable src, Type[] types)
+    {
+        return ((IEnumerable<IEnumerable<object>>)src).Select(c => c.Zip(types, (a, t) => a.SafeConvert(t)).ToArray());
+    }
+
+    private static IEnumerable<object[]> Map(IQueryable sourceQuery, List<string> fields)
+    {
+        return sourceQuery.AsObjectCollection(fields.ToArray());
     }
 
     private readonly Dictionary<string, int> progressDC = new();

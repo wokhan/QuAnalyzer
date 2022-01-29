@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <DefineConstants>_WPF_</DefineConstants>
     <Platforms>AnyCPU;x86;x64;ARM32;ARM64</Platforms>

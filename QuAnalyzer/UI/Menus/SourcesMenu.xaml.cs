@@ -3,11 +3,6 @@
 using QuAnalyzer.UI.Pages;
 using QuAnalyzer.UI.Windows;
 
-using System;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Menus;

@@ -1,9 +1,6 @@
 ﻿using QuAnalyzer.Tests.DummyData;
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 using Wokhan.Collections.Generic.Extensions;
 
@@ -29,7 +26,7 @@ internal class TestDataRowGenerator : IEnumerable<object[]>
         int cpt = 0;
         while (count - data.Count() > 0)
         {
-            data = data.Concat(DummyPersons.Data.Take(count).Select(person => new [] { person[0] + "_" + cpt, person[1], person[2], person[3], person[4] }).ToList());
+            data = data.Concat(DummyPersons.Data.Take(count).Select(person => new[] { person[0] + "_" + cpt, person[1], person[2], person[3], person[4] }).ToList());
         }
 
         SourceData = data.OrderByMany(5).ToList();

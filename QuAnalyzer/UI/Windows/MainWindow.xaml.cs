@@ -1,12 +1,5 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 
-using System;
-using System.Collections.Specialized;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-
 namespace QuAnalyzer.UI.Windows;
 
 /// <summary>

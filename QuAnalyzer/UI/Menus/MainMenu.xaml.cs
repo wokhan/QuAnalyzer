@@ -1,9 +1,6 @@
 ﻿
 using QuAnalyzer.UI.Windows;
 
-using System.Windows;
-using System.Windows.Controls;
-
 namespace QuAnalyzer.UI.Menus;
 
 /// <summary>

@@ -1,6 +1,4 @@
-﻿using System.Windows.Controls;
-
-namespace QuAnalyzer.UI.Pages;
+﻿namespace QuAnalyzer.UI.Pages;
 
 /// <summary>
 /// Logique d'interaction pour DataViewer.xaml

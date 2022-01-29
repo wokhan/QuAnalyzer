@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-
-namespace QuAnalyzer.Core.Helpers;
+﻿namespace QuAnalyzer.Core.Helpers;
 
 public static class MRUManager
 {

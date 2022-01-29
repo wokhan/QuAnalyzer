@@ -1,7 +1,4 @@
-﻿
-using System;
-
-namespace QuAnalyzer.UI.Controls;
+﻿namespace QuAnalyzer.UI.Controls;
 
 public partial class ExtendedDataGridView
 {
