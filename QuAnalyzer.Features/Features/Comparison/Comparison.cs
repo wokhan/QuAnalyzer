@@ -1,10 +1,7 @@
-﻿using Microsoft.Toolkit.HighPerformance.Helpers;
+﻿
+using CommunityToolkit.HighPerformance.Helpers;
 
-using QuAnalyzer.Features.Comparison.Comparers;
-
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 
 using Wokhan.Collections.Generic.Extensions;
@@ -14,7 +11,7 @@ namespace QuAnalyzer.Features.Comparison;
 
 public static class Comparison
 {
-    public static void Run<T>(IEnumerable<ComparerDefinition<T>> comparerData, int nbSamplesCompared, int nbSamplesShown, IProgress<ComparerDefinition<T>>? progressCallback = null, bool useParallelism = true) where T : class
+    public static void Run<T>(IEnumerable<ComparerDefinition<T>> comparerData, int nbSamplesCompared = -1, int nbSamplesShown = -1, IProgress<ComparerDefinition<T>>? progressCallback = null, bool useParallelism = true) where T : class
     {
         var runner = new Runner<T>(progressCallback, nbSamplesShown, nbSamplesCompared);
 
@@ -161,8 +158,6 @@ public static class Comparison
 
     /// <summary>
     /// Comparison of already ordered sets (both sets have to be ordered the same or it will FAIL with no clue)
-    /// TODO: check if both are indeed ordered by comparing previous and current values?
-    /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="f"></param>
@@ -170,23 +165,10 @@ public static class Comparison
     /// <param name="trgData"></param>
     /// <param name="progressCallback"></param>
     /// <param name="token"></param>
-    public static void CompareOrdered<T>(ComparerDefinition<T> f, IEnumerable<T> srcData, IEnumerable<T> trgData, CancellationToken token) where T : class
+    public static void CompareOrdered<T>(ComparerDefinition<T> f, IEnumerable<T>? srcData = null, IEnumerable<T>? trgData = null, CancellationToken? token = null) where T : class
     {
-        Contract.Requires(srcData is not null);
-        Contract.Requires(trgData is not null);
-
-        f.Results.InitCollections(() => new ObservableCollection<T>());
-
-        IEqualityComparer<IEnumerable<object>> dupKeyComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(0, f.SourceKeys?.Count ?? int.MaxValue);
-        ////TODO : key comparison
-        //IEqualityComparer<IEnumerable<object>>? dupRemComparer = null;
-        //if (f.SourceKeys is not null)
-        //{
-        //    dupRemComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(f.SourceKeys.Count);
-        //}
-
-        using var srcEnum = srcData.GetEnumerator();
-        using var trgEnum = trgData.GetEnumerator();
+        using var srcEnum = (srcData ?? f.GetSourceData()).GetEnumerator();
+        using var trgEnum = (trgData ?? f.GetTargetData()).GetEnumerator();
 
         var srcPrev = default(T);
         var trgPrev = default(T);
@@ -201,11 +183,17 @@ public static class Comparison
 
         while (keepGoing)
         {
+            token?.ThrowIfCancellationRequested();
+
             if (advanceSource && issrc)
+            {
                 CheckDuplicate(f.Results.Source, srcPrev, srcEnum.Current, f.Comparer, f.SourceKeys?.Count);
+            }
 
             if (advanceTarget && istrg)
+            {
                 CheckDuplicate(f.Results.Target, trgPrev, trgEnum.Current, f.Comparer, f.SourceKeys?.Count);
+            }
 
             srcPrev = srcEnum.Current;
             trgPrev = trgEnum.Current;
@@ -220,7 +208,7 @@ public static class Comparison
                     advanceTarget = true;
                     break;
 
-                case int.MaxValue:
+                case > 0 or < 0 when f.SourceKeys is not null && Math.Abs(compResult) < f.SourceKeys.Count:
                     f.Results.Source.Differences.Add(srcEnum.Current);
                     f.Results.Target.Differences.Add(trgEnum.Current);
                     advanceSource = true;

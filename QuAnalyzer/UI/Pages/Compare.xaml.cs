@@ -40,11 +40,13 @@ public partial class Compare : Page
         prgGlobal.IsIndeterminate = true;
 
         var newInstances = new List<ComparerDefinition<object[]>>();
-        var comparer = (IComparer<object>)SequenceEqualityComparer<IEnumerable<object>, object>.Default;
+        var comparer = (IComparer<object[]>)SequenceComparer<object[]>.Default;
 
         foreach (SourcesMapper mapper in btnToggleMode.IsChecked is true ? new[] { SingleMap } : lstMappings.SelectedItems)
         {
             var cp = await ComparerDefinition<object[]>.CreateAsync(mapper, comparer, Map, Convert).ConfigureAwait(true);
+            // Using ObservableCollections to reflect any live modification in the UI
+            cp.Results.InitCollections(() => new ObservableCollection<object[]>());
 
             cp.Name = $"[{cpdCount++}] {cp.Name}";
 

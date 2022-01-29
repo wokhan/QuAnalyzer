@@ -5,14 +5,14 @@ namespace QuAnalyzer.Tests.Features.Comparison;
 
 internal class SharedHelper
 {
-    internal static ComparerDefinition<object[]> GetComparer(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData, bool newMode = false)
+    internal static ComparerDefinition<object[]> GetComparer(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData)
     {
         return new ComparerDefinition<object[]>()
         {
             GetSourceData = () => sourceData,
             GetTargetData = () => targetData,
             IsOrdered = true,
-            Comparer = newMode ? new NewSequenceComparer<object>() : new SequenceComparer<IEnumerable<object>, object>()
+            Comparer = SequenceComparer<object>.Default
         };
     }
 }

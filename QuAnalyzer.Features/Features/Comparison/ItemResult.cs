@@ -1,60 +1,32 @@
 ﻿
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace QuAnalyzer.Features.Comparison;
 
-public class ItemResult<T> : ObservableObject
+public partial class ItemResult<T> : ObservableObject
 {
+    [ObservableProperty]
     private int count;
-    public int Count
-    {
-        get => count;
-        internal set => this.SetProperty(ref count, value);
-    }
 
-    private IList<T> differences;
-    public IList<T> Differences
-    {
-        get => differences;
-        internal set => this.SetProperty(ref differences, value);
-    }
+    [ObservableProperty]
+    private IList<T> differences = new List<T>();
 
-    private IList<T> duplicates;
     //TODO: rename DuplicatesByKey?
-    public IList<T> Duplicates
-    {
-        get => duplicates;
-        internal set => this.SetProperty(ref duplicates, value);
-    }
+    [ObservableProperty]
+    private IList<T> duplicates = new List<T>();
 
-    private IList<T> perfectDups;
     //TODO: rename FullDuplicates? Clones?
-    public IList<T> PerfectDups
-    {
-        get => perfectDups;
-        internal set => this.SetProperty(ref perfectDups, value);
-    }
+    [ObservableProperty]
+    private IList<T> perfectDups = new List<T>();
 
-    private IList<T> missing;
-    public IList<T> Missing
-    {
-        get => missing;
-        internal set => this.SetProperty(ref missing, value);
-    }
+    [ObservableProperty]
+    private IList<T> missing = new List<T>();
 
-    public IEnumerable<T> Samples { get; internal set; }
+    public IEnumerable<T>? Samples { get; internal set; }
 
+    [ObservableProperty]
     private long loadingTime;
-    public long LoadingTime
-    {
-        get => loadingTime;
-        internal set => this.SetProperty(ref loadingTime, value);
-    }
 
+    [ObservableProperty]
     private DateTime startTime;
-    public DateTime StartTime
-    {
-        get => startTime;
-        internal set => this.SetProperty(ref startTime, value);
-    }
 }

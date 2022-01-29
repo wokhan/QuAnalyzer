@@ -169,13 +169,14 @@ public partial class Duplicates : Page, INotifyPropertyChanged
 
             gridData.LoadingProgress = -1;
 
-            var ret = Comparison.GetDuplicates(dataObjectArray, keys, (IComparer<object>)SequenceEqualityComparer<IEnumerable<object>, object>.Default, true).Duplicates;
+            var ret = Comparison.GetDuplicates(dataObjectArray, keys, (IComparer<object>)SequenceComparer<IEnumerable<object>>.Default, true).Duplicates;
 
-            var keyComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(0, keys.Length);
-            if (!KeepDuplicates)
-            {
-                ret = ret.Distinct((IEqualityComparer<object>)keyComparer).ToList();
-            }
+            //TODO: rewrite this
+            //var keyComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(0, keys.Length);
+            //if (!KeepDuplicates)
+            //{
+            //    ret = ret.Distinct((IEqualityComparer<object>)keyComparer).ToList();
+            //}
 
             Dispatcher.InvokeAsync(() =>
             {

@@ -1,12 +1,30 @@
 ﻿
-using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 using Wokhan.Collections.Generic.Extensions;
 
 namespace QuAnalyzer.Features.Comparison;
 
-public partial class ComparisonResult<T> : ResultStructBase
+public partial class ComparisonResult<T> : ObservableObject
 {
+    [ObservableProperty]
+    private string message;
+
+    [ObservableProperty]
+    [AlsoNotifyChangeFor(nameof(LocalProgress))]
+    private ProgressType progress;
+
+    [ObservableProperty]
+    private int subProgress;
+
+    [ObservableProperty]
+    private int matchingCount;
+
+    [ObservableProperty]
+    private long totalTime;
+
+    public int LocalProgress => (int)progress + subProgress;
+
     public ItemResult<T> Source { get; } = new ItemResult<T>();
     public ItemResult<T> Target { get; } = new ItemResult<T>();
 
@@ -30,8 +48,8 @@ public partial class ComparisonResult<T> : ResultStructBase
                                    .SelectMany(x => new[] {
                                        new Diff(Source: definition.SourceName, Values: x.First),
                                        new Diff(
-                                           Source: definition.TargetName, 
-                                           Values: x.Second, 
+                                           Source: definition.TargetName,
+                                           Values: x.Second,
                                            IsDiff: hasKeys && !x.First.Take(definition.SourceKeys.Count).SequenceEqual(x.Second.Take(definition.SourceKeys.Count))
                                                        ? allFalse
                                                        : x.First.Zip(x.Second, (a, b) => !Equals(a, b)).ToArray()

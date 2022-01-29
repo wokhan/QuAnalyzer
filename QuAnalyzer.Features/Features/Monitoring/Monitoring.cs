@@ -42,7 +42,7 @@ public static class Monitoring
                 ThreadPool.SetMinThreads(prevThreads, prevPorts);
             }
         });
-     }
+    }
 
     private static void RunForOne(TestCasesCollection testsCollection, int occurence, IProgress<TestResults>? callback, int x)
     {

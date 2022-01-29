@@ -18,7 +18,9 @@ public class ComparisonTests
         this.output = output;
     }
 
+    //TODO: adds nothing compared to CompareOrderedTest. To be reviewed.
     [Theory()]
+    [Benchmark()]
     [ClassData(typeof(TestDataForCompare))]
     public void RunTest(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData, int expMatches, int expSrcDiffs, int expTrgDiffs, int expSrcDups, int expTrgDups, int expSrcMissing, int expTrgMissing)
     {
@@ -54,21 +56,29 @@ public class ComparisonTests
         }
     }
 
-    [Fact()]
-    [Benchmark]
-    public void CompareOrderedTest()
+    [Theory()]
+    [ClassData(typeof(TestDataForCompare))]
+    public void CompareOrderedTest(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData, int expMatches, int expSrcDiffs, int expTrgDiffs, int expSrcDups, int expTrgDups, int expSrcMissing, int expTrgMissing)
     {
-        Assert.True(false, "This test needs an implementation");
+        var comparer = SharedHelper.GetComparer(sourceData, targetData);
+
+        Comparison.Run(new[] { comparer });
+
+        Assert.Equal(expMatches, comparer.Results.MatchingCount);
+        Assert.Equal(expSrcDiffs, comparer.Results.Source.Differences.Count);
+        Assert.Equal(expSrcDiffs, comparer.Results.Target.Differences.Count);
+        Assert.Equal(expSrcDups, comparer.Results.Source.PerfectDups.Count);
+        Assert.Equal(expTrgDups, comparer.Results.Target.PerfectDups.Count);
+        //Assert.Equal(expSrcDups, comparer.Results.Source.Duplicates.Count);
+        //Assert.Equal(expTrgDups, comparer.Results.Target.Duplicates.Count);
+        Assert.Equal(expSrcMissing, comparer.Results.Source.Missing.Count);
+        Assert.Equal(expTrgMissing, comparer.Results.Target.Missing.Count);
+
+        Comparison.CompareOrdered(comparer);
     }
 
     [Fact()]
-    public void CompareTest()
-    {
-        Assert.True(false, "This test needs an implementation");
-    }
-
-    [Fact()]
-    public void InitiateDuplicatesTest()
+    public void GetDuplicatesTest()
     {
         Assert.True(false, "This test needs an implementation");
     }
@@ -76,7 +86,7 @@ public class ComparisonTests
     [Fact()]
     public void RunBenchmark()
     {
-        var report = BenchmarkRunner.Run(typeof(ComparisonPerfTests), DefaultConfig.Instance.WithOptions(ConfigOptions.DisableOptimizationsValidator));
+        var report = BenchmarkRunner.Run(typeof(ComparisonTests), DefaultConfig.Instance.WithOptions(ConfigOptions.DisableOptimizationsValidator));
         output.WriteLine(report.Table.ToString());
     }
 }
