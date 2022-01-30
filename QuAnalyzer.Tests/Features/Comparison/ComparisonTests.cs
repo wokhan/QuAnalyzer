@@ -26,14 +26,11 @@ public class ComparisonTests
     {
         var comparer = SharedHelper.GetComparer(sourceData, targetData);
 
-        var nbSamplesShown = -1;
-        var nbSamplesCompared = -1;
-
-        Comparison.Run(new[] { comparer }, nbSamplesCompared, nbSamplesShown);
+        Comparison.Run(new[] { comparer });
 
         Assert.Equal(expMatches, comparer.Results.MatchingCount);
         Assert.Equal(expSrcDiffs, comparer.Results.Source.Differences.Count);
-        Assert.Equal(expSrcDiffs, comparer.Results.Target.Differences.Count);
+        Assert.Equal(expTrgDiffs, comparer.Results.Target.Differences.Count);
         Assert.Equal(expSrcDups, comparer.Results.Source.PerfectDups.Count);
         Assert.Equal(expTrgDups, comparer.Results.Target.PerfectDups.Count);
         //Assert.Equal(expSrcDups, comparer.Results.Source.Duplicates.Count);
@@ -43,16 +40,16 @@ public class ComparisonTests
     }
 
     [Theory()]
-    [InlineData(new[] { "a", "b", "c", "d", "e" }, 4, null)]
-    [InlineData(new[] { "a", "b", "c", "d" }, 4, new[] { "a", "b", "c", "d" })]
-    public void GetSamplesTest(object[] sourceData, int expectedLength, object[]? expectedSamples = null)
+    [InlineData(new[] { "a", "b", "c", "d", "e" }, 0.9, 4, null)]
+    [InlineData(new[] { "a", "b", "c", "d" }, 1, 4, new[] { "a", "b", "c", "d" })]
+    public void GetSamplesTest(object[] sourceData, int samplesPct,int expectedLength, object[]? expectedSamples = null)
     {
-        var samples = Comparison.GetSamples(expectedLength, sourceData);
-        Assert.Equal(expectedLength, samples.First().Length);
+        var samples = Comparison.GetSamples(samplesPct, sourceData);
+        Assert.Equal(expectedLength, samples[0].Count());
 
         if (expectedSamples is not null)
         {
-            Assert.Equal(expectedSamples, samples.First());
+            Assert.Equal(expectedSamples, samples[0]);
         }
     }
 

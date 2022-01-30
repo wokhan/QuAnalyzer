@@ -2,6 +2,7 @@
 using CommunityToolkit.HighPerformance.Helpers;
 
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 
 using Wokhan.Collections.Generic.Extensions;
@@ -11,23 +12,20 @@ namespace QuAnalyzer.Features.Comparison;
 
 public static class Comparison
 {
-    public static void Run<T>(IEnumerable<ComparerDefinition<T>> comparerData, int nbSamplesCompared = -1, int nbSamplesShown = -1, IProgress<ComparerDefinition<T>>? progressCallback = null, bool useParallelism = true) where T : class
+    public static void Run<T>(IEnumerable<ComparerDefinition<T>> comparerData, double samplesPct = -1, IProgress<ComparerDefinition<T>>? progressCallback = null, bool useParallelism = true) where T : class
     {
-        var runner = new Runner<T>(progressCallback, nbSamplesShown, nbSamplesCompared);
+        var runner = new Runner<T>(progressCallback, samplesPct);
 
         if (!useParallelism)
         {
-            //var t = Task.Run(() => runner.Invoke(comparerData.First()));
             foreach (var cd in comparerData)
             {
-                //await t.ContinueWith(_ => runner.Invoke(cd));
                 runner.Invoke(cd);
             }
         }
         else
         {
             ParallelHelper.ForEach<ComparerDefinition<T>, Runner<T>>(comparerData.ToArray(), runner);
-            //Task.WaitAll(comparerData.Select(cd => runForOne(cd, progressCallback)).ToArray());// AsParallel().Select(runForOne));
         }
     }
 
@@ -35,14 +33,12 @@ public static class Comparison
     {
         private readonly IProgress<ComparerDefinition<T>>? callback;
 
-        private readonly int nbSamplesShown;
-        private readonly int nbSamplesCompared;
+        private readonly double samplesPct;
 
-        public Runner(IProgress<ComparerDefinition<T>>? callback, int nbSamplesShown, int nbSamplesCompared)
+        public Runner(IProgress<ComparerDefinition<T>>? callback, double samplesPct)
         {
             this.callback = callback;
-            this.nbSamplesShown = nbSamplesShown;
-            this.nbSamplesCompared = nbSamplesCompared;
+            this.samplesPct = samplesPct;
         }
 
         public void Invoke(in ComparerDefinition<T> definition)
@@ -60,8 +56,8 @@ public static class Comparison
 
                 SetProgress(definition, ProgressType.LoadingData, 0, callback);
 
-                var t1 = LoadData(definition, definition.Results.Source, definition.GetSourceData(), token);
-                var t2 = LoadData(definition, definition.Results.Target, definition.GetTargetData(), token);
+                var t1 = LoadData(definition, definition.Results.Source, definition.GetSourceData, token);
+                var t2 = LoadData(definition, definition.Results.Target, definition.GetTargetData, token);
 
                 var allTasks = Task.WhenAll(t1, t2);
                 allTasks.Wait();
@@ -71,27 +67,18 @@ public static class Comparison
 
                 if (srcData is not null && trgData is not null)
                 {
-                    if (nbSamplesShown > 0)
+                    if (samplesPct > 0)
                     {
                         SetProgress(definition, ProgressType.GettingSamples, 0, callback);
 
-                        var samples = GetSamples(nbSamplesShown, srcData, trgData);
-                        r.Source.Samples = samples[0];
-                        r.Target.Samples = samples[1];
+                        var samples = GetSamples(samplesPct, srcData, trgData);
+                        srcData = r.Source.Samples = samples[0];
+                        trgData = r.Target.Samples = samples[1];
 
                         SetProgress(definition, ProgressType.GettingSamples, 15, callback);
                     }
 
-                    if (nbSamplesCompared > 0)
-                    {
-                        SetProgress(definition, ProgressType.Filtering, 0, callback);
-
-                        var samples = GetSamples(nbSamplesCompared, srcData, trgData);
-                        srcData = samples[0];
-                        trgData = samples[1];
-
-                        SetProgress(definition, ProgressType.Filtering, 15, callback);
-                    }
+                    SetProgress(definition, ProgressType.Comparing, 0, callback);
 
                     CompareOrdered(definition, srcData, trgData, token);
                 }
@@ -118,19 +105,28 @@ public static class Comparison
         }
     }
 
-    private static Task<IEnumerable<T>> LoadData<T>(ComparerDefinition<T> f, ItemResult<T> item, IEnumerable<T> tr, CancellationToken token) where T : class
+    private static Task<IEnumerable<T>> LoadData<T>(ComparerDefinition<T> f, ItemResult<T> item, Func<IEnumerable<T>> dataGetter, CancellationToken token) where T : class
     {
         return Task.Run(() =>
         {
             var start = Stopwatch.StartNew();
+            
             item.StartTime = DateTime.Now;
-            var res = tr.Select((a, i) => { token.ThrowIfCancellationRequested(); item.Count = i + 1; return a; }); //.ToList();
+
+            var data = dataGetter();
             if (!f.IsOrdered)
             {
-                res = res.OrderByAll();//.ToList();
+                data = data.OrderByAll();//.ToList();
             }
+
+            // TODO: cancelation should be done in the data loading implementation (to keep a Queryable here after)
+            // BTW, since enumerating will not take place here... we only mesure the preparation time. Doesn't make sense.
+            var res = data.Select((a, i) => { token.ThrowIfCancellationRequested(); item.Count = i + 1; return a; }); //.ToList();
+
             start.Stop();
+            
             item.LoadingTime = start.ElapsedMilliseconds;
+            
             return res;
         });
     }
@@ -143,16 +139,39 @@ public static class Comparison
         progressCallback?.Report(f);
     }
 
-    //TODO: What about unordered collections? BTW, looks really unoptimized to me
-    public static T?[][] GetSamples<T>(int nbSamples, params IEnumerable<T>[] collections)
+    /// <summary>
+    /// Gets the specified number of sample data from one or many collections (at the same index for each of those).
+    /// Usefull when only a partial comparison is required.
+    /// Warning: Sources data MUST be sorted the same for all or it will obviously fail!
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="samplesPercentage">Number of requested data samples</param>
+    /// <param name="collections">Source collections (sorted)</param>
+    /// <returns></returns>
+    public static IEnumerable<T>[] GetSamples<T>(double samplesPercentage, params IEnumerable<T>[] collections)
     {
+        Contract.Requires(samplesPercentage <= 1);
+        Contract.Requires(samplesPercentage > 0);
+
+        if (samplesPercentage == 1)
+        {
+            return collections;
+        }
+
         var rdm = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
         var min = collections.Min(c => c.Count());
-        nbSamples = Math.Min(min, nbSamples);
+        var count = Math.Min(min, (int)(min * samplesPercentage));
 
-        var rdmIdxs = Enumerable.Range(0, nbSamples).Select(_ => rdm.Next(min)).ToArray();
-
-        return collections.Select(c => rdmIdxs.Select(i => c.ElementAtOrDefault(i)).ToArray()).ToArray();
+        HashSet<int> indices = new HashSet<int>();
+        while (indices.Count < count)
+        {
+            indices.Add(rdm.Next(min));
+        }
+        
+        // TODO: Probably not the right way to do this. Maybe ordering should be forced here
+        // (despite impact on perf when already done), and using ElementAt might not be the best way since it will create
+        // as many requests as we need samples.
+        return collections.Select(c => indices.Select(i => c.ElementAt(i)).ToArray()).ToArray();
     }
 
 
@@ -282,14 +301,6 @@ public static class Comparison
     public static ItemResult<T> GetDuplicates<T>(IEnumerable<T> data, IList<string>? keys, IComparer<T> comparer, bool keysOnly = false) where T : class
     {
         ItemResult<T> ret = new();
-
-        //IEqualityComparer<IEnumerable<object>> dupKeyComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(0, keys?.Count ?? int.MaxValue);
-        ////TODO : key comparison
-        //IEqualityComparer<IEnumerable<object>>? dupRemComparer = null;
-        //if (!keysOnly && keys is not null)
-        //{
-        //    dupRemComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(keys.Count);
-        //}
 
         var prev = default(T);
         using var enumerator = data.GetEnumerator();

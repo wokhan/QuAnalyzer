@@ -60,7 +60,7 @@ public partial class Compare : Page
         prgGlobal.IsIndeterminate = false;
 
         var callback = new Progress<ComparerDefinition<object[]>>(Progress);
-        await Task.Run(() => Comparison.Run(newInstances, 0, 0, callback, App.Instance.CurrentProject.UseParallelism));
+        await Task.Run(() => Comparison.Run(newInstances, progressCallback: callback, useParallelism: App.Instance.CurrentProject.UseParallelism));
     }
 
     private static IEnumerable<object[]> Convert(IEnumerable src, Type[] types)

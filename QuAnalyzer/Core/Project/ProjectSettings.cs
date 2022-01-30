@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿
+using Microsoft.Win32;
 
 using Newtonsoft.Json;
 
@@ -9,33 +10,20 @@ using QuAnalyzer.Features.Monitoring;
 
 using System.Windows.Media;
 
-using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.Core.Project;
 
-public class ProjectSettings : NotifierHelper
+public partial class ProjectSettings : ObservableObject
 {
-    private string _name;
-    public string Name
-    {
-        get { return _name; }
-        set { _name = value; NotifyPropertyChanged(); }
-    }
+    [ObservableProperty]
+    private string name;
 
-    private string _filePath;
-    public string FilePath
-    {
-        get { return _filePath; }
-        set { _filePath = value; NotifyPropertyChanged(); }
-    }
+    [ObservableProperty]
+    private string filePath;
 
-    private bool _useParallelism = true;
-    public bool UseParallelism
-    {
-        get { return _useParallelism; }
-        set { _useParallelism = value; NotifyPropertyChanged(); }
-    }
+    [ObservableProperty]
+    private bool useParallelism = true;
 
     public byte[] AccentColorBrushSaved
     {
