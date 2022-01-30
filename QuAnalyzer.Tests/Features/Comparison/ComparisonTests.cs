@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
+﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 
 using QuAnalyzer.Tests.Features.Comparison;
@@ -20,8 +19,7 @@ public class ComparisonTests
 
     //TODO: adds nothing compared to CompareOrderedTest. To be reviewed.
     [Theory()]
-    [Benchmark()]
-    [ClassData(typeof(TestDataForCompare))]
+    [ClassData(typeof(ComparisonTestsData))]
     public void RunTest(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData, int expMatches, int expSrcDiffs, int expTrgDiffs, int expSrcDups, int expTrgDups, int expSrcMissing, int expTrgMissing)
     {
         var comparer = SharedHelper.GetComparer(sourceData, targetData);
@@ -54,12 +52,12 @@ public class ComparisonTests
     }
 
     [Theory()]
-    [ClassData(typeof(TestDataForCompare))]
+    [ClassData(typeof(ComparisonTestsData))]
     public void CompareOrderedTest(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData, int expMatches, int expSrcDiffs, int expTrgDiffs, int expSrcDups, int expTrgDups, int expSrcMissing, int expTrgMissing)
     {
         var comparer = SharedHelper.GetComparer(sourceData, targetData);
 
-        Comparison.Run(new[] { comparer });
+        Comparison.CompareOrdered(comparer);
 
         Assert.Equal(expMatches, comparer.Results.MatchingCount);
         Assert.Equal(expSrcDiffs, comparer.Results.Source.Differences.Count);
@@ -70,8 +68,6 @@ public class ComparisonTests
         //Assert.Equal(expTrgDups, comparer.Results.Target.Duplicates.Count);
         Assert.Equal(expSrcMissing, comparer.Results.Source.Missing.Count);
         Assert.Equal(expTrgMissing, comparer.Results.Target.Missing.Count);
-
-        Comparison.CompareOrdered(comparer);
     }
 
     [Fact()]
@@ -83,7 +79,7 @@ public class ComparisonTests
     [Fact()]
     public void RunBenchmark()
     {
-        var report = BenchmarkRunner.Run(typeof(ComparisonTests), DefaultConfig.Instance.WithOptions(ConfigOptions.DisableOptimizationsValidator));
+        var report = BenchmarkRunner.Run<ComparisonPerfTests>(DefaultConfig.Instance.WithOptions(ConfigOptions.DisableOptimizationsValidator));
         output.WriteLine(report.Table.ToString());
     }
 }

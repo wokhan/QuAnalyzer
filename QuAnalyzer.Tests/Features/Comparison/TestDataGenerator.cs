@@ -6,7 +6,7 @@ using Wokhan.Collections.Generic.Extensions;
 
 namespace QuAnalyzer.Features.Comparison.Tests;
 
-internal class TestDataRowGenerator : IEnumerable<object[]>
+internal class TestDataGenerator : IEnumerable<object[]>
 {
     public IList<object[]> SourceData { get; init; }
     public IList<object[]> TargetData { get; init; }
@@ -18,9 +18,9 @@ internal class TestDataRowGenerator : IEnumerable<object[]>
     public int SourceMissing { get; internal set; }
     public int TargetMissing { get; internal set; }
 
-    public TestDataRowGenerator() : this(1, 1) { }
+    public TestDataGenerator() : this(1, 1) { }
 
-    public TestDataRowGenerator(int count, int nbDifferences)
+    public TestDataGenerator(int count, int nbDifferences)
     {
         IEnumerable<object[]> data = new List<object[]>();
         int cpt = 0;

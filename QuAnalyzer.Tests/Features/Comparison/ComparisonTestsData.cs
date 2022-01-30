@@ -2,20 +2,18 @@
 
 namespace QuAnalyzer.Features.Comparison.Tests;
 
-internal class TestDataForCompare : IEnumerable<object[]>
+internal class ComparisonTestsData : IEnumerable<object[]>
 {
-    private readonly int COUNT = 2;
-    private readonly int NB_DIFFERENCES = 1;
-    private readonly int NB_ITERATION = 20;
-
     private readonly IList<object[]> allData = new List<object[]>();
 
-    public TestDataForCompare()
+    public ComparisonTestsData() : this(2, 1, 20) { }
+
+    public ComparisonTestsData(int count, int nbDiffs, int nbIterations = 1)
     {
         var random = new Random();
-        for (var i = 0; i < NB_ITERATION; i++)
+        for (var i = 0; i < nbIterations; i++)
         {
-            var data = new TestDataRowGenerator(COUNT, NB_DIFFERENCES);
+            var data = new TestDataGenerator(count, nbDiffs);
 
             allData.Add(new object[] {
                 data.SourceData,
