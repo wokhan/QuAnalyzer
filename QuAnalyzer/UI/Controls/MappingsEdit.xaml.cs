@@ -1,4 +1,5 @@
 ﻿using QuAnalyzer.Features.Comparison;
+using QuAnalyzer.Features.Comparison.Definition;
 
 using Wokhan.Data.Providers.Contracts;
 

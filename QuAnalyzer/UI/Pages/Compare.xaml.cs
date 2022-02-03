@@ -4,6 +4,7 @@ using OfficeOpenXml;
 
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Comparers;
+using QuAnalyzer.Features.Comparison.Definition;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;

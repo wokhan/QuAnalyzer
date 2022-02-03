@@ -104,8 +104,7 @@ public partial class Monitor : Page
         var progress = new Progress<TestResults>(monitor_OnAdd);
 
         //TODO : Values !!!!
-        await Monitoring.RunAsync(new TestCasesCollection() { TestCases = monitorInstances }, globalPerfCounter++, (int)Occurences.Value, (int)MaxParallel.Value, progress).ConfigureAwait(false);
-
+        await Task.Run(() => Monitoring.Run(new TestCasesCollection() { TestCases = monitorInstances }, globalPerfCounter++, (int)Occurences.Value, (int)MaxParallel.Value, progress)).ConfigureAwait(false);
     }
 
     private async void Timer_Tick(object sender, EventArgs e)
@@ -140,7 +139,7 @@ public partial class Monitor : Page
 
         var progress = new Progress<TestResults>(monitor_OnAdd);
         //TODO : Values !!!!
-        await Monitoring.RunAsync(new TestCasesCollection() { TestCases = { monitorInstance }, ValuesSet = values }, cnt++, 1, 1, progress).ConfigureAwait(false);
+        await Task.Run(() => Monitoring.Run(new TestCasesCollection() { TestCases = { monitorInstance }, ValuesSet = values }, cnt++, 1, 1, progress)).ConfigureAwait(false);
 
         monitorInstance.Status = TestCaseStatus.DONE;
     }
