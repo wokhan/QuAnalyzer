@@ -38,12 +38,12 @@
             <RowDefinition MinHeight="100" />
         </Grid.RowDefinitions>
         <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
-            <Button HorizontalAlignment="Center" ToolTip="Start comparisons for the selected items" BorderBrush="Green" Click="btnRun_Click" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" Content="Run" />
+            <Button HorizontalAlignment="Center" ToolTip="Start comparisons for the selected items" BorderBrush="Green" Command="{Binding RunCommand}" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" Content="Run" />
             <Rectangle />
             <ToggleButton x:Name="btnToggleMode" Content="Single-mapping mode" ToolTip="Single-mapping mode" BorderBrush="Blue" Foreground="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=AbTesting}" IsChecked="False" />
             <Rectangle />
-            <Button Content="Add" ToolTip="Add a mapping" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnNewPrv_Click" />
-            <Button Content="Automap" ToolTip="Automap" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=ShuffleVariant}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Click="btnAuto_Click" />
+            <Button Content="Add" ToolTip="Add a mapping" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Command="{Binding CreateMappingCommand}" />
+            <Button Content="Automap" ToolTip="Automap" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=ShuffleVariant}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Command="{Binding AutoMapCommand}" />
             <Rectangle />
             <Button Content="Sel. all" ToolTip="Select all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectAll}" Click="btnSelectAll_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
             <Button Content="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Select}" Click="btnUnSel_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
@@ -80,8 +80,8 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <WrapPanel>
-                                        <Button x:Name="btnEditMapping" Tag="{Binding}" Click="btnEditMapping_Click" Foreground="Blue" Content="{iconPacks:Material Kind=Pencil}" />
-                                        <Button x:Name="btnDeleteMapping" Tag="{Binding}" Click="btnDeleteMapping_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                        <Button x:Name="btnEditMapping" Command="{Binding EditMappingCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Foreground="Blue" Content="{iconPacks:Material Kind=Pencil}" />
+                                        <Button x:Name="btnDeleteMapping" Command="{Binding DeleteMappingCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
                                     </WrapPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -99,7 +99,7 @@
                 <TextBlock Text="Global progress" Padding="4" Height="26" />
                 <ProgressBar x:Name="prgGlobal" Maximum="100" Height="22" Width="292" />
                 <Rectangle />
-                <Button Content="Create report" ToolTip="Create report" BorderBrush="BlueViolet" ext:CustomAdorner.Image="{iconPacks:Material Kind=Export}" Click="GlobalReport_Click" />
+                <Button Content="Create report" ToolTip="Create report" BorderBrush="BlueViolet" ext:CustomAdorner.Image="{iconPacks:Material Kind=Export}" Command="{Binding GlobalReportCommand}" />
             </WrapPanel>
             <UC:ExtendedDataGridView ItemsSource="{Binding Source={StaticResource groupedViewSource}}" ColumnWidth="*" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" x:Name="allProgress" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="None" SelectionUnit="Cell">
                 <DataGrid.GroupStyle>
@@ -138,7 +138,7 @@
                                                             <ProgressBar BorderThickness="1" Value="{Binding Results.LocalProgress, Mode=OneWay, FallbackValue=0}" Maximum="100" Height="20" Width="150" Margin="10,0" />
                                                             <TextBlock Foreground="White" Text="{Binding Results.Progress, Mode=OneWay, FallbackValue='Current step'}" TextAlignment="Center" VerticalAlignment="Center" />
                                                         </Grid>
-                                                        <Button Tag="{Binding}" Height="40" Click="btnCancel_Click" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=StopCircleOutline}">
+                                                        <Button Height="40" Command="{Binding CancelCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=StopCircleOutline}">
                                                             <Button.Style>
                                                                 <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                                                                     <Style.Triggers>
@@ -167,7 +167,7 @@
                                                             </Style>
                                                         </StackPanel.Style>
                                                         <TextBlock FontWeight="Bold" Text="{Binding Results.MatchingCount, FallbackValue='Matches: -', Mode=OneWay, StringFormat=Matches: \{0\}}" Padding="5" VerticalAlignment="Center" />
-                                                        <Button Tag="{Binding}" Height="40" Click="btnDetails_Click" Width="40" Content="{iconPacks:Material Kind=Eye}" Foreground="Green" />
+                                                        <Button Height="40" Command="{Binding DetailsCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Width="40" Content="{iconPacks:Material Kind=Eye}" Foreground="Green" />
                                                     </StackPanel>
                                                     <!--Error-->
                                                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -203,7 +203,7 @@
                                                             </ContentControl.Style>-->
                                                         </ContentControl>
                                                     </StackPanel>
-                                                    <Button Grid.Column="2" Tag="{Binding}" Height="40" Click="btnDelete_Click" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}">
+                                                    <Button Grid.Column="2" Height="40" Command="{Binding DeleteCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}">
                                                         <Button.Style>
                                                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                                                                 <Setter Property="IsEnabled" Value="False" />

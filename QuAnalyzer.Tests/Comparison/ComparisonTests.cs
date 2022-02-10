@@ -38,7 +38,7 @@ public class ComparisonTests
     [Theory()]
     [InlineData(new[] { "a", "b", "c", "d", "e" }, 0.9, 4, null)]
     [InlineData(new[] { "a", "b", "c", "d" }, 1, 4, new[] { "a", "b", "c", "d" })]
-    public void GetSamplesTest(object[] sourceData, int samplesPct, int expectedLength, object[]? expectedSamples = null)
+    public void GetSamplesTest(object[] sourceData, double samplesPct, int expectedLength, object[]? expectedSamples = null)
     {
         var samples = Comparison.GetSamples(samplesPct, sourceData);
         Assert.Equal(expectedLength, samples[0].Count());
@@ -59,7 +59,7 @@ public class ComparisonTests
 
         Assert.Equal(expMatches, comparer.Results.MatchingCount);
         Assert.Equal(expSrcDiffs, comparer.Results.Source.Differences.Count);
-        Assert.Equal(expSrcDiffs, comparer.Results.Target.Differences.Count);
+        Assert.Equal(expTrgDiffs, comparer.Results.Target.Differences.Count);
         Assert.Equal(expSrcDups, comparer.Results.Source.PerfectDups.Count);
         Assert.Equal(expTrgDups, comparer.Results.Target.PerfectDups.Count);
         //Assert.Equal(expSrcDups, comparer.Results.Source.Duplicates.Count);
@@ -68,10 +68,13 @@ public class ComparisonTests
         Assert.Equal(expTrgMissing, comparer.Results.Target.Missing.Count);
     }
 
-    [Fact()]
-    public void GetDuplicatesTest()
+    [Theory()]
+    [InlineData(new[] { "alpha", "alpha", "beta", "gamma" }, new[] { "alpha" })]
+    public void GetDuplicatesTest(IEnumerable<string> source, IEnumerable<string> expected)
     {
-        Assert.True(false, "This test needs an implementation");
+        var result = Comparison.GetDuplicates(source, null, StringComparer.InvariantCulture);
+
+        Assert.Equal(expected, result.PerfectDuplicates);
     }
 
     //[Fact()]

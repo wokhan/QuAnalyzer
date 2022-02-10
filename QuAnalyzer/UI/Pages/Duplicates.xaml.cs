@@ -2,59 +2,50 @@
 using QuAnalyzer.Features.Comparison.Comparers;
 
 using System.Diagnostics.Contracts;
-using System.Runtime.CompilerServices;
 using System.Windows.Data;
 using System.Windows.Threading;
 
 using Wokhan.Data.Providers.Bases;
 
 using LExpr = System.Linq.Expressions;
+using CommunityToolkit.Mvvm.Input;
 
 namespace QuAnalyzer.UI.Pages;
 
-/// <summary>
-/// Logique d'interaction pour DataViewer.xaml
-/// </summary>
-public partial class Duplicates : Page, INotifyPropertyChanged
+[ObservableObject]
+public partial class Duplicates : Page
 {
 
+    [ObservableProperty]
     private bool _keepDuplicates;
-    public bool KeepDuplicates
-    {
-        get { return _keepDuplicates; }
-        set { _keepDuplicates = value; NotifyPropertyChanged(); }
-    }
 
+
+    [ObservableProperty]
     private bool _keepColumns = true;
-    public bool KeepColumns
-    {
-        get { return _keepColumns; }
-        set { _keepColumns = value; NotifyPropertyChanged(); }
-    }
 
     public Duplicates()
     {
         InitializeComponent();
 
-        ((App)App.Instance).PropertyChanged += App_PropertyChanged;
+        App.Instance.PropertyChanged += App_PropertyChanged;
+        lstColumns.SelectionChanged += LstColumns_SelectionChanged;
+    }
+
+    private void LstColumns_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        RunCommand.NotifyCanExecuteChanged();
     }
 
     private void App_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(App.CurrentSelection))
         {
-            var (prov, repo) = ((App)App.Instance).CurrentSelection;
+            var (prov, repo) = App.Instance.CurrentSelection;
             if (prov is not null)
             {
                 lstColumns.ItemsSource = prov.GetColumns(repo);
             }
         }
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     /// <summary>
@@ -130,9 +121,10 @@ public partial class Duplicates : Page, INotifyPropertyChanged
         }
     }
 
-    private async void btnRun_Click(object sender, RoutedEventArgs e)
+    [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecute))]
+    private async Task Run()
     {
-        var (prov, repository) = ((App)App.Instance).CurrentSelection;
+        var (prov, repository) = App.Instance.CurrentSelection;
 
         var allHeadersFu = prov.GetColumns(repository);
         string[] keys;
@@ -189,6 +181,7 @@ public partial class Duplicates : Page, INotifyPropertyChanged
         }).ConfigureAwait(false);
     }
 
+    public bool CanExecute => lstColumns.SelectedItems.Count > 0;
 
     private void displayData(IEnumerable<object> data, string[] headers, int keysCount)
     {

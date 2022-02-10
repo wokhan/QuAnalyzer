@@ -9,7 +9,7 @@ public partial class ViewerPage : Page
     {
         InitializeComponent();
 
-        ((App)App.Instance).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
+        App.Instance.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
 
         UpdateSelection();
     }

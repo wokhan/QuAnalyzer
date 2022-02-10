@@ -12,7 +12,6 @@ global using System.Reflection;
 global using System.Threading.Tasks;
 global using System.Windows;
 global using System.Windows.Controls;
-global using System.Windows.Input;
 
 global using Wokhan.Collections.Generic.Extensions;
 global using Wokhan.Core.Extensions;

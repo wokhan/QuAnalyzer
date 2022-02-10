@@ -1,23 +1,18 @@
 ﻿using System.Windows.Threading;
 
-using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer.Features.Statistics;
 
-public class StatisticsHolder : NotifierHelper
+public partial class StatisticsHolder : ObservableObject
 {
     public IQueryable Source { get; set; }
     public string Name { get; set; }
     public ObservableCollection<OccurencesResult> Occurences { get; } = new ObservableCollection<OccurencesResult>();
 
+    [ObservableProperty]
     private StatsResult _statistics;
-    public StatsResult Statistics
-    {
-        get { return _statistics; }
-        internal set { _statistics = value; NotifyPropertyChanged(); }
-    }
-
+    
     private void UpdateStats(string attribute)
     {
         Statistics = StatsResult.GetStats(Source, attribute);

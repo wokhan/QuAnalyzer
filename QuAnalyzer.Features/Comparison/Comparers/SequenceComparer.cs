@@ -1,19 +1,21 @@
 ﻿namespace QuAnalyzer.Features.Comparison.Comparers;
 
-/// TODO: Review and improve, I don't like the current implementation
-/// Maybe I should check the keys first, if equals, go on until it fails (or continue if not)
-/// A perf test is required here to pick the best implementation.
-public class SequenceComparer<T> : IComparer<IEnumerable<T>>
+public class SequenceComparer<TItem> : IComparer<IEnumerable<TItem>> //where TItem : IComparable<TItem>
 {
-    public static SequenceComparer<T> Default { get; } = new();
+    public static SequenceComparer<TItem> Default { get; } = new();
 
     public SequenceComparer()
     {
-
+        
     }
 
-    public int Compare(IEnumerable<T>? x, IEnumerable<T>? y)
+    public int Compare(IEnumerable<TItem>? x, IEnumerable<TItem>? y)
     {
+        if (x is null || y is null)
+        {
+            throw new ArgumentException("Both arguments must implement IEnumerable<T>");
+        }
+
         switch (x)
         {
             case null when y is null:
@@ -26,18 +28,16 @@ public class SequenceComparer<T> : IComparer<IEnumerable<T>>
 
         int index = 0;
         int internalResult = 0;
-#pragma warning disable CS8602 // Déréférencement d'une éventuelle référence null.
-        using (var e1 = x.GetEnumerator())
-#pragma warning restore CS8602 // Déréférencement d'une éventuelle référence null.
-#pragma warning disable CS8602 // Déréférencement d'une éventuelle référence null.
-        using (var e2 = y.GetEnumerator())
-#pragma warning restore CS8602 // Déréférencement d'une éventuelle référence null.
+        //using (var e1 = x.GetEnumerator())
+        //using (var e2 = y.GetEnumerator())
+        var e1 = x.GetEnumerator();
+        var e2 = y.GetEnumerator();
         {
             while (internalResult == 0 && e1.MoveNext() && e2.MoveNext())
             {
                 index++;
-                // Null equality: keep moving
-                if (e1.Current is DBNull && e2.Current is null || e1.Current is DBNull && e2.Current is null)
+                // Null equality for both: keep moving as we consider them equal. It's a design choice, btw.
+                if (e1.Current is DBNull or null && e2.Current is DBNull or null)
                 {
                     continue;
                 }
@@ -48,13 +48,7 @@ public class SequenceComparer<T> : IComparer<IEnumerable<T>>
                 }
                 else
                 {
-#pragma warning disable CS8602 // Déréférencement d'une éventuelle référence null.
-#pragma warning disable CS8600 // Conversion de littéral ayant une valeur null ou d'une éventuelle valeur null en type non-nullable.
-#pragma warning disable CS8600 // Conversion de littéral ayant une valeur null ou d'une éventuelle valeur null en type non-nullable.
-                    internalResult = ((IComparable)e1.Current).CompareTo((IComparable)e2.Current);
-#pragma warning restore CS8600 // Conversion de littéral ayant une valeur null ou d'une éventuelle valeur null en type non-nullable.
-#pragma warning restore CS8600 // Conversion de littéral ayant une valeur null ou d'une éventuelle valeur null en type non-nullable.
-#pragma warning restore CS8602 // Déréférencement d'une éventuelle référence null.
+                    internalResult = (e1.Current as IComparable).CompareTo(e2.Current);
                 }
             }
         }

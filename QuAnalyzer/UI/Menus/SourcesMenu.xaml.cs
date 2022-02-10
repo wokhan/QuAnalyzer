@@ -3,6 +3,8 @@
 using QuAnalyzer.UI.Pages;
 using QuAnalyzer.UI.Windows;
 
+using System.Windows.Input;
+
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Menus;

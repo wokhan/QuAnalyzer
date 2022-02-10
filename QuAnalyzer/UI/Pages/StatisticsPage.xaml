@@ -14,7 +14,7 @@
 	Title="Statistics">
     <DockPanel Grid.Row="1" Grid.Column="1">
         <WrapPanel Style="{StaticResource ToolBar}">
-            <Button Click="btnCompute_Click" Content="Compute" ToolTip="Compute statistics" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" />
+            <Button Command="{Binding RunCommand}" Content="Compute" ToolTip="Compute statistics" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" />
             <ToggleButton x:Name="btnAuto" IsChecked="True" Content="Auto update" ToolTip="Compute statistics automatically" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Calculator}" />
             <Rectangle />
             <ComboBox ext:CustomAdorner.PreserveTemplate="True" ext:CustomAdorner.Header="Type: " IsEditable="False" VerticalAlignment="Center" ItemsSource="{Binding ChartTypes}" SelectedItem="{Binding ChartType}" />

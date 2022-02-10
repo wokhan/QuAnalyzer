@@ -2,6 +2,8 @@
 
 using OfficeOpenXml;
 
+using System.Windows.Input;
+
 namespace QuAnalyzer.Generic.Extensions;
 
 public static class DataGridExtensions

@@ -15,7 +15,7 @@
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
             <WrapPanel Style="{StaticResource ToolBar}">
-                <Button x:Name="btnRun" Click="btnRun_Click" Content="Run" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" />
+                <Button Command="{Binding RunCommand}" Content="Run" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" />
                 <WrapPanel VerticalAlignment="Center">
                     <CheckBox Content=" Keep all duplicates" IsChecked="{Binding KeepDuplicates,Mode=TwoWay}" Margin="7" />
                     <CheckBox Content=" Show other columns" IsChecked="{Binding KeepColumns,Mode=TwoWay}" IsEnabled="{Binding KeepDuplicates,Mode=OneWay}" Margin="7" />

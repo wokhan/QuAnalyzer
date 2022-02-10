@@ -1,7 +1,10 @@
-﻿using Microsoft.Win32;
+﻿using CommunityToolkit.Mvvm.Input;
+
+using Microsoft.Win32;
 
 using OfficeOpenXml;
 
+using QuAnalyzer.Core.Extensions;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Comparers;
 using QuAnalyzer.Features.Comparison.Definition;
@@ -16,9 +19,6 @@ using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages;
 
-/// <summary>
-/// Interaction logic for DataCompare.xaml
-/// </summary>
 public partial class Compare : Page
 {
     public SourcesMapper SingleMap { get; } = new();
@@ -29,19 +29,22 @@ public partial class Compare : Page
     public Compare()
     {
         InitializeComponent();
+
+        lstMappings.SelectionChanged += LstMappings_SelectionChanged;
     }
 
-    private async void btnRun_Click(object sender, RoutedEventArgs e)
+    private void LstMappings_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (lstMappings.SelectedItems.Count == 0)
-        {
-            return;
-        }
+        RunCommand.NotifyCanExecuteChanged();
+    }
 
-        prgGlobal.IsIndeterminate = true;
+    [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecute))]
+    private async Task Run()
+    {
+         prgGlobal.IsIndeterminate = true;
 
         var newInstances = new List<ComparerDefinition<object[]>>();
-        var comparer = (IComparer<object[]>)SequenceComparer<object[]>.Default;
+        var comparer = SequenceComparer<object>.Default;
 
         foreach (SourcesMapper mapper in btnToggleMode.IsChecked is true ? new[] { SingleMap } : lstMappings.SelectedItems)
         {
@@ -63,6 +66,8 @@ public partial class Compare : Page
         var callback = new Progress<ComparerDefinition<object[]>>(Progress);
         await Task.Run(() => Comparison.Run(newInstances, progressCallback: callback, useParallelism: App.Instance.CurrentProject.UseParallelism));
     }
+
+    private bool CanExecute => lstMappings?.SelectedItems.Count > 0;
 
     private static IEnumerable<object[]> Convert(IEnumerable src, Type[] types)
     {
@@ -105,29 +110,26 @@ public partial class Compare : Page
         }
     }
 
-    public void btnDelete_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void Delete(ComparerDefinition<object[]> r)
     {
-        var src = (Button)sender;
-        var r = (ComparerDefinition<object[]>)src.Tag;
-
         progressDC.Remove(r.Name);
         ComparisonInstancesView.RemoveRange(ComparisonInstancesView.Where(re => r.Name.Equals((string)re.Name)).ToList());
     }
 
-    public void btnCancel_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void Cancel(ComparerDefinition<object[]> r)
     {
-        var src = (Button)sender;
-        var r = (ComparerDefinition<object[]>)src.Tag;
-
-        src.IsEnabled = false;
+        //TODO: replace by CancelCommand.IsRunning on the corresponding button
+        //src.IsEnabled = false;
         r.TokenSource.Cancel(true);
     }
 
     private readonly Dictionary<ComparerDefinition<object[]>, Popup> openWindows = new();
-    public void btnDetails_Click(object sender, RoutedEventArgs e)
+
+    [ICommand]
+    private void Details(ComparerDefinition<object[]> cmp)
     {
-        var src = (Button)sender;
-        var cmp = (ComparerDefinition<object[]>)src.Tag;
         if (!openWindows.ContainsKey(cmp))
         {
             var dWin = Popup.OpenNew(new DetailsWindow(cmp));
@@ -145,7 +147,8 @@ public partial class Compare : Page
     }
 
 
-    private void GlobalReport_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void GlobalReport()
     {
         var dial = new OpenFileDialog() { CheckFileExists = false, CheckPathExists = true, ValidateNames = false, FileName = "Pick a folder to save reports in. Existing files will be overwritten." };
         if (dial.ShowDialog() is not true)
@@ -225,13 +228,14 @@ public partial class Compare : Page
         }
     }
 
-
-    private void btnNewPrv_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void CreateMapping()
     {
         Popup.OpenNew(new MappingsEditor());
     }
 
-    private void btnAuto_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void AutoMap()
     {
         var allprv = App.Instance.CurrentProject.CurrentProviders;
 
@@ -270,21 +274,25 @@ public partial class Compare : Page
         }
     }
 
-    private void btnEditMapping_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void EditMapping(SourcesMapper mapping)
     {
-        Popup.OpenNew(new MappingsEditor((SourcesMapper)((Button)sender).Tag));
+        Popup.OpenNew(new MappingsEditor(mapping));
     }
 
-    private void btnDeleteMapping_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void DeleteMapping(SourcesMapper mapping)
     {
-        App.Instance.CurrentProject.SourceMapper.Remove((SourcesMapper)((Button)sender).Tag);
+        App.Instance.CurrentProject.SourceMapper.Remove(mapping);
     }
 
+    //TODO: Use Command="{x:Static DataGrid.SelectAllCommand}" instead
     private void btnSelectAll_Click(object sender, RoutedEventArgs e)
     {
         lstMappings.SelectAll();
     }
 
+    //TODO: Figure out what Command using instead 
     private void btnUnSel_Click(object sender, RoutedEventArgs e)
     {
         lstMappings.UnselectAll();

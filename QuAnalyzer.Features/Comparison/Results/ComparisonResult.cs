@@ -10,9 +10,7 @@ namespace QuAnalyzer.Features.Comparison;
 public partial class ComparisonResult<T> : ObservableObject
 {
     [ObservableProperty]
-#pragma warning disable CS8618 // Le champ 'message' non-nullable doit contenir une valeur non-null lors de la fermeture du constructeur. Envisagez de déclarer le champ comme nullable.
     private string message;
-#pragma warning restore CS8618 // Le champ 'message' non-nullable doit contenir une valeur non-null lors de la fermeture du constructeur. Envisagez de déclarer le champ comme nullable.
 
     [ObservableProperty]
     [AlsoNotifyChangeFor(nameof(LocalProgress))]
@@ -32,40 +30,16 @@ public partial class ComparisonResult<T> : ObservableObject
     public ItemResult<T> Source { get; } = new ItemResult<T>();
     public ItemResult<T> Target { get; } = new ItemResult<T>();
 
-    public string[]? MergedHeaders { get; private set; }
+    [ObservableProperty]
+    private IList<(T First, T Second, int Index)> differences = new List<(T, T, int)>();
 
-    public IEnumerable<Diff>? MergedDiff { get; private set; } = null;
+    public string[]? MergedHeaders { get; set; }
 
-    public void InitDiff(ComparerDefinition<T> definition)
-    {
-        if (MergedDiff is null)
-        {
-            MergedHeaders = definition.SourceHeaders.Zip(definition.TargetHeaders, (src, trg) => src + (src != trg ? "/" + trg : String.Empty)).ToArray();
-
-            //TODO: Differences should already be an object array (at the expense of boxing / unboxing)
-            var sortedSrc = definition.SourceKeys?.Count > 0 ? Source.Differences.Cast<object[]>().OrderByMany(definition.SourceKeys.Count) : Source.Differences.Cast<object[]>().OrderByAll();
-            var sortedTrg = definition.SourceKeys?.Count > 0 ? Target.Differences.Cast<object[]>().OrderByMany(definition.SourceKeys.Count) : Target.Differences.Cast<object[]>().OrderByAll();
-
-            var hasKeys = definition.SourceKeys?.Count > 0;
-            var allFalse = new bool[MergedHeaders.Length];
-            MergedDiff = sortedSrc.Zip(sortedTrg)
-                                   .SelectMany(x => new[] {
-                                       new Diff(Source: definition.SourceName, Values: x.First),
-                                       new Diff(
-                                           Source: definition.TargetName,
-                                           Values: x.Second,
-#pragma warning disable CS8602 // Déréférencement d'une éventuelle référence null.
-                                           IsDiff: hasKeys && !x.First.Take(definition.SourceKeys.Count).SequenceEqual(x.Second.Take(definition.SourceKeys.Count))
-#pragma warning restore CS8602 // Déréférencement d'une éventuelle référence null.
-                                                       ? allFalse
-                                                       : x.First.Zip(x.Second, (a, b) => !Equals(a, b)).ToArray()
-                                       )
-                                    });
-        }
-    }
-
+    public IEnumerable<Diff<T>>? MergedDiff { get; set; } = null;
+    
     public void InitCollections(Func<IList<T>> collectionCtor)
     {
+        //Differences = collectionCtor();
         Source.Differences = collectionCtor();
         Target.Differences = collectionCtor();
         Source.Missing = collectionCtor();

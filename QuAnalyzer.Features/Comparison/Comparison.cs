@@ -94,9 +94,7 @@ public static class Comparison
             }
             catch (InvalidDataException ed)
             {
-#pragma warning disable CS8602 // Déréférencement d'une éventuelle référence null.
                 definition.Results.Message = "The following attribute could not be loaded: " + ed.Message + "\r\nThe inner exception is: " + ed.InnerException.Message + "\r\nPlease check your providers and mappings.";
-#pragma warning restore CS8602 // Déréférencement d'une éventuelle référence null.
                 SetProgress(definition, ProgressType.Failed, 0, callback);
             }
             catch (Exception e)
@@ -230,8 +228,7 @@ public static class Comparison
                     break;
 
                 case > 0 or < 0 when f.SourceKeys is not null && Math.Abs(compResult) < f.SourceKeys.Count:
-                    f.Results.Source.Differences.Add(srcEnum.Current);
-                    f.Results.Target.Differences.Add(trgEnum.Current);
+                    f.Results.Differences.Add((srcEnum.Current, trgEnum.Current, compResult));
                     advanceSource = true;
                     advanceTarget = true;
                     break;
@@ -291,20 +288,26 @@ public static class Comparison
         var comparison = comparer.Compare(previous, current);
         if (keyCount is not null && Math.Abs(comparison) > keyCount)
         {
-#pragma warning disable CS8604 // Existence possible d'un argument de référence null pour le paramètre 'item' dans 'void ICollection<T>.Add(T item)'.
             f.Duplicates.Add(current);
-#pragma warning restore CS8604 // Existence possible d'un argument de référence null pour le paramètre 'item' dans 'void ICollection<T>.Add(T item)'.
         }
 
         if (comparison == 0)
         {
-#pragma warning disable CS8604 // Existence possible d'un argument de référence null pour le paramètre 'item' dans 'void ICollection<T>.Add(T item)'.
             f.PerfectDups.Add(current);
-#pragma warning restore CS8604 // Existence possible d'un argument de référence null pour le paramètre 'item' dans 'void ICollection<T>.Add(T item)'.
         }
     }
 
-    public static ItemResult<T> GetDuplicates<T>(IEnumerable<T> data, IList<string>? keys, IComparer<T> comparer, bool keysOnly = false) where T : class
+    /// <summary>
+    /// Get duplicates (either by key or full duplicates, i.e. with all data being equal).
+    /// WARNING: data must already be sorted either by key or by ALL columns. If not, results will be unexpected.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="data"></param>
+    /// <param name="keys"></param>
+    /// <param name="comparer"></param>
+    /// <param name="keysOnly"></param>
+    /// <returns></returns>
+    public static (IEnumerable<T> Duplicates, IEnumerable<T> PerfectDuplicates) GetDuplicates<T>(IEnumerable<T> data, IList<string>? keys, IComparer<T> comparer, bool keysOnly = false) where T : class
     {
         ItemResult<T> ret = new();
 
@@ -316,6 +319,6 @@ public static class Comparison
             prev = enumerator.Current;
         }
 
-        return ret;
+        return (ret.Duplicates, ret.PerfectDups);
     }
 }

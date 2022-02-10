@@ -2,6 +2,7 @@
 
 using System.Linq.Dynamic.Core;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 using Wokhan.ComponentModel.Extensions;

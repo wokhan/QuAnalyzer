@@ -1,3 +1,3 @@
 ﻿namespace QuAnalyzer.Features.Comparison.Results;
 
-public record Diff(string Source, object[] Values, bool[]? IsDiff = null);
+public record Diff<T>(string Source, T Values, bool[]? IsDiff = null);

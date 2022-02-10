@@ -7,20 +7,24 @@ using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer.Features.Statistics;
 
-public record OccurencesResult(string Category, int CategoryIndex, int Frequency)
+public record OccurencesResult(string? Category, int CategoryIndex, int Frequency)
 {
     private static IEnumerable<OccurencesResult> GetTypedData<T, TK>(IQueryable data, string key)
     {
         var param = Expression.Parameter(typeof(T));
-        var fn = Expression.GetFuncType(typeof(T), typeof(TK));
+        //var fn = Expression.GetFuncType(typeof(T), typeof(TK));
         var group = Expression.Lambda<Func<T, TK>>(Expression.Property(param, key), param);
 
         var xx = ((IQueryable<T>)data).GroupBy(group, group)// ((IQueryable<T>)data).GroupBy((dynamic)group)
-                                    .Select(g => new { g.Key, Cnt = g.Count() })
-                                    .OrderByDescending(x => x.Cnt)
+                                    //.Select(g => new { g.Key, Cnt = g.Count() })
+                                    //.OrderByDescending(x => x.Cnt)
+                                    //.Take(11)
+                                    //.ToList()
+                                    //.Select((x, i) => new OccurencesResult(Category: x.Key.ToString(), CategoryIndex: i, Frequency: x.Cnt))
+                                    //.ToList();
+                                    .Select((g, i) => new OccurencesResult(g.Key != null ? g.Key.ToString() : null, i, g.Count()))
+                                    .OrderByDescending(x => x.Frequency)
                                     .Take(11)
-                                    .ToList()
-                                    .Select((x, i) => new OccurencesResult(Category: x.Key.ToString(), CategoryIndex: i, Frequency: x.Cnt))
                                     .ToList();
 
         return xx;
@@ -30,6 +34,17 @@ public record OccurencesResult(string Category, int CategoryIndex, int Frequency
     {
         var m = typeof(OccurencesResult).GetMethod(nameof(GetTypedData), BindingFlags.NonPublic | BindingFlags.Static)
                                           .MakeGenericMethod(data.GetInnerType(), groupKey.Type);
+
         return (IEnumerable<OccurencesResult>)m.Invoke(null, new object[] { data, groupKey.Name });
+    }
+
+    
+    public static IEnumerable<OccurencesResult> CountOccurences(IQueryable data, string attribute)
+    {
+        return data.GroupBy(attribute)
+                   .Select("new { Key, Count() as Count }")
+                   .OrderBy("Count desc")
+                   .ToDynamicList()
+                   .Select((g, i) => new OccurencesResult(g.Key.ToString(), i, g.Count)).ToList();
     }
 }

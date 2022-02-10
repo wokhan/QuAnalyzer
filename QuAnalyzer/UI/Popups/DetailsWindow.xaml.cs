@@ -1,4 +1,5 @@
 ﻿
+using QuAnalyzer.Core.Extensions;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Results;
 using QuAnalyzer.UI.Controls;
@@ -58,13 +59,13 @@ public partial class DetailsWindow : Page
         displayData(dgTargetPerfectDups, results.Target.PerfectDups, r.TargetHeaders.ToArray(), r.TargetKeys.Count);
     }
 
-    private void displayDiffData(ExtendedDataGridView gridData, IEnumerable<Diff> data, string[] headers, int keysCount)
+    private void displayDiffData(ExtendedDataGridView gridData, IEnumerable<Diff<object[]>> data, string[] headers, int keysCount)
     {
         gridData.Columns.Clear();
 
         gridData.AutoGenerateColumns = false;
 
-        gridData.Columns.Add(new DataGridTextColumn() { Header = "Origin", Binding = new Binding(nameof(Diff.Source)) });
+        gridData.Columns.Add(new DataGridTextColumn() { Header = "Origin", Binding = new Binding(nameof(Diff<object[]>.Source)) });
 
         if (data is not null && data.Any())
         {
@@ -78,7 +79,7 @@ public partial class DetailsWindow : Page
                 var trigger = new DataTrigger()
                 {
                     Value = true,
-                    Binding = new Binding($"{nameof(Diff.IsDiff)}[{i}]"),
+                    Binding = new Binding($"{nameof(Diff<object[]>.IsDiff)}[{i}]"),
                     Setters = { new Setter(Control.ForegroundProperty, Brushes.Red) }
                 };
 
@@ -92,7 +93,7 @@ public partial class DetailsWindow : Page
                 var col = new DataGridTextColumn()
                 {
                     Header = headers[i],
-                    Binding = new Binding($"{nameof(Diff.Values)}[{i}]"),
+                    Binding = new Binding($"{nameof(Diff<object[]>.Values)}[{i}]"),
                     FontWeight = (i < keysCount ? FontWeights.Bold : FontWeights.Normal),
                     CellStyle = style
                 };

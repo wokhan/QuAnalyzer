@@ -7,6 +7,7 @@ using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.UI.Windows;
 
 using System.Globalization;
+using System.Windows.Input;
 using System.Windows.Media;
 
 using Wokhan.Data.Providers.Contracts;
