@@ -40,7 +40,7 @@ public partial class MonitoringDetails : Page
         CurrentItem.PrecedingSteps.AddAll(lstPrec.SelectedItems.Cast<TestDefinition>().Select(_ => KeyValuePair.Create(_, false)));
         CurrentItem.Attributes = String.Join(",", lstAttributes.SelectedItems.Cast<KeyValuePair<string, bool>>().Select(s => s.Key));
 
-        var projectMappers = ((App)App.Instance).CurrentProject.TestDefinitions;
+        var projectMappers = App.Instance.CurrentProject.TestDefinitions;
         if (projectMappers.Contains(initialItem))
         {
             projectMappers[projectMappers.IndexOf(initialItem)] = CurrentItem;

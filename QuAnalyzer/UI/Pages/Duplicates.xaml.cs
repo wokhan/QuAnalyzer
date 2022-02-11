@@ -121,7 +121,7 @@ public partial class Duplicates : Page
         }
     }
 
-    [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecute))]
+    [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
     private async Task Run()
     {
         var (prov, repository) = App.Instance.CurrentSelection;
@@ -181,7 +181,7 @@ public partial class Duplicates : Page
         }).ConfigureAwait(false);
     }
 
-    public bool CanExecute => lstColumns.SelectedItems.Count > 0;
+    private bool CanExecuteRun => lstColumns.SelectedItems.Count > 0;
 
     private void displayData(IEnumerable<object> data, string[] headers, int keysCount)
     {

@@ -54,14 +54,14 @@ public partial class StatisticsPage : Page
         }
     }
 
-    [ICommand(AllowConcurrentExecutions = false, CanExecute =nameof(CanExecute))]
+    [ICommand(CanExecute =nameof(CanExecuteRun))]
     private void Run()
     {
         var (prov, repo) = App.Instance.CurrentSelection;
         Computedata(prov, repo);
     }
 
-    private bool CanExecute => App.Instance.CurrentSelection is not (null, null);
+    private bool CanExecuteRun => App.Instance.CurrentSelection is not (null, null);
 
     private async void Computedata(IDataProvider prv, string repo)
     {

@@ -38,7 +38,7 @@ public partial class Compare : Page
         RunCommand.NotifyCanExecuteChanged();
     }
 
-    [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecute))]
+    [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
     private async Task Run()
     {
          prgGlobal.IsIndeterminate = true;
@@ -67,7 +67,7 @@ public partial class Compare : Page
         await Task.Run(() => Comparison.Run(newInstances, progressCallback: callback, useParallelism: App.Instance.CurrentProject.UseParallelism));
     }
 
-    private bool CanExecute => lstMappings?.SelectedItems.Count > 0;
+    private bool CanExecuteRun => lstMappings?.SelectedItems.Count > 0;
 
     private static IEnumerable<object[]> Convert(IEnumerable src, Type[] types)
     {

@@ -1,4 +1,6 @@
-﻿using LiveChartsCore;
+﻿using CommunityToolkit.Mvvm.Input;
+
+using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 
@@ -25,6 +27,8 @@ public partial class Monitor : Page
     public ObservableDictionary<string, ISeries[]> ResultSeriesMappings { get; } = new();
     public double? Occurences { get; set; } = 10;
     public double? MaxParallel { get; set; } = 1;
+    public bool UseComparisonMode { get; set; }
+
     public Monitor()
     {
         this.DataContext = this;
@@ -34,7 +38,7 @@ public partial class Monitor : Page
         InitializeComponent();
     }
 
-    private void MonitorResultsView_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    private void MonitorResultsView_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.Action == NotifyCollectionChangedAction.Add)
         {
@@ -53,17 +57,10 @@ public partial class Monitor : Page
         }
     }
 
-    private void btnStart_Click(object sender, RoutedEventArgs e)
+    [ICommand(CanExecute = nameof(CanExecuteRun))]
+    private void Run()
     {
-        if (gridSteps.SelectedItems.Count == 0)
-        {
-            return;
-        }
-
         var mitems = gridSteps.SelectedItems.Cast<TestDefinition>();
-
-        btnStart.IsEnabled = false;
-        btnStop.IsEnabled = true;
 
         MonitorResultsView.Clear();
 
@@ -72,7 +69,7 @@ public partial class Monitor : Page
         startDate = DateTimeOffset.Now.Ticks;
         BindingOperations.EnableCollectionSynchronization(MonitorResultsView, MonitorResultsView);
 
-        if (btnCompareMode.IsChecked.GetValueOrDefault())
+        if (UseComparisonMode)
         {
             globalTimer = new DispatcherTimer(TimeSpan.FromSeconds(mitems.Max(m => m.Interval)), DispatcherPriority.Background, globalCompTimer_Tick, Dispatcher) { IsEnabled = true, Tag = mitems };
         }
@@ -92,6 +89,8 @@ public partial class Monitor : Page
             timers = mitems.Select(m => new DispatcherTimer(TimeSpan.FromSeconds(m.Interval), DispatcherPriority.Background, Timer_Tick, Dispatcher) { Tag = m, IsEnabled = true }).ToList();
         }
     }
+
+    private bool CanExecuteRun => gridSteps.SelectedItems.Count > 0;
 
     private int globalPerfCounter;
     private async void globalCompTimer_Tick(object sender, EventArgs e)
@@ -167,29 +166,36 @@ public partial class Monitor : Page
         gridResults.ScrollIntoView(results);
     }
 
-    private void btnAdd_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void MonitorAdd()
     {
         Popup.OpenNew(new MonitoringDetails());
     }
 
-    private void btnClear_Click(object sender, RoutedEventArgs e)
+    [ICommand(CanExecute = nameof(CanExecuteClearAll))]
+    private void MonitorClearAll()
     {
         App.Instance.CurrentProject.TestDefinitions.Clear();
+        MonitorClearAllCommand.NotifyCanExecuteChanged();
     }
 
-    private void btnCopy_Click(object sender, RoutedEventArgs e)
+    private bool CanExecuteClearAll => gridSteps.Items.Count > 0;
+
+    [ICommand]
+    private void MonitorCopy(TestDefinition definition)
     {
 
     }
 
-    private void btnEdit_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void MonitorEdit(TestDefinition definition)
     {
-        Popup.OpenNew(new MonitoringDetails((TestDefinition)((Button)sender).Tag));
+        Popup.OpenNew(new MonitoringDetails(definition));
     }
 
-    private void btnDelete_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void MonitorDelete(TestDefinition mtoremove)
     {
-        var mtoremove = (TestDefinition)((Button)sender).Tag;
         foreach (var m in App.Instance.CurrentProject.TestDefinitions)//.Where(m => m.PrecedingSteps.Any()))
         {
             m.PrecedingSteps.Remove(mtoremove);
@@ -206,7 +212,8 @@ public partial class Monitor : Page
         //chart.ScrollHorizontalTo = DateTime.Now.AddMinutes(chartTimeSpanMinutes).Ticks;
     }
 
-    private void btnStopAll_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void Stop()
     {
         globalTimer.Stop();
 

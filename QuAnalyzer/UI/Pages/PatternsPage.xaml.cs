@@ -1,4 +1,6 @@
-﻿using System.Linq.Dynamic.Core;
+﻿using CommunityToolkit.Mvvm.Input;
+
+using System.Linq.Dynamic.Core;
 
 namespace QuAnalyzer.UI.Pages;
 
@@ -16,12 +18,14 @@ public partial class PatternsPage : Page
     {
         InitializeComponent();
 
-        ((App)App.Instance).PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
+        App.Instance.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
     }
 
     private async void UpdateSelection()
     {
-        var (prov, repo) = ((App)App.Instance).CurrentSelection;
+        RunCommand.NotifyCanExecuteChanged();
+
+        var (prov, repo) = App.Instance.CurrentSelection;
         var attr = (string)lstAttributes.SelectedValue;
 
         if (repo is not null && attr is null)
@@ -31,52 +35,53 @@ public partial class PatternsPage : Page
         }
         else if (AutoUpdate)
         {
-            await Compute().ConfigureAwait(false);
+            await Run().ConfigureAwait(false);
         }
     }
 
-    private async Task Compute()
+    [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
+    private async Task Run()
     {
         var (prov, repo) = ((App)App.Instance).CurrentSelection;
 
         var attr = (string)lstAttributes.SelectedValue;
 
-        if (repo is not null && attr is not null)
+        prg.IsIndeterminate = true;
+
+        var res = await Task.Run(() =>
         {
-            prg.IsIndeterminate = true;
+            var data = prov.GetQueryable(repo)
+                           .Select(attr)
+                           .AsEnumerable()
+                           .WithProgress(i => Dispatcher.InvokeAsync(() => txtStatus.Text = $"Loaded {i} entries..."))
+                           .Select(a => a.ToString())
+                           .ToList();
 
-            var res = await Task.Run(() =>
+            Dispatcher.Invoke(() =>
             {
-                var data = prov.GetQueryable(repo)
-                               .Select(attr)
-                               .AsEnumerable()
-                               .WithProgress(i => Dispatcher.InvokeAsync(() => txtStatus.Text = $"Loaded {i} entries..."))
-                               .Select(a => a.ToString())
-                               .ToList();
+                prg.IsIndeterminate = false;
+                prg.Maximum = data.Count;
+            });
 
-                Dispatcher.Invoke(() =>
-                {
-                    prg.IsIndeterminate = false;
-                    prg.Maximum = data.Count;
-                });
+            return data.WithProgress(i => Dispatcher.InvokeAsync(() => prg.Value = i))
+                       .Select(d => new { val = d, reg = Features.Patterns.Patterns.GetRegEx(d, SimThreshold) })
+                       .ToList()
+                       .GroupBy(s => s.reg)
+                       .Select(g => new { Pattern = g.Key, Count = g.Count(), Sample = g.First().val })
+                       .OrderByDescending(g => g.Count);
+        }).ConfigureAwait(true);
 
-                return data.WithProgress(i => Dispatcher.InvokeAsync(() => prg.Value = i))
-                           .Select(d => new { val = d, reg = Features.Patterns.Patterns.GetRegEx(d, SimThreshold) })
-                           .ToList()
-                           .GroupBy(s => s.reg)
-                           .Select(g => new { Pattern = g.Key, Count = g.Count(), Sample = g.First().val })
-                           .OrderByDescending(g => g.Count);
-            }).ConfigureAwait(true);
-
-            //gridPatterns.CustomHeaders = prov.GetColumns(repo).Join(stringAttributes, a => a.Name, b => b, (a, b) => a).ToList();
-            gridPatterns.Source = res.AsQueryable();
-        }
+        //gridPatterns.CustomHeaders = prov.GetColumns(repo).Join(stringAttributes, a => a.Name, b => b, (a, b) => a).ToList();
+        gridPatterns.Source = res.AsQueryable();
+        /*}
         else
         {
             //gridPatterns.CustomHeaders = null;
             gridPatterns.Source = null;
-        }
+        }*/
     }
+
+    private bool CanExecuteRun => App.Instance.CurrentSelection is not (null, null);
 
     private void lstDataSources_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -90,10 +95,5 @@ public partial class PatternsPage : Page
         {
             UpdateSelection();
         }
-    }
-
-    private async void btnUpdate_Click(object sender, System.Windows.RoutedEventArgs e)
-    {
-        await Compute().ConfigureAwait(false);
     }
 }

@@ -13,8 +13,8 @@
       DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}">
     <DockPanel>
         <WrapPanel Style="{StaticResource ToolBar}">
-            <Button Click="btnUpdate_Click" Content="Update" ToolTip="Update now" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" />
-            <ToggleButton x:Name="btnAuto" IsChecked="{Binding AutoUpdate}" Content="Auto update" ToolTip="Analyze automatically" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Calculator}" />
+            <Button Command="{Binding RunCommand}" Content="Update" ToolTip="Update now" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" />
+            <ToggleButton IsChecked="{Binding AutoUpdate}" Content="Auto update" ToolTip="Analyze automatically" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Calculator}" />
             <Rectangle />
             <Label Content="Similarity threshold" VerticalAlignment="Center" />
             <Slider x:Name="slideSim" ValueChanged="slideSim_ValueChanged" VerticalAlignment="Center" Minimum="1" TickFrequency="1" IsSnapToTickEnabled="True" LargeChange="1" SmallChange="1" Maximum="3" TickPlacement="BottomRight" Width="100" />

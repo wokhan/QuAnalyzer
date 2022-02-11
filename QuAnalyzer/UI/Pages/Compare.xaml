@@ -80,8 +80,8 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <WrapPanel>
-                                        <Button x:Name="btnEditMapping" Command="{Binding EditMappingCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Foreground="Blue" Content="{iconPacks:Material Kind=Pencil}" />
-                                        <Button x:Name="btnDeleteMapping" Command="{Binding DeleteMappingCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                        <Button Command="{Binding EditMappingCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Foreground="Blue" Content="{iconPacks:Material Kind=Pencil}" />
+                                        <Button Command="{Binding DeleteMappingCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
                                     </WrapPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
