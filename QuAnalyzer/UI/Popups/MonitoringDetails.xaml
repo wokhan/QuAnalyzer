@@ -33,8 +33,8 @@
     <DockPanel>
         <Border DockPanel.Dock="Bottom" Grid.ColumnSpan="4" Style="{StaticResource ButtonBar}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Apply" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Check}" x:Name="btnSave" Click="btnSave_Click" />
-                <Button Content="Cancel" BorderBrush="OrangeRed" ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}" x:Name="btnCancel" IsCancel="True" Click="btnCancel_Click"/>
+                <Button Content="Apply" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Check}" Command="{Binding SaveCommand,RelativeSource={RelativeSource AncestorType=Page}}" />
+                <Button Content="Cancel" BorderBrush="OrangeRed" ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}" IsCancel="True" Command="{Binding CancelCommand,RelativeSource={RelativeSource AncestorType=Page}}" />
             </StackPanel>
         </Border>
         <Grid Margin="5">

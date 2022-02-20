@@ -15,9 +15,9 @@ public class ComparerDefinition<T>
     public IList<string> TargetHeaders { get; set; }
     public bool IsOrdered { get; set; }
     public CancellationTokenSource TokenSource { get; } = new CancellationTokenSource();
-    public IComparer<T> Comparer { get; set; }
+    public IComparer Comparer { get; set; }
 
-    //TODO: check if directly using an IEnumerable wouldn't be alright (only exception I see is if data has to be fully retrieved before the enumeration takes place)
+    //TODO: check if directly using an IEnumerable or IQueryable wouldn't be alright (only exception I see is if data has to be fully retrieved before the enumeration takes place)
     public Func<IEnumerable<T>> GetSourceData { get; set; }
     //TODO: Same remark
     public Func<IEnumerable<T>> GetTargetData { get; set; }
@@ -27,12 +27,12 @@ public class ComparerDefinition<T>
     {
     }
 
-    public static async Task<ComparerDefinition<T>> CreateAsync(SourcesMapper s, IComparer<T> comparer, Func<IQueryable, List<string>, IEnumerable<T>> mapFunc, Func<IEnumerable, Type[], IEnumerable<T>>? converter = null)
+    public static async Task<ComparerDefinition<T>> CreateAsync(SourcesMapper s, IComparer comparer, Func<IQueryable, List<string>, IEnumerable<T>> mapFunc, Func<IEnumerable, Type[], IEnumerable<T>>? converter = null)
     {
         return await Task.Run(() => new ComparerDefinition<T>(s, comparer, mapFunc));
     }
 
-    private ComparerDefinition(SourcesMapper s, IComparer<T> comparer, Func<IQueryable, List<string>, IEnumerable<T>> mapFunc, Func<IEnumerable, Type[], IEnumerable<T>>? converter = null)
+    private ComparerDefinition(SourcesMapper s, IComparer comparer, Func<IQueryable, List<string>, IEnumerable<T>> mapFunc, Func<IEnumerable, Type[], IEnumerable<T>>? converter = null)
     {
         var fieldsSrc = s.AllMappings.Select(m => m.Source).ToList();
         var fieldsTrg = s.AllMappings.Select(m => m.Target).ToList();

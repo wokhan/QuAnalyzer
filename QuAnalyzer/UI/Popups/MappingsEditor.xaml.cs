@@ -1,4 +1,6 @@
-﻿using QuAnalyzer.Features.Comparison;
+﻿using CommunityToolkit.Mvvm.Input;
+
+using QuAnalyzer.Features.Comparison;
 
 namespace QuAnalyzer.UI.Popups;
 
@@ -14,12 +16,12 @@ public partial class MappingsEditor : Page
 
         InitializeComponent();
     }
+    
+    [ICommand]
+    private void Cancel() => Window.GetWindow(this).Close();
 
-
-    private void btnCancel_Click(object sender, RoutedEventArgs e) => closeParent();
-    private void closeParent() => Window.GetWindow(this).Close();
-
-    private void btnSave_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void Save()
     {
         var projectMappers = ((App)App.Instance).CurrentProject.SourceMapper;
         if (projectMappers.Contains(initialMap))
@@ -30,6 +32,6 @@ public partial class MappingsEditor : Page
         {
             projectMappers.Add(CurrentMap);
         }
-        closeParent();
+        Cancel();
     }
 }

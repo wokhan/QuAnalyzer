@@ -90,7 +90,7 @@ public partial class Monitor : Page
         }
     }
 
-    private bool CanExecuteRun => gridSteps.SelectedItems.Count > 0;
+    private bool CanExecuteRun => gridSteps?.SelectedItems.Count > 0;
 
     private int globalPerfCounter;
     private async void globalCompTimer_Tick(object sender, EventArgs e)
@@ -179,7 +179,7 @@ public partial class Monitor : Page
         MonitorClearAllCommand.NotifyCanExecuteChanged();
     }
 
-    private bool CanExecuteClearAll => gridSteps.Items.Count > 0;
+    private bool CanExecuteClearAll => gridSteps?.Items.Count > 0;
 
     [ICommand]
     private void MonitorCopy(TestDefinition definition)

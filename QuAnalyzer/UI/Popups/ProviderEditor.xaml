@@ -159,12 +159,12 @@
         </ScrollViewer>
         <DockPanel x:Name="dockRepositories" Grid.Row="2" Visibility="Hidden">
             <WrapPanel Style="{StaticResource ToolBar}">
-                <Button Content="Add" ToolTip="Add a repository" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnRepoAdd_Click" />
-                <Button Content="Retrieve" ToolTip="Add a repository" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=DownloadOutline}" Click="btnRepoRetr_Click" />
-                <Button Content="Clear" ToolTip="Clear" BorderBrush="OrangeRed" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectionOff}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}" Click="btnRepoClear_Click" />
+                <Button Content="Add" ToolTip="Add a repository" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" Command="{Binding RepositoryAddCommand,RelativeSource={RelativeSource AncestorType=Page}}"  />
+                <Button Content="Retrieve" ToolTip="Retrieve repositories" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=DownloadOutline}" Command="{Binding RetrieveCommand,RelativeSource={RelativeSource AncestorType=Page}}"  />
+                <Button Content="Clear" ToolTip="Remove all repositories" BorderBrush="OrangeRed" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectionOff}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}" Command="{Binding ClearCommand,RelativeSource={RelativeSource AncestorType=Page}}"  />
                 <Rectangle />
-                <Button Content="Sel. all" ToolTip="Select all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectAll}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}"  Click="btnRepoSel_Click" />
-                <Button Content="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Select}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}" Click="btnRepoUnSel_Click" />
+                <Button Content="Sel. all" ToolTip="Select all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectAll}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}"  Command="{Binding SelectAllCommand,RelativeSource={RelativeSource AncestorType=Page}}" />
+                <Button Content="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Select}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}" Command="{Binding ClearSelectionCommand,RelativeSource={RelativeSource AncestorType=Page}}" />
             </WrapPanel>
             <DataGrid Name="gridRepositories" BorderBrush="LightGray" BorderThickness="1,0,1,1" CanUserAddRows="False" AutoGenerateColumns="False" ItemsSource="{Binding Repositories}" SelectionMode="Single" CanUserReorderColumns="False">
                 <DataGrid.Columns>
@@ -188,7 +188,7 @@
                     <DataGridTemplateColumn IsReadOnly="True" CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Name="btnDeleteRepo" Tag="{Binding}" Click="btnDeleteRepo_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                <Button Name="btnDeleteRepo" CommandParameter="{Binding}" Command="{Binding RepositoryDeleteCommand,RelativeSource={RelativeSource AncestorType=Page}}"  Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -198,8 +198,8 @@
         <Border Grid.Row="3" Style="{StaticResource ButtonBar}">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Button Content="Cancel" BorderBrush="Red" x:Name="btnRevert" ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}" HorizontalAlignment="Center" Click="btnRevert_Click" />
-                    <Button Content="Test" BorderBrush="Blue" x:Name="btnTest" ext:CustomAdorner.Image="{iconPacks:Material Kind=TestTube}" HorizontalAlignment="Left" Click="btnTest_Click" />
+                    <Button Content="Cancel" BorderBrush="Red" x:Name="btnRevert" ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}" HorizontalAlignment="Center" Command="{Binding RevertCommand,RelativeSource={RelativeSource AncestorType=Page}}"  />
+                    <Button Content="Test" BorderBrush="Blue" x:Name="btnTest" ext:CustomAdorner.Image="{iconPacks:Material Kind=TestTube}" HorizontalAlignment="Left" Command="{Binding TestCommand,RelativeSource={RelativeSource AncestorType=Page}}"  />
                     <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

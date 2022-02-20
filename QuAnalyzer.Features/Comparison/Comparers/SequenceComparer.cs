@@ -1,8 +1,10 @@
-﻿namespace QuAnalyzer.Features.Comparison.Comparers;
+﻿using System.Collections;
 
-public class SequenceComparer<TItem> : IComparer<IEnumerable<TItem>> //where TItem : IComparable<TItem>
+namespace QuAnalyzer.Features.Comparison.Comparers;
+
+public class SequenceComparer<TItem> : IComparer<IEnumerable<TItem>>, IComparer //where TItem : IComparable<TItem>
 {
-    public static SequenceComparer<TItem> Default { get; } = new();
+    public static SequenceComparer<TItem> Default = new();
 
     public SequenceComparer()
     {
@@ -11,10 +13,8 @@ public class SequenceComparer<TItem> : IComparer<IEnumerable<TItem>> //where TIt
 
     public int Compare(IEnumerable<TItem>? x, IEnumerable<TItem>? y)
     {
-        if (x is null || y is null)
-        {
-            throw new ArgumentException("Both arguments must implement IEnumerable<T>");
-        }
+        ArgumentNullException.ThrowIfNull(x);
+        ArgumentNullException.ThrowIfNull(y);
 
         switch (x)
         {
@@ -54,5 +54,10 @@ public class SequenceComparer<TItem> : IComparer<IEnumerable<TItem>> //where TIt
         }
 
         return internalResult != 0 ? Math.Sign(internalResult) * index : 0;
+    }
+
+    public int Compare(object? x, object? y)
+    {
+        return Compare(x as IEnumerable<TItem>, y as IEnumerable<TItem>);
     }
 }

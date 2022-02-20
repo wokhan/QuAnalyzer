@@ -1,4 +1,6 @@
 ﻿
+using CommunityToolkit.Mvvm.Input;
+
 using Microsoft.Win32;
 
 using System.Diagnostics.Contracts;
@@ -151,7 +153,8 @@ public partial class ProviderEditor : Page
 
     bool stopAction;
 
-    private async void btnRepoRetr_Click(object sender, RoutedEventArgs e)
+    [ICommand(AllowConcurrentExecutions = false)]
+    private async Task Retrieve()
     {
         MessageTitle = "Please wait";
         MessageContent = "Retrieving repositories...";
@@ -209,12 +212,14 @@ public partial class ProviderEditor : Page
     }
     */
 
-    private void btnRepoClear_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void Clear()
     {
         Repositories.Clear();
     }
 
-    private void btnRepoSel_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void SelectAll()
     {
         foreach (var r in Repositories)
         {
@@ -224,7 +229,8 @@ public partial class ProviderEditor : Page
         gridRepositories.Items.Refresh();
     }
 
-    private void btnRepoUnSel_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void ClearSelection()
     {
         foreach (var r in Repositories)
         {
@@ -246,31 +252,37 @@ public partial class ProviderEditor : Page
         fillProvider();
     }*/
 
-    private void btnRepoAdd_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void RepositoryAdd()
     {
         Repositories.Add(new RepositoryView() { Key = "Repository #" + (Repositories.Count + 1), Selected = true });
     }
 
-    private void btnDeleteProvider_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void ProviderDelete(IDataProvider provider)
     {
-        App.Instance.CurrentProject.CurrentProviders.Remove((IDataProvider)((Button)sender).Tag);
+        App.Instance.CurrentProject.CurrentProviders.Remove(provider);
     }
 
-    private void btnDeleteRepo_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void RepositoryDelete(RepositoryView item)
     {
-        Repositories.Remove((RepositoryView)((Button)sender).Tag);
+        Repositories.Remove(item);
     }
 
-    private void btnRevert_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void Revert()
     {
         _owner.Close();
     }
 
-    private void btnTest_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void Test()
     {
         string res;
         txtTestResult.Text = "Testing...";
         CurrentProvider.Test(out res);
+        //TODO: check if TestCommand has a Result property to return this instead.
         txtTestResult.Text = res;
     }
 

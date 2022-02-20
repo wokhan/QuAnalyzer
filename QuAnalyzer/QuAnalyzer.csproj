@@ -24,6 +24,7 @@
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-beta.80" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
+    <PackageReference Include="NuGet.Protocol" Version="6.1.0" />
     <PackageReference Include="Wokhan.UI" Version="0.9.4-beta" />
     <PackageReference Include="EPPlus" Version="5.8.4" />
     <PackageReference Include="System.Management" Version="6.0.0" />

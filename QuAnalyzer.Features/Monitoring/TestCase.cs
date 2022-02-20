@@ -27,9 +27,7 @@ public partial class TestCase : ObservableObject
     private void preceding_Done(TestCase source, TestResults obj)
     {
         PrecedingStepsInstances.Remove(source);
-#pragma warning disable CS8604 // Existence possible d'un argument de référence null pour le paramètre 'item' dans 'void List<object>.Add(object item)'.
         PrecedingStepsData.Add(obj.Data);
-#pragma warning restore CS8604 // Existence possible d'un argument de référence null pour le paramètre 'item' dans 'void List<object>.Add(object item)'.
 
         if (PrecedingStepsInstances.Count == 0)
         {

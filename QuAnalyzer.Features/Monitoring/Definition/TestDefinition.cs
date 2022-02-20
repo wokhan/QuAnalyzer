@@ -23,16 +23,16 @@ public partial class TestDefinition : ObservableObject
     [ObservableProperty]
     private string name;
 
-    public ValueSelectors.Selector Selector { get; set; }
+    public ValueSelectors.Selector? Selector { get; set; }
 
-    public string ProviderName { get; set; }
+    public string? ProviderName { get; set; }
 
-    private IDataProvider provider;
+    private IDataProvider? provider;
 
     [JsonIgnore]
-    public IDataProvider Provider
+    public IDataProvider? Provider
     {
-        get => provider ??= Providers.First(c => c.Name == ProviderName);
+        get => ProviderName != null ? provider ??= Providers.First(c => c.Name == ProviderName) : null;
         set
         {
             provider = value;

@@ -1,11 +1,10 @@
 ﻿
+using CommunityToolkit.Mvvm.Input;
+
 using QuAnalyzer.UI.Windows;
 
 namespace QuAnalyzer.UI.Menus;
 
-/// <summary>
-/// Logique d'interaction pour MainMenu.xaml
-/// </summary>
 public partial class MainMenu : UserControl
 {
     public MainMenu()
@@ -13,12 +12,14 @@ public partial class MainMenu : UserControl
         InitializeComponent();
     }
 
-    private void btnMenuRecent_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void OpenRecent(string fileName)
     {
-        ((App)App.Instance).CurrentProject.Open((string)((MenuItem)sender).CommandParameter);
+        App.Instance.CurrentProject.Open(fileName);
     }
 
-    private void btnAbout_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void About()
     {
         ((MainWindow)Window.GetWindow(this)).ShowAbout();
     }

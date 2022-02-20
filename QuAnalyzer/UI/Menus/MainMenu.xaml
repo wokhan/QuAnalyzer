@@ -6,8 +6,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:quanalyzer="clr-namespace:QuAnalyzer"
+             xmlns:menus="clr-namespace:QuAnalyzer.UI.Menus"
              xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
-             mc:Ignorable="d" d:DesignWidth="600">
+             mc:Ignorable="d" d:DesignWidth="600"
+             DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}">
     <Grid>
         <Grid.Resources>
             <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.WindowCommands}" />
@@ -27,7 +29,7 @@
                         <Setter Property="CommandParameter" Value="{Binding Key}"/>
                         <Setter Property="Header" Value="{Binding Key}"/>
                         <Setter Property="Icon" Value="{iconPacks:Material Kind=FileOutline}" />
-                        <EventSetter Event="Click" Handler="btnMenuRecent_Click" />
+                        <Setter Property="Command" Value="{Binding OpenRecentCommand,RelativeSource={RelativeSource AncestorType=menus:MainMenu}}" />
                     </Style>
                 </Controls:DropDownButton.ItemContainerStyle>
             </Controls:DropDownButton>
@@ -45,7 +47,7 @@
                     <iconPacks:PackIconMaterial Tag="Save as..." Foreground="DodgerBlue" Margin="5" Kind="ContentSaveMoveOutline" />
                 </Controls:DropDownButton.Items>
             </Controls:DropDownButton>
-            <Button ToolTip="About..." Click="btnAbout_Click" Content="{iconPacks:Material Kind=InformationOutline}" Foreground="Orange" FontSize="26" />
+            <Button ToolTip="About..." Command="{Binding AboutCommand}" Content="{iconPacks:Material Kind=InformationOutline}" Foreground="Orange" FontSize="26" />
             <!--<MenuItem Header="_Options">
                     <MenuItem IsCheckable="True" Header="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static quanalyzer:App.Instance}, FallbackValue=True}"  />
                 </MenuItem>-->

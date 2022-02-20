@@ -16,4 +16,14 @@ public partial class ExtendedDataGridView
             set { TargetValueAsObject = Convert.ChangeType(value, Type); }
         }*/
     }
+
+    public static Dictionary<string, string> Operators { get; } = new()
+    {
+        { "Equals", "=" },
+        { "Differs from", "<>" },
+        { "Greater than", ">" },
+        { "Greater than or equal", ">=" },
+        { "Less than", "<" },
+        { "Less than or equal", "<=" }
+    };
 }

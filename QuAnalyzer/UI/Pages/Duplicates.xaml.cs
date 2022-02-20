@@ -6,9 +6,12 @@ using System.Windows.Data;
 using System.Windows.Threading;
 
 using Wokhan.Data.Providers.Bases;
-
-using LExpr = System.Linq.Expressions;
 using CommunityToolkit.Mvvm.Input;
+using System.Linq.Dynamic.Core;
+
+using LinqExpression = System.Linq.Expressions.Expression;
+using System.Reflection;
+using QuAnalyzer.Core.Helpers;
 
 namespace QuAnalyzer.UI.Pages;
 
@@ -54,9 +57,13 @@ public partial class Duplicates : Page
     /// <param name="src">Source enumeration</param>
     /// <param name="properties">Name of the properties to use to populate the array</param>
     /// <returns></returns>
-    public static IEnumerable<object[]> AsObjectCollection(IEnumerable src, params string[] properties)
+    public static IEnumerable<object[]> AsObjectCollection(IQueryable src, params string[] properties)
     {
-        return AsObjectCollection(src.Cast<object>(), properties);
+        var innertype = src.ElementType;
+
+        //TODO: rename the other method to get the right one directly
+        var m = typeof(Duplicates).GetMethods(BindingFlags.Public | BindingFlags.Static).Where(method => method.IsGenericMethod && method.Name == nameof(AsObjectCollection)).First().MakeGenericMethod(innertype);
+        return (IEnumerable<object[]>)m.Invoke(null, new object[] { src, properties });
     }
 
     /// <summary>
@@ -65,60 +72,56 @@ public partial class Duplicates : Page
     /// <param name="src">Source enumeration</param>
     /// <param name="properties">Name of the properties to use to populate the array</param>
     /// <returns></returns>
-    public static IEnumerable<object[]> AsObjectCollection<T>(IEnumerable<T> src, params string[] properties)
+    public static IEnumerable<object[]> AsObjectCollection<T>(IQueryable<T> src, params string[] properties)
     {
-        Contract.Requires(src is not null);
+        ArgumentNullException.ThrowIfNull(src);
 
-        var innertype = src.GetInnerType();
-        if (innertype.IsArray)
+        //if (typeof(T).IsArray)
+        //{
+        //    return ((IEnumerable<object[]>)src);
+        //}
+        //else
         {
-            return ((IEnumerable<object[]>)src);
-        }
-        else
-        {
-
             if (properties is null)
             {
-                properties = innertype.GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(a => a.Name).ToArray();
+                properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(p => p.Name).ToArray();
             }
 
-            var param = LExpr.Expression.Parameter(typeof(object));
-            var expa = LExpr.Expression.Parameter(typeof(Exception));
-            var ide_cstr = typeof(InvalidDataException).GetConstructor(new[] { typeof(string), typeof(Exception) });
+            var map = GetExpression<T>(properties);
 
-            var casted = LExpr.Expression.Convert(param, innertype);
+            //TODO: Test with actual IQueryable implementation like LinqToSQL...
+            return src.Select(x => map(x));
 
-            Func<string, LExpr.Expression> propertyGet = a => LExpr.Expression.Property(casted, a);
-            // Assuming dynamic...
-            /*if (innertype == typeof(object))
-            {
+            //var param = LExpr.Expression.Parameter(typeof(object));
+            //var expa = LExpr.Expression.Parameter(typeof(Exception));
+            //var ide_cstr = typeof(InvalidDataException).GetConstructor(new[] { typeof(string), typeof(Exception) });
 
-                propertyGet = a =>
-                {
-                    var binder = Microsoft.CSharp.RuntimeBinder.Binder.GetMember(CSharpBinderFlags.None, a, innertype, new[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null) });
-                    return Expression.Dynamic(binder, innertype, casted);
-                };
-            }
-            else
-            {
-                propertyGet = a => Expression.Property(casted, a);
-            }*/
-            var atrs = properties.Select(a =>
-                LExpr.Expression.TryCatch(
-                    LExpr.Expression.Block(
-                        LExpr.Expression.Convert(propertyGet(a), typeof(object))
-                    ),
-                LExpr.Expression.Catch(expa,
-                    LExpr.Expression.Block(
-                        LExpr.Expression.Throw(LExpr.Expression.New(ide_cstr, LExpr.Expression.Constant(a), expa)),
-                        LExpr.Expression.Constant(null))))
-            ).ToList();
+            //var casted = LExpr.Expression.Convert(param, innertype);
 
-            var attrExpr = LExpr.Expression.Lambda<Func<T, object[]>>(LExpr.Expression.NewArrayInit(typeof(object), atrs), param).Compile();
+            //Func<string, LExpr.Expression> propertyGet = a => LExpr.Expression.Property(casted, a);
+            //var atrs = properties.Select(a =>
+            //    LExpr.Expression.TryCatch(
+            //        LExpr.Expression.Block(
+            //            LExpr.Expression.Convert(propertyGet(a), typeof(object))
+            //        ),
+            //    LExpr.Expression.Catch(expa,
+            //        LExpr.Expression.Block(
+            //            LExpr.Expression.Throw(LExpr.Expression.New(ide_cstr, LExpr.Expression.Constant(a), expa)),
+            //            LExpr.Expression.Constant(null))))
+            //).ToList();
 
-            //return src.Select(x => { if (x is null) { throw new Exception("Should never get there."); } return attrExpr(x); });
-            return src.Select(x => attrExpr(x));
+            //var attrExpr = LExpr.Expression.Lambda<Func<T, object[]>>(LExpr.Expression.NewArrayInit(typeof(object), atrs), param).Compile();
+
+            ////return src.Select(x => { if (x is null) { throw new Exception("Should never get there."); } return attrExpr(x); });
+            //return src.Select(x => attrExpr(x));
         }
+    }
+
+    private static Func<T, object[]> GetExpression<T>(params string[] properties)
+    {
+        var param = LinqExpression.Parameter(typeof(T));
+        var propertyGetExpression = properties.Select(property => LinqExpression.Convert(LinqExpression.Property(param, property), typeof(object))).ToArray();
+        return LinqExpression.Lambda<Func<T, object[]>>(LinqExpression.NewArrayInit(typeof(object), propertyGetExpression), param).Compile();
     }
 
     [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
@@ -126,80 +129,48 @@ public partial class Duplicates : Page
     {
         var (prov, repository) = App.Instance.CurrentSelection;
 
-        var allHeadersFu = prov.GetColumns(repository);
+        var columns = prov.GetColumns(repository);
         string[] keys;
         string[] headers;
         if (lstColumns.SelectedItems.Count > 0)
         {
             keys = lstColumns.SelectedItems.Cast<ColumnDescription>().Select(c => c.Name).ToArray();
-            headers = allHeadersFu.OrderBy(h => keys.Contains(h.Name) ? 0 : 1).Select(h => h.Name).ToArray();
+            headers = columns.OrderBy(h => keys.Contains(h.Name) ? 0 : 1).Select(h => h.Name).ToArray();
         }
         else
         {
-            headers = allHeadersFu.Select(h => h.Name).ToArray();
+            headers = columns.Select(h => h.Name).ToArray();
             keys = headers;
         }
+            
+        var progressCallback = new Progress<int>((i) => gridData.Status = $"Checked {i} entries");
+            
+        gridData.LoadingProgress = -1;
 
         await Task.Run(() =>
         {
-            gridData.LoadingProgress = -1;
-            gridData.Status = "Loading data...";
+            
+            var data = prov.GetQueryable(repository);
 
-            var data = prov.GetQueryable(repository);//.Select<dynamic>(headers);
+            var keysAsString = String.Join(",", keys);
 
-            gridData.LoadingProgress = -1;
-
-            //TODO: move
-            //TODO: performance is now awful?! Use proxy object instead?
-            void updateStatusLoad(double i) => Dispatcher.InvokeAsync(() => gridData.Status = $"Parsed {i} entries");
-
-
-            //var dataObjectArray = ComparerDefinition<object[]>.ToObjectArrays(data)
-            IEnumerable<object> dataObjectArray = AsObjectCollection(data, KeepDuplicates ? headers : keys)
-                                      .OrderByAll()
-                                      .WithProgress(updateStatusLoad);
-
-            gridData.LoadingProgress = -1;
-
-            var ret = Comparison.GetDuplicates(dataObjectArray, keys, (IComparer<object>)SequenceComparer<IEnumerable<object>>.Default, true).Duplicates;
-
-            //TODO: rewrite this
-            //var keyComparer = new SequenceEqualityComparer<IEnumerable<object>, object>(0, keys.Length);
-            //if (!KeepDuplicates)
-            //{
-            //    ret = ret.Distinct((IEqualityComparer<object>)keyComparer).ToList();
-            //}
-
-            Dispatcher.InvokeAsync(() =>
+            if (!KeepDuplicates)
             {
-                displayData(ret, headers, keys.Length);
-                //gridData.ItemsSource = ret.Duplicates;
-                //gridData.Columns.Single(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
-            });
+                data = data.Select($"new({keysAsString})");
+            }
+
+            // Ordering by selected columns is required for comparison as items need to be sorted first.
+            data = data.OrderBy(keysAsString);
+
+            var comparer = DynamicComparer.Create(data.ElementType, keys);
+
+            var duplicates = GenericMethodHelper.InvokeGenericStatic<IEnumerable>(typeof(Comparison), nameof(Comparison.GetDuplicates), new[] { data.ElementType }, data, keys, comparer, progressCallback);
+
+            gridData.Source = duplicates.AsQueryable();
 
             gridData.LoadingProgress = 100;
         }).ConfigureAwait(false);
     }
 
-    private bool CanExecuteRun => lstColumns.SelectedItems.Count > 0;
-
-    private void displayData(IEnumerable<object> data, string[] headers, int keysCount)
-    {
-        gridData.Columns.Clear();
-
-        gridData.AutoGenerateColumns = false;
-
-        var count = (KeepColumns && KeepDuplicates ? headers.Length : keysCount);
-        gridData.CustomHeaders = headers.Take(count).Select(h => new ColumnDescription { Name = h, DisplayName = h }).ToList();
-
-        if (data is not null && data.Any())
-        {
-            gridData.Columns.AddAll(headers.Take(count).Select((h, i) => new DataGridTextColumn() { Header = h, Binding = new Binding("[" + i + "]") }));
-            gridData.Source = data.AsQueryable();
-        }
-        else
-        {
-            gridData.Source = null;
-        }
-    }
+    private bool CanExecuteRun => lstColumns?.SelectedItems.Count > 0;
 }

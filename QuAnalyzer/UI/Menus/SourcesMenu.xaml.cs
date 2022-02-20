@@ -1,17 +1,14 @@
-﻿using Microsoft.Win32;
+﻿using CommunityToolkit.Mvvm.Input;
+
+using Microsoft.Win32;
 
 using QuAnalyzer.UI.Pages;
 using QuAnalyzer.UI.Windows;
-
-using System.Windows.Input;
 
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Menus;
 
-/// <summary>
-/// Interaction logic for MainMenu.xaml
-/// </summary>
 public partial class SourcesMenu : UserControl
 {
 
@@ -22,12 +19,14 @@ public partial class SourcesMenu : UserControl
         InitializeComponent();
     }
 
-    private void btnDeleteProvider_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void ProviderDelete(IDataProvider provider)
     {
-        App.Instance.CurrentProject.CurrentProviders.Remove((IDataProvider)((Button)sender).Tag);
+        App.Instance.CurrentProject.CurrentProviders.Remove(provider);
     }
 
-    private void btnImportPrv_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void ProviderImport()
     {
         var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = "QuAnalyzer Data Provider archive|*.qax" };
         if (dial.ShowDialog().Value)
@@ -36,14 +35,22 @@ public partial class SourcesMenu : UserControl
         }
     }
 
-    private void btnEditProvider_Click(object sender, RoutedEventArgs e) => Popup.OpenNew(new ProviderEditor((IDataProvider)((Button)sender).Tag));
+    [ICommand]
+    private void ProviderEdit(IDataProvider provider)
+    {
+        Popup.OpenNew(new ProviderEditor(provider));
+    }
 
-    private void btnNewSource_Click(object sender, RoutedEventArgs e) => Popup.OpenNew(new ProviderPicker());
+    [ICommand]
+    private void SourceNew()
+    {
+        Popup.OpenNew(new ProviderPicker());
+    }
 
     private void Repository_DataGrid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
     {
         Vector diff = startPoint - e.GetPosition(null);
-        if (e.LeftButton == MouseButtonState.Pressed && (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
+        if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed && (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
         {
             var src = (FrameworkElement)sender;
             DragDrop.DoDragDrop(src, new DataObject(src.Tag), DragDropEffects.Link);

@@ -13,13 +13,13 @@
           d:AutoGenerateColumns="True"
           x:Name="me"
           IsReadOnly="True" CanUserAddRows="False" CanUserSortColumns="True" CanUserReorderColumns="True" 
-          Sorting="gridData_Sorting" 
+          Sorting="gridData_Sorting"
           BorderThickness="0" ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto">
     <DataGrid.Resources>
         <Style TargetType="Border" x:Key="DragDropBorder">
             <Setter Property="Margin" Value="10" />
             <Setter Property="BorderBrush" Value="Gray" />
-            <Setter Property="BorderThickness" Value="0 2 0 2" />
+            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="5" />
             <Setter Property="Background" Value="LightYellow" />
         </Style>
@@ -45,10 +45,10 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <WrapPanel Grid.ColumnSpan="2" Style="{StaticResource ToolBar}">
-                                <Button Content="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" ext:CustomAdorner.Image="{iconPacks:Material Kind=ContentCopy}" Click="GlobalCopy_Click" />
+                                <Button Content="Copy" ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" ext:CustomAdorner.Image="{iconPacks:Material Kind=ContentCopy}" Command="{Binding CopyCommand}" />
                                 <Rectangle />
-                                <Button Content="Excel" ToolTip="Export to CSV" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Click="GlobalExportCSV_Click" />
-                                <Button Content="HTML" ToolTip="Export to HTML" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Xml}" Click="GlobalExportHTML_Click" />
+                                <Button Content="Excel" ToolTip="Export to CSV" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=FileExcelBoxOutline}" Command="{Binding ExportCSVCommand}" />
+                                <Button Content="HTML" ToolTip="Export to HTML" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Xml}" Command="{Binding ExportHTMLCommand}" />
                                 <StackPanel Orientation="Horizontal" Visibility="{Binding EnableAdvancedFilters,Converter={StaticResource valueToVisibilityConverter}}">
                                     <Rectangle />
                                     <ToggleButton x:Name="btnAggregate" IsChecked="False" Content="Group/Filter" ToolTip="Show aggregation and filtering options" BorderBrush="Coral" ext:CustomAdorner.Image="{iconPacks:Material Kind=FilterMenu}" />
@@ -185,9 +185,9 @@
                                     <RowDefinition Height="*" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
-                                <ScrollViewer>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
                                     <StackPanel>
-                                        <Expander IsExpanded="True" Header="Filtering" BorderThickness="0" Margin="5,10">
+                                        <Expander IsExpanded="True" Header="Filtering" BorderThickness="0" Margin="5,10" MaxWidth="240">
                                             <DockPanel>
                                                 <Grid DockPanel.Dock="Bottom">
                                                     <Grid.RowDefinitions>
@@ -222,7 +222,7 @@
                                                                                             <ColumnDefinition Width="Auto" />
                                                                                             <ColumnDefinition Width="*" />
                                                                                         </Grid.ColumnDefinitions>
-                                                                                        <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="10" Foreground="Gray" VerticalAlignment="Center" />
+                                                                                        <ContentControl Content="{iconPacks:Material Kind=TargetVariant}" Width="20" Margin="10" Foreground="Gray" VerticalAlignment="Center" />
                                                                                         <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to add a filter. You can also directly type a filter expression below." FontStyle="Italic" />
                                                                                     </Grid>
                                                                                 </Border>
@@ -235,7 +235,7 @@
                                                     </DataGrid.Style>
                                                     <DataGrid.Columns>
                                                         <DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" />
-                                                        <DataGridComboBoxColumn Width="*" Header="Operator" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedValueBinding="{Binding ComparerExpression,Mode=TwoWay}" ItemsSource="{Binding Source={x:Static myself:ExtendedDataGridView.FilterFormula},Mode=OneTime}">
+                                                        <DataGridComboBoxColumn Width="*" Header="Operator" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedValueBinding="{Binding ComparerExpression,Mode=TwoWay}" ItemsSource="{Binding Source={x:Static myself:ExtendedDataGridView.Operators},Mode=OneTime}">
                                                             <DataGridComboBoxColumn.EditingElementStyle>
                                                                 <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
                                                             </DataGridComboBoxColumn.EditingElementStyle>
@@ -244,7 +244,7 @@
                                                         <DataGridTemplateColumn Width="*" CanUserSort="False">
                                                             <DataGridTemplateColumn.CellTemplate>
                                                                 <DataTemplate>
-                                                                    <Button Tag="{Binding}" Click="btnDeleteFilter_Click" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                                                    <Button CommandParameter="{Binding}" Command="{Binding DeleteFilterCommand,RelativeSource={RelativeSource AncestorType=myself:ExtendedDataGridView}}" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
                                                                 </DataTemplate>
                                                             </DataGridTemplateColumn.CellTemplate>
                                                         </DataGridTemplateColumn>
@@ -252,7 +252,7 @@
                                                 </DataGrid>
                                             </DockPanel>
                                         </Expander>
-                                        <Expander IsExpanded="True" Header="Aggregation" BorderThickness="0" Margin="5">
+                                        <Expander IsExpanded="True" Header="Aggregation" BorderThickness="0" Margin="5" MaxWidth="240">
                                             <StackPanel Margin="-5">
                                                 <Label FontWeight="Bold" Content="Group by the following attributes:" />
                                                 <ListBox ItemsSource="{Binding Grouping}" AllowDrop="True" x:Name="lstGrouping" Drop="lstGrouping_Drop">
@@ -269,7 +269,7 @@
                                                                                             <ColumnDefinition Width="Auto" />
                                                                                             <ColumnDefinition Width="*" />
                                                                                         </Grid.ColumnDefinitions>
-                                                                                        <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="5" VerticalAlignment="Center" Foreground="Gray" />
+                                                                                        <ContentControl Content="{iconPacks:Material Kind=TargetVariant}" Width="20" Margin="5" VerticalAlignment="Center" Foreground="Gray" />
                                                                                         <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to group by the related attribute" FontStyle="Italic" />
                                                                                     </Grid>
                                                                                 </Border>
@@ -288,7 +288,7 @@
                                                                     <ColumnDefinition Width="Auto" />
                                                                 </Grid.ColumnDefinitions>
                                                                 <Label Content="{Binding}" />
-                                                                <Button Grid.Column="1" Foreground="OrangeRed" Tag="{Binding}" Click="btnDeleteGrp_Click" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                                                <Button Grid.Column="1" Foreground="OrangeRed" CommandParameter="{Binding}" Command="{Binding DeleteGroupCommand,RelativeSource={RelativeSource AncestorType=myself:ExtendedDataGridView}}" Content="{iconPacks:Material Kind=DeleteOutline}" />
                                                             </Grid>
                                                         </DataTemplate>
                                                     </ListBox.ItemTemplate>
@@ -308,7 +308,7 @@
                                                                                             <ColumnDefinition Width="Auto" />
                                                                                             <ColumnDefinition Width="*" />
                                                                                         </Grid.ColumnDefinitions>
-                                                                                        <ContentControl Content="{iconPacks:Material Kind=PlusCircleOutline}" Width="20" Margin="5" VerticalAlignment="Center" Foreground="Gray" />
+                                                                                        <ContentControl Content="{iconPacks:Material Kind=TargetVariant}" Width="20" Margin="5" VerticalAlignment="Center" Foreground="Gray" />
                                                                                         <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here or add a 'group by attribute' above to aggregate data. Note: at least one 'group by' attribute is required for the aggregation to be computed." FontStyle="Italic" />
                                                                                     </Grid>
                                                                                 </Border>
@@ -321,7 +321,7 @@
                                                     </DataGrid.Style>
                                                     <DataGrid.Columns>
                                                         <DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" IsReadOnly="True" />
-                                                        <DataGridComboBoxColumn Width="*" Header="Aggregation" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedValueBinding="{Binding Aggregate,Mode=TwoWay}" ItemsSource="{Binding Source={x:Static myself:ExtendedDataGridView.AggregationFormula},Mode=OneTime}">
+                                                        <DataGridComboBoxColumn Width="*" Header="Aggregation" DisplayMemberPath="Key" SelectedValuePath="Value" SelectedValueBinding="{Binding Aggregate,Mode=TwoWay}" ItemsSource="{Binding Source={x:Static myself:ExtendedDataGridView.Aggregations},Mode=OneTime}">
                                                             <DataGridComboBoxColumn.EditingElementStyle>
                                                                 <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
                                                             </DataGridComboBoxColumn.EditingElementStyle>
@@ -329,7 +329,7 @@
                                                         <DataGridTemplateColumn>
                                                             <DataGridTemplateColumn.CellTemplate>
                                                                 <DataTemplate>
-                                                                    <Button Foreground="OrangeRed" Tag="{Binding}" Click="btnDeleteAggreg_Click" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                                                    <Button Foreground="OrangeRed" CommandParameter="{Binding}" Command="{Binding DeleteAggregationCommand,RelativeSource={RelativeSource AncestorType=myself:ExtendedDataGridView}}"  Content="{iconPacks:Material Kind=DeleteOutline}" />
                                                                 </DataTemplate>
                                                             </DataGridTemplateColumn.CellTemplate>
                                                         </DataGridTemplateColumn>
@@ -341,8 +341,8 @@
                                 </ScrollViewer>
                                 <Border Grid.Row="1" Background="LightBlue">
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <Button ext:CustomAdorner.Image="{iconPacks:Material Kind=Forward}" Content="Apply" BorderBrush="Green" x:Name="btnApply" Click="btnApply_Click"/>
-                                        <Button ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}" Content="Clear" BorderBrush="Red" Click="btnClear_Click" />
+                                        <Button ext:CustomAdorner.Image="{iconPacks:Material Kind=Forward}" Content="Apply" BorderBrush="Green" Command="{Binding ReloadCommand}"/>
+                                        <Button ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}" Content="Clear" BorderBrush="Red" Command="{Binding ClearAllCommand}" />
                                     </StackPanel>
                                 </Border>
                             </Grid>

@@ -43,9 +43,7 @@ public partial class SourcesMapper : ObservableObject
     [ObservableProperty]
     private bool _isOrdered = false;
     
-#pragma warning disable CS8618 // Le propriété 'Name' non-nullable doit contenir une valeur non-null lors de la fermeture du constructeur. Envisagez de déclarer le propriété comme nullable.
     public SourcesMapper()
-#pragma warning restore CS8618 // Le propriété 'Name' non-nullable doit contenir une valeur non-null lors de la fermeture du constructeur. Envisagez de déclarer le propriété comme nullable.
     {
     }
 

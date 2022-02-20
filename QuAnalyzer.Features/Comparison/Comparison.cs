@@ -1,6 +1,7 @@
 ﻿
 using CommunityToolkit.HighPerformance.Helpers;
 
+using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
@@ -12,9 +13,9 @@ namespace QuAnalyzer.Features.Comparison;
 
 public static class Comparison
 {
-    public static void Run<T>(IEnumerable<ComparerDefinition<T>> comparerData, double samplesPct = -1, IProgress<ComparerDefinition<T>>? progressCallback = null, bool useParallelism = true) where T : class
+    public static void Run<T>(IEnumerable<ComparerDefinition<T>> comparerData, double samplesPct = -1, IProgress<ComparerDefinition<T>>? progressCallback = null, bool useParallelism = true, Func<bool>? checkCancellation = null) where T : class
     {
-        var runner = new Runner<T>(progressCallback, samplesPct);
+        var runner = new Runner<T>(progressCallback, samplesPct, checkCancellation);
 
         if (!useParallelism)
         {
@@ -35,10 +36,14 @@ public static class Comparison
 
         private readonly double samplesPct;
 
-        public Runner(IProgress<ComparerDefinition<T>>? callback, double samplesPct)
+        //TODO: is it better than a cancellation token? See how the latter could fit within Tookit's MVVM ICommand.
+        private readonly Func<bool>? isCancellationRequested;
+
+        public Runner(IProgress<ComparerDefinition<T>>? callback, double samplesPct, Func<bool>? isCancellationRequested)
         {
             this.callback = callback;
             this.samplesPct = samplesPct;
+            this.isCancellationRequested = isCancellationRequested;
         }
 
         public void Invoke(in ComparerDefinition<T> definition)
@@ -278,7 +283,7 @@ public static class Comparison
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void CheckDuplicate<T>(ItemResult<T> f, T? previous, T? current, IComparer<T> comparer, int? keyCount) where T : class
+    private static void CheckDuplicate<T>(ItemResult<T> f, T? previous, T? current, IComparer comparer, int? keyCount) where T : class
     {
         if (previous is default(T))
         {
@@ -286,6 +291,7 @@ public static class Comparison
         }
 
         var comparison = comparer.Compare(previous, current);
+
         if (keyCount is not null && Math.Abs(comparison) > keyCount)
         {
             f.Duplicates.Add(current);
@@ -307,18 +313,20 @@ public static class Comparison
     /// <param name="comparer"></param>
     /// <param name="keysOnly"></param>
     /// <returns></returns>
-    public static (IEnumerable<T> Duplicates, IEnumerable<T> PerfectDuplicates) GetDuplicates<T>(IEnumerable<T> data, IList<string>? keys, IComparer<T> comparer, bool keysOnly = false) where T : class
+    public static IEnumerable<T> GetDuplicates<T>(IEnumerable<T> data, IList<string>? keys, IComparer comparer, IProgress<int>? progressCallback = null) where T : class
     {
         ItemResult<T> ret = new();
 
+        int i = 0;
         var prev = default(T);
         using var enumerator = data.GetEnumerator();
         while (enumerator.MoveNext())
         {
             CheckDuplicate(ret, prev, enumerator.Current, comparer, keys?.Count);
             prev = enumerator.Current;
+            progressCallback?.Report(i++);
         }
 
-        return (ret.Duplicates, ret.PerfectDups);
-    }
+        return ret.Duplicates.Concat(ret.PerfectDups);
+    } 
 }

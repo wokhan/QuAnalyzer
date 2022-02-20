@@ -1,12 +1,11 @@
-﻿using QuAnalyzer.Features.Monitoring;
+﻿using CommunityToolkit.Mvvm.Input;
+
+using QuAnalyzer.Features.Monitoring;
 
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Popups;
 
-/// <summary>
-/// Interaction logic for MonitoringDetails.xaml
-/// </summary>
 public partial class MonitoringDetails : Page
 {
 
@@ -30,12 +29,14 @@ public partial class MonitoringDetails : Page
 
     }
 
-    private void btnCancel_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void Cancel()
     {
         _owner.Close();
     }
 
-    private void btnSave_Click(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void Save()
     {
         CurrentItem.PrecedingSteps.AddAll(lstPrec.SelectedItems.Cast<TestDefinition>().Select(_ => KeyValuePair.Create(_, false)));
         CurrentItem.Attributes = String.Join(",", lstAttributes.SelectedItems.Cast<KeyValuePair<string, bool>>().Select(s => s.Key));

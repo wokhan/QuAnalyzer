@@ -74,7 +74,7 @@ public class ComparisonTests
     {
         var result = Comparison.GetDuplicates(source, null, StringComparer.InvariantCulture);
 
-        Assert.Equal(expected, result.PerfectDuplicates);
+        Assert.Equal(expected, result);
     }
 
     //[Fact()]

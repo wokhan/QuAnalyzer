@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.HighPerformance;
+using CommunityToolkit.Mvvm.Input;
 
 using Microsoft.Win32;
 
@@ -26,6 +27,8 @@ public partial class Compare : Page
     private int cpdCount = 0;
     public ObservableCollection<ComparerDefinition<object[]>> ComparisonInstancesView { get; } = new();
 
+    public bool UseSingleMapping { get; set; }
+
     public Compare()
     {
         InitializeComponent();
@@ -41,12 +44,12 @@ public partial class Compare : Page
     [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
     private async Task Run()
     {
-         prgGlobal.IsIndeterminate = true;
+        prgGlobal.IsIndeterminate = true;
 
         var newInstances = new List<ComparerDefinition<object[]>>();
         var comparer = SequenceComparer<object>.Default;
 
-        foreach (SourcesMapper mapper in btnToggleMode.IsChecked is true ? new[] { SingleMap } : lstMappings.SelectedItems)
+        foreach (SourcesMapper mapper in UseSingleMapping ? new[] { SingleMap } : lstMappings.SelectedItems)
         {
             var cp = await ComparerDefinition<object[]>.CreateAsync(mapper, comparer, Map, Convert).ConfigureAwait(true);
             // Using ObservableCollections to reflect any live modification in the UI
@@ -122,6 +125,7 @@ public partial class Compare : Page
     {
         //TODO: replace by CancelCommand.IsRunning on the corresponding button
         //src.IsEnabled = false;
+        //TODO: replace by RunCommand.Cancel() once implemented in the Comparison class logic.
         r.TokenSource.Cancel(true);
     }
 
@@ -243,33 +247,26 @@ public partial class Compare : Page
 
         mapper.Clear();
 
-        IEnumerable<IDataProvider> done = new List<IDataProvider>();
-        foreach (var pr in allprv)
+        var done = new List<IDataProvider>();
+        foreach (var source in allprv)
         {
-            if (!done.Contains(pr))
+            if (!done.Contains(source))
             {
-                var map = allprv.Where(p => p != pr)
-                                .Select(p => new
+                var map = allprv.Where(target => target != source && target.Repositories.Keys.Intersect(source.Repositories.Keys).Any())
+                                .SelectMany(target => target.Repositories.Keys.Intersect(source.Repositories.Keys).Select(repository => new SourcesMapper()
                                 {
-                                    source = pr,
-                                    target = p,
-                                    matches = p.Repositories.Keys.Intersect(pr.Repositories.Keys).ToList()
-                                })
-                                .Where(rel => rel.matches.Count > 0)
-                                .SelectMany(rel => rel.matches.Select(m => new { source = rel.source, target = rel.target, repository = m, sourceheaders = rel.source.GetColumns(m).Select(h => h.Name), targetheaders = rel.target.GetColumns(m).Select(h => h.Name) }))
-                                .Select(m => new SourcesMapper()
-                                {
-                                    Name = $"{m.source.Name} ({m.repository}) / {m.target.Name} ({m.repository})",
-                                    Source = m.source,
-                                    Target = m.target,
-                                    SourceRepository = m.repository,
-                                    TargetRepository = m.repository,
-                                    AllMappings = m.sourceheaders.Where(k => m.targetheaders.Contains(k)).Select(k => new SimpleMap(k, k)).ToList()
-                                });
+                                    Name = $"{source.Name} ({repository}) / {target.Name} ({repository})",
+                                    Source = source,
+                                    Target = target,
+                                    SourceRepository = repository,
+                                    TargetRepository = repository,
+                                    AllMappings = source.GetColumns(repository).Select(h => h.Name).Intersect(target.GetColumns(repository).Select(h => h.Name)).Select(k => new SimpleMap(k, k)).ToList()
+                                }));
 
                 mapper.AddAll(map);
 
-                done = done.Union(map.Select(m => m.Source)).Union(map.Select(m => m.Target)).ToList();
+                done.AddRange(map.Select(m => m.Source));
+                done.AddRange(map.Select(m => m.Target));
             }
         }
     }

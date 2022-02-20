@@ -40,13 +40,13 @@
         <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
             <Button HorizontalAlignment="Center" ToolTip="Start comparisons for the selected items" BorderBrush="Green" Command="{Binding RunCommand}" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" Content="Run" />
             <Rectangle />
-            <ToggleButton x:Name="btnToggleMode" Content="Single-mapping mode" ToolTip="Single-mapping mode" BorderBrush="Blue" Foreground="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=AbTesting}" IsChecked="False" />
+            <ToggleButton Content="Single-mapping mode" ToolTip="Single-mapping mode" BorderBrush="Blue" Foreground="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=AbTesting}" IsChecked="{Binding UseSingleMapping}" />
             <Rectangle />
-            <Button Content="Add" ToolTip="Add a mapping" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Command="{Binding CreateMappingCommand}" />
-            <Button Content="Automap" ToolTip="Automap" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=ShuffleVariant}" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" Command="{Binding AutoMapCommand}" />
+            <Button Content="Add" ToolTip="Add a mapping" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" IsEnabled="{Binding UseSingleMapping,Converter={StaticResource booleanNegator}}" Command="{Binding CreateMappingCommand}" />
+            <Button Content="Automap" ToolTip="Automap" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=ShuffleVariant}" IsEnabled="{Binding UseSingleMapping,Converter={StaticResource booleanNegator}}" Command="{Binding AutoMapCommand}" />
             <Rectangle />
-            <Button Content="Sel. all" ToolTip="Select all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectAll}" Click="btnSelectAll_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
-            <Button Content="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Select}" Click="btnUnSel_Click" IsEnabled="{Binding IsChecked, ElementName=btnToggleMode,Converter={StaticResource booleanNegator}}" />
+            <Button Content="Sel. all" ToolTip="Select all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectAll}" Click="btnSelectAll_Click" IsEnabled="{Binding UseSingleMapping,Converter={StaticResource booleanNegator}}" />
+            <Button Content="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Select}" Click="btnUnSel_Click" IsEnabled="{Binding UseSingleMapping,Converter={StaticResource booleanNegator}}" />
         </WrapPanel>
         <TabControl Grid.Row="1" VerticalAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch" Padding="0">
             <TabControl.Style>

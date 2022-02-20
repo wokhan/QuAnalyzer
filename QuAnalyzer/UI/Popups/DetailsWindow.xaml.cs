@@ -11,19 +11,10 @@ using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer.UI.Popups;
 
-/// <summary>
-/// Interaction logic for DetailsWindow.xaml
-/// </summary>
 public partial class DetailsWindow : Page
 {
-    public event PropertyChangedEventHandler PropertyChanged;
-
     public ComparerDefinition<object[]> Comparer { get; private set; }
 
-    protected void NotifyPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 
     /*private int _gridDiffExported;
     public int GridDiffExported

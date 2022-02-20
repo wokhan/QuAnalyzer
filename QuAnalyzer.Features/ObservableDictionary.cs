@@ -9,9 +9,7 @@ namespace QuAnalyzer;
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-#pragma warning disable CS8714 // Impossible d'utiliser le type 'TKey' en tant que paramètre de type 'TKey' dans le type ou la méthode générique 'Dictionary<TKey, TValue>'. La nullabilité de l'argument de type 'TKey' ne correspond pas à la contrainte 'notnull'.
 public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INotifyCollectionChanged, INotifyPropertyChanged //where TKey : class
-#pragma warning restore CS8714 // Impossible d'utiliser le type 'TKey' en tant que paramètre de type 'TKey' dans le type ou la méthode générique 'Dictionary<TKey, TValue>'. La nullabilité de l'argument de type 'TKey' ne correspond pas à la contrainte 'notnull'.
 {
     public ObservableDictionary(IDictionary<TKey, TValue> dictionary) : base(dictionary)
     {

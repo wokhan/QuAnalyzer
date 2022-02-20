@@ -4,9 +4,6 @@ using System.Linq.Dynamic.Core;
 
 namespace QuAnalyzer.UI.Pages;
 
-/// <summary>
-/// Interaction logic for Patterns.xaml
-/// </summary>
 public partial class PatternsPage : Page
 {
     private List<string> stringAttributes;
@@ -35,15 +32,15 @@ public partial class PatternsPage : Page
         }
         else if (AutoUpdate)
         {
-            await Run().ConfigureAwait(false);
+            await RunCommand.ExecuteAsync(null);
+            //await Run().ConfigureAwait(false);
         }
     }
 
     [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
     private async Task Run()
     {
-        var (prov, repo) = ((App)App.Instance).CurrentSelection;
-
+        var (prov, repo) = App.Instance.CurrentSelection;
         var attr = (string)lstAttributes.SelectedValue;
 
         prg.IsIndeterminate = true;
@@ -81,7 +78,7 @@ public partial class PatternsPage : Page
         }*/
     }
 
-    private bool CanExecuteRun => App.Instance.CurrentSelection is not (null, null);
+    private bool CanExecuteRun => lstAttributes?.SelectedItems.Count > 0;
 
     private void lstDataSources_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {

@@ -7,6 +7,7 @@
       xmlns:quanalyzer="clr-namespace:QuAnalyzer"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:local="clr-namespace:Wokhan.Data.Providers.Contracts;assembly=Wokhan.Data.Providers"
+      DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}"
       mc:Ignorable="d" d:DesignHeight="460">
     <Grid Background="Gray">
         <Grid.RowDefinitions>
@@ -22,8 +23,8 @@
             </Label.Resources>
         </Label>
         <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
-            <Button Content="Add..." Click="btnNewSource_Click" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" />
-            <Button Content="Import..." IsEnabled="False" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Import}"/>
+            <Button Content="Add..." Command="{Binding SourceNewCommand}" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" />
+            <Button Content="Import..." Command="{Binding ProviderImportCommand}" IsEnabled="False" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Import}"/>
         </WrapPanel>
         <TreeView Grid.Row="2" Background="White" BorderThickness="0" TreeViewItem.Selected="TreeView_Selected" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static quanalyzer:App.Instance}}" SelectedValuePath="Key">
             <TreeView.Resources>
@@ -64,7 +65,7 @@
                         </Grid.ColumnDefinitions>
                         <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxHeight="20" Source="{Binding Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
                         <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Center" />
-                        <Button Grid.Column="2" Name="btnEditProvider" Foreground="RoyalBlue" Tag="{Binding}" Click="btnEditProvider_Click" Content="{iconPacks:Material Kind=Pencil}" />
+                        <Button Grid.Column="2" Name="btnEditProvider" Foreground="RoyalBlue" CommandParameter="{Binding}" Command="{Binding ProviderEdit,RelativeSource={RelativeSource AncestorType=UserControl}}" Content="{iconPacks:Material Kind=Pencil}" />
                     </Grid>
                     <HierarchicalDataTemplate.ItemTemplate>
                         <DataTemplate>

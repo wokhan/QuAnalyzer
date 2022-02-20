@@ -1,14 +1,17 @@
-﻿using System.IO.Compression;
+﻿using NuGet.Common;
+using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
+
+using System.IO.Compression;
 
 using Wokhan.Core.ComponentModel;
 using Wokhan.Data.Providers;
-using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer.Core.Helpers;
 
 public class ProvidersManager : NotifierHelper
 {
-    public IEnumerable<DataProviderDefinition> Providers => DataProviders.AllProviders;
+    public ObservableCollection<dynamic> Providers => new ObservableCollection<dynamic>(DataProviders.AllProviders);
 
     public ProvidersManager()
     {
@@ -17,10 +20,15 @@ public class ProvidersManager : NotifierHelper
                  .ForEach(d => DataProviders.AddPath(d));
     }
 
-    internal void TriggerUpdate()
-    {
-        NotifyPropertyChanged(nameof(Providers));
-    }
+    //internal async Task AddFromNuget()
+    //{
+    //    var repository = Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
+    //    var resource = await repository.GetResourceAsync<PackageSearchResource>();
+
+    //    var metadata = await resource.SearchAsync("Wokhan.Data.Providers", new SearchFilter(true, SearchFilterType.IsLatestVersion), 0, 20, NullLogger.Instance, CancellationToken.None);
+
+    //    Providers.AddAll(metadata.Select(package => new { Category = "NuGet", Name = package.Title, IconPath = package.IconUrl, Copyright = package.Authors, Description = package.Description }));
+    //}
 
     internal void AddProvider(string zipPath)
     {

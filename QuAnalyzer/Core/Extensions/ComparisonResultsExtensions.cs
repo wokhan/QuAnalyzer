@@ -1,12 +1,6 @@
 ﻿using QuAnalyzer.Features.Comparison.Results;
 using QuAnalyzer.Features.Comparison;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace QuAnalyzer.Core.Extensions;
 
 internal static class ComparisonResultsExtensions
