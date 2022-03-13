@@ -31,8 +31,6 @@ public partial class Monitor : Page
 
     public Monitor()
     {
-        this.DataContext = this;
-
         MonitorResultsView.CollectionChanged += MonitorResultsView_CollectionChanged;
 
         InitializeComponent();

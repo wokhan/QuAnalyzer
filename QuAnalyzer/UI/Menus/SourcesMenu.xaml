@@ -24,7 +24,7 @@
         </Label>
         <WrapPanel Grid.Row="1" Style="{StaticResource ToolBar}">
             <Button Content="Add..." Command="{Binding SourceNewCommand}" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" />
-            <Button Content="Import..." Command="{Binding ProviderImportCommand}" IsEnabled="False" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Import}"/>
+            <!--<Button Content="Import..." Command="{Binding ProviderImportCommand}" IsEnabled="False" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Import}"/>-->
         </WrapPanel>
         <TreeView Grid.Row="2" Background="White" BorderThickness="0" TreeViewItem.Selected="TreeView_Selected" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static quanalyzer:App.Instance}}" SelectedValuePath="Key">
             <TreeView.Resources>

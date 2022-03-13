@@ -10,9 +10,10 @@
     <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.0.0-preview1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0-preview1" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.1.0-1.final" />
+    <!--<PackageReference Include="System.Runtime.Loader" Version="4.3.0" />-->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Wokhan.Core" Version="0.9.3-beta" />
-    <PackageReference Include="Wokhan.Data.Providers" Version="1.2108.1001.242" />
+    <PackageReference Include="Wokhan.Data.Providers" Version="0.8.7-beta" />
   </ItemGroup>
 
 </Project>

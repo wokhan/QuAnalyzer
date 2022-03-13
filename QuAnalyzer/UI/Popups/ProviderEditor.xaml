@@ -28,7 +28,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <Image Grid.RowSpan="2" Source="{Binding CurrentType.IconPath, Converter={StaticResource imageSourceConverter}}" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <!--<Image Grid.RowSpan="2" Source="{Binding CurrentType.IconPath, Converter={StaticResource imageSourceConverter}}" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />-->
                 <Label Grid.Column="1" Content="{Binding CurrentType.Name}" FontWeight="Bold" />
                 <Label Grid.Column="1" Grid.Row="1" Content="{Binding CurrentType.Copyright}" FontSize="10" />
                 <Label Grid.Column="1" Grid.Row="2" Content="{Binding CurrentType.Description}" />

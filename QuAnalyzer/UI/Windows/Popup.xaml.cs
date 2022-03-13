@@ -1,8 +1,5 @@
 ﻿namespace QuAnalyzer.UI.Windows;
 
-/// <summary>
-/// Interaction logic for ProviderPage.xaml
-/// </summary>
 public partial class Popup : Window
 {
     private Popup(Page content)
@@ -14,7 +11,7 @@ public partial class Popup : Window
 
     private void Container_Navigated(object sender, System.Windows.Navigation.NavigationEventArgs e)
     {
-        this.Title = ((Page)e.Content).Title;
+        //this.Title = ((Page)e.Content).Title;
     }
 
     public void GoToPage(Page content)

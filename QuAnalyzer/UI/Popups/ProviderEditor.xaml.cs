@@ -62,7 +62,7 @@ public partial class ProviderEditor : Page
 
     public ObservableCollection<RepositoryView> Repositories { get; } = new ObservableCollection<RepositoryView>();
 
-    public ProviderEditor(string name) : this(DataProviders.CreateInstance(name, new Dictionary<string, object>()), true)
+    public ProviderEditor(string providerName, string instanceName) : this(DataProviders.CreateInstance(providerName, new Dictionary<string, object>()), true)
     {
 
     }

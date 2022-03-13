@@ -11,6 +11,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/DropDownButton.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -287,6 +288,31 @@
                 </Style.Triggers>
             </Style>
 
+            <Style TargetType="mahapps:DropDownButton" BasedOn="{StaticResource MahApps.Styles.DropDownButton.WindowCommands}">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.4" />
+                    </Trigger>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="LightBlue" />
+                    </Trigger>
+                </Style.Triggers>
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Padding" Value="10,5" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="LightGray" />
+                <Setter Property="Background" Value="WhiteSmoke" />
+                <Setter Property="ext:CustomAdorner.CornerRadius" Value="3"/>
+                <!--Setter Property="ext:CustomAdorner.ImageStyle">
+                    <Setter.Value>
+                        <Style TargetType="Control">
+                            <Setter Property="Margin" Value="0,0,5,0" />
+                            <Setter Property="Foreground" Value="{Binding BorderBrush,RelativeSource={x:Static RelativeSource.TemplatedParent}}" />
+                        </Style>
+                    </Setter.Value>
+                </Setter>-->
+            </Style>
 
             <Style TargetType="{x:Type Separator}">
                 <Setter Property="Height" Value="1" />

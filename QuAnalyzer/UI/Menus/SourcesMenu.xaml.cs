@@ -25,15 +25,15 @@ public partial class SourcesMenu : UserControl
         App.Instance.CurrentProject.CurrentProviders.Remove(provider);
     }
 
-    [ICommand]
-    private void ProviderImport()
-    {
-        var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = "QuAnalyzer Data Provider archive|*.qax" };
-        if (dial.ShowDialog().Value)
-        {
-            App.Instance.ProvidersMan.AddProvider(dial.FileName);
-        }
-    }
+    //[ICommand]
+    //private void ProviderImport()
+    //{
+    //    var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = "QuAnalyzer Data Provider archive|*.qax" };
+    //    if (dial.ShowDialog().Value)
+    //    {
+    //        App.Instance.ProvidersMan.AddProvider(dial.FileName);
+    //    }
+    //}
 
     [ICommand]
     private void ProviderEdit(IDataProvider provider)

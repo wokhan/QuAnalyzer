@@ -7,11 +7,11 @@ public sealed partial class CollectionViewSourceCreator : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        var source = (value as IEnumerable);
-        var cvs = new CollectionViewSource
-        {
-            Source = source
-        };
+        //var source = (value as IEnumerable);
+
+        var cvs = new CollectionViewSource() { Source = value };
+        
+        //cvs.SetValue(CollectionViewSource.SourceProperty, value);
         cvs.GroupDescriptions.Add(new PropertyGroupDescription((string)parameter));
 
         return cvs.View;
