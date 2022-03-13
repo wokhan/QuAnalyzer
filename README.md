@@ -1,7 +1,8 @@
 # QuAnalyzer
 
 ![](https://img.shields.io/badge/.NET-6-blue)
-![](https://img.shields.io/badge/UI-WPF-orange])
+![](https://img.shields.io/badge/UI-WPF-green)
+![](https://img.shields.io/badge/Status-Unreleased-red)
 
 ## Disclaimer 🏴
 
@@ -21,7 +22,16 @@ This application goal is to provide easy tooling around data management and expl
 - Monitoring (including a performance test)
 - ...
 
-## How it works ❓
+Various data sources can be used (database, web service query, CSV/Xlsx, ...) and can be parameterized through the UI, making it easier to manage those. 
+
+## Releases 🗄️
+
+Releases will be published once the app reaches a stable state, so don't expect one before at least mid-2022.
+
+As of now I've to double check that Providers are all OK (since I updated the underlying logic) and I should improve the Monitoring page. 
+And of course I still have some known issues to deal with 😅
+
+## How it works 🧰
 
 QuAnalyzer relies on my Wokhan.Data.Providers libraries to access data, which in turn uses .NET LINQ's IQueryable features (meaning that everytime it's possible, a LINQ-to-whatever expression is built, allowing ordering, filtering, grouping... to occur on the server side for database accesses, for instance).
 
