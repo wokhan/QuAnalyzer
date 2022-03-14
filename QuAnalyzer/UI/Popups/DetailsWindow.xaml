@@ -44,7 +44,7 @@
                                 </Style.Triggers>
                             </Style>
                         </DockPanel.Resources>
-                        <UC:ExtendedDataGridView x:Name="dgDiff" AlternationCount="4" IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView x:Name="dgDiff" AutoGenerateColumns="False" AlternationCount="4" IsReadOnly="True" FrozenColumnCount="1" />
                     </DockPanel>
                 </Border>
             </TabItem>
@@ -59,10 +59,10 @@
                             <RowDefinition Height="179*" />
                         </Grid.RowDefinitions>
                         <Label Content="{Binding SourceName,FallbackValue=Source}" ContentStringFormat="Items missing from {0}" Background="#FFEEEEEE" />
-                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgMissingSource" IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgMissingSource" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
                         <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
                         <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" ContentStringFormat="Items missing from {0}" Background="#FFEEEEEE" />
-                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgMissingTarget" IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgMissingTarget" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
                     </Grid>
                 </Border>
             </TabItem>
@@ -77,10 +77,10 @@
                             <RowDefinition Height="179*" />
                         </Grid.RowDefinitions>
                         <Label Content="{Binding SourceName,FallbackValue=Source}" Background="#FFEEEEEE" />
-                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourceDups"  IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourceDups" AutoGenerateColumns="False"  IsReadOnly="True" FrozenColumnCount="1" />
                         <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
                         <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" Background="#FFEEEEEE" />
-                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetDups"  IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetDups" AutoGenerateColumns="False"  IsReadOnly="True" FrozenColumnCount="1" />
                     </Grid>
                 </Border>
             </TabItem>
@@ -95,10 +95,10 @@
                             <RowDefinition Height="179*" />
                         </Grid.RowDefinitions>
                         <Label Content="{Binding SourceName,FallbackValue=Source}" Background="#FFEEEEEE" />
-                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourcePerfectDups" IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourcePerfectDups" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
                         <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
                         <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" Background="#FFEEEEEE" />
-                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetPerfectDups" IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetPerfectDups" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
                     </Grid>
                 </Border>
             </TabItem>

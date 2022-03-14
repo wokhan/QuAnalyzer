@@ -54,8 +54,6 @@ public partial class DetailsWindow : Page
     {
         gridData.Columns.Clear();
 
-        gridData.AutoGenerateColumns = false;
-
         gridData.Columns.Add(new DataGridTextColumn() { Header = "Origin", Binding = new Binding(nameof(Diff<object[]>.Source)) });
 
         if (data is not null && data.Any())

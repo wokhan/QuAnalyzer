@@ -3,7 +3,9 @@
 using QuAnalyzer.Generic.Extensions;
 
 using System.Linq.Dynamic.Core;
+using System.Reflection.PortableExecutable;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Threading;
 
 using Wokhan.Data.Providers.Bases;
@@ -104,7 +106,7 @@ public partial class ExtendedDataGridView : DataGrid
         //TODO: Externalize (shouldn't be at the Control level)
         this.ExportAsHTML();
     }
-    
+
     [ICommand]
     private void Copy()
     {
@@ -162,10 +164,20 @@ public partial class ExtendedDataGridView : DataGrid
             return;
         }
 
-        if (AutoGenerateColumns)
+        this.Columns.Clear();
+        //TODO: review for non-arrays when CustomHeaders are used as it seems incorrect
+        //BTW, CustomHeaders seem useless to me (should directly use Columns, right?)
+        if (!AutoGenerateColumns && this.CustomHeaders is not null)
         {
-            this.Columns.Clear();
+            this.Columns.AddAll(CustomHeaders.Select((h, i) => new DataGridTextColumn()
+            {
+                Header = h.DisplayName,
+                Binding = new Binding($"[{i}]"),
+                SortMemberPath = $"it[{i}]",
+                FontWeight = (h.IsKey ? FontWeights.Bold : FontWeights.Normal)
+            }));
         }
+
         this.IsEnabled = true;
 
         await Task.Run(() =>
@@ -196,12 +208,12 @@ public partial class ExtendedDataGridView : DataGrid
 
             query = query.AggregateBy(Grouping, Compute.Where(c => c.Aggregate is not null).ToDictionary(c => c.Attribute, c => c.Aggregate));
             {
-            /*if (!prov.IsDirectlyBindable)
-            {
-                dispHeaders = allHeaders.Keys.ToList();
+                /*if (!prov.IsDirectlyBindable)
+                {
+                    dispHeaders = allHeaders.Keys.ToList();
 
-                Dispatcher.Invoke(GenHeaders);
-            }*/
+                    Dispatcher.Invoke(GenHeaders);
+                }*/
             }
 
             LoadingProgress = 0;
@@ -213,16 +225,14 @@ public partial class ExtendedDataGridView : DataGrid
             }
 
             IEnumerable virtualizedData;
-        //TODO: temporary workaround since Object[] collections are not supported by AsVirtualized yet.
-        // One could wonder WHY I'm using object[] collections for a start, but tbh I don't remember.
-        // Performance was probably worse with dynamically typed collections?
-        try
-            {
-                virtualizedData = query.AsVirtualized();
-            }
-            catch
+            // Virtualization doesn't work with arrays (and would be useless anyway as it's already in-memory)            
+            if (query.ElementType.IsArray)
             {
                 virtualizedData = query;
+            }
+            else
+            {
+                virtualizedData = query.AsVirtualized();
             }
 
             Dispatcher.Invoke(() =>
