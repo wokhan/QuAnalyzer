@@ -15,6 +15,6 @@
     <Content Include="Assets\Fonts\uno-fluentui-assets.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QuAnalyzer.Uno.Skia.WPF\QuAnalyzer.Uno.Skia.WPF.csproj" />
+    <ProjectReference Include="..\QuAnalyzer.Skia.WPF\QuAnalyzer.Skia.WPF.csproj" />
   </ItemGroup>
 </Project>

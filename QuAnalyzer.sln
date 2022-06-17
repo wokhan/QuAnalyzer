@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuAnalyzer", "QuAnalyzer\QuAnalyzer.csproj", "{C080DFD3-CC65-4442-96FB-A8C08630398F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{281C94EA-3B55-4048-B8A0-9EF55BF3DA60}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -22,13 +20,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "Platforms", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuAnalyzer.Mobile", "QuAnalyzer.Platforms\QuAnalyzer.Mobile\QuAnalyzer.Mobile.csproj", "{33DD36A7-ECFE-4905-BAF1-9E2B5969C45D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuAnalyzer.Skia.Gtk", "QuAnalyzer.Platforms\QuAnalyzer.Skia.Gtk\QuAnalyzer.Skia.Gtk.csproj", "{0AD123F1-FB0B-4DFC-AA17-6D3E41A29D8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuAnalyzer.Skia.Gtk", "QuAnalyzer.Platforms\QuAnalyzer.Skia.Gtk\QuAnalyzer.Skia.Gtk.csproj", "{0AD123F1-FB0B-4DFC-AA17-6D3E41A29D8D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuAnalyzer.Windows", "QuAnalyzer.Platforms\QuAnalyzer.Windows\QuAnalyzer.Windows.csproj", "{46A2CC2F-2E65-4E5A-A0E5-9E68271DA1DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuAnalyzer.Skia.Wpf", "QuAnalyzer.Platforms\QuAnalyzer.Skia.Wpf\QuAnalyzer.Skia.Wpf.csproj", "{552FF955-BFDB-40FE-A21F-F1BE6719F333}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuAnalyzer.Skia.Wpf", "QuAnalyzer.Platforms\QuAnalyzer.Skia.Wpf\QuAnalyzer.Skia.Wpf.csproj", "{552FF955-BFDB-40FE-A21F-F1BE6719F333}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuAnalyzer.Skia.Wpf.Host", "QuAnalyzer.Platforms\QuAnalyzer.Skia.Wpf.Host\QuAnalyzer.Skia.Wpf.Host.csproj", "{0A804DA6-A86D-4E55-BEEB-53F80670121C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuAnalyzer.Skia.Wpf.Host", "QuAnalyzer.Platforms\QuAnalyzer.Skia.Wpf.Host\QuAnalyzer.Skia.Wpf.Host.csproj", "{0A804DA6-A86D-4E55-BEEB-53F80670121C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,26 +42,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Debug|ARM.ActiveCfg = Debug|ARM32
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Debug|ARM.Build.0 = Debug|ARM32
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Debug|ARM64.ActiveCfg = Debug|ARM64
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Debug|ARM64.Build.0 = Debug|ARM64
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Debug|x64.ActiveCfg = Debug|x64
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Debug|x64.Build.0 = Debug|x64
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Debug|x86.ActiveCfg = Debug|x86
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Debug|x86.Build.0 = Debug|x86
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Release|ARM.ActiveCfg = Release|ARM32
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Release|ARM.Build.0 = Release|ARM32
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Release|ARM64.ActiveCfg = Release|ARM64
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Release|ARM64.Build.0 = Release|ARM64
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Release|x64.ActiveCfg = Release|x64
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Release|x64.Build.0 = Release|x64
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Release|x86.ActiveCfg = Release|x86
-		{C080DFD3-CC65-4442-96FB-A8C08630398F}.Release|x86.Build.0 = Release|x86
 		{D52514C5-F1DE-4EEF-9619-C47966E6C335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D52514C5-F1DE-4EEF-9619-C47966E6C335}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D52514C5-F1DE-4EEF-9619-C47966E6C335}.Debug|ARM.ActiveCfg = Debug|Any CPU
@@ -229,7 +207,10 @@ Global
 		SolutionGuid = {4BB7C6B8-DAF4-4E01-B502-9E26075F82B2}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		QuAnalyzer.Shared\QuAnalyzer.Shared.projitems*{0ad123f1-fb0b-4dfc-aa17-6d3e41a29d8d}*SharedItemsImports = 5
+		QuAnalyzer.Shared\QuAnalyzer.Shared.projitems*{33dd36a7-ecfe-4905-baf1-9e2b5969c45d}*SharedItemsImports = 5
 		QuAnalyzer.Shared\QuAnalyzer.Shared.projitems*{46a2cc2f-2e65-4e5a-a0e5-9e68271da1de}*SharedItemsImports = 5
+		QuAnalyzer.Shared\QuAnalyzer.Shared.projitems*{552ff955-bfdb-40fe-a21f-f1be6719f333}*SharedItemsImports = 5
 		QuAnalyzer.Shared\QuAnalyzer.Shared.projitems*{6279c845-92f8-4333-ab99-3d213163593c}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution

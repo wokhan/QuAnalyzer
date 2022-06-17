@@ -5,13 +5,13 @@
     <TargetFramework>net6.0</TargetFramework>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <ItemGroup Condition="exists('..\QuAnalyzer.Uno.UWP')">
-    <EmbeddedResource Include="..\QuAnalyzer.Uno.UWP\Package.appxmanifest" LogicalName="Package.appxmanifest" />
-    <Content Include="..\QuAnalyzer.Uno.UWP\Assets\StoreLogo.png" Link="Assets\StoreLogo.png" />
+  <ItemGroup Condition="exists('..\QuAnalyzer.UWP')">
+    <EmbeddedResource Include="..\QuAnalyzer.UWP\Package.appxmanifest" LogicalName="Package.appxmanifest" />
+    <Content Include="..\QuAnalyzer.UWP\Assets\StoreLogo.png" Link="Assets\StoreLogo.png" />
     <Content Include="Assets\Fonts\uno-fluentui-assets.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <UpToDateCheckInput Include="..\QuAnalyzer.Uno.Shared\**\*.xaml" />
+    <UpToDateCheckInput Include="..\QuAnalyzer.Shared\**\*.xaml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="5.8.4" />

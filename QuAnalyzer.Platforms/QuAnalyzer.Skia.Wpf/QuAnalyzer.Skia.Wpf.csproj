@@ -13,7 +13,7 @@
     <PackageReference Include="Uno.UI.Adapter.Microsoft.Extensions.Logging" Version="4.3.6" />
   </ItemGroup>
   <ItemGroup>
-    <UpToDateCheckInput Include="..\QuAnalyzer.Uno.Shared\**\*.xaml" />
+    <UpToDateCheckInput Include="..\QuAnalyzer.Shared\**\*.xaml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\QuAnalyzer.Features\QuAnalyzer.Features.csproj" />
