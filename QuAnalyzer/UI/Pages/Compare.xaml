@@ -2,33 +2,27 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-      xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
-      xmlns:local="clr-namespace:QuAnalyzer.UI.Pages"
-      xmlns:quanalyzer="clr-namespace:QuAnalyzer"
+      xmlns:UC="using:QuAnalyzer.UI.Controls"
+      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:quanalyzer="using:QuAnalyzer" 
+      xmlns:comparison="using:QuAnalyzer.Features.Comparison" 
+      xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" xmlns:collections="using:System.Collections"
       x:Class="QuAnalyzer.UI.Pages.Compare"
-      x:Name="me"
-      DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}"
+      x:Name="thisPage"
       mc:Ignorable="d"
       d:DesignWidth="800"
-      d:DesignHeight="607.375"
-      Title="DataCompare">
+      d:DesignHeight="600">
     <Page.Resources>
-        <CollectionViewSource Source="{Binding ComparisonInstancesView}" x:Key="groupedViewSource">
-            <CollectionViewSource.GroupDescriptions>
-                <PropertyGroupDescription PropertyName="Name" />
-            </CollectionViewSource.GroupDescriptions>
-        </CollectionViewSource>
-        <Style x:Key="RedWhenNotZero"  TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
-            <Setter Property="Foreground" Value="OrangeRed" />
+        <CollectionViewSource Source="{x:Bind GroupedComparisonInstancesView}" x:Name="groupedViewSource" IsSourceGrouped="True" />
+        <!--<Style x:Key="RedWhenNotZero" TargetType="DataGridCell">
+            <Setter Target="Foreground" Value="OrangeRed" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Content.Text,RelativeSource={x:Static RelativeSource.Self}}" Value="0">
-                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Target="Foreground" Value="Black" />
                 </DataTrigger>
             </Style.Triggers>
-        </Style>
-        <local:SourceOrTargetPicker x:Key="SourceOrTargetPicker" />
+        </Style>-->
+        <!--<local:SourceOrTargetPicker x:Key="SourceOrTargetPicker" />-->
     </Page.Resources>
     <Grid x:Name="gridMain">
         <Grid.RowDefinitions>
@@ -37,157 +31,153 @@
             <RowDefinition Height="4" />
             <RowDefinition MinHeight="100" />
         </Grid.RowDefinitions>
-        <WrapPanel Grid.ColumnSpan="3" Style="{StaticResource ToolBar}">
-            <Button HorizontalAlignment="Center" ToolTip="Start comparisons for the selected items" BorderBrush="Green" Command="{Binding RunCommand}" ext:CustomAdorner.Image="{iconPacks:Material Kind=Play,Width=10}" Content="Run" />
-            <Rectangle />
-            <ToggleButton Content="Single-mapping mode" ToolTip="Single-mapping mode" BorderBrush="Blue" Foreground="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=AbTesting}" IsChecked="{Binding UseSingleMapping}" />
-            <Rectangle />
-            <Button Content="Add" ToolTip="Add a mapping" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" IsEnabled="{Binding UseSingleMapping,Converter={StaticResource booleanNegator}}" Command="{Binding CreateMappingCommand}" />
-            <Button Content="Automap" ToolTip="Automap" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=ShuffleVariant}" IsEnabled="{Binding UseSingleMapping,Converter={StaticResource booleanNegator}}" Command="{Binding AutoMapCommand}" />
-            <Rectangle />
-            <Button Content="Sel. all" ToolTip="Select all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectAll}" Click="btnSelectAll_Click" IsEnabled="{Binding UseSingleMapping,Converter={StaticResource booleanNegator}}" />
-            <Button Content="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Select}" Click="btnUnSel_Click" IsEnabled="{Binding UseSingleMapping,Converter={StaticResource booleanNegator}}" />
-        </WrapPanel>
-        <TabControl Grid.Row="1" VerticalAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch" Padding="0">
-            <TabControl.Style>
-                <Style TargetType="TabControl">
-                    <Style.Resources>
-                        <Style TargetType="TabPanel">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </Style>
-                        <Style TargetType="TabItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        </Style>
-                    </Style.Resources>
-                </Style>
-            </TabControl.Style>
-            <TabItem x:Name="tabMapping" IsSelected="{Binding IsChecked,ElementName=btnToggleMode, Converter={StaticResource booleanNegator}}">
-                <DataGrid SelectionMode="Extended" ItemsSource="{Binding CurrentProject.SourceMapper, Source={x:Static quanalyzer:App.Instance}}" ColumnWidth="18*" AutoGenerateColumns="False" x:Name="lstMappings" CanUserAddRows="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding Name}" Header="Mapping name" IsReadOnly="True" />
-                        <DataGridTextColumn Binding="{Binding SourceName}" Header="Source" IsReadOnly="True" />
-                        <DataGridTextColumn Binding="{Binding SourceRepository}" Header="Source repository" IsReadOnly="True" />
-                        <DataGridTextColumn Binding="{Binding TargetName}" Header="Target" IsReadOnly="True" />
-                        <DataGridTextColumn Binding="{Binding TargetRepository}" Header="Target repository" IsReadOnly="True" />
-                        <DataGridTemplateColumn Header="Stream" Width="Auto">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="5,0" Foreground="Black" IsChecked="{Binding IsOrdered, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <CommandBar Grid.ColumnSpan="3">
+            <AppBarButton HorizontalAlignment="Center" ToolTipService.ToolTip="Start comparisons for the selected items" BorderBrush="Green" Command="{x:Bind RunCommand}" Icon="Play" Content="Run" />
+            <AppBarSeparator />
+            <AppBarToggleButton Content="Single-mapping mode" x:Name="btnToggleMode" ToolTipService.ToolTip="Single-mapping mode" BorderBrush="Blue" Foreground="Blue" Icon="DisableUpdates" IsChecked="{Binding UseSingleMapping}" />
+            <AppBarSeparator />
+            <AppBarButton Content="Add" ToolTipService.ToolTip="Add a mapping" BorderBrush="Green" Icon="Add" IsEnabled="{x:Bind UseSingleMapping,Converter={StaticResource booleanNegator}}" Command="{x:Bind CreateMappingCommand}" />
+            <AppBarButton Content="Automap" ToolTipService.ToolTip="Automap" BorderBrush="Green" Icon="Shuffle" IsEnabled="{x:Bind UseSingleMapping,Converter={StaticResource booleanNegator}}" Command="{x:Bind AutoMapCommand}" />
+            <AppBarSeparator />
+            <AppBarButton Content="Sel. all" ToolTipService.ToolTip="Select all" BorderBrush="Blue" Icon="SelectAll" Click="btnSelectAll_Click" IsEnabled="{x:Bind UseSingleMapping,Converter={StaticResource booleanNegator}}" />
+            <AppBarButton Content="Unsel. all" ToolTipService.ToolTip="Unselect all" BorderBrush="Blue" Icon="ClearSelection" Click="btnUnSel_Click" IsEnabled="{x:Bind UseSingleMapping,Converter={StaticResource booleanNegator}}" />
+        </CommandBar>
+        <TabView Grid.Row="1" VerticalAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch" Padding="0">
+            <TabViewItem x:Name="tabMapping" IsSelected="{x:Bind btnToggleMode.IsChecked,Converter={StaticResource booleanNegator}}">
+                <controls:DataGrid SelectionMode="Extended" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.SourceMapper}" ColumnWidth="18*" AutoGenerateColumns="False" x:Name="lstMappings">
+                    <controls:DataGrid.Columns>
+                        <controls:DataGridTextColumn Binding="{Binding Name}" Header="Mapping name" IsReadOnly="True" />
+                        <controls:DataGridTextColumn Binding="{Binding SourceName}" Header="Source" IsReadOnly="True" />
+                        <controls:DataGridTextColumn Binding="{Binding SourceRepository}" Header="Source repository" IsReadOnly="True" />
+                        <controls:DataGridTextColumn Binding="{Binding TargetName}" Header="Target" IsReadOnly="True" />
+                        <controls:DataGridTextColumn Binding="{Binding TargetRepository}" Header="Target repository" IsReadOnly="True" />
+                        <controls:DataGridTemplateColumn Header="Stream" Width="Auto">
+                            <controls:DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="comparison:SourcesMapper">
+                                    <ToggleSwitch Padding="5,0" Foreground="Black" IsOn="{x:Bind IsOrdered, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn IsReadOnly="True" CanUserResize="False" Width="100">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <WrapPanel>
-                                        <Button Command="{Binding EditMappingCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Foreground="Blue" Content="{iconPacks:Material Kind=Pencil}" />
-                                        <Button Command="{Binding DeleteMappingCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
-                                    </WrapPanel>
+                            </controls:DataGridTemplateColumn.CellTemplate>
+                        </controls:DataGridTemplateColumn>
+                        <controls:DataGridTemplateColumn IsReadOnly="True" CanUserResize="False" Width="100">
+                            <controls:DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="comparison:SourcesMapper">
+                                    <StackPanel Orientation="Horizontal">
+                                        <AppBarButton Command="{Binding EditMappingCommand,ElementName=thisPage}" CommandParameter="{x:Bind}" Foreground="Blue" Icon="Edit" />
+                                        <AppBarButton Command="{Binding DeleteMappingCommand,ElementName=thisPage}" CommandParameter="{x:Bind}" Foreground="OrangeRed" Icon="Delete" />
+                                    </StackPanel>
                                 </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </TabItem>
-            <TabItem IsSelected="{Binding IsChecked, ElementName=btnToggleMode}">
-                <UC:MappingsEdit Mapping="{Binding}" DataContext="{Binding SingleMap,ElementName=me}" />
-            </TabItem>
-        </TabControl>
-        <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" />
-        <DockPanel Grid.Column="0" Grid.Row="3">
-            <WrapPanel Style="{StaticResource ToolBar}">
-                <TextBlock Text="Global progress" Padding="4" Height="26" />
-                <ProgressBar x:Name="prgGlobal" Maximum="100" Height="22" Width="292" />
-                <Rectangle />
-                <Button Content="Create report" ToolTip="Create report" BorderBrush="BlueViolet" ext:CustomAdorner.Image="{iconPacks:Material Kind=Export}" Command="{Binding GlobalReportCommand}" />
-            </WrapPanel>
-            <UC:ExtendedDataGridView ItemsSource="{Binding Source={StaticResource groupedViewSource}}" ColumnWidth="*" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" x:Name="allProgress" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="None" SelectionUnit="Cell">
-                <DataGrid.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.ContainerStyle>
-                            <Style TargetType="{x:Type GroupItem}">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type GroupItem}">
-                                            <StackPanel>
-                                                <!--<DataGridCell BorderThickness="0" Margin="0" Padding="0">-->
-                                                <Grid Height="55" DataContext="{Binding Items[0]}" Background="#FFEEEEEE" >
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock FontWeight="Bold" Text="{Binding Name, Mode=OneWay, FallbackValue='Mapping title'}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,10,0,0" />
-                                                    <TextBlock Text="{Binding Results.TotalTime, FallbackValue='Ellapsed time: -ms', Mode=OneWay, StringFormat='Ellapsed time: {0}ms'}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,10"/>
-                                                    <!-- Progress and cancel button -->
-                                                    <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
-                                                        <StackPanel.Style>
-                                                            <Style TargetType="StackPanel">
-                                                                <Setter Property="Visibility" Value="Visible" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Results.LocalProgress}" Value="100">
-                                                                        <Setter Property="Visibility" Value="Hidden" />
-                                                                    </DataTrigger>
-                                                                    <DataTrigger Binding="{Binding Results.Message, Mode=OneWay, Converter={StaticResource objectToBool}}" Value="True" >
-                                                                        <Setter Property="Visibility" Value="Hidden" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </StackPanel.Style>
-                                                        <Grid>
-                                                            <ProgressBar BorderThickness="1" Value="{Binding Results.LocalProgress, Mode=OneWay, FallbackValue=0}" Maximum="100" Height="20" Width="150" Margin="10,0" />
-                                                            <TextBlock Foreground="White" Text="{Binding Results.Progress, Mode=OneWay, FallbackValue='Current step'}" TextAlignment="Center" VerticalAlignment="Center" />
-                                                        </Grid>
-                                                        <Button Height="40" Command="{Binding CancelCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=StopCircleOutline}">
-                                                            <Button.Style>
-                                                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                                                    <Style.Triggers>
-                                                                        <Trigger Property="IsEnabled" Value="False" >
-                                                                            <Setter Property="Opacity" Value="0.5" />
-                                                                        </Trigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </Button.Style>
-                                                        </Button>
-                                                    </StackPanel>
-                                                    <!--Results-->
-                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                                                        <StackPanel.Style>
-                                                            <Style TargetType="StackPanel">
-                                                                <Setter Property="Visibility" Value="Hidden" />
-                                                                <Style.Triggers>
-                                                                    <MultiDataTrigger>
-                                                                        <MultiDataTrigger.Conditions>
-                                                                            <Condition Binding="{Binding Results.LocalProgress}" Value="100" />
-                                                                            <Condition Binding="{Binding Results.Message,Converter={StaticResource objectToBool}}" Value="False" />
-                                                                        </MultiDataTrigger.Conditions>
-                                                                        <Setter Property="Visibility" Value="Visible" />
-                                                                    </MultiDataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </StackPanel.Style>
-                                                        <TextBlock FontWeight="Bold" Text="{Binding Results.MatchingCount, FallbackValue='Matches: -', Mode=OneWay, StringFormat=Matches: \{0\}}" Padding="5" VerticalAlignment="Center" />
-                                                        <Button Height="40" Command="{Binding DetailsCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Width="40" Content="{iconPacks:Material Kind=Eye}" Foreground="Green" />
-                                                    </StackPanel>
-                                                    <!--Error-->
-                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                                                        <StackPanel.Style>
-                                                            <Style TargetType="StackPanel">
-                                                                <Setter Property="Visibility" Value="Hidden" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Results.Message, Mode=OneWay, Converter={StaticResource objectToBool}}" Value="True" >
-                                                                        <Setter Property="Visibility" Value="Visible" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </StackPanel.Style>
-                                                        <ContentControl Background="Yellow" BorderBrush="Red" ToolTip="{Binding Results.Message}" Height="40" Width="40" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red" Content="{iconPacks:Material Kind=Alert}">
-                                                            <ContentControl.Resources>
-                                                                <Storyboard x:Key="sbBlink" AutoReverse="True" BeginTime="00:00:02" RepeatBehavior="Forever" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)">
-                                                                    <ColorAnimation From="Transparent" To="Red" Duration="0:0:2"/>
-                                                                </Storyboard>
-                                                            </ContentControl.Resources>
-                                                            <!--<ContentControl.Style>
+                            </controls:DataGridTemplateColumn.CellTemplate>
+                        </controls:DataGridTemplateColumn>
+                    </controls:DataGrid.Columns>
+                </controls:DataGrid>
+            </TabViewItem>
+            <TabViewItem IsSelected="{x:Bind btnToggleMode.IsChecked.GetValueOrDefault()}">
+                <UC:MappingsEdit Mapping="{x:Bind SingleMap}" />
+            </TabViewItem>
+        </TabView>
+        <controls:GridSplitter Grid.Row="2" Background="{ThemeResource AccentColorBrush}" HorizontalAlignment="Stretch" />
+        <controls:DockPanel Grid.Column="0" Grid.Row="3">
+            <CommandBar>
+                <AppBarElementContainer>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Global progress" />
+                        <ProgressBar x:Name="prgGlobal" Maximum="100" Height="22" Width="292" />
+                    </StackPanel>
+                </AppBarElementContainer>
+                <AppBarSeparator />
+                <AppBarButton Content="Create report" ToolTipService.ToolTip="Create report" BorderBrush="BlueViolet" Icon="SaveLocal" Command="{x:Bind GlobalReportCommand}" />
+            </CommandBar>
+            <UC:ExtendedDataGridView ItemsSource="{x:Bind GroupedComparisonInstancesView,Mode=OneWay}" ColumnWidth="*" IsReadOnly="True" AutoGenerateColumns="False" x:Name="allProgress" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="None" SelectionMode="Single">
+                <controls:DataGrid.RowGroupHeaderStyles>
+                    <!-- Override the default Style for groups headers -->
+                    <Style TargetType="controls:DataGridRowGroupHeader">
+                        <Setter Target="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="GroupItem">
+                                    <StackPanel>
+                                        <!--<controls:DataGridCell BorderThickness="0" Margin="0" Padding="0">-->
+                                        <Grid Height="55" DataContext="{Binding Items[0]}" Background="#FFEEEEEE" >
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock FontWeight="Bold" Text="{Binding Name, Mode=OneWay, FallbackValue='Mapping title'}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,10,0,0" />
+                                            <TextBlock Text="{Binding Results.TotalTime,ElementName=thisPage,FallbackValue='-',Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,10"/>
+                                            <!--sys:String.Format('Ellapsed time: {0}ms',-->
+                                            <!-- Progress and cancel button -->
+                                            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
+                                                <VisualStateManager.VisualStateGroups>
+                                                    <VisualStateGroup>
+                                                        <VisualState>
+                                                            <VisualState.StateTriggers>
+                                                                <triggers:IsEqualStateTrigger Value="{Binding Results.LocalProgress,ElementName=thisPage}" To="100" />
+                                                                <triggers:IsNotEqualStateTrigger Value="{Binding Results.Message,ElementName=thisPage}" To="{x:Null}" />
+                                                            </VisualState.StateTriggers>
+                                                            <VisualState.Setters>
+                                                                <Setter Target="Visibility" Value="Collapsed" />
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                </VisualStateManager.VisualStateGroups>
+                                                <Grid>
+                                                    <ProgressBar BorderThickness="1" Value="{Binding Results.LocalProgress,ElementName=thisPage, Mode=OneWay, FallbackValue=0}" Maximum="100" Height="20" Width="150" Margin="10,0" />
+                                                    <TextBlock Foreground="White" Text="{Binding Results.Progress,ElementName=thisPage, Mode=OneWay, FallbackValue='Current step'}" TextAlignment="Center" VerticalAlignment="Center" />
+                                                </Grid>
+                                                <AppBarButton Height="40" Command="{Binding CancelCommand,ElementName=thisPage}" CommandParameter="{Binding}" Width="40" Foreground="OrangeRed" Icon="Stop">
+                                                    <VisualStateManager.VisualStateGroups>
+                                                        <VisualStateGroup>
+                                                            <VisualState>
+                                                                <VisualState.StateTriggers>
+                                                                    <StateTrigger IsActive="{Binding IsEnabled}" />
+                                                                </VisualState.StateTriggers>
+                                                                <VisualState.Setters>
+                                                                    <Setter Target="Opacity" Value="0.5" />
+                                                                </VisualState.Setters>
+                                                            </VisualState>
+                                                        </VisualStateGroup>
+                                                    </VisualStateManager.VisualStateGroups>
+                                                </AppBarButton>
+                                            </StackPanel>
+                                            <!--Results-->
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="Collapsed">
+                                                <VisualStateManager.VisualStateGroups>
+                                                    <VisualStateGroup>
+                                                        <VisualState>
+                                                            <VisualState.StateTriggers>
+                                                                <triggers:IsEqualStateTrigger Value="{Binding Results.LocalProgress,ElementName=thisPage}" To="100" />
+                                                                <triggers:IsNotEqualStateTrigger Value="{Binding Results.Message,ElementName=thisPage}" To="{x:Null}" />
+                                                            </VisualState.StateTriggers>
+                                                            <VisualState.Setters>
+                                                                <Setter Target="Visibility" Value="Visible" />
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                </VisualStateManager.VisualStateGroups>
+                                                <!--<TextBlock FontWeight="Bold" Text="{x:Bind sys:String.Format('Matches: {0}', Results.MatchingCount), FallbackValue='-', Mode=OneWay}" Padding="5" VerticalAlignment="Center" />-->
+                                                <AppBarButton Height="40" Command="{Binding DetailsCommand,ElementName=thisPage}" CommandParameter="{Binding}" Width="40" Icon="View" Foreground="Green" />
+                                            </StackPanel>
+                                            <!--Error-->
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="Collapsed">
+                                                <VisualStateManager.VisualStateGroups>
+                                                    <VisualStateGroup>
+                                                        <VisualState>
+                                                            <VisualState.StateTriggers>
+                                                                <triggers:IsNotEqualStateTrigger Value="{Binding Results.Message}" To="{x:Null}" />
+                                                            </VisualState.StateTriggers>
+                                                            <VisualState.Setters>
+                                                                <Setter Target="Visibility" Value="Visible" />
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                </VisualStateManager.VisualStateGroups>
+                                                <SymbolIcon ToolTipService.ToolTip="{Binding Results.Message,ElementName=thisPage}" Height="40" Width="40" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red" Symbol="Flag">
+                                                    <SymbolIcon.Resources>
+                                                        <Storyboard x:Key="sbBlink" AutoReverse="True" BeginTime="00:00:02" RepeatBehavior="Forever" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)">
+                                                            <ColorAnimation From="Transparent" To="Red" Duration="0:0:2"/>
+                                                        </Storyboard>
+                                                    </SymbolIcon.Resources>
+                                                    <!--<ContentControl.Style>
                                                                 <Style TargetType="ContentControl">
                                                                     <Style.Triggers>
                                                                         <Trigger Property="Visibility" Value="Visible">
@@ -201,115 +191,102 @@
                                                                     </Style.Triggers>
                                                                 </Style>
                                                             </ContentControl.Style>-->
-                                                        </ContentControl>
-                                                    </StackPanel>
-                                                    <Button Grid.Column="2" Height="40" Command="{Binding DeleteCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}" Width="40" Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}">
-                                                        <Button.Style>
-                                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                                                <Setter Property="IsEnabled" Value="False" />
-                                                                <Setter Property="Opacity" Value="0.5" />
-                                                                <Style.Triggers>
-                                                                    <!--<DataTrigger Binding="{Binding IsEnabled, ElementName=btnCancel}" Value="False" >
-                                                                        <Setter Property="IsEnabled" Value="True" />
-                                                                        <Setter Property="Opacity" Value="1" />
-                                                                    </DataTrigger>-->
-                                                                    <DataTrigger Binding="{Binding Results.LocalProgress}" Value="100">
-                                                                        <Setter Property="IsEnabled" Value="True" />
-                                                                        <Setter Property="Opacity" Value="1" />
-                                                                    </DataTrigger>
-                                                                    <DataTrigger Binding="{Binding Results.Message, Converter={StaticResource objectToBool}}" Value="True" >
-                                                                        <Setter Property="IsEnabled" Value="True" />
-                                                                        <Setter Property="Opacity" Value="1" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </Button.Style>
-                                                    </Button>
-                                                </Grid>
-                                                <!--</DataGridCell>-->
-                                                <ItemsPresenter />
+                                                </SymbolIcon>
                                             </StackPanel>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </GroupStyle.ContainerStyle>
-                        <GroupStyle.Panel>
-                            <ItemsPanelTemplate>
-                                <DataGridRowsPresenter/>
-                            </ItemsPanelTemplate>
-                        </GroupStyle.Panel>
-                    </GroupStyle>
-                </DataGrid.GroupStyle>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Width="0" MinWidth="0" Header="Name" Binding="{Binding Name}" />
-                    <DataGridTextColumn Header="Item" Width="Auto" MinWidth="110" FontWeight="Bold">
-                        <DataGridBoundColumn.Binding>
+                                            <AppBarButton Grid.Column="2" Height="40" IsEnabled="False" Opacity="0.5" Command="{Binding DeleteCommand,ElementName=thisPage}" CommandParameter="{Binding}" Width="40" Foreground="OrangeRed" Icon="Delete">
+                                                <VisualStateManager.VisualStateGroups>
+                                                    <VisualStateGroup>
+                                                        <VisualState>
+                                                            <VisualState.StateTriggers>
+                                                                <triggers:IsEqualStateTrigger Value="{Binding Results.LocalProgress,ElementName=thisPage}" To="100" />
+                                                                <triggers:IsNotEqualStateTrigger Value="{Binding Results.Message,ElementName=thisPage}" To="{x:Null}" />
+                                                            </VisualState.StateTriggers>
+                                                            <VisualState.Setters>
+                                                                <Setter Target="IsEnabled" Value="True" />
+                                                                <Setter Target="Opacity" Value="1" />
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                </VisualStateManager.VisualStateGroups>
+                                            </AppBarButton>
+                                        </Grid>
+                                        <!--</controls:DataGridCell>-->
+                                        <ItemsPresenter />
+                                    </StackPanel>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </controls:DataGrid.RowGroupHeaderStyles>
+                <!--<controls:DataGrid.Columns>
+                    <controls:DataGridTextColumn Width="0" MinWidth="0" Header="Name" Binding="{x:Bind Name}" />
+                    <controls:DataGridTextColumn Header="Item" Width="Auto" MinWidth="110" FontWeight="Bold">
+                        <controls:DataGridBoundColumn.Binding>
                             <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
-                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" Path="AlternationIndex" />
                                 <Binding Path="SourceName" />
                                 <Binding Path="TargetName" />
                             </MultiBinding>
-                        </DataGridBoundColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="Start time">
-                        <DataGridBoundColumn.Binding>
+                        </controls:DataGridBoundColumn.Binding>
+                    </controls:DataGridTextColumn>
+                    <controls:DataGridTextColumn Header="Start time">
+                        <controls:DataGridBoundColumn.Binding>
                             <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
-                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" Path="AlternationIndex" />
                                 <Binding Path="Results.Source.StartTime" />
                                 <Binding Path="Results.Target.StartTime" />
                             </MultiBinding>
-                        </DataGridBoundColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="Loading time">
-                        <DataGridBoundColumn.Binding>
+                        </controls:DataGridBoundColumn.Binding>
+                    </controls:DataGridTextColumn>
+                    <controls:DataGridTextColumn Header="Loading time">
+                        <controls:DataGridBoundColumn.Binding>
                             <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
-                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" Path="AlternationIndex" />
                                 <Binding Path="Results.Source.LoadingTime" />
                                 <Binding Path="Results.Target.LoadingTime" />
                             </MultiBinding>
-                        </DataGridBoundColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="Count">
-                        <DataGridBoundColumn.Binding>
+                        </controls:DataGridBoundColumn.Binding>
+                    </controls:DataGridTextColumn>
+                    <controls:DataGridTextColumn Header="Count">
+                        <controls:DataGridBoundColumn.Binding>
                             <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
-                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" Path="AlternationIndex" />
                                 <Binding Path="Results.Source.Count" />
                                 <Binding Path="Results.Target.Count" />
                             </MultiBinding>
-                        </DataGridBoundColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Width="0" MinWidth="0" Header="Matches" Binding="{Binding Results.MatchingCount, FallbackValue=0}" />
-                    <DataGridTextColumn Header="Missing" CellStyle="{StaticResource RedWhenNotZero}">
-                        <DataGridBoundColumn.Binding>
+                        </controls:DataGridBoundColumn.Binding>
+                    </controls:DataGridTextColumn>
+                    <controls:DataGridTextColumn Width="0" MinWidth="0" Header="Matches" Binding="{Binding Results.MatchingCount, FallbackValue=0}" />
+                    <controls:DataGridTextColumn Header="Missing" CellStyle="{StaticResource RedWhenNotZero}">
+                        <controls:DataGridBoundColumn.Binding>
                             <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
-                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" Path="AlternationIndex" />
                                 <Binding Path="Results.Source.Missing.Count" />
                                 <Binding Path="Results.Target.Missing.Count" />
                             </MultiBinding>
-                        </DataGridBoundColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="Differences" Binding="{Binding Results.Source.Differences.Count}" CellStyle="{StaticResource RedWhenNotZero}" />
-                    <DataGridTextColumn Header="Look-alikes" CellStyle="{StaticResource RedWhenNotZero}">
-                        <DataGridBoundColumn.Binding>
+                        </controls:DataGridBoundColumn.Binding>
+                    </controls:DataGridTextColumn>
+                    <controls:DataGridTextColumn Header="Differences" Binding="{Binding Results.Source.Differences.Count}" CellStyle="{StaticResource RedWhenNotZero}" />
+                    <controls:DataGridTextColumn Header="Look-alikes" CellStyle="{StaticResource RedWhenNotZero}">
+                        <controls:DataGridBoundColumn.Binding>
                             <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
-                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" Path="AlternationIndex" />
                                 <Binding Path="Results.Source.Duplicates.Count" />
                                 <Binding Path="Results.Target.Duplicates.Count" />
                             </MultiBinding>
-                        </DataGridBoundColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="Duplicates" CellStyle="{StaticResource RedWhenNotZero}">
-                        <DataGridBoundColumn.Binding>
+                        </controls:DataGridBoundColumn.Binding>
+                    </controls:DataGridTextColumn>
+                    <controls:DataGridTextColumn Header="Duplicates" CellStyle="{StaticResource RedWhenNotZero}">
+                        <controls:DataGridBoundColumn.Binding>
                             <MultiBinding Converter="{StaticResource SourceOrTargetPicker}">
-                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" BindsDirectlyToSource="True" Path="AlternationIndex" />
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGridRow}" Path="AlternationIndex" />
                                 <Binding Path="Results.Source.PerfectDups.Count" />
                                 <Binding Path="Results.Target.PerfectDups.Count" />
                             </MultiBinding>
-                        </DataGridBoundColumn.Binding>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
+                        </controls:DataGridBoundColumn.Binding>
+                    </controls:DataGridTextColumn>
+                </controls:DataGrid.Columns>-->
             </UC:ExtendedDataGridView>
-        </DockPanel>
+        </controls:DockPanel>
     </Grid>
 </Page>

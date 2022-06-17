@@ -1,4 +1,6 @@
-﻿using QuAnalyzer.Features.Comparison;
+﻿using CommunityToolkit.WinUI.UI.Controls;
+
+using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Definition;
 
 using Wokhan.Data.Providers.Contracts;
@@ -13,7 +15,7 @@ public partial class MappingsEdit : UserControl
         set => SetValue(MappingProperty, value);
     }
 
-    public static readonly DependencyProperty MappingProperty = DependencyProperty.Register(nameof(Mapping), typeof(SourcesMapper), typeof(MappingsEdit));
+    public static readonly DependencyProperty MappingProperty = DependencyProperty.Register(nameof(Mapping), typeof(SourcesMapper), typeof(MappingsEdit), new PropertyMetadata(null));
 
     public ObservableCollection<string> SourceAttributes { get; } = new();
 
@@ -31,7 +33,7 @@ public partial class MappingsEdit : UserControl
     private void btnAdd_Click(object sender, RoutedEventArgs e)
     {
         Mapping.AllMappings.Add(new SimpleMap());
-        gridMappings.Items.Refresh();
+        //gridMappings.Items.Refresh();
     }
 
     private void lstSrcRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -58,27 +60,27 @@ public partial class MappingsEdit : UserControl
     {
         Mapping.AllMappings.Remove((SimpleMap)((Button)sender).Tag);
         // TODO: Use an observable collection?
-        gridMappings.Items.Refresh();
+        //gridMappings.Items.Refresh();
     }
 
     private void btnRmAll_Click(object sender, RoutedEventArgs e)
     {
         Mapping.AllMappings.Clear();
-        gridMappings.Items.Refresh();
+        //gridMappings.Items.Refresh();
     }
 
 
     private void btnMapName_Click(object sender, RoutedEventArgs e)
     {
         Mapping.AllMappings.ReplaceAll(SourceAttributes.Where(s => TargetAttributes.Contains(s)).Select(s => new SimpleMap(s, s)));
-        gridMappings.Items.Refresh();
+        //gridMappings.Items.Refresh();
 
     }
 
     private void btnMapPos_Click(object sender, RoutedEventArgs e)
     {
         Mapping.AllMappings.ReplaceAll(SourceAttributes.Take(TargetAttributes.Count).Zip(TargetAttributes, (s, i) => new SimpleMap(s, i)));
-        gridMappings.Items.Refresh();
+        //gridMappings.Items.Refresh();
     }
 }
 

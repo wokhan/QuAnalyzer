@@ -1,0 +1,124 @@
+﻿<Page
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="QuAnalyzer.UI.Pages.MainPage"
+    xmlns:UserControls="using:QuAnalyzer.UI.Menus"
+    xmlns:sys="using:System"
+    xmlns:helpers="using:QuAnalyzer.Core.Helpers"
+    xmlns:popups="using:QuAnalyzer.UI.Popups"
+    xmlns:quanalyzer="using:QuAnalyzer"
+    Background="{ThemeResource SystemControlBaseHighAcrylicWindowMediumBrush}"
+    MinWidth="1030" MinHeight="600"
+    x:Name="me">
+    <!--<Window.TaskbarItemInfo>
+        <TaskbarItemInfo />
+    </Window.TaskbarItemInfo>-->
+    <Grid x:Name="gridMain">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid x:Name="AppTitleBar" Grid.ColumnSpan="2">
+            <Grid.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Target="IsHitTestVisible" Value="False" />
+                </Style>
+            </Grid.Resources>
+            <UserControls:MainMenu Width="{x:Bind quanalyzer:App.Instance.MainWindow.Bounds.Width,Mode=OneWay}" />
+        </Grid>
+        <Grid Grid.Row="1" x:Name="stackExports" />
+        <UserControls:SourcesMenu Grid.Row="1" Width="200" Grid.RowSpan="2" />
+        <NavigationView Grid.Row="1" Grid.Column="1" x:Name="NavView" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" ItemInvoked="NavView_ItemInvoked">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Icon="Preview" Content="DISPLAY" Foreground="Blue" Tag="display" />
+                <NavigationViewItem Icon="Copy" Content="DUPLICATES" Tag="duplicates" />
+                <NavigationViewItem Icon="Scan" Content="PATTERNS" Tag="patterns" />
+                <NavigationViewItem Icon="ThreeBars" Content="STATISTICS" Tag="statistics" />
+                <NavigationViewItem Icon="Attach" Content="COMPARISON" Tag="comparison" />
+                <NavigationViewItem Icon="Go" Content="MONITORING" Tag="monitoring" />
+            </NavigationView.MenuItems>
+        </NavigationView>
+        <Frame Grid.Row="2" Grid.Column="1" x:Name="ContentFrame">
+            <Frame.ContentTransitions>
+                <TransitionCollection>
+                    <NavigationThemeTransition/>
+                </TransitionCollection>
+            </Frame.ContentTransitions>
+        </Frame>
+        <popups:About x:Name="flyAbout" Visibility="Collapsed" Grid.RowSpan="3" Grid.ColumnSpan="2" Width="500" VerticalAlignment="Center">
+            <!--<popups:About.Effect>
+                <DropShadowEffect BlurRadius="10" ShadowDepth="1" Color="Gray" />
+            </popups:About.Effect>-->
+        </popups:About>
+        <Grid x:Name="flyExports" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="350" Background="{ThemeResource AccentColorBrush}" Visibility="{Binding IsChecked,ElementName=btnTasks,Converter={StaticResource valueToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32"/>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" Background="{ThemeResource SystemControlBaseLowAcrylicWindowBrush}">
+                <SymbolIcon Foreground="WhiteSmoke" Margin="10,0" Height="19" Symbol="Setting" />
+                <TextBlock Grid.Column="1" VerticalAlignment="Center" Foreground="WhiteSmoke" Text="TASKS" FontSize="12" />
+            </StackPanel>
+            <Border Background="{ThemeResource AccentAcrylicBackgroundFillColorBaseBrush}" Grid.Row="2">
+                <ScrollViewer HorizontalScrollBarVisibility="Hidden">
+                    <ItemsControl ItemsSource="{x:Bind quanalyzer:App.Instance.Tasks,Mode=OneWay}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="helpers:GlobalTask">
+                                <StackPanel Margin="20,2,20,2">
+                                    <TextBlock Text="{x:Bind Title}" />
+                                    <ProgressBar Value="{x:Bind Progress,Mode=OneWay}" Height="20" HorizontalAlignment="Stretch" Maximum="1" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <!--<StackPanel x:Name="stackExports" />-->
+                </ScrollViewer>
+            </Border>
+        </Grid>
+        <Grid Grid.Row="2" Grid.ColumnSpan="2" Height="25" Background="{ThemeResource SystemControlAltMediumLowAcrylicWindowMediumBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{x:Bind quanalyzer:App.Instance.CurrentProject.FilePath,FallbackValue='No project has been loaded nor saved.'}" HorizontalAlignment="Right" Margin="0,0,20,0" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <TextBlock Width="90" Text="{x:Bind sys:String.Format('Memory: {0}', quanalyzer:App.Instance.Performance.MemoryUseFormatted), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />
+                <TextBlock Width="60" Text="{x:Bind sys:String.Format('CPU: {0}%,', quanalyzer:App.Instance.Performance.CPUUsage), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />
+                <TextBlock Width="70" Text="{x:Bind sys:String.Format('Threads: {0}', quanalyzer:App.Instance.Performance.ThreadsCount), Mode=OneWay,FallbackValue='-'}" Margin="0,0,20,0" />
+                <ToggleButton x:Name="btnTasks" IsChecked="False" BorderThickness="0" Padding="0">
+                    <!--<ToggleButton.Style>
+                            <Style BasedOn="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" TargetType="ToggleButton">
+                                <Style.Triggers>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsChecked" Value="False" />
+                                            <Condition Property="IsMouseOver" Value="False" />
+                                        </MultiTrigger.Conditions>
+                                        <MultiTrigger.Setters>
+                                            <Setter Target="Background" Value="Transparent" />
+                                        </MultiTrigger.Setters>
+                                    </MultiTrigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Target="Background" Value="LightGray" />
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Target="Background" Value="LightGray" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style-->
+                    <StackPanel Orientation="Horizontal">
+                        <SymbolIcon Margin="0,0,5,0" Foreground="White" Symbol="List" />
+                        <TextBlock Text="Tasks" Foreground="White" FontSize="12" VerticalAlignment="Center" />
+                    </StackPanel>
+                </ToggleButton>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

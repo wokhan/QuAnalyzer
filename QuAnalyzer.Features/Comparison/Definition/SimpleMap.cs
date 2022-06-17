@@ -1,3 +1,26 @@
-﻿namespace QuAnalyzer.Features.Comparison.Definition;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-public record SimpleMap(string Source = "", string Target = "", bool IsKey = false);
+namespace QuAnalyzer.Features.Comparison.Definition;
+
+[ObservableObject]
+public partial class SimpleMap
+{
+    [ObservableProperty]
+    public string source = "";
+
+    [ObservableProperty]
+    public string target = "";
+
+    [ObservableProperty]
+    public bool isKey = false;
+
+    public SimpleMap()
+    {
+    }
+
+    public SimpleMap(string source, string target)
+    {
+        this.Source = source;
+        this.Target = target;
+    }
+}

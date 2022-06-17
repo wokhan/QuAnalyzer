@@ -2,15 +2,14 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-      xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
-      xmlns:quanalyzer="clr-namespace:QuAnalyzer"
-      xmlns:mahapps="http://metro.mahapps.com/winfx/xaml/controls"
-      DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:quanalyzer="using:QuAnalyzer"
+      xmlns:sys="using:System" 
+      xmlns:helpers="using:QuAnalyzer.Core.Helpers" 
+      xmlns:bases="using:Wokhan.Data.Providers.Bases"
+      x:Name="me"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="Provider type">
+      d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -18,23 +17,21 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Border BorderBrush="LightGray" BorderThickness="0,0,0,2" Background="WhiteSmoke" Padding="10">
-            <Label Content="Select a provider type below and press Next to continue." />
-        </Border>
+        <TextBlock Text="Select a provider type below and press Next to continue." />
         <ScrollViewer x:Name="gridProviders" Grid.Row="2">
             <StackPanel>
-                <ListView Margin="5" SelectedItem="{Binding SelectedProviderDef}" ItemsSource="{Binding ProvidersMan.Providers,Source={x:Static quanalyzer:App.Instance}}">
+                <ListView Margin="5" SelectedItem="{x:Bind SelectedProviderDef,Mode=TwoWay}" ItemsSource="{x:Bind quanalyzer:App.Instance.ProvidersMan.Providers}">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
-                            <!--<Setter Property="Background" Value="Transparent" />-->
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <!--<Setter Target="Background" Value="Transparent" />-->
+                            <Setter Target="HorizontalContentAlignment" Value="Stretch" />
                         </Style>
                     </ListView.ItemContainerStyle>
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate x:DataType="bases:DataProviderDefinition">
                             <Grid Margin="5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" SharedSizeGroup="ImgCol" />
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
@@ -44,29 +41,31 @@
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <!--<Image Grid.RowSpan="2" HorizontalAlignment="Center" Height="28" Margin="2" Stretch="Uniform" MaxWidth="50" Source="{Binding IconPath,Converter={StaticResource imageSourceConverter}}" />-->
-                                <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" FontWeight="Bold" Text="{Binding Name}" />
-                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Copyright}" Margin="5,0" HorizontalAlignment="Left" TextWrapping="Wrap" FontSize="10" />
-                                <TextBlock Grid.Row="2" HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" Text="{Binding Description}" />
-                                <Label Grid.ColumnSpan="3" ext:CustomAdorner.CornerRadius="10" Padding="10,0"  Background="Beige" Content="{Binding Category}" HorizontalAlignment="Right" />
+                                <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" FontWeight="Bold" Text="{x:Bind Name}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind Copyright}" Margin="5,0" HorizontalAlignment="Left" TextWrapping="Wrap" FontSize="10" />
+                                <TextBlock Grid.Row="2" HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" Text="{x:Bind Description}" />
+                                <TextBlock Grid.ColumnSpan="3" Padding="10,0" Text="{x:Bind Category}" HorizontalAlignment="Right" />
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ListView>
                 <Expander Padding="10" Header="NuGet packages">
-                    <ItemsControl Background="Transparent" Margin="5" ItemsSource="{Binding NugetPackages}">
+                    <ItemsControl Background="Transparent" Margin="5" ItemsSource="{x:Bind NugetPackages}">
                         <!--<ItemsControl.ItemContainerStyle>
                             <Style TargetType="Items">
-                                --><!--<Setter Property="Background" Value="Transparent" />--><!--
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                -->
+                        <!--<Setter Target="Background" Value="Transparent" />-->
+                        <!--
+                                <Setter Target="HorizontalContentAlignment" Value="Stretch" />
                             </Style>
                         </ItemsControl.ItemContainerStyle>-->
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate>
+                            <DataTemplate x:DataType="helpers:NugetPackage">
                                 <StackPanel Margin="10">
-                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" />
-                                    <TextBlock TextWrapping="Wrap" Text="{Binding Description}" />
-                                    <TextBlock Text="{Binding Copyright,StringFormat='Author: {0}'}" FontStyle="Italic" />
-                                    <Button Content="Install" BorderBrush="Green" Command="{Binding InstallPackageCommand,RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding Id}" HorizontalAlignment="Right" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusBox}" />
+                                    <TextBlock Text="{x:Bind Name}" FontWeight="Bold" />
+                                    <TextBlock TextWrapping="Wrap" Text="{x:Bind Description}" />
+                                    <TextBlock Text="{x:Bind sys:String.Format('Author: {0}',Copyright)}" FontStyle="Italic" />
+                                    <AppBarButton Content="Install" BorderBrush="Green" Command="{Binding InstallPackageCommand, ElementName=me}" CommandParameter="{Binding Id}" HorizontalAlignment="Right" Icon="Add" />
                                 </StackPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -74,20 +73,16 @@
                 </Expander>
             </StackPanel>
         </ScrollViewer>
-        <Border Grid.Row="3" Style="{StaticResource ButtonBar}">
-            <Grid>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Button Content="Cancel" BorderBrush="Red" x:Name="btnRevert" HorizontalAlignment="Center" Command="{Binding CancelCommand}" ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}"/>
-                    <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
-                    <StackPanel Orientation="Horizontal" Visibility="{Binding InstallPackageCommand.IsRunning,Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <mahapps:ProgressRing Width="20" Height="20" Margin="5,0,10,0" />
-                        <TextBlock Text="Installing package..." VerticalAlignment="Center" />
-                    </StackPanel>
+        <CommandBar Grid.Row="3">
+            <AppBarElementContainer>
+                <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
+            </AppBarElementContainer>
+            <AppBarElementContainer>
+                <StackPanel Orientation="Horizontal" Visibility="{x:Bind InstallPackageCommand.IsRunning,Mode=OneWay}">
+                    <ProgressRing Width="20" Height="20" Margin="5,0,10,0" IsIndeterminate="True" />
+                    <TextBlock Text="Installing package..." VerticalAlignment="Center" />
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Next" BorderBrush="Green" HorizontalAlignment="Center" Command="{Binding CreateProviderCommand}" ext:CustomAdorner.Image="{iconPacks:Material Kind=StepForward}"/>
-                </StackPanel>
-            </Grid>
-        </Border>
+            </AppBarElementContainer>
+        </CommandBar>
     </Grid>
 </Page>

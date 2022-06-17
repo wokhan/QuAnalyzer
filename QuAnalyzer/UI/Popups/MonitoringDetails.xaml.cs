@@ -12,7 +12,7 @@ public partial class MonitoringDetails : Page
     private readonly TestDefinition initialItem;
     public TestDefinition CurrentItem { get; set; }
 
-    private Window _owner => Window.GetWindow(this);
+    private Window _owner => Window.Current;
 
     public MonitoringDetails(TestDefinition TestDefinition = null)
     {

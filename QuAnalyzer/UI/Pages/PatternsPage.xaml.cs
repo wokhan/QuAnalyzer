@@ -1,6 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 
+using Microsoft.UI.Xaml.Controls.Primitives;
+
 using System.Linq.Dynamic.Core;
+
+using Windows.UI.Core;
 
 namespace QuAnalyzer.UI.Pages;
 
@@ -45,22 +49,22 @@ public partial class PatternsPage : Page
 
         prg.IsIndeterminate = true;
 
-        var res = await Task.Run(() =>
+        var res = await Task.Run(async () =>
         {
             var data = prov.GetQueryable(repo)
                            .Select(attr)
                            .AsEnumerable()
-                           .WithProgress(i => Dispatcher.InvokeAsync(() => txtStatus.Text = $"Loaded {i} entries..."))
+                           .WithProgress(async i => await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => txtStatus.Text = $"Loaded {i} entries..."))
                            .Select(a => a.ToString())
                            .ToList();
 
-            Dispatcher.Invoke(() =>
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 prg.IsIndeterminate = false;
                 prg.Maximum = data.Count;
             });
 
-            return data.WithProgress(i => Dispatcher.InvokeAsync(() => prg.Value = i))
+            return data.WithProgress(async i => await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => prg.Value = i))
                        .Select(d => new { val = d, reg = Features.Patterns.Patterns.GetRegEx(d, SimThreshold) })
                        .ToList()
                        .GroupBy(s => s.reg)
@@ -85,7 +89,7 @@ public partial class PatternsPage : Page
         UpdateSelection();
     }
 
-    private void slideSim_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
+    private void slideSim_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
         SimThreshold = (int)e.NewValue;
         if (gridPatterns is not null)

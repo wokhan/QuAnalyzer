@@ -1,11 +1,7 @@
 ﻿<Page x:Class="QuAnalyzer.UI.Popups.MappingsEditor"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
-        xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-        Title="{Binding Name,StringFormat='Comparison details - {0}'}" 
-        DataContext="{Binding CurrentMap,RelativeSource={x:Static RelativeSource.Self}}"
+      xmlns:UC="using:QuAnalyzer.UI.Controls"
         x:Name="me"
         MinWidth="700">
     <Grid>
@@ -20,15 +16,15 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Label Content="Mapping name:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="26" />
-                <TextBox Name="lstMappings" Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Top" Grid.ColumnSpan="3" Height="26"/>
+                <TextBlock Text="Mapping name:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="26" />
+                <TextBox x:Name="lstMappings" Grid.Column="1" Text="{x:Bind Name}" VerticalAlignment="Top" Grid.ColumnSpan="3" Height="26"/>
             </Grid>
         </Border>
-        <UC:MappingsEdit Grid.Row="1" Mapping="{Binding}" DataContext="{Binding DataContext,ElementName=me}" />
+        <UC:MappingsEdit Grid.Row="1" Mapping="{x:Bind CurrentMap}" />
         <Border Style="{StaticResource ButtonBar}" Grid.Row="2">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Apply" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Check}" Command="{Binding SaveCommand,RelativeSource={RelativeSource AncestorType=Page}}" />
-                <Button Content="Cancel" BorderBrush="OrangeRed" ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}" IsCancel="True" Command="{Binding CancelCommand,RelativeSource={RelativeSource AncestorType=Page}}" />
+                <AppBarButton Content="Apply" BorderBrush="Blue" Icon="Accept" Command="{x:Bind SaveCommand}" />
+                <AppBarButton Content="Cancel" BorderBrush="OrangeRed" Icon="Cancel" Command="{x:Bind CancelCommand}" />
             </StackPanel>
         </Border>
     </Grid>

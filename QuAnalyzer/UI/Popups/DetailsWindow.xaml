@@ -1,13 +1,11 @@
 ﻿<Page x:Class="QuAnalyzer.UI.Popups.DetailsWindow"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-      xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
-      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      DataContext="{Binding Comparer,RelativeSource={x:Static RelativeSource.Self}}"
-      Title="{Binding Name, StringFormat='Comparison details - {0}'}"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:sys="using:System"
+      xmlns:UC="using:QuAnalyzer.UI.Controls"
+      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600" 
       x:Name="me">
     <Grid>
@@ -20,35 +18,41 @@
             <ColumnDefinition Width="5"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <TabControl Grid.RowSpan="2" Name="tabs" Padding="0">
-            <TabControl.Resources>
+        <TabView Grid.RowSpan="2" x:Name="tabs" Padding="0">
+            <TabView.Resources>
                 <Style TargetType="Border">
-                    <Setter Property="BorderThickness" Value="0,1,0,0" />
-                    <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}" />
-                    <Setter Property="Margin" Value="0,-1,0,0" />
+                    <Setter Target="BorderThickness" Value="0,1,0,0" />
+                    <Setter Target="BorderBrush" Value="{ThemeResource AccentColorBrush}" />
+                    <Setter Target="Margin" Value="0,-1,0,0" />
                 </Style>
-            </TabControl.Resources>
-            <TabItem x:Name="tabDiff" Header="DIFFERENCES" ext:CustomAdorner.PreserveTemplate="True" ext:CustomAdorner.Image="{iconPacks:Material Kind=VectorDifference}">
+            </TabView.Resources>
+            <TabViewItem x:Name="tabDiff" Header="DIFFERENCES">
+                <TabViewItem.IconSource>
+                    <SymbolIconSource Symbol="Preview" />
+                </TabViewItem.IconSource>
                 <Border>
-                    <DockPanel>
-                        <DockPanel.Resources>
+                    <controls:DockPanel>
+                        <!--<controls:DockPanel.Resources>
                             <Style TargetType="DataGridRow">
-                                <Setter Property="Background" Value="White" />
+                                <Setter Target="Background" Value="White" />
                                 <Style.Triggers>
                                     <Trigger Property="ItemsControl.AlternationIndex" Value="2">
-                                        <Setter Property="Background" Value="#EEE" />
+                                        <Setter Target="Background" Value="#EEE" />
                                     </Trigger>
                                     <Trigger Property="ItemsControl.AlternationIndex" Value="3">
-                                        <Setter Property="Background" Value="#EEE" />
+                                        <Setter Target="Background" Value="#EEE" />
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
-                        </DockPanel.Resources>
-                        <UC:ExtendedDataGridView x:Name="dgDiff" AutoGenerateColumns="False" AlternationCount="4" IsReadOnly="True" FrozenColumnCount="1" />
-                    </DockPanel>
+                        </controls:DockPanel.Resources>-->
+                        <UC:ExtendedDataGridView x:Name="dgDiff" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
+                    </controls:DockPanel>
                 </Border>
-            </TabItem>
-            <TabItem x:Name="tabMissingSrc" Header="MISSING ENTRIES" ext:CustomAdorner.PreserveTemplate="True" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectionSearch}">
+            </TabViewItem>
+            <TabViewItem x:Name="tabMissingSrc" Header="MISSING ENTRIES">
+                <TabViewItem.IconSource>
+                    <SymbolIconSource Symbol="ClearSelection" />
+                </TabViewItem.IconSource>
                 <Border>
                     <Grid>
                         <Grid.RowDefinitions>
@@ -58,15 +62,18 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="179*" />
                         </Grid.RowDefinitions>
-                        <Label Content="{Binding SourceName,FallbackValue=Source}" ContentStringFormat="Items missing from {0}" Background="#FFEEEEEE" />
+                        <TextBlock Text="{x:Bind sys:String.Format('Items missing from {0}', Comparer.SourceName),FallbackValue=Source}" />
                         <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgMissingSource" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
-                        <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
-                        <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" ContentStringFormat="Items missing from {0}" Background="#FFEEEEEE" />
+                        <controls:GridSplitter Grid.Row="2" Background="{ThemeResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
+                        <TextBlock Grid.Row="3" Text="{x:Bind sys:String.Format('Items missing from {0}',Comparer.TargetName),FallbackValue=Target}" />
                         <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgMissingTarget" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
                     </Grid>
                 </Border>
-            </TabItem>
-            <TabItem x:Name="tabDupTrg" ext:CustomAdorner.PreserveTemplate="True" ext:CustomAdorner.Image="{iconPacks:Material Kind=TableSearch}" Header="SIMILAR ENTRIES">
+            </TabViewItem>
+            <TabViewItem x:Name="tabDupTrg" Header="SIMILAR ENTRIES">
+                <TabViewItem.IconSource>
+                    <SymbolIconSource Symbol="List" />
+                </TabViewItem.IconSource>
                 <Border>
                     <Grid>
                         <Grid.RowDefinitions>
@@ -76,15 +83,18 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="179*" />
                         </Grid.RowDefinitions>
-                        <Label Content="{Binding SourceName,FallbackValue=Source}" Background="#FFEEEEEE" />
+                        <TextBlock Text="{x:Bind Comparer.SourceName,FallbackValue=Source}" />
                         <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourceDups" AutoGenerateColumns="False"  IsReadOnly="True" FrozenColumnCount="1" />
-                        <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
-                        <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" Background="#FFEEEEEE" />
+                        <controls:GridSplitter Grid.Row="2" Background="{ThemeResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
+                        <TextBlock Grid.Row="3" Text="{x:Bind Comparer.TargetName,FallbackValue=Target}" />
                         <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetDups" AutoGenerateColumns="False"  IsReadOnly="True" FrozenColumnCount="1" />
                     </Grid>
                 </Border>
-            </TabItem>
-            <TabItem x:Name="tabDupPrfSrc" ext:CustomAdorner.PreserveTemplate="True" ext:CustomAdorner.Image="{iconPacks:Material Kind=Equal}" Header="DUPLICATES">
+            </TabViewItem>
+            <TabViewItem x:Name="tabDupPrfSrc" Header="DUPLICATES">
+                <TabViewItem.IconSource>
+                    <SymbolIconSource Symbol="Copy" />
+                </TabViewItem.IconSource>
                 <Border>
                     <Grid>
                         <Grid.RowDefinitions>
@@ -94,14 +104,14 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="179*" />
                         </Grid.RowDefinitions>
-                        <Label Content="{Binding SourceName,FallbackValue=Source}" Background="#FFEEEEEE" />
+                        <TextBlock Text="{x:Bind Comparer.SourceName,FallbackValue=Source}" />
                         <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourcePerfectDups" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
-                        <GridSplitter Grid.Row="2" Background="{DynamicResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
-                        <Label Grid.Row="3" Content="{Binding TargetName,FallbackValue=Target}" Background="#FFEEEEEE" />
+                        <controls:GridSplitter Grid.Row="2" Background="{ThemeResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
+                        <TextBlock Grid.Row="3" Text="{x:Bind Comparer.TargetName,FallbackValue=Target}" />
                         <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetPerfectDups" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
                     </Grid>
                 </Border>
-            </TabItem>
-        </TabControl>
+            </TabViewItem>
+        </TabView>
     </Grid>
 </Page>

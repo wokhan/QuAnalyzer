@@ -5,6 +5,8 @@ using Microsoft.Win32;
 
 using System.Diagnostics.Contracts;
 
+using Windows.UI.Core;
+
 using Wokhan.Data.Providers;
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
@@ -21,7 +23,7 @@ public partial class ProviderEditor : Page
 
     private IDataProvider _currentProvider;
 
-    private Window _owner => Window.GetWindow(this);
+    private Window _owner => Window.Current;
 
     public IDataProvider CurrentProvider
     {
@@ -162,12 +164,12 @@ public partial class ProviderEditor : Page
         string res = null;
         try
         {
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 var reps = CurrentProvider.GetDefaultRepositories().OrderBy(r => r.Key).Select(r => new RepositoryView() { Key = r.Key, Value = r.Value, Selected = true });
                 foreach (var r in reps)
                 {
-                    Dispatcher.Invoke(() => Repositories.Add(r));
+                    await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => Repositories.Add(r));
 
                     if (stopAction)
                     {
@@ -225,8 +227,6 @@ public partial class ProviderEditor : Page
         {
             r.Selected = true;
         }
-
-        gridRepositories.Items.Refresh();
     }
 
     [ICommand]
@@ -236,8 +236,6 @@ public partial class ProviderEditor : Page
         {
             r.Selected = false;
         }
-
-        gridRepositories.Items.Refresh();
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -286,13 +284,13 @@ public partial class ProviderEditor : Page
         txtTestResult.Text = res;
     }
 
-    private void ShowFileDialog(object sender, RoutedEventArgs e)
+    [ICommand]
+    private void ShowFileDialog(DataProviderMemberDefinition definition)
     {
-        var txt = (DataProviderMemberDefinition)((Button)sender).Tag;
-        var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = txt.FileFilter };
+        var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = definition.FileFilter };
         if (dial.ShowDialog().Value)
         {
-            txt.ValueWrapper = dial.FileName;
+            definition.ValueWrapper = dial.FileName;
         }
     }
 
@@ -307,7 +305,7 @@ public partial class ProviderEditor : Page
         else
         {
             dockRepositories.Visibility = Visibility.Visible;
-            gridParameters.Visibility = Visibility.Hidden;
+            gridParameters.Visibility = Visibility.Collapsed;
             btnBack.IsEnabled = true;
             btnNext.Content = "Done";
         }
@@ -317,7 +315,7 @@ public partial class ProviderEditor : Page
     {
         if (pageCount-- > 0)
         {
-            dockRepositories.Visibility = Visibility.Hidden;
+            dockRepositories.Visibility = Visibility.Collapsed;
             gridParameters.Visibility = Visibility.Visible;
             btnNext.Content = "Next >";
             if (!isNewProvider)
@@ -327,7 +325,7 @@ public partial class ProviderEditor : Page
         }
         else
         {
-            this.NavigationService.GoBack();
+            //this.NavigationService.GoBack();
         }
     }
 }

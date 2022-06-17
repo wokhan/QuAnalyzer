@@ -3,13 +3,9 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-      xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
-      xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-      DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}"
+      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" xmlns:bases="using:Wokhan.Data.Providers.Bases"
       mc:Ignorable="d"  x:Name="me"
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="{Binding CurrentProvider.Name, FallbackValue='Provider editor'}">
+      d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -29,15 +25,15 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <!--<Image Grid.RowSpan="2" Source="{Binding CurrentType.IconPath, Converter={StaticResource imageSourceConverter}}" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />-->
-                <Label Grid.Column="1" Content="{Binding CurrentType.Name}" FontWeight="Bold" />
-                <Label Grid.Column="1" Grid.Row="1" Content="{Binding CurrentType.Copyright}" FontSize="10" />
-                <Label Grid.Column="1" Grid.Row="2" Content="{Binding CurrentType.Description}" />
+                <TextBlock Grid.Column="1" Text="{x:Bind CurrentType.Name}" FontWeight="Bold" />
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{x:Bind CurrentType.Copyright}" FontSize="10" />
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{x:Bind CurrentType.Description}" />
             </Grid>
         </Border>
         <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="0,0,0,1">
             <Grid Margin="10">
-                <Label FontWeight="Bold" Content="Name:" HorizontalAlignment="Left" VerticalContentAlignment="Center" />
-                <TextBox VerticalAlignment="Top" Margin="50,5,5,5" x:Name="txtProviderName" Text="{Binding CurrentProvider.Name}" />
+                <TextBlock FontWeight="Bold" Text="Name:" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <TextBox VerticalAlignment="Top" Margin="50,5,5,5" x:Name="txtProviderName" Text="{x:Bind CurrentProvider.Name}" />
             </Grid>
         </Border>
         <ScrollViewer x:Name="gridParameters" Grid.Row="2">
@@ -49,169 +45,105 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl x:Name="itms" ItemsSource="{Binding ExpParameters}">
+                    <ItemsControl x:Name="itms" ItemsSource="{x:Bind ExpParameters}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <GroupBox>
-                                    <GroupBox.Style>
+                                <StackPanel BorderThickness="1" CornerRadius="10">
+                                    <!--<GroupBox.Style>
                                         <Style TargetType="GroupBox">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding HasMultipleItems,ElementName=me}" Value="False">
-                                                    <Setter Property="BorderThickness" Value="0" />
+                                                <DataTrigger Binding="{x:Bind HasMultipleItems}" Value="False">
+                                                    <Setter Target="BorderThickness" Value="0" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </GroupBox.Style>
-                                    <GroupBox.Header>
-                                        <RadioButton x:Name="rdb" Visibility="{Binding HasMultipleItems,ElementName=me,Converter={StaticResource valueToVisibilityConverter}}" IsChecked="{Binding ExpParameters.Count,ElementName=me,Converter={StaticResource valueChecker}, ConverterParameter=1, Mode=OneWay}" GroupName="optionsGroup" Background="LightGray" BorderBrush="LightGray" Content="{Binding Key}" />
-                                    </GroupBox.Header>
-                                    <ItemsControl Grid.IsSharedSizeScope="True" ItemsSource="{Binding}" ScrollViewer.CanContentScroll="True" x:Name="itms">
-                                        <ItemsControl.Resources>
-                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                                <EventSetter Event="Click" Handler="ShowFileDialog" />
-                                            </Style>
-                                        </ItemsControl.Resources>
+                                    </GroupBox.Style>-->
+                                    <RadioButton x:Name="rdb" Visibility="{Binding HasMultipleItems}" IsChecked="{Binding ExpParameters,Converter={StaticResource valueChecker}, Mode=OneWay,ElementName=me}" GroupName="optionsGroup" Background="LightGray" BorderBrush="LightGray" Content="{Binding Key}" />
+                                    <ItemsControl ItemsSource="{x:Bind}" x:Name="itms">
                                         <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <ContentControl Content="{Binding}">
-                                                    <ContentControl.Style>
-                                                        <Style TargetType="ContentControl">
-                                                            <Setter Property="ContentTemplate">
-                                                                <Setter.Value>
-                                                                    <DataTemplate>
-                                                                        <Grid HorizontalAlignment="Stretch">
-                                                                            <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="Auto" SharedSizeGroup="gridFirst" />
-                                                                                <ColumnDefinition />
-                                                                            </Grid.ColumnDefinitions>
-                                                                            <Label Content="{Binding Description}" VerticalContentAlignment="Center" />
-                                                                            <TextBox Grid.Column="1" Text="{Binding ValueWrapper,Mode=TwoWay}" />
-                                                                        </Grid>
-                                                                    </DataTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding MemberType}" Value="{x:Type sys:Boolean}">
-                                                                    <Setter Property="ContentTemplate">
-                                                                        <Setter.Value>
-                                                                            <DataTemplate>
-                                                                                <Grid HorizontalAlignment="Stretch">
-                                                                                    <Grid.ColumnDefinitions>
-                                                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="gridFirst" />
-                                                                                        <ColumnDefinition />
-                                                                                    </Grid.ColumnDefinitions>
-                                                                                    <Label Content="{Binding Description}" VerticalContentAlignment="Center" />
-                                                                                    <CheckBox Grid.Column="1" IsChecked="{Binding ValueWrapper,Mode=TwoWay}" />
-                                                                                </Grid>
-                                                                            </DataTemplate>
-                                                                        </Setter.Value>
-                                                                    </Setter>
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding IsFile}" Value="True">
-                                                                    <Setter Property="ContentTemplate">
-                                                                        <Setter.Value>
-                                                                            <DataTemplate>
-                                                                                <Grid HorizontalAlignment="Stretch">
-                                                                                    <Grid.ColumnDefinitions>
-                                                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="gridFirst" />
-                                                                                        <ColumnDefinition />
-                                                                                    </Grid.ColumnDefinitions>
-                                                                                    <Label Content="{Binding Description}" VerticalContentAlignment="Center" />
-                                                                                    <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Left">
-                                                                                        <TextBox x:Name="txtFile" Width="200" Text="{Binding ValueWrapper,Mode=TwoWay}" />
-                                                                                        <Button Margin="10,0,0,0" Content="Browse" Tag="{Binding}" />
-                                                                                    </StackPanel>
-                                                                                </Grid>
-                                                                            </DataTemplate>
-                                                                        </Setter.Value>
-                                                                    </Setter>
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding HasValuesGetter}" Value="True">
-                                                                    <Setter Property="ContentTemplate">
-                                                                        <Setter.Value>
-                                                                            <DataTemplate>
-                                                                                <Grid HorizontalAlignment="Stretch">
-                                                                                    <Grid.ColumnDefinitions>
-                                                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="gridFirst" />
-                                                                                        <ColumnDefinition />
-                                                                                    </Grid.ColumnDefinitions>
-                                                                                    <Label Content="{Binding Description}" VerticalContentAlignment="Center" />
-                                                                                    <ComboBox Grid.Column="1" DisplayMemberPath="Value" SelectedValuePath="Key" ItemsSource="{Binding Values}" SelectedValue="{Binding ValueWrapper,Mode=TwoWay}" />
-                                                                                </Grid>
-                                                                            </DataTemplate>
-                                                                        </Setter.Value>
-                                                                    </Setter>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </ContentControl.Style>
-                                                </ContentControl>
+                                            <DataTemplate x:DataType="bases:DataProviderMemberDefinition">
+                                                <controls:UniformGrid Columns="2">
+                                                    <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center" />
+                                                    <controls:SwitchPresenter>
+                                                        <controls:Case IsDefault="True">
+                                                            <TextBox Grid.Column="1" Text="{x:Bind ValueWrapper,Mode=TwoWay}" />
+                                                        </controls:Case>
+                                                        <!--<controls:Case Value="{x:Bind MemberType.Name.Equals('Boolean')}">
+                                                            <CheckBox Grid.Column="1" IsChecked="{x:Bind ValueWrapper,Mode=TwoWay}" />
+                                                        </controls:Case>-->
+                                                        <controls:Case Value="{x:Bind IsFile}">
+                                                            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Left">
+                                                                <TextBox x:Name="txtFile" Width="200" Text="{x:Bind ValueWrapper,Mode=TwoWay}" />
+                                                                <Button Margin="10,0,0,0" Content="Browse" Tag="{x:Bind}" Command="{Binding ShowFileDialogCommand,ElementName=me}" />
+                                                            </StackPanel>
+                                                        </controls:Case>
+                                                        <controls:Case Value="{x:Bind HasValuesGetter}">
+                                                            <ComboBox Grid.Column="1" DisplayMemberPath="Value" SelectedValuePath="Key" ItemsSource="{x:Bind Values}" SelectedValue="{x:Bind ValueWrapper,Mode=TwoWay}" />
+                                                        </controls:Case>
+                                                    </controls:SwitchPresenter>
+                                                </controls:UniformGrid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
-                                </GroupBox>
+                                </StackPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    <!--<StackPanel Name="stackOptions" Grid.IsSharedSizeScope="True"  CanHorizontallyScroll="True" />-->
+                    <!--<StackPanel x:Name="stackOptions" Grid.IsSharedSizeScope="True"  CanHorizontallyScroll="True" />-->
                 </ScrollViewer>
             </Grid>
         </ScrollViewer>
-        <DockPanel x:Name="dockRepositories" Grid.Row="2" Visibility="Hidden">
-            <WrapPanel Style="{StaticResource ToolBar}">
-                <Button Content="Add" ToolTip="Add a repository" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" Command="{Binding RepositoryAddCommand,RelativeSource={RelativeSource AncestorType=Page}}"  />
-                <Button Content="Retrieve" ToolTip="Retrieve repositories" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=DownloadOutline}" Command="{Binding RetrieveCommand,RelativeSource={RelativeSource AncestorType=Page}}"  />
-                <Button Content="Clear" ToolTip="Remove all repositories" BorderBrush="OrangeRed" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectionOff}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}" Command="{Binding ClearCommand,RelativeSource={RelativeSource AncestorType=Page}}"  />
-                <Rectangle />
-                <Button Content="Sel. all" ToolTip="Select all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=SelectAll}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}"  Command="{Binding SelectAllCommand,RelativeSource={RelativeSource AncestorType=Page}}" />
-                <Button Content="Unsel. all" ToolTip="Unselect all" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Select}" IsEnabled="{Binding Items.IsEmpty,ElementName=gridRepositories,Converter={StaticResource booleanNegator}}" Command="{Binding ClearSelectionCommand,RelativeSource={RelativeSource AncestorType=Page}}" />
-            </WrapPanel>
-            <DataGrid Name="gridRepositories" BorderBrush="LightGray" BorderThickness="1,0,1,1" CanUserAddRows="False" AutoGenerateColumns="False" ItemsSource="{Binding Repositories}" SelectionMode="Single" CanUserReorderColumns="False">
-                <DataGrid.Columns>
-                    <DataGridCheckBoxColumn Binding="{Binding Selected,UpdateSourceTrigger=PropertyChanged}" Width="80" Header="Selected" />
-                    <DataGridTextColumn Binding="{Binding Key, UpdateSourceTrigger=PropertyChanged}" Width="0.3*" Header="Name" />
-                    <DataGridTextColumn Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Width="0.7*" Header="Definition">
-                        <DataGridTextColumn.ElementStyle>
+        <controls:DockPanel x:Name="dockRepositories" Grid.Row="2" Visibility="Collapsed">
+            <CommandBar>
+                <AppBarButton Content="Add" ToolTipService.ToolTip="Add a repository" BorderBrush="Green" Icon="Add" Command="{x:Bind RepositoryAddCommand}"  />
+                <AppBarButton Content="Retrieve" ToolTipService.ToolTip="Retrieve repositories" BorderBrush="Green" Icon="Download" Command="{x:Bind RetrieveCommand}"  />
+                <AppBarButton Content="Clear" ToolTipService.ToolTip="Remove all repositories" BorderBrush="OrangeRed" Icon="Clear" IsEnabled="{x:Bind Repositories.Count,Converter={StaticResource objectToBool}}" Command="{x:Bind ClearCommand}"  />
+                <AppBarSeparator />
+                <AppBarButton Content="Sel. all" ToolTipService.ToolTip="Select all" BorderBrush="Blue" Icon="SelectAll" IsEnabled="{x:Bind Repositories.Count,Converter={StaticResource objectToBool}}"  Command="{x:Bind SelectAllCommand}" />
+                <AppBarButton Content="Unsel. all" ToolTipService.ToolTip="Unselect all" BorderBrush="Blue" Icon="ClearSelection" IsEnabled="{x:Bind Repositories.Count,Converter={StaticResource objectToBool}}" Command="{x:Bind ClearSelectionCommand}" />
+            </CommandBar>
+            <controls:DataGrid x:Name="gridRepositories" BorderBrush="LightGray" BorderThickness="1,0,1,1" AutoGenerateColumns="False" ItemsSource="{x:Bind Repositories,Mode=OneWay}" SelectionMode="Single" CanUserReorderColumns="False">
+                <controls:DataGrid.Columns>
+                    <controls:DataGridCheckBoxColumn Binding="{Binding Selected,UpdateSourceTrigger=PropertyChanged}" Width="80" Header="Selected" />
+                    <controls:DataGridTextColumn Binding="{Binding Key, UpdateSourceTrigger=PropertyChanged}" Width="30*" Header="Name" />
+                    <controls:DataGridTextColumn Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Width="70*" Header="Definition">
+                        <controls:DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
-                                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                                <Setter Property="TextWrapping" Value="NoWrap" />
-                                <Setter Property="Height" Value="14" />
+                                <Setter Target="TextTrimming" Value="CharacterEllipsis" />
+                                <Setter Target="TextWrapping" Value="NoWrap" />
+                                <Setter Target="Height" Value="14" />
                             </Style>
-                        </DataGridTextColumn.ElementStyle>
-                        <DataGridTextColumn.EditingElementStyle>
+                        </controls:DataGridTextColumn.ElementStyle>
+                        <controls:DataGridTextColumn.EditingElementStyle>
                             <Style TargetType="TextBox">
-                                <Setter Property="TextWrapping" Value="Wrap" />
-                                <Setter Property="AcceptsReturn" Value="true" />
+                                <Setter Target="TextWrapping" Value="Wrap" />
+                                <Setter Target="AcceptsReturn" Value="true" />
                             </Style>
-                        </DataGridTextColumn.EditingElementStyle>
-                    </DataGridTextColumn>
-                    <DataGridTemplateColumn IsReadOnly="True" CanUserResize="False">
-                        <DataGridTemplateColumn.CellTemplate>
+                        </controls:DataGridTextColumn.EditingElementStyle>
+                    </controls:DataGridTextColumn>
+                    <controls:DataGridTemplateColumn IsReadOnly="True" CanUserResize="False">
+                        <controls:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Name="btnDeleteRepo" CommandParameter="{Binding}" Command="{Binding RepositoryDeleteCommand,RelativeSource={RelativeSource AncestorType=Page}}"  Foreground="OrangeRed" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                                <AppBarButton x:Name="btnDeleteRepo" CommandParameter="{Binding}" Command="{Binding RepositoryDeleteCommand,ElementName=me}"  Foreground="OrangeRed" Icon="Delete" />
                             </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </DockPanel>
-        <Border Grid.Row="3" Style="{StaticResource ButtonBar}">
-            <Grid>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Button Content="Cancel" BorderBrush="Red" x:Name="btnRevert" ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}" HorizontalAlignment="Center" Command="{Binding RevertCommand,RelativeSource={RelativeSource AncestorType=Page}}"  />
-                    <Button Content="Test" BorderBrush="Blue" x:Name="btnTest" ext:CustomAdorner.Image="{iconPacks:Material Kind=TestTube}" HorizontalAlignment="Left" Command="{Binding TestCommand,RelativeSource={RelativeSource AncestorType=Page}}"  />
-                    <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Back" BorderBrush="Orange" ext:CustomAdorner.Image="{iconPacks:Material Kind=StepBackward}" x:Name="btnBack" HorizontalAlignment="Center" Click="btnBack_Click" IsEnabled="False" />
-                    <Button Content="Next" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=StepForward}" x:Name="btnNext" HorizontalAlignment="Center" Click="btnNext_Click" />
-                </StackPanel>
-            </Grid>
-        </Border>
-        <Grid Grid.RowSpan="3" VerticalAlignment="Center" HorizontalAlignment="Center" Background="White" Width="400" Visibility="{Binding MessageTitle,Converter={StaticResource valueToVisibilityConverter}}">
+                        </controls:DataGridTemplateColumn.CellTemplate>
+                    </controls:DataGridTemplateColumn>
+                </controls:DataGrid.Columns>
+            </controls:DataGrid>
+        </controls:DockPanel>
+        <CommandBar Grid.Row="3">
+            <AppBarButton Content="Cancel" BorderBrush="Red" x:Name="btnRevert" Icon="Cancel" HorizontalAlignment="Center" Command="{x:Bind RevertCommand}"  />
+            <AppBarButton Content="Test" BorderBrush="Blue" x:Name="btnTest" Icon="Accept" HorizontalAlignment="Left" Command="{x:Bind TestCommand}"  />
+            <AppBarElementContainer>
+                <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
+            </AppBarElementContainer>
+            <AppBarButton Content="Back" BorderBrush="Orange" Icon="Back" x:Name="btnBack" HorizontalAlignment="Center" Click="btnBack_Click" IsEnabled="False" />
+            <AppBarButton Content="Next" BorderBrush="Green" Icon="Next" x:Name="btnNext" HorizontalAlignment="Center" Click="btnNext_Click" />
+        </CommandBar>
+        <Grid Grid.RowSpan="3" VerticalAlignment="Center" HorizontalAlignment="Center" Background="White" Width="400" Visibility="{x:Bind MessageTitle}">
             <StackPanel Margin="10">
-                <TextBlock Text="{Binding MessageTitle}" VerticalAlignment="Stretch" />
-                <TextBlock Text="{Binding MessageContent}" VerticalAlignment="Stretch" />
+                <TextBlock Text="{x:Bind MessageTitle}" VerticalAlignment="Stretch" />
+                <TextBlock Text="{x:Bind MessageContent}" VerticalAlignment="Stretch" />
                 <ProgressBar x:Name="progress" VerticalAlignment="Top" />
                 <Button Content="Cancel" HorizontalAlignment="Center" />
             </StackPanel>

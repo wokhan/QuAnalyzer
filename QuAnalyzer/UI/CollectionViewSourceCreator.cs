@@ -1,5 +1,6 @@
-﻿using System.Globalization;
-using System.Windows.Data;
+﻿using Microsoft.UI.Xaml.Data;
+
+using System.Globalization;
 
 namespace QuAnalyzer.UI.BindingConverters;
 
@@ -12,7 +13,7 @@ public sealed partial class CollectionViewSourceCreator : IValueConverter
         var cvs = new CollectionViewSource() { Source = value };
         
         //cvs.SetValue(CollectionViewSource.SourceProperty, value);
-        cvs.GroupDescriptions.Add(new PropertyGroupDescription((string)parameter));
+        //cvs.GroupDescriptions.Add(new PropertyGroupDescription((string)parameter));
 
         return cvs.View;
     }

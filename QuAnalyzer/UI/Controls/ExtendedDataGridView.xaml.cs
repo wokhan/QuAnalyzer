@@ -1,12 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.UI.Controls;
 
-using QuAnalyzer.Generic.Extensions;
+using Microsoft.UI.Text;
+using Microsoft.UI.Xaml.Data;
 
 using System.Linq.Dynamic.Core;
-using System.Reflection.PortableExecutable;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Threading;
+
+using Windows.Devices.Input;
+using Windows.UI.Core;
 
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Linq.Extensions;
@@ -42,10 +44,7 @@ public partial class ExtendedDataGridView : DataGrid
 
     public string CustomFilter { get; set; }
 
-    public bool IsCustomFilterError => CustomFilterError is not null;
-
     [ObservableProperty]
-    [AlsoNotifyChangeFor(nameof(CustomFilterError), nameof(IsCustomFilterError))]
     private string _customFilterError;
 
     public ObservableCollection<ComputeStruct> Compute { get; } = new();
@@ -68,18 +67,16 @@ public partial class ExtendedDataGridView : DataGrid
         InitializeComponent();
 
         this.PropertyChanged += ExtendedDataGridView_PropertyChanged;
-
-        VirtualizedQueryableExtensions.Init(Dispatcher);
     }
 
-    private void ExtendedDataGridView_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private async void ExtendedDataGridView_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(Source))
         {
-            Dispatcher.Invoke(() =>
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
                 ClearAll();
-                Reload();
+                await Reload();
             });
         }
     }
@@ -96,60 +93,60 @@ public partial class ExtendedDataGridView : DataGrid
     private void ExportCSV()
     {
         //TODO: Externalize (shouldn't be at the Control level)
-        var (host, progress, cancellationToken) = App.Instance.AddTaskAndGetCallback("Exporting data");
-        this.ExportAsXLSX(host: host, progress: progress, cancellationToken: cancellationToken);
+        //var (host, progress, cancellationToken) = App.Instance.AddTaskAndGetCallback("Exporting data");
+        //this.ExportAsXLSX(host: host, progress: progress, cancellationToken: cancellationToken);
     }
 
     [ICommand]
     private void ExportHTML()
     {
         //TODO: Externalize (shouldn't be at the Control level)
-        this.ExportAsHTML();
+        //this.ExportAsHTML();
     }
 
     [ICommand]
     private void Copy()
     {
-        this.CopyToClipboard();
+        //this.CopyToClipboard();
     }
 
-    private Point startPoint;
+    //private Point startPoint;
     private void DataGrid_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        startPoint = e.GetPosition(null);
+        //startPoint = e.GetPosition(null);
     }
 
-    private void DataGrid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+    private void DataGrid_MouseMove(object sender, MouseEventArgs e)
     {
-        Vector diff = startPoint - e.GetPosition(null);
-        if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed && (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
-        {
-            DragDrop.DoDragDrop((Control)sender, new DataObject(((DataGridColumnHeader)sender).Column.SortMemberPath), DragDropEffects.Link);
-            e.Handled = true;
-        }
+        //if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed && (Math.Abs(e.MouseDelta.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
+        //{
+        //    DragDrop.DoDragDrop((Control)sender, new DataObject(((DataGridColumnHeader)sender).Column.SortMemberPath), DragDropEffects.Link);
+        //    e.Handled = true;
+        //}
     }
 
-    private void lstGrouping_Drop(object sender, DragEventArgs e)
+    private async void lstGrouping_Drop(object sender, DragEventArgs e)
     {
-        var src = (string)e.Data.GetData(typeof(string));
+        var src = await e.DataView.GetTextAsync();
         if (!Grouping.Contains(src))
         {
             Grouping.Add(src);
-            foreach (var h in this.Columns.Select(c => c.SortMemberPath).Except(Grouping).Except(Compute.Select(c => c.Attribute)))
-            {
-                Compute.Add(new ComputeStruct() { Attribute = h, Aggregate = null });
-            }
+            //foreach (var h in this.Columns.Select(c => c.SortMemberPath).Except(Grouping).Except(Compute.Select(c => c.Attribute)))
+            //{
+            //    Compute.Add(new ComputeStruct() { Attribute = h, Aggregate = null });
+            //}
         }
     }
 
-    private void gridCompute_Drop(object sender, DragEventArgs e)
+    private async void gridCompute_Drop(object sender, DragEventArgs e)
     {
-        Compute.Add(new ComputeStruct() { Attribute = (string)e.Data.GetData(typeof(string)), Aggregate = null });
+        var attr = await e.DataView.GetTextAsync();
+        Compute.Add(new ComputeStruct() { Attribute = attr, Aggregate = null });
     }
 
-    private void gridFilters_Drop(object sender, DragEventArgs e)
+    private async void gridFilters_Drop(object sender, DragEventArgs e)
     {
-        var attr = (string)e.Data.GetData(typeof(string));
+        var attr = await e.DataView.GetTextAsync();
         Filters.Add(new FilterStruct() { Attribute = attr, Type = CustomHeaders.First(c => c.Name == attr).Type });
     }
 
@@ -172,15 +169,15 @@ public partial class ExtendedDataGridView : DataGrid
             this.Columns.AddAll(CustomHeaders.Select((h, i) => new DataGridTextColumn()
             {
                 Header = h.DisplayName,
-                Binding = new Binding($"[{i}]"),
-                SortMemberPath = $"it[{i}]",
+                Binding = new Binding() { Path = new PropertyPath($"[{i}]") },
+                //SortMemberPath = $"it[{i}]",
                 FontWeight = (h.IsKey ? FontWeights.Bold : FontWeights.Normal)
             }));
         }
 
         this.IsEnabled = true;
 
-        await Task.Run(() =>
+        await Task.Run(async () =>
         {
             LoadingProgress = -1;
             Status = "Initializing...";
@@ -235,13 +232,14 @@ public partial class ExtendedDataGridView : DataGrid
                 virtualizedData = query.AsVirtualized();
             }
 
-            Dispatcher.Invoke(() =>
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                () =>
             {
                 this.SelectedItems.Clear();
                 this.ItemsSource = virtualizedData;
                 if (SortOrder is not null && this.Columns.Any())
                 {
-                    this.Columns.First(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
+                    //this.Columns.First(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
                 }
             });
 
@@ -270,15 +268,16 @@ public partial class ExtendedDataGridView : DataGrid
 
     private string currentSortAttribute = null;
     private bool currentSortDirectionAsc = true;
-    private void gridData_Sorting(object sender, DataGridSortingEventArgs e)
+
+    private void gridData_Sorting(object sender, DataGridColumnEventArgs e)
     {
-        currentSortDirectionAsc = (currentSortAttribute == e.Column.SortMemberPath) && !currentSortDirectionAsc;
-        currentSortAttribute = e.Column.SortMemberPath;
+        //currentSortDirectionAsc = (currentSortAttribute == e.Column.SortMemberPath) && !currentSortDirectionAsc;
+        //currentSortAttribute = e.Column.SortMemberPath;
 
-        e.Column.SortDirection = currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending;
+        //e.Column.SortDirection = currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending;
 
-        Reload();
+        //Reload();
 
-        e.Handled = true;
+        //e.Handled = true;
     }
 }

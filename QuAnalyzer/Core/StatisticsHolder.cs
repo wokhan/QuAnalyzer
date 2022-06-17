@@ -1,5 +1,7 @@
 ﻿using System.Windows.Threading;
 
+using Windows.UI.Core;
+
 using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer.Features.Statistics;
@@ -18,13 +20,13 @@ public partial class StatisticsHolder : ObservableObject
         Statistics = StatsResult.GetStats(Source, attribute);
     }
 
-    private async void UpdateOccurences(ColumnDescription column, Dispatcher dispatcher)
+    private async void UpdateOccurences(ColumnDescription column, CoreDispatcher dispatcher)
     {
         var occurences = OccurencesResult.CountOccurences(Source, column);
-        await dispatcher.InvokeAsync(() => Occurences.AddAll(occurences));
+        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => Occurences.AddAll(occurences));
     }
 
-    internal void Update(ColumnDescription h, Dispatcher dispatcher)
+    internal void Update(ColumnDescription h, CoreDispatcher dispatcher)
     {
         UpdateStats(h.Name);
         UpdateOccurences(h, dispatcher);

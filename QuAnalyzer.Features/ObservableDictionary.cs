@@ -23,13 +23,13 @@ public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INot
     {
     }
 
-    public ObservableDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection) : base(collection)
-    {
-    }
+    //public ObservableDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection) : base(collection)
+    //{
+    //}
 
-    public ObservableDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer) : base(collection, comparer)
-    {
-    }
+    //public ObservableDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer) : base(collection, comparer)
+    //{
+    //}
 
     public ObservableDictionary(IEqualityComparer<TKey> comparer) : base(comparer)
     {

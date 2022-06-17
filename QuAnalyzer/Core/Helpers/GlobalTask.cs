@@ -1,4 +1,6 @@
-﻿namespace QuAnalyzer.Core.Helpers;
+﻿using System.Threading;
+
+namespace QuAnalyzer.Core.Helpers;
 
 public partial class GlobalTask : ObservableObject
 {
@@ -6,7 +8,7 @@ public partial class GlobalTask : ObservableObject
     private string title;
 
     [ObservableProperty]
-    private double? progress;
+    private double progress = -1;
 
     public CancellationTokenSource CancellationTokenSource { get; } = new CancellationTokenSource();
 }

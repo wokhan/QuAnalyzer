@@ -13,6 +13,7 @@ using Wokhan.Data.Providers.Bases;
 using NuGet.Configuration;
 using NuGet.Frameworks;
 using NuGet.Resolver;
+using System.Threading;
 
 namespace QuAnalyzer.Core.Helpers;
 
@@ -41,14 +42,14 @@ public class ProvidersManager : NotifierHelper
         }   
     }
 
-    internal async Task<IEnumerable<dynamic>> GetNugetPackages()
+    internal async Task<IEnumerable<NugetPackage>> GetNugetPackages()
     {
         var repository = Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
         var resource = await repository.GetResourceAsync<PackageSearchResource>();
 
         var metadata = await resource.SearchAsync("Wokhan.Data.Providers", new SearchFilter(true, SearchFilterType.IsLatestVersion) { IncludeDelisted = true }, 0, 20, NullLogger.Instance, CancellationToken.None);
 
-        return metadata.Select(package => new { Id = package.Identity, Name = package.Title, IconPath = package.IconUrl, Copyright = package.Authors, Description = package.Description }).ToList();
+        return metadata.Select(package => new NugetPackage(package.Identity, package.Title, package.IconUrl, package.Authors, package.Description)).ToList();
     }
 
     internal async Task InstallPackage(PackageIdentity identity)
@@ -170,3 +171,5 @@ public class ProvidersManager : NotifierHelper
         NotifyPropertyChanged(nameof(Providers));
     }
 }
+
+public record NugetPackage(PackageIdentity Id, string Name, Uri IconPath, string Copyright, string Description);

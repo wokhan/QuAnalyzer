@@ -41,8 +41,8 @@ public class DynamicComparer<TA, TB> : IComparer where TA : class where TB : cla
 
     public int Compare(object? x, object? y)
     {
-        ArgumentNullException.ThrowIfNull(x);
-        ArgumentNullException.ThrowIfNull(y);
+        _ArgumentNullException.ThrowIfNull(x);
+        _ArgumentNullException.ThrowIfNull(y);
 
         switch (x)
         {

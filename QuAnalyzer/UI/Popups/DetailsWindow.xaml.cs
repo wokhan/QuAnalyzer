@@ -1,11 +1,13 @@
 ﻿
+using CommunityToolkit.WinUI.UI.Controls;
+
+using Microsoft.UI.Text;
+using Microsoft.UI.Xaml.Data;
+
 using QuAnalyzer.Core.Extensions;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Results;
 using QuAnalyzer.UI.Controls;
-
-using System.Windows.Data;
-using System.Windows.Media;
 
 using Wokhan.Data.Providers.Bases;
 
@@ -54,7 +56,7 @@ public partial class DetailsWindow : Page
     {
         gridData.Columns.Clear();
 
-        gridData.Columns.Add(new DataGridTextColumn() { Header = "Origin", Binding = new Binding(nameof(Diff<object[]>.Source)) });
+        gridData.Columns.Add(new DataGridTextColumn() { Header = "Origin", Binding = new Binding() { Path = new PropertyPath(nameof(Diff<object[]>.Source)) } });
 
         if (data is not null && data.Any())
         {
@@ -65,26 +67,27 @@ public partial class DetailsWindow : Page
 
             for (int i = 0; i < headers.Length; i++)
             {
-                var trigger = new DataTrigger()
-                {
-                    Value = true,
-                    Binding = new Binding($"{nameof(Diff<object[]>.IsDiff)}[{i}]"),
-                    Setters = { new Setter(Control.ForegroundProperty, Brushes.Red) }
-                };
+                //TODO: WINUI
+                //var trigger = new DataTrigger()
+                //{
+                //    Value = true,
+                //    Binding = new Binding($"{nameof(Diff<object[]>.IsDiff)}[{i}]"),
+                //    Setters = { new Setter(Control.ForegroundProperty, Brushes.Red) }
+                //};
 
-                var style = new Style()
-                {
-                    TargetType = typeof(DataGridCell),
-                    BasedOn = gridData.CellStyle,
-                    Triggers = { trigger }
-                };
+                //var style = new Style()
+                //{
+                //    TargetType = typeof(DataGridCell),
+                //    BasedOn = gridData.CellStyle,
+                //    Triggers = { trigger }
+                //};
 
                 var col = new DataGridTextColumn()
                 {
                     Header = headers[i],
-                    Binding = new Binding($"{nameof(Diff<object[]>.Values)}[{i}]"),
+                    Binding = new Binding() { Path = new PropertyPath($"{nameof(Diff<object[]>.Values)}[{i}]") },
                     FontWeight = (i < keysCount ? FontWeights.Bold : FontWeights.Normal),
-                    CellStyle = style
+                    //CellStyle = style
                 };
 
                 gridData.Columns.Add(col);

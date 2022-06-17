@@ -1,42 +1,39 @@
 ﻿<Page x:Class="QuAnalyzer.UI.Popups.MonitoringDetails"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
-      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:monitor="clr-namespace:QuAnalyzer.Features.Monitoring;assembly=QuAnalyzer.Features"
-      xmlns:quanalyzer="clr-namespace:QuAnalyzer"
+      xmlns:monitor="using:QuAnalyzer.Features.Monitoring"
+      xmlns:quanalyzer="using:QuAnalyzer" 
+      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:ui="using:CommunityToolkit.WinUI.UI" xmlns:contracts="using:Wokhan.Data.Providers.Contracts"
       mc:Ignorable="d" 
-      d:DesignWidth="388" DataContext="{Binding CurrentItem,RelativeSource={x:Static RelativeSource.Self}}"
-      Title="{Binding Name,StringFormat='Monitoring settings - {0}',FallbackValue='New monitor'}"
+      d:DesignWidth="388"
       x:Name="myself">
     <Page.Resources>
-        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
-            <Setter Property="Margin" Value="5" />
+        <Style TargetType="TextBox">
+            <Setter Target="Margin" Value="5" />
         </Style>
-        <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
-            <Setter Property="Margin" Value="5" />
+        <Style TargetType="ComboBox">
+            <Setter Target="Margin" Value="5" />
         </Style>
-        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
-            <Setter Property="VerticalAlignment" Value="Center" />
+        <Style TargetType="TextBlock">
+            <Setter Target="VerticalAlignment" Value="Center" />
         </Style>
-        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
-            <Setter Property="Margin" Value="5" />
+        <Style TargetType="CheckBox">
+            <Setter Target="Margin" Value="5" />
         </Style>
-        <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource {x:Type ListBox}}">
-            <Setter Property="Margin" Value="5" />
-            <Setter Property="BorderBrush" Value="LightGray" />
-            <Setter Property="BorderThickness" Value="1" />
+        <Style TargetType="ListBox">
+            <Setter Target="Margin" Value="5" />
+            <Setter Target="BorderBrush" Value="LightGray" />
+            <Setter Target="BorderThickness" Value="1" />
         </Style>
     </Page.Resources>
-    <DockPanel>
-        <Border DockPanel.Dock="Bottom" Grid.ColumnSpan="4" Style="{StaticResource ButtonBar}">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Apply" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Check}" Command="{Binding SaveCommand,RelativeSource={RelativeSource AncestorType=Page}}" />
-                <Button Content="Cancel" BorderBrush="OrangeRed" ext:CustomAdorner.Image="{iconPacks:Material Kind=Cancel}" IsCancel="True" Command="{Binding CancelCommand,RelativeSource={RelativeSource AncestorType=Page}}" />
-            </StackPanel>
-        </Border>
+    <controls:DockPanel>
+        <CommandBar controls:DockPanel.Dock="Bottom" Grid.ColumnSpan="4">
+            <AppBarButton Content="Apply" BorderBrush="Blue" Icon="Accept" Command="{x:Bind SaveCommand}" />
+            <AppBarButton Content="Cancel" BorderBrush="OrangeRed" Icon="Cancel" Command="{x:Bind CancelCommand}" />
+        </CommandBar>
         <Grid Margin="5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -56,32 +53,33 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Label Content="Name:" HorizontalAlignment="Left" />
-            <TextBox Grid.Column="1" Grid.ColumnSpan="3" x:Name="txtName" Text="{Binding Name}" />
-            <Label Grid.Row="1" Content="Provider:" />
-            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstSrc" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static quanalyzer:App.Instance}}" VerticalAlignment="Top" SelectedItem="{Binding Provider}">
+            <TextBlock Text="Name:" HorizontalAlignment="Left" />
+            <TextBox Grid.Column="1" Grid.ColumnSpan="3" x:Name="txtName" Text="{x:Bind CurrentItem.Name}" />
+            <TextBlock Grid.Row="1" Text="Provider:" />
+            <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstSrc" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders}" VerticalAlignment="Top" SelectedItem="{x:Bind CurrentItem.Provider}">
                 <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <WrapPanel>
-                            <Image HorizontalAlignment="Center" Grid.Column="0" Height="16" VerticalAlignment="Center" Margin="2" Source="{Binding Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
-                            <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="2" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Center" />
-                        </WrapPanel>
+                    <DataTemplate x:DataType="contracts:IDataProvider">
+                        <StackPanel Orientation="Horizontal">
+                            <Image HorizontalAlignment="Center" Grid.Column="0" Height="16" VerticalAlignment="Center" Margin="2" Source="{x:Bind Definition.IconPath}" />
+                            <!--, Converter={StaticResource imageSourceConverter}}-->
+                            <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="2" TextWrapping="Wrap" Text="{x:Bind Name}" VerticalAlignment="Center" />
+                        </StackPanel>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <Label Grid.Row="2" Content="Repository:" />
-            <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstSrcRepo" SelectionChanged="lstSrcRepo_SelectionChanged" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding Repository}" DataContext="{Binding Provider}"/>
-            <Label Grid.Row="3" Content="Interval (in seconds):" />
-            <TextBox Grid.Row="3" Grid.Column="1" x:Name="txtInterval" Text="{Binding Interval}" />
-            <Label Grid.Row="3" Content="Run when started:" Grid.Column="2"  />
-            <CheckBox Grid.Row="3" Grid.Column="3" x:Name="chkRunWS" IsChecked="{Binding RunWhenStarted}" />
-            <Label Grid.Row="5" Content="Type:" />
-            <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" x:Name="cbType" SelectedValue="{Binding Type}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding Source={x:Static monitor:MonitoringModes.MonitoringTypes}}" />
-            <Label Grid.Row="6" Content="Attributes:" VerticalAlignment="Top"/>
+            <TextBlock Grid.Row="2" Text="Repository:" />
+            <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstSrcRepo" SelectionChanged="lstSrcRepo_SelectionChanged" ItemsSource="{x:Bind CurrentItem.Provider.Repositories.Keys}" SelectedItem="{x:Bind CurrentItem.Repository}" />
+            <TextBlock Grid.Row="3" Text="Interval (in seconds):" />
+            <TextBox Grid.Row="3" Grid.Column="1" x:Name="txtInterval" Text="{x:Bind CurrentItem.Interval}" />
+            <TextBlock Grid.Row="3" Text="Run when started:" Grid.Column="2"  />
+            <CheckBox Grid.Row="3" Grid.Column="3" x:Name="chkRunWS" IsChecked="{x:Bind CurrentItem.RunWhenStarted}" />
+            <TextBlock Grid.Row="5" Text="Type:" />
+            <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3" x:Name="cbType" SelectedValue="{x:Bind CurrentItem.Type}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{x:Bind monitor:MonitoringModes.MonitoringTypes}" />
+            <TextBlock Grid.Row="6" Text="Attributes:" VerticalAlignment="Top"/>
             <ListBox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstAttributes" Height="80" SelectionMode="Multiple">
                 <ListBox.Resources>
-                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-                        <Setter Property="IsSelected" Value="{Binding Value, Mode=OneWay}" />
+                    <Style TargetType="ListBoxItem">
+                        <Setter Target="IsSelected" Value="{Binding Value, Mode=OneWay}" />
                     </Style>
                 </ListBox.Resources>
                 <ListBox.ItemTemplate>
@@ -91,29 +89,29 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
-                            <Label Content="{Binding Key}" Grid.Column="1" />
+                            <CheckBox ui:FrameworkElementExtensions.AncestorType="ListBoxItem" IsChecked="{Binding (ui:FrameworkElementExtensions.Ancestor).IsSelected,RelativeSource={RelativeSource Mode=Self}}" />
+                            <TextBlock Text="{Binding Key}" Grid.Column="1" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Label Grid.Row="7" Content="Filter:" />
-            <TextBox Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3" x:Name="txtFilter" Text="{Binding Filter}" />
-            <Label Grid.Row="8" Content="Preceding steps:" VerticalAlignment="Top" />
-            <ListBox Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.TestDefinitions, Source={x:Static quanalyzer:App.Instance}}" SelectionMode="Multiple">
+            <TextBlock Grid.Row="7" Text="Filter:" />
+            <TextBox Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3" x:Name="txtFilter" Text="{x:Bind CurrentItem.Filter}" />
+            <TextBlock Grid.Row="8" Text="Preceding steps:" VerticalAlignment="Top" />
+            <ListBox Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3" x:Name="lstPrec" Height="70" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.TestDefinitions}" SelectionMode="Multiple">
                 <ListBox.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="monitor:TestDefinition">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
-                            <Label Content="{Binding Name}" Grid.Column="1" />
+                            <CheckBox ui:FrameworkElementExtensions.AncestorType="ListBoxItem" IsChecked="{Binding (ui:FrameworkElementExtensions.Ancestor).IsSelected,RelativeSource={RelativeSource Mode=Self}}" />
+                            <TextBlock Text="{x:Bind Name}" Grid.Column="1" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-    </DockPanel>
+    </controls:DockPanel>
 </Page>

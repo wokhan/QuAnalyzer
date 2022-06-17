@@ -18,7 +18,7 @@ public partial class MappingsEditor : Page
     }
     
     [ICommand]
-    private void Cancel() => Window.GetWindow(this).Close();
+    private void Cancel() => Window.Current.Close();
 
     [ICommand]
     private void Save()

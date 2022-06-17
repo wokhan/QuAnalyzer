@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 
 using QuAnalyzer.Features.Statistics;
 
+using Windows.UI.Core;
+
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages;
@@ -21,6 +23,8 @@ public partial class StatisticsPage : Page
     [ObservableProperty]
     private int _progress;
 
+    [ObservableProperty]
+    private bool _autoCompute;
     
 
     //      public ObservableDictionary<string, Series> ComputedStatsForGraph { get; } = new ObservableDictionary<string, Series>();
@@ -48,7 +52,7 @@ public partial class StatisticsPage : Page
     private void UpdateSelection()
     {
         var (prov, repo) = App.Instance.CurrentSelection;
-        if (prov is not null && btnAuto.IsChecked.Value)
+        if (prov is not null && _autoCompute)
         {
             Computedata(prov, repo);
         }
@@ -77,7 +81,7 @@ public partial class StatisticsPage : Page
             var data = prv.GetQueryable(repo);
 
             var results = headers.ToDictionary(h => h, h => new StatisticsHolder() { Name = h.Name, Source = data });
-            await Dispatcher.InvokeAsync(() => ComputedStats.AddAll(results.Values));
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ComputedStats.AddAll(results.Values));
 
             headers.AsParallel().ForAll(h => results[h].Update(h, Dispatcher));
         }).ConfigureAwait(false);

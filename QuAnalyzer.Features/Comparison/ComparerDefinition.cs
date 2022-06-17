@@ -79,7 +79,7 @@ public class ComparerDefinition<T>
 
         if (!allTypesSrc.SequenceEqual(allTypesTrg))
         {
-            ArgumentNullException.ThrowIfNull(converter);
+            _ArgumentNullException.ThrowIfNull(converter);
 
             GetSourceData = () => converter(mapFunc(srcDataGetter, fieldsSrc), allTypesTrg);
             GetTargetData = () => converter(mapFunc(trgDataGetter, fieldsTrg), allTypesTrg);

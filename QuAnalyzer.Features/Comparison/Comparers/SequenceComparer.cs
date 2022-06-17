@@ -13,8 +13,8 @@ public class SequenceComparer<TItem> : IComparer<IEnumerable<TItem>>, IComparer 
 
     public int Compare(IEnumerable<TItem>? x, IEnumerable<TItem>? y)
     {
-        ArgumentNullException.ThrowIfNull(x);
-        ArgumentNullException.ThrowIfNull(y);
+        _ArgumentNullException.ThrowIfNull(x);
+        _ArgumentNullException.ThrowIfNull(y);
 
         switch (x)
         {

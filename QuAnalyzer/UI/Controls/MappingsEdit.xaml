@@ -2,22 +2,20 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-             xmlns:ext="clr-namespace:Wokhan.UI.Xaml.Extensibility;assembly=Wokhan.UI"
-             xmlns:providers="clr-namespace:Wokhan.Data.Providers;assembly=Wokhan.Data.Providers"
-             xmlns:quanalyzer="clr-namespace:QuAnalyzer"
-             mc:Ignorable="d" 
-             x:Name="me"
-             DataContext="{Binding Mapping,ElementName=me}"
-             d:DesignHeight="450" d:DesignWidth="800">
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:quanalyzer="using:QuAnalyzer" 
+             xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+             xmlns:providers="using:Wokhan.Data.Providers.Contracts" 
+             xmlns:definition="using:QuAnalyzer.Features.Comparison.Definition"
+             mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.Resources>
-            <DataTemplate x:Key="AttributesTemplate" DataType="providers:IDataProvider">
-                <WrapPanel>
-                    <Image HorizontalAlignment="Center" Grid.Column="0" Height="16" VerticalAlignment="Center" Margin="2" Source="{Binding Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
-                    <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="2" TextWrapping="Wrap" Text="{Binding Name}" VerticalAlignment="Center" />
-                </WrapPanel>
+            <DataTemplate x:Key="AttributesTemplate" x:DataType="providers:IDataProvider">
+                <StackPanel Orientation="Horizontal">
+                    <Image HorizontalAlignment="Center" Grid.Column="0" Height="16" VerticalAlignment="Center" Margin="2" Source="{x:Bind Definition.IconPath}" />
+                    <!--, Converter={StaticResource imageSourceConverter}}" />-->
+                    <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="2" TextWrapping="Wrap" Text="{x:Bind Name}" VerticalAlignment="Center" />
+                </StackPanel>
             </DataTemplate>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
@@ -41,13 +39,13 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Label Content="SOURCE" Background="SteelBlue" Foreground="White" Grid.ColumnSpan="2" />
-            <Label Content="Provider:" Grid.Row="1" VerticalAlignment="Center" />
-            <ComboBox x:Name="lstSrc" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding CurrentProject.CurrentProviders,Source={x:Static quanalyzer:App.Instance}}" SelectedItem="{Binding Source}" ItemTemplate="{StaticResource AttributesTemplate}" />
-            <Label Content="Repository:" Grid.Row="2" VerticalAlignment="Center" />
-            <ComboBox x:Name="lstSrcRepo" Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding Mapping.SourceRepository,ElementName=me}" SelectionChanged="lstSrcRepo_SelectionChanged" DataContext="{Binding SelectedItem, ElementName=lstSrc}"/>
+            <TextBlock Text="SOURCE" Foreground="White" Grid.ColumnSpan="2" />
+            <TextBlock Text="Provider:" Grid.Row="1" VerticalAlignment="Center" />
+            <ComboBox x:Name="lstSrc" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders}" SelectedItem="{x:Bind Mapping.Source}" ItemTemplate="{StaticResource AttributesTemplate}" />
+            <TextBlock Text="Repository:" Grid.Row="2" VerticalAlignment="Center" />
+            <ComboBox x:Name="lstSrcRepo" Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{x:Bind ((providers:IDataProvider)lstSrc.SelectedItem).Repositories.Keys}" SelectedItem="{x:Bind Mapping.SourceRepository}" SelectionChanged="lstSrcRepo_SelectionChanged" DataContext="{x:Bind lstSrc.SelectedItem}"/>
         </Grid>
-        <ContentControl Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{iconPacks:Material Kind=ArrowSplitVertical,Width=32,Height=32}" Foreground="Gray" />
+        <SymbolIcon Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="SlideShow" Width="32" Height="32" Foreground="Gray" />
         <Grid Grid.Row="1" Height="97" VerticalAlignment="Top" Grid.Column="2" Background="WhiteSmoke" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -58,48 +56,50 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Label Content="TARGET" Background="SteelBlue" Foreground="White" Grid.ColumnSpan="2" />
-            <Label Content="Provider:" Grid.Row="1" VerticalAlignment="Center" />
-            <ComboBox x:Name="lstTrg" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding CurrentProject.CurrentProviders, Source={x:Static quanalyzer:App.Instance}}" SelectedItem="{Binding Target}" ItemTemplate="{StaticResource AttributesTemplate}" />
-            <Label Content="Repository:" Grid.Row="2" VerticalAlignment="Center" />
-            <ComboBox x:Name="lstTrgRepo" Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{Binding Repositories.Keys}" SelectedItem="{Binding Mapping.TargetRepository,ElementName=me}" SelectionChanged="lstTrgRepo_SelectionChanged" DataContext="{Binding SelectedItem, ElementName=lstTrg}"/>
+            <TextBlock Text="TARGET" Foreground="White" Grid.ColumnSpan="2" />
+            <TextBlock Text="Provider:" Grid.Row="1" VerticalAlignment="Center" />
+            <ComboBox x:Name="lstTrg" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders}" SelectedItem="{Binding Target}" ItemTemplate="{StaticResource AttributesTemplate}" />
+            <TextBlock Text="Repository:" Grid.Row="2" VerticalAlignment="Center" />
+            <ComboBox x:Name="lstTrgRepo" Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{x:Bind ((providers:IDataProvider)lstTrg.SelectedItem).Repositories.Keys}" SelectedItem="{x:Bind Mapping.TargetRepository}" SelectionChanged="lstTrgRepo_SelectionChanged" DataContext="{x:Bind lstTrg.SelectedItem}"/>
         </Grid>
-        <TextBlock Text="Mappings" Grid.Row="2"  Background="LightGray" Padding="5" Grid.ColumnSpan="3"/>
-        <DockPanel Grid.Row="3" Grid.ColumnSpan="3">
-            <WrapPanel Style="{StaticResource ToolBar}">
-                <Button Content="Add" ToolTip="Add a mapping" BorderBrush="Green" ext:CustomAdorner.Image="{iconPacks:Material Kind=PlusCircleOutline}" Click="btnAdd_Click" />
-                <Button Content="By position" ToolTip="Map by position" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=FormatListNumbered}" Click="btnMapPos_Click" />
-                <Button Content="By name" ToolTip="Map by name" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=AbTesting}" Click="btnMapName_Click" />
-                <Button Content="Remove all" ToolTip="Clear all" IsEnabled="{Binding Items.IsEmpty,ElementName=gridMappings,Converter={StaticResource booleanNegator}}" BorderBrush="OrangeRed" ext:CustomAdorner.Image="{iconPacks:Material Kind=DeleteSweepOutline}" Click="btnRmAll_Click" />
-            </WrapPanel>
-            <DataGrid Name="gridMappings" ItemsSource="{Binding AllMappings}" HorizontalAlignment="Stretch" CanUserAddRows="False" BorderThickness="1" BorderBrush="LightGray" VerticalAlignment="Stretch" AutoGenerateColumns="False">
-                <DataGrid.Columns>
-                    <DataGridComboBoxColumn Width="*" Header="Source field" ItemsSource="{Binding SourceAttributes,ElementName=me}" TextBinding="{Binding Source, Mode=TwoWay}">
-                        <DataGridComboBoxColumn.EditingElementStyle>
+        <TextBlock Text="Mappings" Grid.Row="2" Padding="5" Grid.ColumnSpan="3"/>
+        <controls:DockPanel Grid.Row="3" Grid.ColumnSpan="3">
+            <CommandBar>
+                <AppBarButton Content="Add" ToolTipService.ToolTip="Add a mapping" BorderBrush="Green" Icon="Add" Click="btnAdd_Click" />
+                <AppBarButton Content="By position" ToolTipService.ToolTip="Map by position" BorderBrush="Blue" Icon="Sort" Click="btnMapPos_Click" />
+                <AppBarButton Content="By name" ToolTipService.ToolTip="Map by name" BorderBrush="Blue" Icon="Character" Click="btnMapName_Click" />
+                <AppBarButton Content="Remove all" ToolTipService.ToolTip="Clear all" IsEnabled="{x:Bind Mapping.AllMappings,Converter={StaticResource valueChecker}}" BorderBrush="OrangeRed" Icon="Delete" Click="btnRmAll_Click" />
+            </CommandBar>
+            <controls:DataGrid x:Name="gridMappings" ItemsSource="{x:Bind Mapping.AllMappings}" HorizontalAlignment="Stretch" BorderThickness="1" BorderBrush="LightGray" VerticalAlignment="Stretch" AutoGenerateColumns="False">
+                <controls:DataGrid.Columns>
+                    <controls:DataGridComboBoxColumn Width="*" Header="Source field" ItemsSource="{x:Bind SourceAttributes}">
+                        <!--Binding="{x:Bind Mapping.Source, Mode=TwoWay}"-->
+                        <!--<controls:DataGridComboBoxColumn.EditingElementStyle>
                             <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
-                        </DataGridComboBoxColumn.EditingElementStyle>
-                    </DataGridComboBoxColumn>
-                    <DataGridComboBoxColumn Width="*" Header="Target field" ItemsSource="{Binding TargetAttributes,ElementName=me}" TextBinding="{Binding Target, Mode=TwoWay}">
-                        <DataGridComboBoxColumn.EditingElementStyle>
+                        </controls:DataGridComboBoxColumn.EditingElementStyle>-->
+                    </controls:DataGridComboBoxColumn>
+                    <controls:DataGridComboBoxColumn Width="*" Header="Target field" ItemsSource="{x:Bind TargetAttributes}">
+                        <!--Binding="{x:Bind Mapping.Target, Mode=TwoWay}"-->
+                        <!--<controls:DataGridComboBoxColumn.EditingElementStyle>
                             <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
-                        </DataGridComboBoxColumn.EditingElementStyle>
-                    </DataGridComboBoxColumn>
-                    <DataGridTemplateColumn Width="80" Header="Use as keys">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <ToggleButton Style="{StaticResource ToggleSwitch}" Padding="5,0" Foreground="Black" IsChecked="{Binding IsKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  />
+                        </controls:DataGridComboBoxColumn.EditingElementStyle>-->
+                    </controls:DataGridComboBoxColumn>
+                    <controls:DataGridTemplateColumn Width="80" Header="Use as keys">
+                        <controls:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="definition:SimpleMap">
+                                <ToggleSwitch Padding="5,0" Foreground="Black" IsOn="{x:Bind IsKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  />
                             </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Width="Auto" IsReadOnly="True" CanUserResize="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Name="btnDelete" Foreground="OrangeRed" Tag="{Binding}" Click="btnRm_Click" Content="{iconPacks:Material Kind=DeleteOutline}" />
+                        </controls:DataGridTemplateColumn.CellTemplate>
+                    </controls:DataGridTemplateColumn>
+                    <controls:DataGridTemplateColumn Width="Auto" IsReadOnly="True" CanUserResize="False">
+                        <controls:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="definition:SimpleMap">
+                                <AppBarButton x:Name="btnDelete" Foreground="OrangeRed" Tag="{x:Bind}" Click="btnRm_Click" Icon="Delete" />
                             </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </DockPanel>
+                        </controls:DataGridTemplateColumn.CellTemplate>
+                    </controls:DataGridTemplateColumn>
+                </controls:DataGrid.Columns>
+            </controls:DataGrid>
+        </controls:DockPanel>
     </Grid>
 </UserControl>

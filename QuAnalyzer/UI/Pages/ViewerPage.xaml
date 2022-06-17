@@ -3,12 +3,9 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:UC="clr-namespace:QuAnalyzer.UI.Controls"
-      mc:Ignorable="d" 
-      xmlns:myself="clr-namespace:QuAnalyzer.UI.Pages"
+      xmlns:UC="using:QuAnalyzer.UI.Controls"
+      mc:Ignorable="d"
       d:DesignHeight="600" d:DesignWidth="850"
-      x:Name="thisWindow"
-	  Title="DataViewer"
-      DataContext="{Binding RelativeSource={x:Static RelativeSource.Self}}">
+      x:Name="thisWindow">
     <UC:ExtendedDataGridView x:Name="gridData" EnableAdvancedFilters="True" />
 </Page>

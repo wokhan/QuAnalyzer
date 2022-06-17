@@ -7,8 +7,21 @@ using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer.Features.Statistics;
 
-public record OccurencesResult(string? Category, int CategoryIndex, int Frequency)
+
+/// Cannot use record (see https://github.com/microsoft/microsoft-ui-xaml/issues/5315)
+public readonly struct OccurencesResult
 {
+    public readonly string? Category;
+    public readonly int CategoryIndex;
+    public readonly int Frequency;
+
+    public OccurencesResult(string? category, int categoryIndex, int frequency)
+    {
+        Category = category;
+        CategoryIndex = categoryIndex;
+        Frequency = frequency;
+    }
+
     private static IEnumerable<OccurencesResult> GetTypedData<T, TK>(IQueryable data, string key)
     {
         var param = Expression.Parameter(typeof(T));

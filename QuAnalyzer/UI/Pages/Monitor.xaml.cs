@@ -4,13 +4,21 @@ using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 
+using Microsoft.UI.Dispatching;
+
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
 
+using System.Threading;
 using System.Windows.Data;
 using System.Windows.Threading;
+
+using Windows.System.Threading;
+using Windows.UI.Core;
+
+using winth = System.Windows.Threading;
 
 namespace QuAnalyzer.UI.Pages;
 
@@ -18,15 +26,15 @@ public partial class Monitor : Page
 {
     private const int chartTimeSpanMinutes = 1;
     private long startDate;
-    private DispatcherTimer globalTimer;
-    private List<DispatcherTimer> timers = new();
+    private ThreadPoolTimer globalTimer;
+    private List<ThreadPoolTimer> timers = new();
     private Dictionary<TestDefinition, (TestCase Item, int Index)> instances;
 
-    public static ObservableCollection<TestResults> MonitorResultsView { get; } = new();
+    public ObservableCollection<TestResults> MonitorResultsView { get; } = new();
 
     public ObservableDictionary<string, ISeries[]> ResultSeriesMappings { get; } = new();
-    public double? Occurences { get; set; } = 10;
-    public double? MaxParallel { get; set; } = 1;
+    public double Occurences { get; set; } = 10;
+    public double MaxParallel { get; set; } = 1;
     public bool UseComparisonMode { get; set; }
 
     public Monitor()
@@ -69,13 +77,16 @@ public partial class Monitor : Page
 
         if (UseComparisonMode)
         {
-            globalTimer = new DispatcherTimer(TimeSpan.FromSeconds(mitems.Max(m => m.Interval)), DispatcherPriority.Background, globalCompTimer_Tick, Dispatcher) { IsEnabled = true, Tag = mitems };
+            //globalTimer = new winth.DispatcherTimer(TimeSpan.FromSeconds(mitems.Max(m => m.Interval)), winth.DispatcherPriority.Background, globalCompTimer_Tick, Dispatcher) { IsEnabled = true, Tag = mitems };
+            globalTimer = ThreadPoolTimer.CreatePeriodicTimer(globalTimer_Tick, TimeSpan.FromSeconds(mitems.Max(m => m.Interval)));
         }
         else
         {
             var gcd = mitems.Select(m => m.Interval).GreatestCommonDiv();
             // TODO: Used to be * 30... Why?
-            globalTimer = new DispatcherTimer(TimeSpan.FromSeconds(gcd), DispatcherPriority.Background, globalTimer_Tick, Dispatcher) { IsEnabled = true };
+            //globalTimer = new DispatcherTimer(TimeSpan.FromSeconds(gcd), DispatcherPriority.Background, globalTimer_Tick, Dispatcher) { IsEnabled = true };
+            globalTimer = ThreadPoolTimer.CreatePeriodicTimer(globalTimer_Tick, TimeSpan.FromSeconds(gcd));
+
             //globalTimer_Tick(null, null);
 
             instances = mitems.ToDictionary(m => m, m => (m.CreateInstance(), 1));
@@ -84,31 +95,27 @@ public partial class Monitor : Page
                 instance.Value.Item.AttachPrecedingStepInstances(instance.Key.PrecedingSteps.Select(step => instances[step.Key].Item));
             }
 
-            timers = mitems.Select(m => new DispatcherTimer(TimeSpan.FromSeconds(m.Interval), DispatcherPriority.Background, Timer_Tick, Dispatcher) { Tag = m, IsEnabled = true }).ToList();
+            //timers = mitems.Select(m => new DispatcherTimer(TimeSpan.FromSeconds(m.Interval), DispatcherPriority.Background, Timer_Tick, Dispatcher) { Tag = m, IsEnabled = true }).ToList();
+            timers = mitems.Select(m => ThreadPoolTimer.CreatePeriodicTimer(timer => Timer_Tick(timer, m), TimeSpan.FromSeconds(m.Interval))).ToList();
+
         }
     }
 
     private bool CanExecuteRun => gridSteps?.SelectedItems.Count > 0;
 
     private int globalPerfCounter;
-    private async void globalCompTimer_Tick(object sender, EventArgs e)
+    private async void globalCompTimer_Tick(ThreadPoolTimer timer, TestDefinition[] monitors)
     {
-        var timer = (DispatcherTimer)sender;
-        var monitors = (TestDefinition[])timer.Tag;
-
         var monitorInstances = monitors.Select(m => m.CreateInstance()).ToList();
 
         var progress = new Progress<TestResults>(monitor_OnAdd);
 
         //TODO : Values !!!!
-        await Task.Run(() => Monitoring.Run(new TestCasesCollection() { TestCases = monitorInstances }, globalPerfCounter++, (int)Occurences.Value, (int)MaxParallel.Value, progress)).ConfigureAwait(false);
+        await Task.Run(() => Monitoring.Run(new TestCasesCollection() { TestCases = monitorInstances }, globalPerfCounter++, (int)Occurences, (int)MaxParallel, progress)).ConfigureAwait(false);
     }
 
-    private async void Timer_Tick(object sender, EventArgs e)
+    private async void Timer_Tick(ThreadPoolTimer timer, TestDefinition monitor)
     {
-        var timer = (DispatcherTimer)sender;
-        var monitor = (TestDefinition)timer.Tag;
-
         var (monitorInstance, cnt) = instances[monitor];
         if (monitorInstance.Status == TestCaseStatus.DONE)
         {
@@ -161,13 +168,13 @@ public partial class Monitor : Page
     private void monitor_OnAdd(TestResults results)
     {
         MonitorResultsView.Add(results);
-        gridResults.ScrollIntoView(results);
+        gridResults.ScrollIntoView(results, gridResults.Columns[0]);
     }
 
     [ICommand]
     private void MonitorAdd()
     {
-        Popup.OpenNew(new MonitoringDetails());
+        Popup.OpenNew(new MonitoringDetails(), this.XamlRoot);
     }
 
     [ICommand(CanExecute = nameof(CanExecuteClearAll))]
@@ -177,7 +184,7 @@ public partial class Monitor : Page
         MonitorClearAllCommand.NotifyCanExecuteChanged();
     }
 
-    private bool CanExecuteClearAll => gridSteps?.Items.Count > 0;
+    private bool CanExecuteClearAll => App.Instance.CurrentProject?.TestDefinitions?.Count > 0;
 
     [ICommand]
     private void MonitorCopy(TestDefinition definition)
@@ -188,7 +195,7 @@ public partial class Monitor : Page
     [ICommand]
     private void MonitorEdit(TestDefinition definition)
     {
-        Popup.OpenNew(new MonitoringDetails(definition));
+        Popup.OpenNew(new MonitoringDetails(definition), this.XamlRoot);
     }
 
     [ICommand]
@@ -201,7 +208,7 @@ public partial class Monitor : Page
         App.Instance.CurrentProject.TestDefinitions.Remove(mtoremove);
     }
 
-    private void globalTimer_Tick(object sender, EventArgs e)
+    private void globalTimer_Tick(ThreadPoolTimer _)
     {
         var xAxis = chart.XAxes.First();
         xAxis.MinLimit = DateTime.Now.Ticks;
@@ -213,9 +220,9 @@ public partial class Monitor : Page
     [ICommand]
     private void Stop()
     {
-        globalTimer.Stop();
+        globalTimer.Cancel();
 
-        timers.ForEach(timer => timer.Stop());
+        timers.ForEach(timer => timer.Cancel());
         timers.Clear();
     }
 

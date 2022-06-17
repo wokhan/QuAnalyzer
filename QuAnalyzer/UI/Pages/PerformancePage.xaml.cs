@@ -1,7 +1,4 @@
-﻿using LiveCharts;
-using LiveCharts.Configurations;
-using LiveCharts.Defaults;
-using LiveCharts.Wpf;
+﻿using LiveChartsCore.Defaults;
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Features.Performance;
 using QuAnalyzer.Generic.Extensions;

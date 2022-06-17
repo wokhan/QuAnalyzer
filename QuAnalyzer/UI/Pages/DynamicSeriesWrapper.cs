@@ -6,7 +6,7 @@ using QuAnalyzer.Features.Statistics;
 
 namespace QuAnalyzer.UI.Pages;
 
-public class DynamicSeriesWrapper : Freezable
+public class DynamicSeriesWrapper : DependencyObject
 {
     private string type;
     private static Axis xAxis;
@@ -37,10 +37,6 @@ public class DynamicSeriesWrapper : Freezable
 
     public DynamicSeriesWrapper() : base() { }
 
-    protected override Freezable CreateInstanceCore()
-    {
-        return new DynamicSeriesWrapper();
-    }
 
     private void Init()
     {
@@ -54,7 +50,7 @@ public class DynamicSeriesWrapper : Freezable
         }
         else
         {
-            Series.AddAll(Source.Occurences.Select(f => new PieSeries<OccurencesResult>() { Name = f.Category, Values = new[] { f }, InnerRadius = InnerRadius, Mapping = MapPiePoint, TooltipLabelFormatter = DefaultTooltipFormatter, DataLabelsPosition = LiveChartsCore.Measure.PolarLabelsPosition.Start }));
+            Series.AddAll(Source.Occurences.Select(f => new PieSeries<OccurencesResult>() {Name = f.Category, Values = new[] { f }, InnerRadius = InnerRadius, Mapping = MapPiePoint, TooltipLabelFormatter = DefaultTooltipFormatter, DataLabelsPosition = LiveChartsCore.Measure.PolarLabelsPosition.Start }));
             Source.Occurences.CollectionChanged += Frequencies_CollectionChanged;
         }
     }

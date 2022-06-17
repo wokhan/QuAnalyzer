@@ -1,19 +1,24 @@
-﻿using Microsoft.Win32;
+﻿using CommunityToolkit.WinUI.UI.Controls;
+
+using Microsoft.Win32;
 
 using OfficeOpenXml;
 
+using System.Threading;
 using System.Windows.Input;
+
+using Windows.ApplicationModel.DataTransfer;
 
 namespace QuAnalyzer.Generic.Extensions;
 
 public static class DataGridExtensions
 {
-    public static void ExportAsHTML(this DataGrid grid, string path = null)
+    public async static void ExportAsHTML(this DataGrid grid, string path = null)
     {
-        path = ExportAs(grid, path, "HTML File|*.htm", DataFormats.Html);
+        path = await ExportAs(grid, path, "HTML File|*.htm", "Html");
     }
 
-    private static string ExportAs(DataGrid grid, string path, string p1, string p2)
+    private async static Task<string> ExportAs(DataGrid grid, string path, string p1, string p2)
     {
         grid.CopyToClipboard();
 
@@ -30,7 +35,7 @@ public static class DataGridExtensions
         {
             var str = new StreamWriter(path);
 
-            str.Write((string)Clipboard.GetData(p2));
+            str.Write(await Clipboard.GetContent().GetTextAsync());
 
             str.Close();
 
@@ -102,9 +107,9 @@ public static class DataGridExtensions
 
     public static void CopyToClipboard(this DataGrid grid)
     {
-        grid.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
-        grid.SelectAllCells();
-        ApplicationCommands.Copy.Execute(null, grid);
-        grid.UnselectAllCells();
+        //grid.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
+        //grid.SelectAllCells();
+        //ApplicationCommands.Copy.Execute(null, grid);
+        //grid.UnselectAllCells();
     }
 }

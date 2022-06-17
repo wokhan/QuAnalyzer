@@ -1,9 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 
-using Microsoft.Win32;
-
 using QuAnalyzer.UI.Pages;
 using QuAnalyzer.UI.Windows;
+
+using Windows.Devices.Input;
+using Windows.Foundation;
 
 using Wokhan.Data.Providers.Contracts;
 
@@ -38,36 +39,38 @@ public partial class SourcesMenu : UserControl
     [ICommand]
     private void ProviderEdit(IDataProvider provider)
     {
-        Popup.OpenNew(new ProviderEditor(provider));
+        Popup.OpenNew(new ProviderEditor(provider), this.XamlRoot);
     }
 
     [ICommand]
     private void SourceNew()
     {
-        Popup.OpenNew(new ProviderPicker());
+        Popup.OpenNew(new ProviderPicker(), this.XamlRoot);
     }
 
-    private void Repository_DataGrid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+    private void Repository_DataGrid_MouseMove(object sender, MouseEventArgs e)
     {
-        Vector diff = startPoint - e.GetPosition(null);
-        if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed && (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
-        {
-            var src = (FrameworkElement)sender;
-            DragDrop.DoDragDrop(src, new DataObject(src.Tag), DragDropEffects.Link);
-            e.Handled = true;
-        }
+        //TODO: fix
+        //Vector diff = startPoint - e.GetPosition(null);
+        //if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed && (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
+        //{
+        //    var src = (FrameworkElement)sender;
+        //    DragDrop.DoDragDrop(src, new DataObject(src.Tag), DragDropEffects.Link);
+        //    e.Handled = true;
+        //}
     }
 
     private void Repository_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        startPoint = e.GetPosition(null);
+        //TODO: fix
+        //startPoint = e.GetPosition(null);
     }
 
     private void TreeView_Selected(object sender, RoutedEventArgs e)
     {
         var treeViewItem = (TreeViewItem)e.OriginalSource;
         var provider = (IDataProvider)treeViewItem.Tag;
-        var repository = (string)((TreeView)sender).SelectedValue;
+        var repository = (string)((TreeView)sender).SelectedItem;
 
         App.Instance.CurrentSelection = (provider, repository);
 

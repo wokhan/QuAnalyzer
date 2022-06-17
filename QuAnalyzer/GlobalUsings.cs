@@ -10,8 +10,10 @@ global using System.IO;
 global using System.Linq;
 global using System.Reflection;
 global using System.Threading.Tasks;
-global using System.Windows;
-global using System.Windows.Controls;
+
+global using Microsoft.UI.Xaml;
+global using Microsoft.UI.Xaml.Controls;
 
 global using Wokhan.Collections.Generic.Extensions;
 global using Wokhan.Core.Extensions;
+

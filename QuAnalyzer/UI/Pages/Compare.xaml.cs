@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.HighPerformance;
+using CommunityToolkit.Mvvm.Collections;
 using CommunityToolkit.Mvvm.Input;
 
 using Microsoft.Win32;
@@ -25,6 +26,9 @@ public partial class Compare : Page
     public SourcesMapper SingleMap { get; } = new();
 
     private int cpdCount = 0;
+
+    public IEnumerable<IGrouping<string, ComparerDefinition<object[]>>> GroupedComparisonInstancesView { get; }
+
     public ObservableCollection<ComparerDefinition<object[]>> ComparisonInstancesView { get; } = new();
 
     public bool UseSingleMapping { get; set; }
@@ -34,6 +38,8 @@ public partial class Compare : Page
         InitializeComponent();
 
         lstMappings.SelectionChanged += LstMappings_SelectionChanged;
+
+        GroupedComparisonInstancesView = ComparisonInstancesView.GroupBy(x => x.Name);
     }
 
     private void LstMappings_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -101,13 +107,13 @@ public partial class Compare : Page
 
                 prgGlobal.Value = currentProgress;
 
-                Application.Current.MainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
-                Application.Current.MainWindow.TaskbarItemInfo.ProgressValue = currentProgress / 100.0;
+                //App.Instance.MainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
+                //App.Instance.MainWindow.TaskbarItemInfo.ProgressValue = currentProgress / 100.0;
 
-                if (progressDC.Values.All(v => v == 100))
-                {
-                    Application.Current.MainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
-                }
+                //if (progressDC.Values.All(v => v == 100))
+                //{
+                //    App.Instance.MainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
+                //}
 
                 break;
         }
@@ -132,12 +138,12 @@ public partial class Compare : Page
     private readonly Dictionary<ComparerDefinition<object[]>, Popup> openWindows = new();
 
     [ICommand]
-    private void Details(ComparerDefinition<object[]> cmp)
+    private async void Details(ComparerDefinition<object[]> cmp)
     {
         if (!openWindows.ContainsKey(cmp))
         {
-            var dWin = Popup.OpenNew(new DetailsWindow(cmp));
-            dWin.Closed += dWin_Closed;
+            var dWin = await Popup.OpenNew(new DetailsWindow(cmp), this.XamlRoot);
+            dWin.Closed += dWin_Closed; ;
             openWindows.Add(cmp, dWin);
         }
 
@@ -145,9 +151,10 @@ public partial class Compare : Page
         openWindows[cmp].Activate();
     }
 
-    private void dWin_Closed(object sender, EventArgs e)
+
+    private void dWin_Closed(object sender, ContentDialogClosedEventArgs e)
     {
-        openWindows.Remove(openWindows.Single(o => o.Value == sender).Key);
+        openWindows.Remove(openWindows.Single(o => o.Value.Equals(sender)).Key);
     }
 
 
@@ -235,7 +242,7 @@ public partial class Compare : Page
     [ICommand]
     private void CreateMapping()
     {
-        Popup.OpenNew(new MappingsEditor());
+        Popup.OpenNew(new MappingsEditor(), this.XamlRoot);
     }
 
     [ICommand]
@@ -274,7 +281,7 @@ public partial class Compare : Page
     [ICommand]
     private void EditMapping(SourcesMapper mapping)
     {
-        Popup.OpenNew(new MappingsEditor(mapping));
+        Popup.OpenNew(new MappingsEditor(mapping), this.XamlRoot);
     }
 
     [ICommand]
@@ -286,13 +293,13 @@ public partial class Compare : Page
     //TODO: Use Command="{x:Static DataGrid.SelectAllCommand}" instead
     private void btnSelectAll_Click(object sender, RoutedEventArgs e)
     {
-        lstMappings.SelectAll();
+        //lstMappings.SelectAll();
     }
 
     //TODO: Figure out what Command using instead 
     private void btnUnSel_Click(object sender, RoutedEventArgs e)
     {
-        lstMappings.UnselectAll();
+        //lstMappings.UnselectAll();
     }
 
 }

@@ -1,0 +1,10 @@
+Replace all Bindings
+- Static references (simplified)
+- With x:DataType
+- Keeping Bindings with ElementName refering to the current Window for Command handlers and page-level members in templates
+
+Replace records since it's not supported if the record is used in x:DataType (see https://github.com/microsoft/microsoft-ui-xaml/issues/5315)
+
+Namespace update (from System.... to Microsoft....)
+
+WinUI XamlControlResources addition in App.xaml

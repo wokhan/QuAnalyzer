@@ -1,4 +1,7 @@
 ﻿
+using CommunityToolkit.Mvvm.Input;
+
+using Microsoft.UI.Xaml.Media;
 using Microsoft.Win32;
 
 using Newtonsoft.Json;
@@ -8,7 +11,7 @@ using QuAnalyzer.Core.Project.Exceptions;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Monitoring;
 
-using System.Windows.Media;
+using Windows.UI;
 
 using Wokhan.Data.Providers.Contracts;
 
@@ -43,7 +46,26 @@ public partial class ProjectSettings : ObservableObject
     public ObservableCollection<SourcesMapper> SourceMapper { get; } = new();
     //public ObservableCollection<TestCasesCollection> PerformanceItems { get; } = new();
 
-    internal void Open(string p)
+
+    [ICommand]
+    private void PickFile()
+    {
+        var dial = new OpenFileDialog()
+        {
+            CheckFileExists = true,
+            ValidateNames = true,
+            AddExtension = true,
+            Filter = "QuAnalyzer project file|*.qap"
+        };
+
+        if (dial.ShowDialog().Value)
+        {
+            Open(dial.FileName);
+        }
+    }
+
+    [ICommand]
+    public void Open(string p)
     {
         try
         {
@@ -71,7 +93,8 @@ public partial class ProjectSettings : ObservableObject
         }
     }
 
-    internal void Save(string p = null)
+    [ICommand]
+    public void Save(string p = null)
     {
         try
         {
@@ -101,7 +124,8 @@ public partial class ProjectSettings : ObservableObject
         }
     }
 
-    internal void CreateNew()
+    [ICommand]
+    public void CreateNew()
     {
         FilePath = String.Empty;
         Name = "Untitled project";
@@ -112,7 +136,8 @@ public partial class ProjectSettings : ObservableObject
         GC.Collect();
     }
 
-    internal void SaveAs()
+    [ICommand]
+    public void SaveAs()
     {
         var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = "QuAnalyzer project file|*.qap" };
         if (dial.ShowDialog().Value)

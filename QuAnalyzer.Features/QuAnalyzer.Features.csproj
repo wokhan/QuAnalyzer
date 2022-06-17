@@ -1,15 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.23">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0-windows10.0.18362;net6.0-maccatalyst</TargetFrameworks>
+    <LangVersion>10</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.0.0-preview1" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0-preview1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.1.0-1.final" />
+    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.0.0-preview3" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0-preview3" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.3.0-1.final" />
     <!--<PackageReference Include="System.Runtime.Loader" Version="4.3.0" />-->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Wokhan.Core" Version="0.9.3-beta" />
