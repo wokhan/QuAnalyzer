@@ -23,15 +23,12 @@ namespace QuAnalyzer.UI.Pages;
 
 public partial class Compare : Page
 {
-    public SourcesMapper SingleMap { get; } = new();
 
     private int cpdCount = 0;
 
-    public IEnumerable<IGrouping<string, ComparerDefinition<object[]>>> GroupedComparisonInstancesView { get; }
+    private readonly Dictionary<ComparerDefinition<object[]>, Window> openWindows = new();
 
-    public ObservableCollection<ComparerDefinition<object[]>> ComparisonInstancesView { get; } = new();
-
-    public bool UseSingleMapping { get; set; }
+    private readonly Dictionary<string, int> progressDC = new();
 
     public Compare()
     {
@@ -42,91 +39,52 @@ public partial class Compare : Page
         GroupedComparisonInstancesView = ComparisonInstancesView.GroupBy(x => x.Name);
     }
 
-    private void LstMappings_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    [RelayCommand]
+    private void AutoMap()
     {
-        RunCommand.NotifyCanExecuteChanged();
-    }
+        var allprv = App.Instance.CurrentProject.CurrentProviders;
 
-    [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
-    private async Task Run()
-    {
-        prgGlobal.IsIndeterminate = true;
+        var mapper = App.Instance.CurrentProject.SourceMapper;
 
-        var newInstances = new List<ComparerDefinition<object[]>>();
-        var comparer = SequenceComparer<object>.Default;
+        mapper.Clear();
 
-        foreach (SourcesMapper mapper in UseSingleMapping ? new[] { SingleMap } : lstMappings.SelectedItems)
+        var done = new List<IDataProvider>();
+        foreach (var source in allprv)
         {
-            var cp = await ComparerDefinition<object[]>.CreateAsync(mapper, comparer, Map, Convert).ConfigureAwait(true);
-            // Using ObservableCollections to reflect any live modification in the UI
-            cp.Results.InitCollections(() => new ObservableCollection<object[]>());
+            if (!done.Contains(source))
+            {
+                var map = allprv.Where(target => target != source && target.Repositories.Keys.Intersect(source.Repositories.Keys).Any())
+                                .SelectMany(target => target.Repositories.Keys.Intersect(source.Repositories.Keys).Select(repository => new SourcesMapper()
+                                {
+                                    Name = $"{source.Name} ({repository}) / {target.Name} ({repository})",
+                                    Source = source,
+                                    Target = target,
+                                    SourceRepository = repository,
+                                    TargetRepository = repository,
+                                    AllMappings = source.GetColumns(repository).Select(h => h.Name).Intersect(target.GetColumns(repository).Select(h => h.Name)).Select(k => new SimpleMap(k, k)).ToList()
+                                }));
 
-            cp.Name = $"[{cpdCount++}] {cp.Name}";
+                mapper.AddAll(map);
 
-            // Adding it twice... because we need two rows in the table (...)
-            ComparisonInstancesView.Add(cp);
-            ComparisonInstancesView.Add(cp);
-
-            newInstances.Add(cp);
-        }
-
-        prgGlobal.IsIndeterminate = false;
-
-        var callback = new Progress<ComparerDefinition<object[]>>(Progress);
-        await Task.Run(() => Comparison.Run(newInstances, progressCallback: callback, useParallelism: App.Instance.CurrentProject.UseParallelism));
-    }
-
-    private bool CanExecuteRun => lstMappings?.SelectedItems.Count > 0;
-
-    private static IEnumerable<object[]> Convert(IEnumerable src, Type[] types)
-    {
-        return ((IEnumerable<IEnumerable<object>>)src).Select(c => c.Zip(types, (a, t) => a.SafeConvert(t)).ToArray());
-    }
-
-    private static IEnumerable<object[]> Map(IQueryable sourceQuery, List<string> fields)
-    {
-        return sourceQuery.AsObjectCollection(fields.ToArray());
-    }
-
-    private readonly Dictionary<string, int> progressDC = new();
-
-    public void Progress(ComparerDefinition<object[]> comparer)
-    {
-        switch (comparer.Results.Progress)
-        {
-            case ProgressType.Failed:
-            case ProgressType.Canceling:
-                progressDC.Remove(comparer.Name);
-                break;
-
-            case ProgressType.Done:
-            default:
-                progressDC[comparer.Name] = comparer.Results.LocalProgress;
-
-                int currentProgress = (int)progressDC.Average(p => p.Value);
-
-                prgGlobal.Value = currentProgress;
-
-                //App.Instance.MainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
-                //App.Instance.MainWindow.TaskbarItemInfo.ProgressValue = currentProgress / 100.0;
-
-                //if (progressDC.Values.All(v => v == 100))
-                //{
-                //    App.Instance.MainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
-                //}
-
-                break;
+                done.AddRange(map.Select(m => m.Source));
+                done.AddRange(map.Select(m => m.Target));
+            }
         }
     }
 
-    [ICommand]
-    private void Delete(ComparerDefinition<object[]> r)
+    //TODO: Use Command="{x:Static DataGrid.SelectAllCommand}" instead
+    private void btnSelectAll_Click(object sender, RoutedEventArgs e)
     {
-        progressDC.Remove(r.Name);
-        ComparisonInstancesView.RemoveRange(ComparisonInstancesView.Where(re => r.Name.Equals((string)re.Name)).ToList());
+        //lstMappings.SelectAll();
     }
 
-    [ICommand]
+    //TODO: Figure out what Command using instead 
+    private void btnUnSel_Click(object sender, RoutedEventArgs e)
+    {
+        //lstMappings.UnselectAll();
+    }
+
+    [RelayCommand]
     private void Cancel(ComparerDefinition<object[]> r)
     {
         //TODO: replace by CancelCommand.IsRunning on the corresponding button
@@ -135,15 +93,37 @@ public partial class Compare : Page
         r.TokenSource.Cancel(true);
     }
 
-    private readonly Dictionary<ComparerDefinition<object[]>, Popup> openWindows = new();
+    private static IEnumerable<object[]> Convert(IEnumerable src, Type[] types)
+    {
+        return ((IEnumerable<IEnumerable<object>>)src).Select(c => c.Zip(types, (a, t) => a.SafeConvert(t)).ToArray());
+    }
 
-    [ICommand]
+    [RelayCommand]
+    private void CreateMapping()
+    {
+        GenericPopup.OpenNew<MappingsEditor>();
+    }
+
+    [RelayCommand]
+    private void Delete(ComparerDefinition<object[]> r)
+    {
+        progressDC.Remove(r.Name);
+        ComparisonInstancesView.RemoveRange(ComparisonInstancesView.Where(re => r.Name.Equals((string)re.Name)).ToList());
+    }
+
+    [RelayCommand]
+    private void DeleteMapping(SourcesMapper mapping)
+    {
+        App.Instance.CurrentProject.SourceMapper.Remove(mapping);
+    }
+
+    [RelayCommand]
     private async void Details(ComparerDefinition<object[]> cmp)
     {
         if (!openWindows.ContainsKey(cmp))
         {
-            var dWin = await Popup.OpenNew(new DetailsWindow(cmp), this.XamlRoot);
-            dWin.Closed += dWin_Closed; ;
+            var dWin = GenericPopup.OpenNew<DetailsWindow>(cmp);
+            dWin.Closed += dWin_Closed;
             openWindows.Add(cmp, dWin);
         }
 
@@ -151,14 +131,19 @@ public partial class Compare : Page
         openWindows[cmp].Activate();
     }
 
-
-    private void dWin_Closed(object sender, ContentDialogClosedEventArgs e)
+    private void dWin_Closed(object sender, WindowEventArgs e)
     {
         openWindows.Remove(openWindows.Single(o => o.Value.Equals(sender)).Key);
     }
 
+    [RelayCommand]
+    private void EditMapping(SourcesMapper mapping)
+    {
+        GenericPopup.OpenNew<MappingsEditor>(mapping);
+    }
 
-    [ICommand]
+
+    [RelayCommand]
     private void GlobalReport()
     {
         var dial = new OpenFileDialog() { CheckFileExists = false, CheckPathExists = true, ValidateNames = false, FileName = "Pick a folder to save reports in. Existing files will be overwritten." };
@@ -239,67 +224,81 @@ public partial class Compare : Page
         }
     }
 
-    [ICommand]
-    private void CreateMapping()
+    private void LstMappings_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        Popup.OpenNew(new MappingsEditor(), this.XamlRoot);
+        RunCommand.NotifyCanExecuteChanged();
     }
 
-    [ICommand]
-    private void AutoMap()
+    private static IEnumerable<object[]> Map(IQueryable sourceQuery, List<string> fields)
     {
-        var allprv = App.Instance.CurrentProject.CurrentProviders;
+        return sourceQuery.AsObjectCollection(fields.ToArray());
+    }
 
-        var mapper = App.Instance.CurrentProject.SourceMapper;
+    [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
+    private async Task Run()
+    {
+        prgGlobal.IsIndeterminate = true;
 
-        mapper.Clear();
+        var newInstances = new List<ComparerDefinition<object[]>>();
+        var comparer = SequenceComparer<object>.Default;
 
-        var done = new List<IDataProvider>();
-        foreach (var source in allprv)
+        foreach (SourcesMapper mapper in UseSingleMapping ? new[] { SingleMap } : lstMappings.SelectedItems)
         {
-            if (!done.Contains(source))
-            {
-                var map = allprv.Where(target => target != source && target.Repositories.Keys.Intersect(source.Repositories.Keys).Any())
-                                .SelectMany(target => target.Repositories.Keys.Intersect(source.Repositories.Keys).Select(repository => new SourcesMapper()
-                                {
-                                    Name = $"{source.Name} ({repository}) / {target.Name} ({repository})",
-                                    Source = source,
-                                    Target = target,
-                                    SourceRepository = repository,
-                                    TargetRepository = repository,
-                                    AllMappings = source.GetColumns(repository).Select(h => h.Name).Intersect(target.GetColumns(repository).Select(h => h.Name)).Select(k => new SimpleMap(k, k)).ToList()
-                                }));
+            var cp = await ComparerDefinition<object[]>.CreateAsync(mapper, comparer, Map, Convert).ConfigureAwait(true);
+            // Using ObservableCollections to reflect any live modification in the UI
+            cp.Results.InitCollections(() => new ObservableCollection<object[]>());
 
-                mapper.AddAll(map);
+            cp.Name = $"[{cpdCount++}] {cp.Name}";
 
-                done.AddRange(map.Select(m => m.Source));
-                done.AddRange(map.Select(m => m.Target));
-            }
+            // Adding it twice... because we need two rows in the table (...)
+            ComparisonInstancesView.Add(cp);
+            ComparisonInstancesView.Add(cp);
+
+            newInstances.Add(cp);
+        }
+
+        prgGlobal.IsIndeterminate = false;
+
+        var callback = new Progress<ComparerDefinition<object[]>>(Progress);
+        await Task.Run(() => Comparison.Run(newInstances, progressCallback: callback, useParallelism: App.Instance.CurrentProject.UseParallelism));
+    }
+
+    private bool CanExecuteRun => lstMappings?.SelectedItems.Count > 0;
+
+    public void Progress(ComparerDefinition<object[]> comparer)
+    {
+        switch (comparer.Results.Progress)
+        {
+            case ProgressType.Failed:
+            case ProgressType.Canceling:
+                progressDC.Remove(comparer.Name);
+                break;
+
+            case ProgressType.Done:
+            default:
+                progressDC[comparer.Name] = comparer.Results.LocalProgress;
+
+                int currentProgress = (int)progressDC.Average(p => p.Value);
+
+                prgGlobal.Value = currentProgress;
+
+                //App.Instance.MainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
+                //App.Instance.MainWindow.TaskbarItemInfo.ProgressValue = currentProgress / 100.0;
+
+                //if (progressDC.Values.All(v => v == 100))
+                //{
+                //    App.Instance.MainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
+                //}
+
+                break;
         }
     }
 
-    [ICommand]
-    private void EditMapping(SourcesMapper mapping)
-    {
-        Popup.OpenNew(new MappingsEditor(mapping), this.XamlRoot);
-    }
+    public ObservableCollection<ComparerDefinition<object[]>> ComparisonInstancesView { get; } = new();
 
-    [ICommand]
-    private void DeleteMapping(SourcesMapper mapping)
-    {
-        App.Instance.CurrentProject.SourceMapper.Remove(mapping);
-    }
+    public IEnumerable<IGrouping<string, ComparerDefinition<object[]>>> GroupedComparisonInstancesView { get; }
+    public SourcesMapper SingleMap { get; } = new();
 
-    //TODO: Use Command="{x:Static DataGrid.SelectAllCommand}" instead
-    private void btnSelectAll_Click(object sender, RoutedEventArgs e)
-    {
-        //lstMappings.SelectAll();
-    }
-
-    //TODO: Figure out what Command using instead 
-    private void btnUnSel_Click(object sender, RoutedEventArgs e)
-    {
-        //lstMappings.UnselectAll();
-    }
+    public bool UseSingleMapping { get; set; }
 
 }

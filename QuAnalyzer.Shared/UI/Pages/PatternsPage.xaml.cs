@@ -41,7 +41,7 @@ public partial class PatternsPage : Page
         }
     }
 
-    [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
+    [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
     private async Task Run()
     {
         var (prov, repo) = App.Instance.CurrentSelection;
@@ -49,22 +49,22 @@ public partial class PatternsPage : Page
 
         prg.IsIndeterminate = true;
 
-        var res = await Task.Run(async () =>
+        var res = await Task.Run(() =>
         {
             var data = prov.GetQueryable(repo)
                            .Select(attr)
                            .AsEnumerable()
-                           .WithProgress(async i => await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => txtStatus.Text = $"Loaded {i} entries..."))
+                           .WithProgress(i => DispatcherQueue.TryEnqueue(() => txtStatus.Text = $"Loaded {i} entries..."))
                            .Select(a => a.ToString())
                            .ToList();
 
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            DispatcherQueue.TryEnqueue(() =>
             {
                 prg.IsIndeterminate = false;
                 prg.Maximum = data.Count;
             });
 
-            return data.WithProgress(async i => await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => prg.Value = i))
+            return data.WithProgress(i => DispatcherQueue.TryEnqueue(() => prg.Value = i))
                        .Select(d => new { val = d, reg = Features.Patterns.Patterns.GetRegEx(d, SimThreshold) })
                        .ToList()
                        .GroupBy(s => s.reg)
@@ -73,7 +73,7 @@ public partial class PatternsPage : Page
         }).ConfigureAwait(true);
 
         //gridPatterns.CustomHeaders = prov.GetColumns(repo).Join(stringAttributes, a => a.Name, b => b, (a, b) => a).ToList();
-        gridPatterns.Source = res.AsQueryable();
+        gridPatterns.ItemsSource = res;
         /*}
         else
         {

@@ -14,8 +14,11 @@
             <AppBarButton Command="{x:Bind RunCommand}" Content="Compute" ToolTipService.ToolTip="Compute statistics" BorderBrush="Green" Icon="Play" />
             <AppBarToggleButton IsChecked="{x:Bind AutoCompute,Mode=TwoWay}" Content="Auto update" ToolTipService.ToolTip="Compute statistics automatically" BorderBrush="Blue" Icon="Calculator" />
             <AppBarSeparator />
-            <AppBarElementContainer>
-                <ComboBox Header="Type: " IsEditable="False" VerticalAlignment="Center" ItemsSource="{x:Bind ChartTypes}" SelectedItem="{x:Bind ChartType}" />
+            <AppBarElementContainer VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Text="Type: " Margin="10,0" />
+                    <ComboBox IsEditable="False" VerticalAlignment="Center" ItemsSource="{x:Bind ChartTypes}" SelectedItem="{x:Bind ChartType}" />
+                </StackPanel>
             </AppBarElementContainer>
             <!--<ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding IgnoreEmptyInChart}" Content="Ignore empty values" ToolTipService.ToolTip="Ignore empty values in the graphics" ext:CustomAdorner.Image="{iconPacks:Material Kind=GraphOutline}" />-->
         </CommandBar>

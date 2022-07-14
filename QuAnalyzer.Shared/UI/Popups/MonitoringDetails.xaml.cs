@@ -29,13 +29,13 @@ public partial class MonitoringDetails : Page
 
     }
 
-    [ICommand]
+    [RelayCommand]
     private void Cancel()
     {
         _owner.Close();
     }
 
-    [ICommand]
+    [RelayCommand]
     private void Save()
     {
         CurrentItem.PrecedingSteps.AddAll(lstPrec.SelectedItems.Cast<TestDefinition>().Select(_ => KeyValuePair.Create(_, false)));

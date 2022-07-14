@@ -98,7 +98,7 @@ public partial class DetailsWindow : Page
             gridData.IsEnabled = false;
         }
 
-        gridData.Source = data.AsQueryable();
+        gridData.ItemsSource = data;
     }
 
     private void displayData<T>(ExtendedDataGridView gridData, IEnumerable<T> data, string[] headers, int keysCount)
@@ -125,7 +125,7 @@ public partial class DetailsWindow : Page
         if (data is not null && data.Any())
         {
             gridData.CustomHeaders = headers.Select((h, i) => new ColumnDescription() { Name = $"it[{i}]", DisplayName = h + (i < keysCount ? "*" : "") }).ToList();
-            gridData.Source = data.AsQueryable();
+            gridData.ItemsSource = data.AsQueryable();
         }
         else
         {

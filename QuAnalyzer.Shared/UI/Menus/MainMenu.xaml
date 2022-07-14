@@ -7,55 +7,36 @@
              mc:Ignorable="d" d:DesignWidth="600">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <CommandBar>
-            <AppBarButton Foreground="YellowGreen" FontSize="20" ToolTipService.ToolTip="New project" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.CreateNewCommand}" Icon="NewFolder" />
+            <AppBarButton Foreground="YellowGreen" ToolTipService.ToolTip="New project" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.CreateNewCommand}" Icon="NewFolder" />
             <AppBarElementContainer>
-                <SplitButton Padding="0" Foreground="Green" ToolTipService.ToolTip="Open..." Command="{x:Bind quanalyzer:App.Instance.CurrentProject.PickFileCommand}">
-                    <SymbolIcon Symbol="OpenFile" Foreground="Green" />
+                <SplitButton ToolTipService.ToolTip="Open..." Command="{x:Bind quanalyzer:App.Instance.CurrentProject.PickFileCommand}">
+                    <SymbolIcon Symbol="OpenFile" />
                     <SplitButton.Flyout>
-                        <MenuFlyout x:Name="recentProjects">
-                            <MenuFlyout.MenuFlyoutPresenterStyle>
-                                <Style TargetType="MenuFlyoutPresenter">
-                                    <Setter Target="Padding" Value="5" />
-                                    <!--<Setter Target="CommandParameter" Value="{Binding Key}"/>-->
-                                    <!--<Setter Target="Header" Value="{Binding Key}"/>-->
-                                    <!--<Setter Target="Icon" Value="File" />-->
-                                    <!--<Setter Target="Command" Value="{x:Bind OpenRecentCommand}" />-->
-                                </Style>
-                            </MenuFlyout.MenuFlyoutPresenterStyle>
-                        </MenuFlyout>
+                        <MenuFlyout x:Name="recentProjects" />
                     </SplitButton.Flyout>
-                    <!--<DropDownButton.ItemContainerStyle>
-                        <Style TargetType="MenuItem">
-                            <Setter Target="Padding" Value="5" />
-                            <Setter Target="CommandParameter" Value="{Binding Key}"/>
-                            <Setter Target="Header" Value="{Binding Key}"/>
-                            <Setter Target="Icon" Value="{iconPacks:Material Kind=FileOutline}" />
-                            <Setter Target="Command" Value="{Binding OpenRecentCommand,RelativeSource={RelativeSource AncestorType=menus:MainMenu}}" />
-                        </Style>
-                    </DropDownButton.ItemContainerStyle>-->
                 </SplitButton>
             </AppBarElementContainer>
             <AppBarElementContainer>
-                <SplitButton Foreground="DodgerBlue" ToolTipService.ToolTip="Save" Padding="0" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.SaveCommand}">
+                <SplitButton Foreground="DodgerBlue" ToolTipService.ToolTip="Save" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.SaveCommand}">
                     <SymbolIcon Symbol="Save" />
                     <SplitButton.Flyout>
                         <MenuFlyout>
-                            <MenuFlyoutItem Text="Save as..." Foreground="DodgerBlue" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.SaveAsCommand}" />
+                            <MenuFlyoutItem Text="Save as..." Icon="Save" Foreground="DodgerBlue" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.SaveAsCommand}" />
                         </MenuFlyout>
                     </SplitButton.Flyout>
                 </SplitButton>
             </AppBarElementContainer>
-            <AppBarButton ToolTipService.ToolTip="About..." Command="{x:Bind AboutCommand}" Icon="ContactInfo" Foreground="Orange" FontSize="26" />
             <!--<MenuItem Header="_Options">
                     <MenuItem IsCheckable="True" Header="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static quanalyzer:App.Instance}, FallbackValue=True}"  />
                 </MenuItem>-->
         </CommandBar>
         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-            <TextBox MinWidth="200" x:Name="txt" BorderBrush="Transparent" Background="Transparent" FontSize="14" Foreground="Black" BorderThickness="1" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{x:Bind quanalyzer:App.Instance.CurrentProject.Name, FallbackValue='Unamed project'}">
+            <TextBox MinWidth="200" Foreground="{ThemeResource SystemColorWindowTextColor}" x:Name="txt" BorderBrush="Transparent" Background="Transparent" FontSize="14" BorderThickness="1" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{x:Bind quanalyzer:App.Instance.CurrentProject.Name, FallbackValue='Unamed project'}">
                 <VisualStateManager.VisualStateGroups>
                     <VisualStateGroup x:Name="CommonStates">
                         <VisualState x:Name="MouseOver">
@@ -73,13 +54,7 @@
                     </VisualStateGroup>
                 </VisualStateManager.VisualStateGroups>
             </TextBox>
-            <ComboBox Background="Transparent" BorderThickness="0" ItemsSource="{x:Bind quanalyzer:App.Instance.AvailableColors}" SelectedItem="{x:Bind quanalyzer:App.Instance.CurrentProject.AccentColor,Mode=TwoWay}" Width="Auto">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <Ellipse Fill="{Binding}" Width="16" Height="16" VerticalAlignment="Stretch" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
         </StackPanel>
+        <TextBlock VerticalAlignment="Center" Grid.Column="2" Text="{x:Bind quanalyzer:App.Instance.MainWindow.Title}" />
     </Grid>
 </UserControl>

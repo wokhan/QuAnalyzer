@@ -2,10 +2,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Class="QuAnalyzer.UI.Pages.MainPage"
-    xmlns:UserControls="using:QuAnalyzer.UI.Menus"
-    xmlns:sys="using:System"
+    xmlns:menus="using:QuAnalyzer.UI.Menus"
     xmlns:helpers="using:QuAnalyzer.Core.Helpers"
-    xmlns:popups="using:QuAnalyzer.UI.Popups"
     xmlns:quanalyzer="using:QuAnalyzer"
     Background="{ThemeResource SystemControlBaseHighAcrylicWindowMediumBrush}"
     MinWidth="1030" MinHeight="600"
@@ -21,22 +19,15 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="250" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Grid x:Name="AppTitleBar" Grid.ColumnSpan="2">
-            <Grid.Resources>
-                <Style TargetType="TextBlock">
-                    <Setter Target="IsHitTestVisible" Value="False" />
-                </Style>
-            </Grid.Resources>
-            <UserControls:MainMenu Width="{x:Bind quanalyzer:App.Instance.MainWindow.Bounds.Width,Mode=OneWay}" />
-        </Grid>
+        <menus:MainMenu HorizontalAlignment="Left" x:Name="AppTitleBar" Grid.ColumnSpan="2" />
         <Grid Grid.Row="1" x:Name="stackExports" />
-        <UserControls:SourcesMenu Grid.Row="1" Width="200" Grid.RowSpan="2" />
+        <menus:SourcesMenu Grid.Row="1" Grid.RowSpan="2" />
         <NavigationView Grid.Row="1" Grid.Column="1" x:Name="NavView" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" ItemInvoked="NavView_ItemInvoked">
             <NavigationView.MenuItems>
-                <NavigationViewItem Icon="Preview" Content="DISPLAY" Foreground="Blue" Tag="display" />
+                <NavigationViewItem Icon="Preview" Content="DISPLAY" Tag="display" IsSelected="True" />
                 <NavigationViewItem Icon="Copy" Content="DUPLICATES" Tag="duplicates" />
                 <NavigationViewItem Icon="Scan" Content="PATTERNS" Tag="patterns" />
                 <NavigationViewItem Icon="ThreeBars" Content="STATISTICS" Tag="statistics" />
@@ -51,11 +42,6 @@
                 </TransitionCollection>
             </Frame.ContentTransitions>
         </Frame>
-        <popups:About x:Name="flyAbout" Visibility="Collapsed" Grid.RowSpan="3" Grid.ColumnSpan="2" Width="500" VerticalAlignment="Center">
-            <!--<popups:About.Effect>
-                <DropShadowEffect BlurRadius="10" ShadowDepth="1" Color="Gray" />
-            </popups:About.Effect>-->
-        </popups:About>
         <Grid x:Name="flyExports" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="350" Background="{ThemeResource AccentColorBrush}" Visibility="{Binding IsChecked,ElementName=btnTasks,Converter={StaticResource valueToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="32"/>
@@ -81,16 +67,16 @@
                 </ScrollViewer>
             </Border>
         </Grid>
-        <Grid Grid.Row="2" Grid.ColumnSpan="2" Height="25" Background="{ThemeResource SystemControlAltMediumLowAcrylicWindowMediumBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+        <Grid Grid.Row="3" Grid.ColumnSpan="2" Height="25" Background="{ThemeResource SystemControlAltMediumLowAcrylicWindowMediumBrush}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <TextBlock Text="{x:Bind quanalyzer:App.Instance.CurrentProject.FilePath,FallbackValue='No project has been loaded nor saved.'}" HorizontalAlignment="Right" Margin="0,0,20,0" />
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <TextBlock Width="90" Text="{x:Bind sys:String.Format('Memory: {0}', quanalyzer:App.Instance.Performance.MemoryUseFormatted), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />
-                <TextBlock Width="60" Text="{x:Bind sys:String.Format('CPU: {0}%,', quanalyzer:App.Instance.Performance.CPUUsage), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />
-                <TextBlock Width="70" Text="{x:Bind sys:String.Format('Threads: {0}', quanalyzer:App.Instance.Performance.ThreadsCount), Mode=OneWay,FallbackValue='-'}" Margin="0,0,20,0" />
+                <TextBlock Width="90" Text="{x:Bind x:String.Format('Memory: {0}', quanalyzer:App.Instance.Performance.MemoryUseFormatted), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />
+                <TextBlock Width="60" Text="{x:Bind x:String.Format('CPU: {0}%,', quanalyzer:App.Instance.Performance.CPUUsage), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />
+                <TextBlock Width="70" Text="{x:Bind x:String.Format('Threads: {0}', quanalyzer:App.Instance.Performance.ThreadsCount), Mode=OneWay,FallbackValue='-'}" Margin="0,0,20,0" />
                 <ToggleButton x:Name="btnTasks" IsChecked="False" BorderThickness="0" Padding="0">
                     <!--<ToggleButton.Style>
                             <Style BasedOn="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" TargetType="ToggleButton">
@@ -120,5 +106,62 @@
                 </ToggleButton>
             </StackPanel>
         </Grid>
+        <ItemsRepeater VerticalAlignment="Bottom" Margin="30" ItemsSource="{x:Bind Messages,Mode=OneWay}" Grid.RowSpan="3" Grid.ColumnSpan="2">
+            <ItemsRepeater.ItemTemplate>
+                <DataTemplate>
+                    <InfoBar Severity="{Binding Severity}" IsOpen="True" Content="{Binding Content}" Title="{Binding Title}" CloseButtonCommand="{Binding CloseInfoCommand,ElementName=me}" CloseButtonCommandParameter="{Binding}" />
+                </DataTemplate>
+            </ItemsRepeater.ItemTemplate>
+        </ItemsRepeater>
+        <ContentDialog x:Name="about" CloseButtonText="OK" HorizontalAlignment="Stretch">
+            <NavigationView PaneDisplayMode="Top" IsSettingsVisible="False" IsBackButtonVisible="Collapsed" ItemInvoked="NavSettings_Invoked">
+                <NavigationView.MenuItems>
+                    <NavigationViewItem Content="Settings">
+                        <NavigationViewItem.Tag>
+                            <ScrollViewer>
+                                <StackPanel Margin="20">
+                                    <TextBlock Text="Project settings" Style="{StaticResource SubtitleTextBlockStyle}" />
+                                    <Expander Header="Project accent color" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
+                                        <!--<ColorPicker HorizontalAlignment="Left" IsAlphaEnabled="False" IsHexInputVisible="False" IsColorChannelTextInputVisible="False" Color="{x:Bind quanalyzer:App.Instance.CurrentProject.AccentColor,Mode=TwoWay}" />-->
+                                    </Expander>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </NavigationViewItem.Tag>
+                    </NavigationViewItem>
+                    <NavigationViewItem Content="About">
+                        <NavigationViewItem.Tag>
+                            <ScrollViewer>
+                                <StackPanel Margin="20">
+                                    <TextBlock Text="About" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                                    <TextBlock Text="{x:Bind quanalyzer:App.Instance.ApplicationInfo, FallbackValue='Wokhan QuAnalyzer vX.X.X'}" />
+                                    <TextBlock Text="{x:Bind quanalyzer:App.Instance.Copyright, FallbackValue='Copyright notice'}" />
+                                    <TextBlock Text="{x:Bind quanalyzer:App.Instance.HelpLink, FallbackValue='Link'}" />
+                                    <TextBlock Text="External resources" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock TextWrapping="Wrap">
+            This project uses the following libraries:
+            <LineBreak />
+            - EPPlus
+            <LineBreak />
+            - LiveCharts.WinUI
+            <LineBreak />
+            - VirtualizedObservableCollection
+            <LineBreak />
+            - Wokhan.Core
+            <LineBreak />
+            - Wokhan.DataProviders
+            <LineBreak />
+            - Wokhan.UI
+                                    </TextBlock>
+                                    <TextBlock TextWrapping="Wrap">
+            Each additional Data Provider plugin belongs to their developer, as stated in corresponding application pages.
+                                    </TextBlock>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </NavigationViewItem.Tag>
+                    </NavigationViewItem>
+                </NavigationView.MenuItems>
+                <ContentControl x:Name="settingsContent" />
+            </NavigationView>
+        </ContentDialog>
     </Grid>
 </Page>

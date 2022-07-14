@@ -1,4 +1,6 @@
-﻿using System.Windows.Threading;
+﻿using Microsoft.UI.Dispatching;
+
+using System.Windows.Threading;
 
 using Windows.UI.Core;
 
@@ -20,15 +22,15 @@ public partial class StatisticsHolder : ObservableObject
         Statistics = StatsResult.GetStats(Source, attribute);
     }
 
-    private async void UpdateOccurences(ColumnDescription column, CoreDispatcher dispatcher)
+    private void UpdateOccurences(ColumnDescription column)
     {
         var occurences = OccurencesResult.CountOccurences(Source, column);
-        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => Occurences.AddAll(occurences));
+        DispatcherQueue.GetForCurrentThread().TryEnqueue(() => Occurences.AddAll(occurences));
     }
 
-    internal void Update(ColumnDescription h, CoreDispatcher dispatcher)
+    internal void Update(ColumnDescription h)
     {
         UpdateStats(h.Name);
-        UpdateOccurences(h, dispatcher);
+        UpdateOccurences(h);
     }
 }

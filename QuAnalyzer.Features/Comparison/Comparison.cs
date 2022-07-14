@@ -36,7 +36,7 @@ public static class Comparison
 
         private readonly double samplesPct;
 
-        //TODO: is it better than a cancellation token? See how the latter could fit within Tookit's MVVM ICommand.
+        //TODO: is it better than a cancellation token? See how the latter could fit within Tookit's MVVM RelayCommand.
         private readonly Func<bool>? isCancellationRequested;
 
         public Runner(IProgress<ComparerDefinition<T>>? callback, double samplesPct, Func<bool>? isCancellationRequested)

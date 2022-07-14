@@ -2,8 +2,7 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:sys="using:System"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:UC="using:QuAnalyzer.UI.Controls"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600" 
@@ -45,7 +44,7 @@
                                 </Style.Triggers>
                             </Style>
                         </controls:DockPanel.Resources>-->
-                        <UC:ExtendedDataGridView x:Name="dgDiff" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView x:Name="dgDiff" AutoGenerateColumns="False" FrozenColumnCount="1" />
                     </controls:DockPanel>
                 </Border>
             </TabViewItem>
@@ -62,11 +61,11 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="179*" />
                         </Grid.RowDefinitions>
-                        <TextBlock Text="{x:Bind sys:String.Format('Items missing from {0}', Comparer.SourceName),FallbackValue=Source}" />
-                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgMissingSource" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
+                        <TextBlock Text="{x:Bind x:String.Format('Items missing from {0}', Comparer.SourceName),FallbackValue=Source}" />
+                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgMissingSource" AutoGenerateColumns="False" FrozenColumnCount="1" />
                         <controls:GridSplitter Grid.Row="2" Background="{ThemeResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
-                        <TextBlock Grid.Row="3" Text="{x:Bind sys:String.Format('Items missing from {0}',Comparer.TargetName),FallbackValue=Target}" />
-                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgMissingTarget" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
+                        <TextBlock Grid.Row="3" Text="{x:Bind x:String.Format('Items missing from {0}',Comparer.TargetName),FallbackValue=Target}" />
+                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgMissingTarget" AutoGenerateColumns="False" FrozenColumnCount="1" />
                     </Grid>
                 </Border>
             </TabViewItem>
@@ -84,10 +83,10 @@
                             <RowDefinition Height="179*" />
                         </Grid.RowDefinitions>
                         <TextBlock Text="{x:Bind Comparer.SourceName,FallbackValue=Source}" />
-                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourceDups" AutoGenerateColumns="False"  IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourceDups" AutoGenerateColumns="False" FrozenColumnCount="1" />
                         <controls:GridSplitter Grid.Row="2" Background="{ThemeResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
                         <TextBlock Grid.Row="3" Text="{x:Bind Comparer.TargetName,FallbackValue=Target}" />
-                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetDups" AutoGenerateColumns="False"  IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetDups" AutoGenerateColumns="False" FrozenColumnCount="1" />
                     </Grid>
                 </Border>
             </TabViewItem>
@@ -105,10 +104,10 @@
                             <RowDefinition Height="179*" />
                         </Grid.RowDefinitions>
                         <TextBlock Text="{x:Bind Comparer.SourceName,FallbackValue=Source}" />
-                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourcePerfectDups" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourcePerfectDups" AutoGenerateColumns="False" FrozenColumnCount="1" />
                         <controls:GridSplitter Grid.Row="2" Background="{ThemeResource AccentColorBrush}" HorizontalAlignment="Stretch" Height="5" />
                         <TextBlock Grid.Row="3" Text="{x:Bind Comparer.TargetName,FallbackValue=Target}" />
-                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetPerfectDups" AutoGenerateColumns="False" IsReadOnly="True" FrozenColumnCount="1" />
+                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetPerfectDups" AutoGenerateColumns="False" FrozenColumnCount="1" />
                     </Grid>
                 </Border>
             </TabViewItem>

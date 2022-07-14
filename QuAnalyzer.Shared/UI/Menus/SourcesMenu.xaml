@@ -2,74 +2,94 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:quanalyzer="using:QuAnalyzer"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:contracts="using:Wokhan.Data.Providers.Contracts"
+             xmlns:quanalyzer="using:QuAnalyzer"
              mc:Ignorable="d" d:DesignHeight="460"
       x:Name="me">
     <Grid Background="{ThemeResource SystemControlAltMediumLowAcrylicWindowMediumBrush}">
+        <Grid.Resources>
+            <CollectionViewSource x:Key="groupedItems" ItemsPath="Repositories" Source="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders,Mode=OneWay}" IsSourceGrouped="True" />
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Foreground="WhiteSmoke" Text="SOURCES" FontSize="12">
-            <TextBlock.Resources>
-                <Style TargetType="Control">
-                    <Setter Target="Background" Value="Gray" />
-                </Style>
-            </TextBlock.Resources>
-        </TextBlock>
-        <CommandBar>
-            <AppBarButton Content="Add..." Command="{x:Bind SourceNewCommand}" BorderBrush="Green" Icon="Add" />
+        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="SOURCES" FontSize="12" />
+        <CommandBar OverflowButtonVisibility="Collapsed">
+            <AppBarButton Content="Add..." Command="{x:Bind SourceNewCommand}" Foreground="Green" Icon="Add" />
             <!--<Button Content="Import..." Command="{Binding ProviderImportCommand}" IsEnabled="False" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Import}"/>-->
         </CommandBar>
-        <TreeView Grid.Row="2" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders}">
-            <VisualStateManager.VisualStateGroups>
-                <VisualStateGroup>
-                    <VisualState>
-                        <VisualState.StateTriggers>
-                            <StateTrigger IsActive="{Binding HasItems}" />
-                        </VisualState.StateTriggers>
-                        <VisualState.Setters>
-                            <Setter Target="Focusable" Value="False" />
-                            <Setter Target="Tag" Value="{Binding}" />
-                        </VisualState.Setters>
-                    </VisualState>
-                    <VisualState>
-                        <VisualState.StateTriggers>
-                            <StateTrigger IsActive="{Binding HasItems}" />
-                        </VisualState.StateTriggers>
-                        <VisualState.Setters>
-                            <Setter Target="Template">
-                                <Setter.Value>
-                                    <ControlTemplate>
-                                        <TextBlock Padding="10" TextWrapping="Wrap" Text="Please start by adding a new source." FontStyle="Italic" />
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </VisualState.Setters>
-                    </VisualState>
-                </VisualStateGroup>
-            </VisualStateManager.VisualStateGroups>
-            <TreeView.ItemTemplate>
-                <DataTemplate x:DataType="contracts:IDataProvider">
-                    <TreeViewItem ItemsSource="{Binding Values,ElementName=me}">
+        <ListView Grid.Row="2" ItemsSource="{Binding Source={StaticResource groupedItems}}" SelectionChanged="ListView_SelectionChanged">
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate x:DataType="contracts:IDataProvider">
+                            <Grid>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="MouseOver">
+                                            <!--<VisualState.StateTriggers>
+                                                <StateTrigger IsActive="{Binding Source= ,RelativeSource={RelativeSource Mode=TemplatedParent}}"
+                                            </VisualState.StateTriggers>-->
+                                            <VisualState.Setters>
+                                                <Setter Target="buttons.Visibility" Value="Visible" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Height="20" Stretch="Uniform" VerticalAlignment="Center" Margin="2" Source="{x:Bind Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{x:Bind Name,Mode=OneWay,FallbackValue='N/A'}" VerticalAlignment="Center" />
+                                <CommandBar x:Name="buttons" Visibility="Collapsed" Grid.ColumnSpan="3" HorizontalAlignment="Right" HorizontalContentAlignment="Right" OverflowButtonVisibility="Collapsed" IsDynamicOverflowEnabled="False">
+                                    <AppBarButton Foreground="RoyalBlue" CommandParameter="{x:Bind}" Command="{Binding ProviderEditCommand,ElementName=me}" Icon="Edit" />
+                                    <AppBarButton Foreground="OrangeRed" CommandParameter="{x:Bind}" Command="{Binding ProviderDeleteCommand,ElementName=me}" Icon="Delete" />
+                                </CommandBar>
+                            </Grid>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListView.GroupStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Key}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <!--<controls:SwitchPresenter Grid.Row="2" Value="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders.Count,Mode=OneWay}">
+            <controls:Case Value="1">-->
+        <!--<TreeView Grid.Row="2" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders,Mode=OneWay}" ItemTemplateSelector="{x:Bind selector}" ItemInvoked="TreeView_ItemInvoked">
+            <TreeView.Resources>
+                <DataTemplate x:Name="RepositoriesNodeTemplate" x:DataType="x:String">
+                    <TreeViewItem Content="{x:Bind}" />
+                </DataTemplate>
+                <DataTemplate x:DataType="contracts:IDataProvider" x:Name="DataProviderNodeTemplate">
+                    <TreeViewItem ItemsSource="{x:Bind Repositories.Keys,Mode=OneWay}" IsExpanded="True">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <Image HorizontalAlignment="Center" Grid.Column="0" Height="32" VerticalAlignment="Center" Margin="2" MaxHeight="20" Source="{x:Bind Definition.IconPath}" />
-                            <!--, Converter={StaticResource imageSourceConverter}}-->
-                            <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{x:Bind Name}" VerticalAlignment="Center" />
-                            <AppBarButton Grid.Column="2" x:Name="btnEditProvider" Foreground="RoyalBlue" CommandParameter="{x:Bind}" Command="{Binding ProviderEdit,ElementName=me}" Icon="Edit" />
+                            <Image HorizontalAlignment="Center" Height="32" Width="32" VerticalAlignment="Center" Margin="2" MaxHeight="20" Source="{x:Bind Definition.IconPath,Converter={StaticResource imageSourceConverter}}" />
+                            <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{x:Bind Name,Mode=OneWay,FallbackValue='test'}" VerticalAlignment="Center" />
+                            <AppBarButton Grid.Column="2" Foreground="RoyalBlue" CommandParameter="{x:Bind}" Command="{Binding ProviderEditCommand,ElementName=me}" Icon="Edit" />
+                            <AppBarButton Grid.Column="3" Foreground="OrangeRed" CommandParameter="{x:Bind}" Command="{Binding ProviderDeleteCommand,ElementName=me}" Icon="Delete" />
                         </Grid>
                     </TreeViewItem>
                 </DataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+            </TreeView.Resources>
+        </TreeView>-->
+        <!--</controls:Case>
+            <controls:Case Value="0" IsDefault="True">
+                <TextBlock TextWrapping="Wrap" Text="Please start by adding a new source." />
+            </controls:Case>
+        </controls:SwitchPresenter>-->
         <!--<ListView Visibility="Collapsed" BorderThickness="0" Grid.Row="2" x:Name="lstProviders" SelectedItem="{Binding CurrentSelection,Source={x:Static quanalyzer:App.Instance}}" Background="Transparent" ItemsSource="{Binding GroupedProviders.View}">
             <ListView.Resources>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">

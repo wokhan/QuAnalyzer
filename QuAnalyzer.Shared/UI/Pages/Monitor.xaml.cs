@@ -63,7 +63,7 @@ public partial class Monitor : Page
         }
     }
 
-    [ICommand(CanExecute = nameof(CanExecuteRun))]
+    [RelayCommand(CanExecute = nameof(CanExecuteRun))]
     private void Run()
     {
         var mitems = gridSteps.SelectedItems.Cast<TestDefinition>();
@@ -171,13 +171,13 @@ public partial class Monitor : Page
         gridResults.ScrollIntoView(results, gridResults.Columns[0]);
     }
 
-    [ICommand]
+    [RelayCommand]
     private void MonitorAdd()
     {
-        Popup.OpenNew(new MonitoringDetails(), this.XamlRoot);
+        GenericPopup.OpenNew<MonitoringDetails>();
     }
 
-    [ICommand(CanExecute = nameof(CanExecuteClearAll))]
+    [RelayCommand(CanExecute = nameof(CanExecuteClearAll))]
     private void MonitorClearAll()
     {
         App.Instance.CurrentProject.TestDefinitions.Clear();
@@ -186,19 +186,19 @@ public partial class Monitor : Page
 
     private bool CanExecuteClearAll => App.Instance.CurrentProject?.TestDefinitions?.Count > 0;
 
-    [ICommand]
+    [RelayCommand]
     private void MonitorCopy(TestDefinition definition)
     {
 
     }
 
-    [ICommand]
+    [RelayCommand]
     private void MonitorEdit(TestDefinition definition)
     {
-        Popup.OpenNew(new MonitoringDetails(definition), this.XamlRoot);
+        GenericPopup.OpenNew<MonitoringDetails>();
     }
 
-    [ICommand]
+    [RelayCommand]
     private void MonitorDelete(TestDefinition mtoremove)
     {
         foreach (var m in App.Instance.CurrentProject.TestDefinitions)//.Where(m => m.PrecedingSteps.Any()))
@@ -217,7 +217,7 @@ public partial class Monitor : Page
         //chart.ScrollHorizontalTo = DateTime.Now.AddMinutes(chartTimeSpanMinutes).Ticks;
     }
 
-    [ICommand]
+    [RelayCommand]
     private void Stop()
     {
         globalTimer.Cancel();

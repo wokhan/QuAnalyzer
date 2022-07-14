@@ -7,4 +7,6 @@ Replace records since it's not supported if the record is used in x:DataType (se
 
 Namespace update (from System.... to Microsoft....)
 
+Replace usings for namespaces imports in XAML files (to "using:MyNamespace" scheme even for external namespaces)
+
 WinUI XamlControlResources addition in App.xaml

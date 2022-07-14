@@ -17,10 +17,10 @@ public partial class MappingsEditor : Page
         InitializeComponent();
     }
     
-    [ICommand]
+    [RelayCommand]
     private void Cancel() => Window.Current.Close();
 
-    [ICommand]
+    [RelayCommand]
     private void Save()
     {
         var projectMappers = ((App)App.Instance).CurrentProject.SourceMapper;

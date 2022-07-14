@@ -3,18 +3,22 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" xmlns:bases="using:Wokhan.Data.Providers.Bases"
-      mc:Ignorable="d"  x:Name="me"
-      d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+      xmlns:bases="using:Wokhan.Data.Providers.Bases"
+      xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+      x:Name="me" 
+      mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="20">
+        <Grid.Resources>
+            <CollectionViewSource x:Key="parametersCollection" Source="{x:Bind ExpParameters}" IsSourceGrouped="True" />
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Border BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="WhiteSmoke" Padding="10,5">
-            <Grid>
+        <Border CornerRadius="10" Background="{ThemeResource SystemControlBaseHighAcrylicWindowMediumBrush}" Padding="20" >
+            <Grid animations:Connected.Key="item">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
@@ -24,130 +28,54 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <!--<Image Grid.RowSpan="2" Source="{Binding CurrentType.IconPath, Converter={StaticResource imageSourceConverter}}" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />-->
-                <TextBlock Grid.Column="1" Text="{x:Bind CurrentType.Name}" FontWeight="Bold" />
-                <TextBlock Grid.Column="1" Grid.Row="1" Text="{x:Bind CurrentType.Copyright}" FontSize="10" />
-                <TextBlock Grid.Column="1" Grid.Row="2" Text="{x:Bind CurrentType.Description}" />
+                <Image Source="{x:Bind CurrentProvider.Definition.IconPath,Converter={StaticResource imageSourceConverter}}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <TextBlock Grid.Column="1" Text="{x:Bind CurrentProvider.Definition.Name}" FontWeight="Bold" />
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{x:Bind CurrentProvider.Definition.Copyright}" FontSize="10" />
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{x:Bind CurrentProvider.Definition.Description}" />
             </Grid>
         </Border>
-        <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="0,0,0,1">
-            <Grid Margin="10">
-                <TextBlock FontWeight="Bold" Text="Name:" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                <TextBox VerticalAlignment="Top" Margin="50,5,5,5" x:Name="txtProviderName" Text="{x:Bind CurrentProvider.Name}" />
-            </Grid>
+        <Border Grid.Row="1" Padding="10">
+            <TextBox Header="Name: " Text="{x:Bind CurrentProvider.Name,Mode=TwoWay}" />
         </Border>
-        <ScrollViewer x:Name="gridParameters" Grid.Row="2">
-            <Grid ScrollViewer.VerticalScrollBarVisibility="Visible">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="80"/>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl x:Name="itms" ItemsSource="{x:Bind ExpParameters}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel BorderThickness="1" CornerRadius="10">
-                                    <!--<GroupBox.Style>
-                                        <Style TargetType="GroupBox">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{x:Bind HasMultipleItems}" Value="False">
-                                                    <Setter Target="BorderThickness" Value="0" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </GroupBox.Style>-->
-                                    <RadioButton x:Name="rdb" Visibility="{Binding HasMultipleItems}" IsChecked="{Binding ExpParameters,Converter={StaticResource valueChecker}, Mode=OneWay,ElementName=me}" GroupName="optionsGroup" Background="LightGray" BorderBrush="LightGray" Content="{Binding Key}" />
-                                    <ItemsControl ItemsSource="{x:Bind}" x:Name="itms">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate x:DataType="bases:DataProviderMemberDefinition">
-                                                <controls:UniformGrid Columns="2">
-                                                    <TextBlock Text="{x:Bind Description}" VerticalAlignment="Center" />
-                                                    <controls:SwitchPresenter>
-                                                        <controls:Case IsDefault="True">
-                                                            <TextBox Grid.Column="1" Text="{x:Bind ValueWrapper,Mode=TwoWay}" />
-                                                        </controls:Case>
-                                                        <!--<controls:Case Value="{x:Bind MemberType.Name.Equals('Boolean')}">
-                                                            <CheckBox Grid.Column="1" IsChecked="{x:Bind ValueWrapper,Mode=TwoWay}" />
-                                                        </controls:Case>-->
-                                                        <controls:Case Value="{x:Bind IsFile}">
-                                                            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Left">
-                                                                <TextBox x:Name="txtFile" Width="200" Text="{x:Bind ValueWrapper,Mode=TwoWay}" />
-                                                                <Button Margin="10,0,0,0" Content="Browse" Tag="{x:Bind}" Command="{Binding ShowFileDialogCommand,ElementName=me}" />
-                                                            </StackPanel>
-                                                        </controls:Case>
-                                                        <controls:Case Value="{x:Bind HasValuesGetter}">
-                                                            <ComboBox Grid.Column="1" DisplayMemberPath="Value" SelectedValuePath="Key" ItemsSource="{x:Bind Values}" SelectedValue="{x:Bind ValueWrapper,Mode=TwoWay}" />
-                                                        </controls:Case>
-                                                    </controls:SwitchPresenter>
-                                                </controls:UniformGrid>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <!--<StackPanel x:Name="stackOptions" Grid.IsSharedSizeScope="True"  CanHorizontallyScroll="True" />-->
-                </ScrollViewer>
-            </Grid>
-        </ScrollViewer>
-        <controls:DockPanel x:Name="dockRepositories" Grid.Row="2" Visibility="Collapsed">
-            <CommandBar>
-                <AppBarButton Content="Add" ToolTipService.ToolTip="Add a repository" BorderBrush="Green" Icon="Add" Command="{x:Bind RepositoryAddCommand}"  />
-                <AppBarButton Content="Retrieve" ToolTipService.ToolTip="Retrieve repositories" BorderBrush="Green" Icon="Download" Command="{x:Bind RetrieveCommand}"  />
-                <AppBarButton Content="Clear" ToolTipService.ToolTip="Remove all repositories" BorderBrush="OrangeRed" Icon="Clear" IsEnabled="{x:Bind Repositories.Count,Converter={StaticResource objectToBool}}" Command="{x:Bind ClearCommand}"  />
-                <AppBarSeparator />
-                <AppBarButton Content="Sel. all" ToolTipService.ToolTip="Select all" BorderBrush="Blue" Icon="SelectAll" IsEnabled="{x:Bind Repositories.Count,Converter={StaticResource objectToBool}}"  Command="{x:Bind SelectAllCommand}" />
-                <AppBarButton Content="Unsel. all" ToolTipService.ToolTip="Unselect all" BorderBrush="Blue" Icon="ClearSelection" IsEnabled="{x:Bind Repositories.Count,Converter={StaticResource objectToBool}}" Command="{x:Bind ClearSelectionCommand}" />
-            </CommandBar>
-            <controls:DataGrid x:Name="gridRepositories" BorderBrush="LightGray" BorderThickness="1,0,1,1" AutoGenerateColumns="False" ItemsSource="{x:Bind Repositories,Mode=OneWay}" SelectionMode="Single" CanUserReorderColumns="False">
-                <controls:DataGrid.Columns>
-                    <controls:DataGridCheckBoxColumn Binding="{Binding Selected,UpdateSourceTrigger=PropertyChanged}" Width="80" Header="Selected" />
-                    <controls:DataGridTextColumn Binding="{Binding Key, UpdateSourceTrigger=PropertyChanged}" Width="30*" Header="Name" />
-                    <controls:DataGridTextColumn Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Width="70*" Header="Definition">
-                        <controls:DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Target="TextTrimming" Value="CharacterEllipsis" />
-                                <Setter Target="TextWrapping" Value="NoWrap" />
-                                <Setter Target="Height" Value="14" />
-                            </Style>
-                        </controls:DataGridTextColumn.ElementStyle>
-                        <controls:DataGridTextColumn.EditingElementStyle>
-                            <Style TargetType="TextBox">
-                                <Setter Target="TextWrapping" Value="Wrap" />
-                                <Setter Target="AcceptsReturn" Value="true" />
-                            </Style>
-                        </controls:DataGridTextColumn.EditingElementStyle>
-                    </controls:DataGridTextColumn>
-                    <controls:DataGridTemplateColumn IsReadOnly="True" CanUserResize="False">
-                        <controls:DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <AppBarButton x:Name="btnDeleteRepo" CommandParameter="{Binding}" Command="{Binding RepositoryDeleteCommand,ElementName=me}"  Foreground="OrangeRed" Icon="Delete" />
-                            </DataTemplate>
-                        </controls:DataGridTemplateColumn.CellTemplate>
-                    </controls:DataGridTemplateColumn>
-                </controls:DataGrid.Columns>
-            </controls:DataGrid>
-        </controls:DockPanel>
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding Source={StaticResource parametersCollection}}" ItemTemplateSelector="{x:Bind TemplateSelector}">
+            <ItemsControl.Resources>
+                <DataTemplate x:Name="DefaultTemplate" x:DataType="bases:DataProviderMemberDefinition">
+                    <TextBox Header="{x:Bind Description}" Text="{x:Bind ValueWrapper,Mode=TwoWay}" />
+                </DataTemplate>
+                <DataTemplate x:Name="FileTemplate" x:DataType="bases:DataProviderMemberDefinition">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <TextBox Header="{x:Bind Description}" x:Name="txtFile" Width="200" Text="{x:Bind ValueWrapper,Mode=TwoWay}" />
+                        <Button Margin="10,0,0,0" Content="Browse" Tag="{x:Bind}" Command="{Binding ShowFileDialogCommand,ElementName=me}" />
+                    </StackPanel>
+                </DataTemplate>
+                <DataTemplate x:Name="ListTemplate" x:DataType="bases:DataProviderMemberDefinition">
+                    <ComboBox Header="{x:Bind Description}" DisplayMemberPath="Value" SelectedValuePath="Key" ItemsSource="{x:Bind Values}" SelectedValue="{x:Bind ValueWrapper,Mode=TwoWay}" />
+                </DataTemplate>
+                <DataTemplate x:Name="BooleanTemplate" x:DataType="bases:DataProviderMemberDefinition">
+                    <CheckBox Content="{x:Bind Description}" IsChecked="{Binding ValueWrapper,Mode=TwoWay}" />
+                </DataTemplate>
+            </ItemsControl.Resources>
+            <ItemsControl.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <RadioButton x:Name="rdb" Visibility="{Binding HasMultipleItems,ElementName=me}" GroupName="optionsGroup" Content="{Binding Key}" />
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                    <GroupStyle.Panel>
+                        <ItemsPanelTemplate>
+                            <ItemsStackPanel Visibility="{Binding IsChecked,ElementName=rdb,Converter={StaticResource valueToVisibilityConverter}}" />
+                        </ItemsPanelTemplate>
+                    </GroupStyle.Panel>
+                </GroupStyle>
+            </ItemsControl.GroupStyle>
+        </ItemsControl>
+        <!--<StackPanel x:Name="stackOptions" Grid.IsSharedSizeScope="True"  CanHorizontallyScroll="True" />-->
         <CommandBar Grid.Row="3">
-            <AppBarButton Content="Cancel" BorderBrush="Red" x:Name="btnRevert" Icon="Cancel" HorizontalAlignment="Center" Command="{x:Bind RevertCommand}"  />
-            <AppBarButton Content="Test" BorderBrush="Blue" x:Name="btnTest" Icon="Accept" HorizontalAlignment="Left" Command="{x:Bind TestCommand}"  />
+            <AppBarButton Content="Test" x:Name="btnTest" Icon="Accept" HorizontalAlignment="Left" Command="{x:Bind TestCommand}"  />
             <AppBarElementContainer>
                 <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
             </AppBarElementContainer>
-            <AppBarButton Content="Back" BorderBrush="Orange" Icon="Back" x:Name="btnBack" HorizontalAlignment="Center" Click="btnBack_Click" IsEnabled="False" />
-            <AppBarButton Content="Next" BorderBrush="Green" Icon="Next" x:Name="btnNext" HorizontalAlignment="Center" Click="btnNext_Click" />
         </CommandBar>
-        <Grid Grid.RowSpan="3" VerticalAlignment="Center" HorizontalAlignment="Center" Background="White" Width="400" Visibility="{x:Bind MessageTitle}">
-            <StackPanel Margin="10">
-                <TextBlock Text="{x:Bind MessageTitle}" VerticalAlignment="Stretch" />
-                <TextBlock Text="{x:Bind MessageContent}" VerticalAlignment="Stretch" />
-                <ProgressBar x:Name="progress" VerticalAlignment="Top" />
-                <Button Content="Cancel" HorizontalAlignment="Center" />
-            </StackPanel>
-        </Grid>
-
     </Grid>
 </Page>

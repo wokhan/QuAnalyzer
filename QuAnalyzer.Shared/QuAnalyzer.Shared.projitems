@@ -23,8 +23,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ExcelPackageExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\GenericMethodHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\GlobalTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\ImageSourceConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\MRUManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\PopupHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\GenericPopup.xaml.cs">
+      <DependentUpon>GenericPopup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\PopupHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\ProvidersManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Project\Exceptions\ProjectLoadException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Project\Exceptions\ProjectSaveException.cs" />
@@ -81,6 +85,9 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditor.xaml.cs">
       <DependentUpon>ProviderEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditorRepositories.xaml.cs">
+      <DependentUpon>ProviderEditorRepositories.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderPicker.xaml.cs">
       <DependentUpon>ProviderPicker.xaml</DependentUpon>
@@ -140,6 +147,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)UI\Popups\GenericPopup.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="$(MSBuildThisFileDirectory)UI\Popups\About.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
@@ -159,6 +171,11 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditorRepositories.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditor.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
@@ -191,6 +208,7 @@
 		 explicitly included in the projitem, so files can be added from vscode
 		 without manipulating the projitem file.
 	-->
+    <Content Include="$(MSBuildThisFileDirectory)IconNew.ico" />
     <None Include="$(MSBuildThisFileDirectory)providers\donotremove.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

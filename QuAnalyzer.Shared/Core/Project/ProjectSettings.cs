@@ -11,15 +11,19 @@ using QuAnalyzer.Core.Project.Exceptions;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Monitoring;
 
+using System.ComponentModel.DataAnnotations;
+
 using Windows.UI;
 
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.Core.Project;
 
-public partial class ProjectSettings : ObservableObject
+
+public partial class ProjectSettings : ObservableValidator
 {
     [ObservableProperty]
+    [Required]
     private string name;
 
     [ObservableProperty]
@@ -28,18 +32,18 @@ public partial class ProjectSettings : ObservableObject
     [ObservableProperty]
     private bool useParallelism = true;
 
-    public byte[] AccentColorBrushSaved
-    {
-        get { return new byte[] { AccentColor.Color.A, AccentColor.Color.R, AccentColor.Color.G, AccentColor.Color.B }; }
-        set { AccentColor = new SolidColorBrush(Color.FromArgb(value[0], value[1], value[2], value[3])); }
-    }
+    //public byte[] AccentColorBrushSaved
+    //{
+    //    get { return new byte[] { AccentColor.Color.A, AccentColor.Color.R, AccentColor.Color.G, AccentColor.Color.B }; }
+    //    set { AccentColor = new SolidColorBrush(Color.FromArgb(value[0], value[1], value[2], value[3])); }
+    //}
 
-    [JsonIgnore]
-    public SolidColorBrush AccentColor
-    {
-        get { return (SolidColorBrush)App.Instance.Resources["AccentColorBrush"]; }
-        set { App.Instance.Resources["AccentColorBrush"] = value; }
-    }
+    //[JsonIgnore]
+    //public SolidColorBrush AccentColor
+    //{
+    //    get { return (SolidColorBrush)App.Instance.Resources["AccentColorBrush"]; }
+    //    set { App.Instance.Resources["AccentColorBrush"] = value; }
+    //}
 
     public ObservableCollection<IDataProvider> CurrentProviders { get; } = new();
     public ObservableCollection<TestDefinition> TestDefinitions { get; } = new();
@@ -47,7 +51,7 @@ public partial class ProjectSettings : ObservableObject
     //public ObservableCollection<TestCasesCollection> PerformanceItems { get; } = new();
 
 
-    [ICommand]
+    [RelayCommand]
     private void PickFile()
     {
         var dial = new OpenFileDialog()
@@ -64,7 +68,7 @@ public partial class ProjectSettings : ObservableObject
         }
     }
 
-    [ICommand]
+    [RelayCommand]
     public void Open(string p)
     {
         try
@@ -93,7 +97,7 @@ public partial class ProjectSettings : ObservableObject
         }
     }
 
-    [ICommand]
+    [RelayCommand]
     public void Save(string p = null)
     {
         try
@@ -124,7 +128,7 @@ public partial class ProjectSettings : ObservableObject
         }
     }
 
-    [ICommand]
+    [RelayCommand]
     public void CreateNew()
     {
         FilePath = String.Empty;
@@ -136,7 +140,7 @@ public partial class ProjectSettings : ObservableObject
         GC.Collect();
     }
 
-    [ICommand]
+    [RelayCommand]
     public void SaveAs()
     {
         var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = "QuAnalyzer project file|*.qap" };

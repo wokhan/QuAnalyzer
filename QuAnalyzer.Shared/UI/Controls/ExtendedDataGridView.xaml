@@ -1,4 +1,4 @@
-﻿<controls:DataGrid  
+﻿<UserControl  
           xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
           x:Class="QuAnalyzer.UI.Controls.ExtendedDataGridView"
           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -7,17 +7,11 @@
           xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
           mc:Ignorable="d"
           xmlns:myself="using:QuAnalyzer.UI.Controls"
-          xmlns:sys="using:System"
-          xmlns:primitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives" 
-          xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
+    xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
           d:DesignHeight="600" d:DesignWidth="850"
-          d:ItemsSource="{x:Bind DemoItems}"
-          d:AutoGenerateColumns="True"
           x:Name="me"
-          IsReadOnly="True" CanUserSortColumns="True" CanUserReorderColumns="True" 
-          Sorting="gridData_Sorting"
-          BorderThickness="0" ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto">
-    <controls:DataGrid.Resources>
+          BorderThickness="0">
+    <UserControl.Resources>
         <Style TargetType="Border" x:Key="DragDropBorder">
             <Setter Target="Margin" Value="10" />
             <Setter Target="BorderBrush" Value="Gray" />
@@ -29,370 +23,90 @@
             <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGrid_PreviewMouseLeftButtonDown" />
             <EventSetter Event="PreviewMouseMove" Handler="DataGrid_MouseMove" />
         </Style>-->
-    </controls:DataGrid.Resources>
+    </UserControl.Resources>
     <!-- Setting the template directly through DataGrid.Template doesn't work, using a Style to do so (as it might in fact be expected for a control which is NOT a usercontrol) -->
-    <controls:DataGrid.Template>
-        <!--<controls:DataGrid.Style>
-        <Style TargetType="controls:DataGrid">
-            <Setter Target="Template">
-                <Setter.Value>-->
-        <ControlTemplate TargetType="myself:ExtendedDataGridView">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <CommandBar Grid.ColumnSpan="2">
-                    <AppBarButton Content="Copy" ToolTipService.ToolTip="Copy to clipboard" BorderBrush="#FFFD00FD" Icon="Copy" Command="{x:Bind CopyCommand}" />
-                    <AppBarSeparator />
-                    <AppBarButton Content="Excel" ToolTipService.ToolTip="Export to CSV" BorderBrush="Green" Icon="OpenFile" Command="{x:Bind ExportCSVCommand}" />
-                    <AppBarButton Content="HTML" ToolTipService.ToolTip="Export to HTML" BorderBrush="Blue" Icon="OpenFile" Command="{x:Bind ExportHTMLCommand}" />
-                    <AppBarElementContainer Visibility="{x:Bind EnableAdvancedFilters,Converter={StaticResource valueToVisibilityConverter}}">
-                        <StackPanel Orientation="Horizontal">
-                            <AppBarSeparator />
-                            <AppBarToggleButton x:Name="btnAggregate" IsChecked="False" Content="Group/Filter" ToolTipService.ToolTip="Show aggregation and filtering options" BorderBrush="Coral" Icon="Filter" />
-                        </StackPanel>
-                    </AppBarElementContainer>
-                </CommandBar>
-                <StackPanel Orientation="Horizontal" Grid.Row="2" Height="25">
-                    <TextBlock Margin="20,4">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <CommandBar Grid.ColumnSpan="2">
+            <AppBarButton Label="Copy" ToolTipService.ToolTip="Copy to clipboard" Foreground="RosyBrown" Icon="Copy" Command="{x:Bind CopyCommand}" />
+            <AppBarSeparator />
+            <AppBarButton Label="Excel" ToolTipService.ToolTip="Export to CSV" Foreground="Green" Icon="OpenFile" Command="{x:Bind ExportCSVCommand}" />
+            <AppBarButton Label="HTML" ToolTipService.ToolTip="Export to HTML" Foreground="LightBlue" Icon="OpenFile" Command="{x:Bind ExportHTMLCommand}" />
+            <AppBarSeparator Visibility="{x:Bind EnableAdvancedFilters,Converter={StaticResource valueToVisibilityConverter}}" />
+            <AppBarToggleButton x:Name="btnAggregate" IsChecked="False" Label="Group/Filter" ToolTipService.ToolTip="Show aggregation and filtering options" Icon="Filter" Visibility="{x:Bind EnableAdvancedFilters,Converter={StaticResource valueToVisibilityConverter}}" />
+        </CommandBar>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Height="30" VerticalAlignment="Center">
+            <TextBlock VerticalAlignment="Center" Margin="20,0">
                     <Run Text="{x:Bind LoadingProgress,Mode=OneWay}" />
-                    <Run Text=" / ?" />
-                    <!--<Run Text="{x:Bind Enumerable.Count(ItemsSource),Mode=OneWay}" />-->
+                    <Run Text=" / " />
+                    <Run Text="{x:Bind ItemsCount,Mode=OneWay}" />
                     <Run Text=" item(s) found" />
-                    </TextBlock>
-                    <TextBlock Text="{x:Bind sys:String.Format('Status: {0}', Status)}" />
-                    <ProgressBar Value="{x:Bind LoadingProgress,Mode=OneWay}" IsIndeterminate="{x:Bind LoadingProgress.Equals(-1),Mode=OneWay}" Margin="5"  Width="200" BorderThickness="0" />
-                </StackPanel>
-                <!--<ContentPresenter Grid.Row="1" Content="{Binding InnerBorder,RelativeSource={x:Static RelativeSource.TemplatedParent}}" ContentTemplate="{Binding BaseTemplate,RelativeSource={x:Static RelativeSource.TemplatedParent}}" />-->
-                <Grid x:Name="Root" Grid.Row="1"  BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}">
-
-                    <VisualStateManager.VisualStateGroups>
-                        <VisualStateGroup x:Name="CommonStates">
-                            <VisualState x:Name="Normal"/>
-                            <VisualState x:Name="Disabled">
-                                <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetName="DisabledVisualElement" Storyboard.TargetProperty="Opacity" Duration="0" To="1"/>
-                                </Storyboard>
-                            </VisualState>
-                        </VisualStateGroup>
-
-                        <VisualStateGroup x:Name="ScrollBarsStates">
-                            <VisualStateGroup.Transitions>
-                                <VisualTransition From="MouseIndicator" To="NoIndicator">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                            <DiscreteObjectKeyFrame KeyTime="{ThemeResource ScrollBarsSeparatorContractDelay}">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <ScrollingIndicatorMode>None</ScrollingIndicatorMode>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                            <DiscreteObjectKeyFrame KeyTime="{ThemeResource ScrollBarsSeparatorContractDelay}">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <ScrollingIndicatorMode>None</ScrollingIndicatorMode>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualTransition>
-                                <VisualTransition From="MouseIndicatorFull" To="NoIndicator">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                            <DiscreteObjectKeyFrame KeyTime="{ThemeResource ScrollBarsSeparatorContractDelay}">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <ScrollingIndicatorMode>None</ScrollingIndicatorMode>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                            <DiscreteObjectKeyFrame KeyTime="{ThemeResource ScrollBarsSeparatorContractDelay}">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <ScrollingIndicatorMode>None</ScrollingIndicatorMode>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualTransition>
-                                <VisualTransition From="MouseIndicatorFull" To="MouseIndicator">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                            <DiscreteObjectKeyFrame KeyTime="{ThemeResource ScrollBarsSeparatorContractDelay}">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <ScrollingIndicatorMode>MouseIndicator</ScrollingIndicatorMode>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                            <DiscreteObjectKeyFrame KeyTime="{ThemeResource ScrollBarsSeparatorContractDelay}">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <ScrollingIndicatorMode>MouseIndicator</ScrollingIndicatorMode>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualTransition>
-                                <VisualTransition From="TouchIndicator" To="NoIndicator">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                            <DiscreteObjectKeyFrame KeyTime="{ThemeResource ScrollBarsSeparatorNoTouchDuration}">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <ScrollingIndicatorMode>None</ScrollingIndicatorMode>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                            <DiscreteObjectKeyFrame KeyTime="{ThemeResource ScrollBarsSeparatorNoTouchDuration}">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <ScrollingIndicatorMode>None</ScrollingIndicatorMode>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualTransition>
-                            </VisualStateGroup.Transitions>
-
-                            <VisualState x:Name="NoIndicator"/>
-
-                            <VisualState x:Name="TouchIndicator">
-                                <Storyboard>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                        <DiscreteObjectKeyFrame KeyTime="0">
-                                            <DiscreteObjectKeyFrame.Value>
-                                                <ScrollingIndicatorMode>TouchIndicator</ScrollingIndicatorMode>
-                                            </DiscreteObjectKeyFrame.Value>
-                                        </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                        <DiscreteObjectKeyFrame KeyTime="0">
-                                            <DiscreteObjectKeyFrame.Value>
-                                                <ScrollingIndicatorMode>TouchIndicator</ScrollingIndicatorMode>
-                                            </DiscreteObjectKeyFrame.Value>
-                                        </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                </Storyboard>
-                            </VisualState>
-
-                            <VisualState x:Name="MouseIndicator">
-                                <Storyboard>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                        <DiscreteObjectKeyFrame KeyTime="0">
-                                            <DiscreteObjectKeyFrame.Value>
-                                                <ScrollingIndicatorMode>MouseIndicator</ScrollingIndicatorMode>
-                                            </DiscreteObjectKeyFrame.Value>
-                                        </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                        <DiscreteObjectKeyFrame KeyTime="0">
-                                            <DiscreteObjectKeyFrame.Value>
-                                                <ScrollingIndicatorMode>MouseIndicator</ScrollingIndicatorMode>
-                                            </DiscreteObjectKeyFrame.Value>
-                                        </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                </Storyboard>
-                            </VisualState>
-
-                            <VisualState x:Name="MouseIndicatorFull">
-                                <Storyboard>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                        <DiscreteObjectKeyFrame KeyTime="0">
-                                            <DiscreteObjectKeyFrame.Value>
-                                                <ScrollingIndicatorMode>MouseIndicator</ScrollingIndicatorMode>
-                                            </DiscreteObjectKeyFrame.Value>
-                                        </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalScrollBar" Storyboard.TargetProperty="IndicatorMode">
-                                        <DiscreteObjectKeyFrame KeyTime="0">
-                                            <DiscreteObjectKeyFrame.Value>
-                                                <ScrollingIndicatorMode>MouseIndicator</ScrollingIndicatorMode>
-                                            </DiscreteObjectKeyFrame.Value>
-                                        </DiscreteObjectKeyFrame>
-                                    </ObjectAnimationUsingKeyFrames>
-                                </Storyboard>
-                            </VisualState>
-                        </VisualStateGroup>
-
-                        <VisualStateGroup x:Name="ScrollBarsSeparatorStates">
-                            <VisualStateGroup.Transitions>
-                                <VisualTransition From="SeparatorExpanded" To="SeparatorCollapsed">
-                                    <Storyboard>
-                                        <DoubleAnimation Duration="{ThemeResource ScrollBarsSeparatorContractDuration}"
-                                                BeginTime="{ThemeResource ScrollBarsSeparatorContractBeginTime}"
-                                                Storyboard.TargetName="BottomRightCorner"
-                                                Storyboard.TargetProperty="Opacity"
-                                                To="0"/>
-                                    </Storyboard>
-                                </VisualTransition>
-                            </VisualStateGroup.Transitions>
-                            <VisualState x:Name="SeparatorCollapsed"/>
-                            <VisualState x:Name="SeparatorExpanded">
-                                <Storyboard>
-                                    <DoubleAnimation Duration="{ThemeResource ScrollBarsSeparatorExpandDuration}"
-                                            BeginTime="{ThemeResource ScrollBarsSeparatorExpandBeginTime}"
-                                            Storyboard.TargetName="BottomRightCorner"
-                                            Storyboard.TargetProperty="Opacity"
-                                            To="1"/>
-                                </Storyboard>
-                            </VisualState>
-                            <VisualState x:Name="SeparatorExpandedWithoutAnimation">
-                                <Storyboard>
-                                    <DoubleAnimation Duration="0"
-                                            BeginTime="{ThemeResource ScrollBarsSeparatorExpandBeginTime}"
-                                            Storyboard.TargetName="BottomRightCorner"
-                                            Storyboard.TargetProperty="Opacity"
-                                            To="1"/>
-                                </Storyboard>
-                            </VisualState>
-                            <VisualState x:Name="SeparatorCollapsedWithoutAnimation" >
-                                <Storyboard>
-                                    <DoubleAnimation Duration="0"
-                                            BeginTime="{ThemeResource ScrollBarsSeparatorContractBeginTime}"
-                                            Storyboard.TargetName="BottomRightCorner"
-                                            Storyboard.TargetProperty="Opacity"
-                                            To="0"/>
-                                </Storyboard>
-                            </VisualState>
-                        </VisualStateGroup>
-                    </VisualStateManager.VisualStateGroups>
-
-                    <Grid Background="{TemplateBinding Background}">
-                        <Grid.Resources>
-                            <!--Start: TopLeftHeaderTemplate-->
-                            <ControlTemplate x:Key="TopLeftHeaderTemplate" TargetType="primitives:DataGridColumnHeader">
-                                <Grid x:Name="TopLeftHeaderRoot">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <Border BorderThickness="0,0,1,0" BorderBrush="{ThemeResource GridLinesBrush}" Grid.RowSpan="2"/>
-                                    <Rectangle VerticalAlignment="Bottom" Width="Auto" StrokeThickness="1" Height="1" Fill="{ThemeResource GridLinesBrush}" Grid.RowSpan="2"/>
-                                </Grid>
-                            </ControlTemplate>
-                            <!--End: TopLeftHeaderTemplate-->
-
-                            <!--Start: TopRightHeaderTemplate-->
-                            <ControlTemplate x:Key="TopRightHeaderTemplate" TargetType="primitives:DataGridColumnHeader">
-                                <Grid x:Name="RootElement"/>
-                            </ControlTemplate>
-                            <!--End: TopRightHeaderTemplate-->
-                        </Grid.Resources>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                            <!-- For ValidationSummary addition
-                                <RowDefinition Height="Auto"/>
-                                -->
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <primitives:DataGridColumnHeader x:Name="TopLeftCornerHeader" Template="{StaticResource TopLeftHeaderTemplate}"/>
-                        <primitives:DataGridColumnHeadersPresenter x:Name="ColumnHeadersPresenter" Grid.Column="1" Grid.ColumnSpan="2"
-                                AutomationProperties.AccessibilityView="Raw"/>
-                        <!-- Use TopRightCornerHeader when ColumnHeadersPresenter's Grid.ColumnSpan is 1 and the vertical ScrollBar does not paint on top of the cells -->
-                        <!--<primitives:DataGridColumnHeader x:Name="TopRightCornerHeader" Grid.Column="2" Template="{StaticResource TopRightHeaderTemplate}"/>-->
-                        <Rectangle x:Name="ColumnHeadersAndRowsSeparator" Grid.ColumnSpan="3" VerticalAlignment="Bottom" Width="Auto" StrokeThickness="1" Height="1" Fill="{ThemeResource GridLinesBrush}"/>
-
-                        <primitives:DataGridRowsPresenter x:Name="RowsPresenter" Grid.ColumnSpan="3" Grid.Row="1" Grid.RowSpan="2"
-                                AutomationProperties.AccessibilityView="Raw"/>
-                        <Rectangle x:Name="BottomRightCorner" Fill="{ThemeResource ScrollBarsSeparatorBackground}" Opacity="0" Grid.Row="2" Grid.Column="2"/>
-                        <!-- Use BottomLeftCorner when RowsPresenter's Grid.RowSpan is 1 and the horizontal ScrollBar does not paint on top of the cells -->
-                        <!--<Rectangle x:Name="BottomLeftCorner" Fill="#FFE9EEF4" Grid.Row="2" Grid.ColumnSpan="2"/>-->
-                        <ScrollBar x:Name="VerticalScrollBar" Orientation="Vertical" Visibility="Collapsed" Grid.Column="2" Grid.Row="1"/>
-
-                        <Grid Grid.Column="1" Grid.Row="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Rectangle x:Name="FrozenColumnScrollBarSpacer"/>
-                            <ScrollBar x:Name="HorizontalScrollBar" Grid.Column="1" Orientation="Horizontal" Visibility="Collapsed"/>
-                        </Grid>
-
-                        <!--<dataInput:ValidationSummary x:Name="ValidationSummary" Grid.Row="3" Grid.ColumnSpan="3" MaxHeight="90"/>-->
-                    </Grid>
-                    <Border x:Name="DisabledVisualElement" IsHitTestVisible="False" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" CornerRadius="2" Background="#8CFFFFFF" Opacity="0"/>
-
-                </Grid>
-                <!--<controls:DataGrid Grid.Row="1" Sorting="gridData_Sorting" x:Name="gridData" IsReadOnly="True" CanUserAddRows="False" CanUserSortColumns="True" CanUserReorderColumns="True" BorderThickness="0" ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto">
-                        <controls:DataGrid.Resources>
+            </TextBlock>
+            <TextBlock VerticalAlignment="Center" Text="{x:Bind x:String.Format('Status: {0}', Status),Mode=OneWay}" />
+            <ProgressBar HorizontalAlignment="Right" VerticalAlignment="Center" Height="20" Value="{x:Bind LoadingProgress,Mode=OneWay}" IsIndeterminate="{x:Bind LoadingProgress.Equals(-1),Mode=OneWay}" Margin="5,0" Width="200" />
+        </StackPanel>
+        <controls:DataGrid Grid.Row="1" Sorting="gridData_Sorting" x:Name="gridData" IsReadOnly="True" CanUserSortColumns="True" CanUserReorderColumns="True" BorderThickness="0" ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto">
+            <!--<controls:DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                                 <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGrid_PreviewMouseLeftButtonDown" />
                                 <EventSetter Event="PreviewMouseMove" Handler="DataGrid_MouseMove" />
                             </Style>
-                        </controls:DataGrid.Resources>
-                    </controls:DataGrid>-->
-                <Grid Width="250" Grid.RowSpan="3" Grid.Column="1" Visibility="{Binding IsChecked,ElementName=btnAggregate,Converter={StaticResource valueToVisibilityConverter}}" Background="WhiteSmoke">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel>
-                            <Expander IsExpanded="True" Header="Filtering" BorderThickness="0" Margin="5,10" MaxWidth="240">
-                                <controls:DockPanel>
-                                    <Grid controls:DockPanel.Dock="Bottom">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-                                        <TextBlock Text="Custom filter:" />
-                                        <TextBox TextWrapping="Wrap" MinHeight="25" HorizontalAlignment="Stretch" Text="{x:Bind CustomFilter,Mode=OneWay}" Grid.Row="1">
-                                            <VisualStateManager.VisualStateGroups>
-                                                <VisualStateGroup>
-                                                    <VisualState>
-                                                        <VisualState.StateTriggers>
-                                                            <triggers:IsNotEqualStateTrigger Value="{x:Bind CustomFilterError,Mode=OneWay}" To="{x:Null}" />
-                                                        </VisualState.StateTriggers>
-                                                        <VisualState.Setters>
-                                                            <Setter Target="Foreground" Value="Red" />
-                                                            <Setter Target="ToolTipService.ToolTip" Value="{x:Bind CustomFilterError,Mode=OneWay}" />
-                                                        </VisualState.Setters>
-                                                    </VisualState>
-                                                </VisualStateGroup>
-                                            </VisualStateManager.VisualStateGroups>
-                                        </TextBox>
-                                    </Grid>
+                        </controls:DataGrid.Resources>-->
+        </controls:DataGrid>
+        <Grid Width="250" Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Visibility="{x:Bind btnAggregate.IsChecked.Value,Converter={StaticResource valueToVisibilityConverter},Mode=OneWay}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Expander IsExpanded="True" Header="Filtering" Margin="5,10" MaxWidth="240" HorizontalAlignment="Stretch">
+                        <controls:DockPanel HorizontalAlignment="Stretch">
+                            <Grid controls:DockPanel.Dock="Bottom" Margin="0,10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Custom filter:" />
+                                <TextBox TextWrapping="Wrap" MinHeight="25" HorizontalAlignment="Stretch" Text="{x:Bind CustomFilter,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Row="1">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup>
+                                            <VisualState x:Name="Default">
+                                                <VisualState.StateTriggers>
+                                                    <triggers:CompareStateTrigger Value="{x:Bind CustomFilterError,Mode=OneWay}" To="{x:Null}" />
+                                                </VisualState.StateTriggers>
+                                                <VisualState.Setters>
+                                                    <!--<Setter Target="Foreground" Value="Red" />-->
+                                                    <Setter Target="ToolTipService.ToolTip" Value="{x:Bind CustomFilterError,Mode=OneWay}" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                                </TextBox>
+                            </Grid>
+                            <controls:SwitchPresenter Value="{x:Bind IsFiltersEmpty,Mode=OneWay}">
+                                <controls:Case Value="True" IsDefault="True">
+                                    <Border Style="{StaticResource DragDropBorder}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <SymbolIcon Symbol="Placeholder" Width="20" Margin="10" Foreground="Gray" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to add a filter. You can also directly type a filter expression below." />
+                                        </Grid>
+                                    </Border>
+                                </controls:Case>
+                                <controls:Case Value="False">
                                     <controls:DataGrid Margin="-5" AllowDrop="True" AutoGenerateColumns="False" ItemsSource="{x:Bind Filters,Mode=OneWay}" x:Name="gridFilters" Drop="gridFilters_Drop">
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroup>
-                                                <VisualState>
-                                                    <VisualState.StateTriggers>
-                                                        <triggers:IsNullOrEmptyStateTrigger Value="{x:Bind ItemsSource,Mode=OneWay}" />
-                                                    </VisualState.StateTriggers>
-                                                    <VisualState.Setters>
-                                                        <Setter Target="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate>
-                                                                    <Border Style="{StaticResource DragDropBorder}">
-                                                                        <Grid>
-                                                                            <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="Auto" />
-                                                                                <ColumnDefinition Width="*" />
-                                                                            </Grid.ColumnDefinitions>
-                                                                            <SymbolIcon Symbol="Placeholder" Width="20" Margin="10" Foreground="Gray" VerticalAlignment="Center" />
-                                                                            <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to add a filter. You can also directly type a filter expression below." />
-                                                                        </Grid>
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </VisualState.Setters>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                        </VisualStateManager.VisualStateGroups>
                                         <controls:DataGrid.Columns>
                                             <controls:DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" />
                                             <controls:DataGridComboBoxColumn Width="*" Header="Operator" DisplayMemberPath="Key" Binding="{Binding ComparerExpression,Mode=TwoWay}" ItemsSource="{x:Bind myself:ExtendedDataGridView.Operators}" />
@@ -406,39 +120,28 @@
                                             </controls:DataGridTemplateColumn>
                                         </controls:DataGrid.Columns>
                                     </controls:DataGrid>
-                                </controls:DockPanel>
-                            </Expander>
-                            <Expander IsExpanded="True" Header="Aggregation" BorderThickness="0" Margin="5" MaxWidth="240">
-                                <StackPanel Margin="-5">
-                                    <TextBlock FontWeight="Bold" Text="Group by the following attributes:" />
-                                    <ListBox ItemsSource="{Binding Grouping}" AllowDrop="True" x:Name="lstGrouping" Drop="lstGrouping_Drop">
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroup>
-                                                <VisualState>
-                                                    <VisualState.StateTriggers>
-                                                        <triggers:IsNullOrEmptyStateTrigger Value="{x:Bind ItemsSource,Mode=OneWay}" />
-                                                    </VisualState.StateTriggers>
-                                                    <VisualState.Setters>
-                                                        <Setter Target="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate>
-                                                                    <Border Style="{StaticResource DragDropBorder}">
-                                                                        <Grid>
-                                                                            <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="Auto" />
-                                                                                <ColumnDefinition Width="*" />
-                                                                            </Grid.ColumnDefinitions>
-                                                                            <SymbolIcon Symbol="Placeholder" Width="20" Margin="5" VerticalAlignment="Center" Foreground="Gray" />
-                                                                            <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to group by the related attribute" />
-                                                                        </Grid>
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </VisualState.Setters>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                        </VisualStateManager.VisualStateGroups>
+                                </controls:Case>
+                            </controls:SwitchPresenter>
+                        </controls:DockPanel>
+                    </Expander>
+                    <Expander IsExpanded="True" Header="Aggregation" MaxWidth="240" Margin="5" HorizontalAlignment="Stretch">
+                        <StackPanel Margin="-5">
+                            <TextBlock Text="Group by the following attributes:" />
+                            <controls:SwitchPresenter Value="{x:Bind Grouping.Count,Mode=OneWay}">
+                                <controls:Case Value="0">
+                                    <Border Style="{StaticResource DragDropBorder}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <SymbolIcon Symbol="Placeholder" Width="20" Margin="5" VerticalAlignment="Center" Foreground="Gray" />
+                                            <TextBlock Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="Drag and drop column headers here to group by the related attribute" />
+                                        </Grid>
+                                    </Border>
+                                </controls:Case>
+                                <controls:Case IsDefault="True">
+                                    <ListBox ItemsSource="{x:Bind Grouping}" AllowDrop="True" x:Name="lstGrouping" Drop="lstGrouping_Drop">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid>
@@ -452,9 +155,11 @@
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
-                                    <TextBlock FontWeight="Bold" Text="Aggregated attributes:" />
-                                    <controls:DataGrid Grid.Column="1" x:Name="gridCompute" AutoGenerateColumns="False" AllowDrop="True" Drop="gridCompute_Drop" ItemsSource="{x:Bind Compute,Mode=OneWay}">
-                                        <!--<controls:DataGrid.Style>
+                                </controls:Case>
+                            </controls:SwitchPresenter>
+                            <TextBlock FontWeight="Bold" Text="Aggregated attributes:" />
+                            <controls:DataGrid Grid.Column="1" x:Name="gridCompute" AutoGenerateColumns="False" AllowDrop="True" Drop="gridCompute_Drop" ItemsSource="{x:Bind Compute,Mode=OneWay}">
+                                <!--<controls:DataGrid.Style>
                                                         <Style TargetType="DataGrid">
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding HasItems,RelativeSource={x:Static RelativeSource.Self}}" Value="False">
@@ -478,34 +183,28 @@
                                                             </Style.Triggers>
                                                         </Style>
                                                     </controls:DataGrid.Style>-->
-                                        <controls:DataGrid.Columns>
-                                            <controls:DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" IsReadOnly="True" />
-                                            <controls:DataGridComboBoxColumn Width="*" Header="Aggregation" DisplayMemberPath="Key" Binding="{Binding Aggregate,Mode=TwoWay}" ItemsSource="{x:Bind myself:ExtendedDataGridView.Aggregations}" />
-                                            <controls:DataGridTemplateColumn>
-                                                <controls:DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <AppBarButton Foreground="OrangeRed" CommandParameter="{x:Bind}" Command="{Binding DeleteAggregationCommand,ElementName=me}"  Icon="Delete" />
-                                                    </DataTemplate>
-                                                </controls:DataGridTemplateColumn.CellTemplate>
-                                            </controls:DataGridTemplateColumn>
-                                        </controls:DataGrid.Columns>
-                                    </controls:DataGrid>
-                                </StackPanel>
-                            </Expander>
+                                <controls:DataGrid.Columns>
+                                    <controls:DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" IsReadOnly="True" />
+                                    <controls:DataGridComboBoxColumn Width="*" Header="Aggregation" DisplayMemberPath="Key" Binding="{Binding Aggregate,Mode=TwoWay}" ItemsSource="{x:Bind myself:ExtendedDataGridView.Aggregations}" />
+                                    <controls:DataGridTemplateColumn>
+                                        <controls:DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <AppBarButton Foreground="OrangeRed" CommandParameter="{x:Bind}" Command="{Binding DeleteAggregationCommand,ElementName=me}"  Icon="Delete" />
+                                            </DataTemplate>
+                                        </controls:DataGridTemplateColumn.CellTemplate>
+                                    </controls:DataGridTemplateColumn>
+                                </controls:DataGrid.Columns>
+                            </controls:DataGrid>
                         </StackPanel>
-                    </ScrollViewer>
-                    <Border Grid.Row="1" Background="LightBlue">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <AppBarButton Icon="Forward" Content="Apply" BorderBrush="Green" Command="{x:Bind ReloadCommand}"/>
-                            <AppBarButton Icon="Cancel" Content="Clear" BorderBrush="Red" Command="{x:Bind ClearAllCommand}" />
-                        </StackPanel>
-                    </Border>
-                </Grid>
-            </Grid>
-        </ControlTemplate>
-        <!--</Setter.Value>
-            </Setter>
-        </Style>
-    </controls:DataGrid.Style>-->
-    </controls:DataGrid.Template>
-</controls:DataGrid>
+                    </Expander>
+                </StackPanel>
+            </ScrollViewer>
+            <Border Grid.Row="1" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+                <CommandBar HorizontalAlignment="Center">
+                    <AppBarButton Label="Apply" Icon="Forward" Foreground="Green" Command="{x:Bind ReloadCommand}"/>
+                    <AppBarButton Label="Clear" Icon="Cancel" Foreground="Red" Command="{x:Bind ClearAllCommand}" />
+                </CommandBar>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

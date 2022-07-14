@@ -4,11 +4,12 @@ using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml.Data;
 
+using QuAnalyzer.Generic.Extensions;
+
 using System.Linq.Dynamic.Core;
-using System.Windows.Threading;
+using System.Threading;
 
 using Windows.Devices.Input;
-using Windows.UI.Core;
 
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Linq.Extensions;
@@ -17,14 +18,11 @@ using Wokhan.UI.Extensions;
 namespace QuAnalyzer.UI.Controls;
 
 [ObservableObject]
-public partial class ExtendedDataGridView : DataGrid
+public partial class ExtendedDataGridView : UserControl
 {
     public IProgress<double> ExportProgressCallback { get; set; }
 
     public IEnumerable<string> DemoItems { get; } = new[] { "Item #1", "Item #2" };
-
-    [ObservableProperty]
-    private IQueryable _source;
 
     [ObservableProperty]
     private bool _enableAdvancedFilters;
@@ -38,9 +36,15 @@ public partial class ExtendedDataGridView : DataGrid
     [ObservableProperty]
     private int _loadingProgress;
 
+    [ObservableProperty]
+    private long _itemsCount;
+
     public ObservableCollection<string> Grouping { get; } = new();
 
     public ObservableCollection<FilterStruct> Filters { get; } = new();
+
+    [ObservableProperty]
+    public bool isFiltersEmpty = true;
 
     public string CustomFilter { get; set; }
 
@@ -67,13 +71,23 @@ public partial class ExtendedDataGridView : DataGrid
         InitializeComponent();
 
         this.PropertyChanged += ExtendedDataGridView_PropertyChanged;
+
+
+        Filters.CollectionChanged += Filters_CollectionChanged;
+
+        _ = Reload();
     }
 
-    private async void ExtendedDataGridView_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void Filters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(Source))
+        IsFiltersEmpty = !Filters.Any();
+    }
+
+    private void ExtendedDataGridView_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ItemsSource))
         {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            DispatcherQueue.TryEnqueue(async () =>
             {
                 ClearAll();
                 await Reload();
@@ -81,7 +95,7 @@ public partial class ExtendedDataGridView : DataGrid
         }
     }
 
-    [ICommand]
+    [RelayCommand]
     private void ClearAll()
     {
         Grouping.Clear();
@@ -89,7 +103,7 @@ public partial class ExtendedDataGridView : DataGrid
         Filters.Clear();
     }
 
-    [ICommand]
+    [RelayCommand]
     private void ExportCSV()
     {
         //TODO: Externalize (shouldn't be at the Control level)
@@ -97,14 +111,14 @@ public partial class ExtendedDataGridView : DataGrid
         //this.ExportAsXLSX(host: host, progress: progress, cancellationToken: cancellationToken);
     }
 
-    [ICommand]
+    [RelayCommand]
     private void ExportHTML()
     {
         //TODO: Externalize (shouldn't be at the Control level)
         //this.ExportAsHTML();
     }
 
-    [ICommand]
+    [RelayCommand]
     private void Copy()
     {
         //this.CopyToClipboard();
@@ -150,134 +164,200 @@ public partial class ExtendedDataGridView : DataGrid
         Filters.Add(new FilterStruct() { Attribute = attr, Type = CustomHeaders.First(c => c.Name == attr).Type });
     }
 
-    [ICommand(AllowConcurrentExecutions = false)]
+    [RelayCommand(AllowConcurrentExecutions = false)]
     private async Task Reload()
     {
-        if (Source is null)
+        if (ItemsSource is null)
         {
-            this.ItemsSource = Enumerable.Range(0, 100);
-            this.Columns.Add(new DataGridTextColumn() { Header = "..." });
-            this.IsEnabled = false;
+            gridData.AutoGenerateColumns = false;
+            gridData.ItemsSource = Enumerable.Range(0, 100);
+            gridData.Columns.Add(new DataGridTextColumn() { Header = "..." });
+            gridData.IsHitTestVisible = false;
+            ItemsCount = 0;
             return;
         }
 
-        this.Columns.Clear();
+        gridData.AutoGenerateColumns = this.AutoGenerateColumns;
+
+        gridData.Columns.Clear();
+
+        gridData.IsEnabled = true;
+        gridData.IsHitTestVisible = true;
+
+        LoadingProgress = -1;
+        Status = "Initializing...";
+
+        if (ItemsSource as IQueryable is null)
+        {
+            Status = "Source is not queryable and will be enumerated.";
+        }
+
+        IQueryable query = ItemsSource.AsQueryable();
+
+        if (Filters.Any())
+        {
+            var values = Filters.Select(f => f.TargetValue).ToArray();
+            query = query.Where(Filters.Select((f, i) => f.Attribute + f.ComparerExpression + " @" + i).Aggregate((a, b) => a + " AND " + b), values);
+        }
+
+        if (!string.IsNullOrEmpty(CustomFilter))
+        {
+            try
+            {
+                query = query.Where(CustomFilter);
+                CustomFilterError = null;
+            }
+            catch (Exception exc)
+            {
+                CustomFilterError = exc.Message;
+                LoadingProgress = 0;
+                Status = "Failed";
+                return;
+            }
+        }
+
+        query = query.AggregateBy(Grouping, Compute.Where(c => c.Aggregate is not null).ToDictionary(c => c.Attribute, c => c.Aggregate));
+        {
+            /*if (!prov.IsDirectlyBindable)
+            {
+                dispHeaders = allHeaders.Keys.ToList();
+
+                Dispatcher.Invoke(GenHeaders);
+            }*/
+        }
+
+        LoadingProgress = 0;
+        Status = "Loading data...";
+
+        if (SortOrder is not null)
+        {
+            query = query.OrderBy(SortOrder + (currentSortDirectionAsc ? "" : " descending"));
+        }
+
+        IEnumerable virtualizedData;
+        // Virtualization doesn't work with arrays (and would be useless anyway as it's already in-memory)            
+        if (query.ElementType.IsArray)
+        {
+            virtualizedData = query;
+        }
+        else
+        {
+            //TODO: get rid of the actual virtualization implementation (not .Net Core compliant)
+            virtualizedData = query.AsVirtualized();
+        }
+
         //TODO: review for non-arrays when CustomHeaders are used as it seems incorrect
         //BTW, CustomHeaders seem useless to me (should directly use Columns, right?)
-        if (!AutoGenerateColumns && this.CustomHeaders is not null)
+        if (!gridData.AutoGenerateColumns && this.CustomHeaders is not null)
         {
-            this.Columns.AddAll(CustomHeaders.Select((h, i) => new DataGridTextColumn()
+            gridData.Columns.AddAll(CustomHeaders.Select((h, i) => new DataGridTextColumn()
             {
                 Header = h.DisplayName,
-                Binding = new Binding() { Path = new PropertyPath($"[{i}]") },
-                //SortMemberPath = $"it[{i}]",
+                Binding = new Binding() { Path = new PropertyPath(query.ElementType.IsArray ? $"[{i}]" : h.Name) },
+                Tag = h.Name,
                 FontWeight = (h.IsKey ? FontWeights.Bold : FontWeights.Normal)
             }));
         }
 
-        this.IsEnabled = true;
+        // TODO: ensure there is no impact on perf (as it might require the query to fully executed on some providers)
+        ItemsCount = query.Count();
 
-        await Task.Run(async () =>
+        gridData.SelectedItems.Clear();
+        gridData.ItemsSource = virtualizedData;
+        if (SortOrder is not null && gridData.Columns.Any())
         {
-            LoadingProgress = -1;
-            Status = "Initializing...";
+            gridData.Columns.First(c => (string)c.Tag == SortOrder).SortDirection = (currentSortDirectionAsc ? DataGridSortDirection.Ascending : DataGridSortDirection.Descending);
+        }
 
-            IQueryable query = Source;
-
-            if (Filters.Any())
-            {
-                var values = Filters.Select(f => f.TargetValue).ToArray();
-                query = query.Where(Filters.Select((f, i) => f.Attribute + f.ComparerExpression + " @" + i).Aggregate((a, b) => a + " AND " + b), values);
-            }
-
-            if (!string.IsNullOrEmpty(CustomFilter))
-            {
-                try
-                {
-                    query = query.Where(CustomFilter);
-                    CustomFilterError = null;
-                }
-                catch (Exception exc)
-                {
-                    CustomFilterError = exc.Message;
-                }
-            }
-
-            query = query.AggregateBy(Grouping, Compute.Where(c => c.Aggregate is not null).ToDictionary(c => c.Attribute, c => c.Aggregate));
-            {
-                /*if (!prov.IsDirectlyBindable)
-                {
-                    dispHeaders = allHeaders.Keys.ToList();
-
-                    Dispatcher.Invoke(GenHeaders);
-                }*/
-            }
-
-            LoadingProgress = 0;
-            Status = "Loading data...";
-
-            if (SortOrder is not null)
-            {
-                query = query.OrderBy(SortOrder + (currentSortDirectionAsc ? "" : " descending"));
-            }
-
-            IEnumerable virtualizedData;
-            // Virtualization doesn't work with arrays (and would be useless anyway as it's already in-memory)            
-            if (query.ElementType.IsArray)
-            {
-                virtualizedData = query;
-            }
-            else
-            {
-                virtualizedData = query.AsVirtualized();
-            }
-
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                () =>
-            {
-                this.SelectedItems.Clear();
-                this.ItemsSource = virtualizedData;
-                if (SortOrder is not null && this.Columns.Any())
-                {
-                    //this.Columns.First(c => c.SortMemberPath == SortOrder).SortDirection = (currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending);
-                }
-            });
-
-            Status = "Done.";
-
-        }).ConfigureAwait(false);
+        Status = "Done !";
     }
 
-    [ICommand]
+    [RelayCommand]
     private void DeleteAggregation(ComputeStruct item)
     {
         Compute.Remove(item);
     }
 
-    [ICommand]
+    [RelayCommand]
     private void DeleteGroup(string groupName)
     {
         Grouping.Remove(groupName);
     }
 
-    [ICommand]
+    [RelayCommand]
     private void DeleteFilter(FilterStruct filter)
     {
         Filters.Remove(filter);
     }
+
+    public void ExportAsXLSX(string path = null, string worksheetName = null, Panel host = null, IProgress<double> progress = null, CancellationTokenSource cancellationToken = null)
+    {
+        gridData?.ExportAsXLSX(path, worksheetName, host, progress, cancellationToken);
+    }
+
 
     private string currentSortAttribute = null;
     private bool currentSortDirectionAsc = true;
 
     private void gridData_Sorting(object sender, DataGridColumnEventArgs e)
     {
-        //currentSortDirectionAsc = (currentSortAttribute == e.Column.SortMemberPath) && !currentSortDirectionAsc;
-        //currentSortAttribute = e.Column.SortMemberPath;
+        var sortby = (string)e.Column.Tag;
+        currentSortDirectionAsc = (currentSortAttribute == sortby) && !currentSortDirectionAsc;
+        currentSortAttribute = sortby;
 
-        //e.Column.SortDirection = currentSortDirectionAsc ? ListSortDirection.Ascending : ListSortDirection.Descending;
+        e.Column.SortDirection = currentSortDirectionAsc ? DataGridSortDirection.Ascending : DataGridSortDirection.Descending;
 
-        //Reload();
-
-        //e.Handled = true;
+        _ = Reload();
     }
+
+
+    public DataGridSelectionMode SelectionMode
+    {
+        get => gridData.SelectionMode;
+        set => gridData.SelectionMode = value;
+    }
+
+    public DataGridGridLinesVisibility GridLinesVisibility
+    {
+        get => gridData.GridLinesVisibility;
+        set => gridData.GridLinesVisibility = value;
+    }
+
+    public bool CanUserSortColumns
+    {
+        get => gridData.CanUserSortColumns;
+        set => gridData.CanUserSortColumns = value;
+    }
+
+    public bool CanUserResizeColumns
+    {
+        get => gridData.CanUserResizeColumns;
+        set => gridData.CanUserResizeColumns = value;
+    }
+
+    public bool CanUserReorderColumns
+    {
+        get => gridData.CanUserReorderColumns;
+        set => gridData.CanUserReorderColumns = value;
+    }
+
+    public int FrozenColumnCount
+    {
+        get => gridData.FrozenColumnCount;
+        set => gridData.FrozenColumnCount = value;
+    }
+
+    [ObservableProperty]
+    public bool _autoGenerateColumns;
+
+    public DataGridLength ColumnWidth
+    {
+        get => gridData.ColumnWidth;
+        set => gridData.ColumnWidth = value;
+    }
+
+    [ObservableProperty]
+    public IEnumerable _itemsSource;
+
+    public ObservableCollection<Style> RowGroupHeaderStyles => gridData.RowGroupHeaderStyles;
 }

@@ -11,9 +11,11 @@
 		<UseWinUI>true</UseWinUI>
 		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
 		<BaseIntermediateOutputPath />
+		<ApplicationIcon>IconNew.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Content Include="IconNew.ico" />
 		<Content Include="Images\SplashScreen.scale-200.png" />
 		<Content Include="Images\LockScreenLogo.scale-200.png" />
 		<Content Include="Images\Square150x150Logo.scale-200.png" />
@@ -25,15 +27,17 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.WinUI.UI" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Animations" Version="7.1.2" />
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
 		<PackageReference Include="EPPlus" Version="6.0.5" />
-		<PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-beta.240" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.0" />
+		<PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-beta.300" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.2" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
 		<PackageReference Include="Uno.Core.Extensions.Logging.Singleton" Version="4.0.1" />
+		<PackageReference Include="Wokhan.Data.Providers" Version="0.8.7-beta" />
 		<PackageReference Include="Wokhan.UI" Version="0.9.4-beta" />
-    <PackageReference Include="NuGet.Protocol" Version="6.1.0" />
-    <PackageReference Include="NuGet.Resolver" Version="6.1.0" />
+    <PackageReference Include="NuGet.Protocol" Version="6.2.1" />
+    <PackageReference Include="NuGet.Resolver" Version="6.2.1" />
 
     <Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
@@ -47,7 +51,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\QuAnalyzer.Features\QuAnalyzer.Features.csproj" />
 	</ItemGroup>
-	
+  
 	<ItemGroup>
 		<!--
 		If you encounter this error message:

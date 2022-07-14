@@ -119,7 +119,7 @@
                     </DataTemplate>
                 </controls:DataGrid.RowDetailsTemplate>-->
         </controls:DataGrid>
-        <controls:GridSplitter Grid.Row="2" Height="2" Background="LightGray" />
+        <controls:GridSplitter Grid.Row="2" Height="2" />
         <controls:DockPanel Grid.Row="3">
             <CommandBar controls:DockPanel.Dock="Top">
                 <AppBarButton x:Name="btnGrCopy" Content="Copy" ToolTipService.ToolTip="Copy to clipboard" BorderBrush="Magenta" Icon="Copy" Click="btnGrCopy_Click" />
@@ -213,7 +213,7 @@
                 </controls:DataGrid.GroupStyle>-->
             </controls:DataGrid>
         </controls:DockPanel>
-        <controls:GridSplitter Grid.Row="4" Height="2" Background="LightGray" />
+        <controls:GridSplitter Grid.Row="4" Height="2" />
         <controls:DockPanel Grid.Row="5">
             <CommandBar controls:DockPanel.Dock="Top">
                 <AppBarButton Content="Copy" ToolTipService.ToolTip="Copy to clipboard" BorderBrush="Magenta" Icon="Copy" IsEnabled="False" Command="{x:Bind MonitorCopyCommand}" CommandParameter="{Binding}" />

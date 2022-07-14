@@ -4,13 +4,13 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:quanalyzer="using:QuAnalyzer"
-      xmlns:sys="using:System" 
       xmlns:helpers="using:QuAnalyzer.Core.Helpers" 
       xmlns:bases="using:Wokhan.Data.Providers.Bases"
+      xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
       x:Name="me"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto" />
@@ -20,16 +20,10 @@
         <TextBlock Text="Select a provider type below and press Next to continue." />
         <ScrollViewer x:Name="gridProviders" Grid.Row="2">
             <StackPanel>
-                <ListView Margin="5" SelectedItem="{x:Bind SelectedProviderDef,Mode=TwoWay}" ItemsSource="{x:Bind quanalyzer:App.Instance.ProvidersMan.Providers}">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <!--<Setter Target="Background" Value="Transparent" />-->
-                            <Setter Target="HorizontalContentAlignment" Value="Stretch" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
+                <ListView Margin="5" SelectedItem="{x:Bind SelectedProviderDef,Mode=TwoWay}" animations:Connected.ListItemKey="item" animations:Connected.ListItemElementName="grid"  ItemsSource="{x:Bind quanalyzer:App.Instance.ProvidersMan.Providers}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="bases:DataProviderDefinition">
-                            <Grid Margin="5">
+                            <Grid Margin="15" x:Name="grid">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
@@ -40,17 +34,19 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <!--<Image Grid.RowSpan="2" HorizontalAlignment="Center" Height="28" Margin="2" Stretch="Uniform" MaxWidth="50" Source="{Binding IconPath,Converter={StaticResource imageSourceConverter}}" />-->
+                                <Image Source="{x:Bind IconPath,Converter={StaticResource imageSourceConverter}}" VerticalAlignment="Center" Margin="0,0,10,0" />
                                 <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" FontWeight="Bold" Text="{x:Bind Name}" />
                                 <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind Copyright}" Margin="5,0" HorizontalAlignment="Left" TextWrapping="Wrap" FontSize="10" />
                                 <TextBlock Grid.Row="2" HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" Text="{x:Bind Description}" />
-                                <TextBlock Grid.ColumnSpan="3" Padding="10,0" Text="{x:Bind Category}" HorizontalAlignment="Right" />
+                                <Border Grid.ColumnSpan="3" HorizontalAlignment="Right" VerticalAlignment="Center" Background="{ThemeResource AccentAAFillColorDefaultBrush}" CornerRadius="20">
+                                    <TextBlock Padding="10" Text="{x:Bind Category}" />
+                                </Border>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ListView>
-                <Expander Padding="10" Header="NuGet packages">
-                    <ItemsControl Background="Transparent" Margin="5" ItemsSource="{x:Bind NugetPackages}">
+                <Expander Padding="10" Header="NuGet packages" HorizontalAlignment="Stretch">
+                    <ItemsControl Background="Transparent" Margin="5" ItemsSource="{x:Bind NugetPackages,Mode=OneWay}">
                         <!--<ItemsControl.ItemContainerStyle>
                             <Style TargetType="Items">
                                 -->
@@ -64,7 +60,7 @@
                                 <StackPanel Margin="10">
                                     <TextBlock Text="{x:Bind Name}" FontWeight="Bold" />
                                     <TextBlock TextWrapping="Wrap" Text="{x:Bind Description}" />
-                                    <TextBlock Text="{x:Bind sys:String.Format('Author: {0}',Copyright)}" FontStyle="Italic" />
+                                    <TextBlock Text="{x:Bind x:String.Format('Author: {0}',Copyright)}" FontStyle="Italic" />
                                     <AppBarButton Content="Install" BorderBrush="Green" Command="{Binding InstallPackageCommand, ElementName=me}" CommandParameter="{Binding Id}" HorizontalAlignment="Right" Icon="Add" />
                                 </StackPanel>
                             </DataTemplate>

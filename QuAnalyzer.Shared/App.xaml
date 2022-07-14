@@ -1,9 +1,8 @@
 ﻿<Application
     x:Class="QuAnalyzer.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:sys="using:System"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-    xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters">
+    xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters" xmlns:bindingconverters="using:Wokhan.UI.BindingConverters" xmlns:helpers="using:QuAnalyzer.Core.Helpers">
 
     <Application.Resources>
         <XamlControlsResources>
@@ -13,21 +12,27 @@
                     <converters:BoolToVisibilityConverter x:Key="valueToVisibilityConverter" />
                     <converters:EmptyCollectionToObjectConverter x:Key="valueChecker" />
                     <converters:EmptyObjectToObjectConverter x:Key="objectToBool" />
-                    
-                    <!--<BindingConverters:ImageSourceConverter x:Key="imageSourceConverter" />-->
-                    
-                    <!--<BindingConvertersEx:CollectionViewSourceCreator x:Key="collectionViewSourceCreator" />-->
 
-                    <SolidColorBrush x:Key="ParametersBlockColor" Color="#CCBF4747" />
-                    <SolidColorBrush x:Key="SourceColorBrush" Color="#CC47BF47" />
-                    <SolidColorBrush x:Key="TargetColorBrush" Color="#CC4747BF" />
-                    <SolidColorBrush x:Key="AccentColorBrush" Color="#FF41B1E1" />
-                    <sys:Double x:Key="DialogTitleFontSize">14</sys:Double>
-                    <sys:Double x:Key="DialogMessageFontSize">12</sys:Double>
+                    <x:Double x:Key="DialogTitleFontSize">14</x:Double>
+                    <x:Double x:Key="DialogMessageFontSize">12</x:Double>
 
                     <Style TargetType="CommandBar">
-                        <Setter Property="OverflowButtonVisibility" Value="Collapsed" />
+                        <Setter Target="OverflowButtonVisibility" Value="Collapsed" />
                     </Style>
+                    
+                    <helpers:ImageSourceConverter x:Key="imageSourceConverter" />
+
+                    <!--<BindingConvertersEx:CollectionViewSourceCreator x:Key="collectionViewSourceCreator" />-->
+                </ResourceDictionary>
+                <ResourceDictionary>
+                    <ResourceDictionary.ThemeDictionaries>
+                        <ResourceDictionary x:Key="Default">
+                            <SolidColorBrush x:Key="ParametersBlockColor" Color="#CCBF4747" />
+                            <SolidColorBrush x:Key="SourceColorBrush" Color="#CC47BF47" />
+                            <SolidColorBrush x:Key="TargetColorBrush" Color="#CC4747BF" />
+                            <SolidColorBrush x:Key="AccentColorBrush" Color="#FF41B1E1" />
+                        </ResourceDictionary>
+                    </ResourceDictionary.ThemeDictionaries>
                 </ResourceDictionary>
             </XamlControlsResources.MergedDictionaries>
         </XamlControlsResources>

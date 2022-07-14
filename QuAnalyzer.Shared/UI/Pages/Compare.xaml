@@ -75,7 +75,7 @@
                 <UC:MappingsEdit Mapping="{x:Bind SingleMap}" />
             </TabViewItem>
         </TabView>
-        <controls:GridSplitter Grid.Row="2" Background="{ThemeResource AccentColorBrush}" HorizontalAlignment="Stretch" />
+        <controls:GridSplitter Grid.Row="2" />
         <controls:DockPanel Grid.Column="0" Grid.Row="3">
             <CommandBar>
                 <AppBarElementContainer>
@@ -87,8 +87,8 @@
                 <AppBarSeparator />
                 <AppBarButton Content="Create report" ToolTipService.ToolTip="Create report" BorderBrush="BlueViolet" Icon="SaveLocal" Command="{x:Bind GlobalReportCommand}" />
             </CommandBar>
-            <UC:ExtendedDataGridView ItemsSource="{x:Bind GroupedComparisonInstancesView,Mode=OneWay}" ColumnWidth="*" IsReadOnly="True" AutoGenerateColumns="False" x:Name="allProgress" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="None" SelectionMode="Single">
-                <controls:DataGrid.RowGroupHeaderStyles>
+            <UC:ExtendedDataGridView ItemsSource="{x:Bind GroupedComparisonInstancesView,Mode=OneWay}" ColumnWidth="*" AutoGenerateColumns="False" x:Name="allProgress" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="None" SelectionMode="Single">
+                <UC:ExtendedDataGridView.RowGroupHeaderStyles>
                     <!-- Override the default Style for groups headers -->
                     <Style TargetType="controls:DataGridRowGroupHeader">
                         <Setter Target="Template">
@@ -196,7 +196,7 @@
                                             <AppBarButton Grid.Column="2" Height="40" IsEnabled="False" Opacity="0.5" Command="{Binding DeleteCommand,ElementName=thisPage}" CommandParameter="{Binding}" Width="40" Foreground="OrangeRed" Icon="Delete">
                                                 <VisualStateManager.VisualStateGroups>
                                                     <VisualStateGroup>
-                                                        <VisualState>
+                                                        <VisualState x:Name="Default">
                                                             <VisualState.StateTriggers>
                                                                 <triggers:IsEqualStateTrigger Value="{Binding Results.LocalProgress,ElementName=thisPage}" To="100" />
                                                                 <triggers:IsNotEqualStateTrigger Value="{Binding Results.Message,ElementName=thisPage}" To="{x:Null}" />
@@ -217,7 +217,7 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
-                </controls:DataGrid.RowGroupHeaderStyles>
+                </UC:ExtendedDataGridView.RowGroupHeaderStyles>
                 <!--<controls:DataGrid.Columns>
                     <controls:DataGridTextColumn Width="0" MinWidth="0" Header="Name" Binding="{x:Bind Name}" />
                     <controls:DataGridTextColumn Header="Item" Width="Auto" MinWidth="110" FontWeight="Bold">

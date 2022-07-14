@@ -1,5 +1,6 @@
 ﻿
 using Wokhan.Data.Providers;
+using Wokhan.Data.Providers.Embedded;
 
 using Xunit;
 

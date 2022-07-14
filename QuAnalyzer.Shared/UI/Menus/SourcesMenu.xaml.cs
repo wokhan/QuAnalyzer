@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Collections;
+using CommunityToolkit.Mvvm.Input;
 
 using QuAnalyzer.UI.Pages;
 using QuAnalyzer.UI.Windows;
@@ -10,9 +11,9 @@ using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Menus;
 
+[ObservableObject]
 public partial class SourcesMenu : UserControl
 {
-
     private Point startPoint;
 
     public SourcesMenu()
@@ -20,13 +21,14 @@ public partial class SourcesMenu : UserControl
         InitializeComponent();
     }
 
-    [ICommand]
+
+    [RelayCommand]
     private void ProviderDelete(IDataProvider provider)
     {
         App.Instance.CurrentProject.CurrentProviders.Remove(provider);
     }
 
-    //[ICommand]
+    //[RelayCommand]
     //private void ProviderImport()
     //{
     //    var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = "QuAnalyzer Data Provider archive|*.qax" };
@@ -36,16 +38,16 @@ public partial class SourcesMenu : UserControl
     //    }
     //}
 
-    [ICommand]
+    [RelayCommand]
     private void ProviderEdit(IDataProvider provider)
     {
-        Popup.OpenNew(new ProviderEditor(provider), this.XamlRoot);
+        GenericPopup.OpenNew<ProviderEditor>(provider, true);
     }
 
-    [ICommand]
+    [RelayCommand]
     private void SourceNew()
     {
-        Popup.OpenNew(new ProviderPicker(), this.XamlRoot);
+        GenericPopup.OpenNew<ProviderPicker>(isWizard: true);
     }
 
     private void Repository_DataGrid_MouseMove(object sender, MouseEventArgs e)
@@ -66,13 +68,19 @@ public partial class SourcesMenu : UserControl
         //startPoint = e.GetPosition(null);
     }
 
-    private void TreeView_Selected(object sender, RoutedEventArgs e)
+    private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        var treeViewItem = (TreeViewItem)e.OriginalSource;
-        var provider = (IDataProvider)treeViewItem.Tag;
-        var repository = (string)((TreeView)sender).SelectedItem;
+        var listview = (ListView)sender;
+
+        //var container = listview.ContainerFromItem(listview.SelectedItem);
+        //var group = listview.GroupHeaderContainerFromItemContainer(container);
+
+        var item = (KeyValuePair<string, object>)listview.SelectedItem;
+
+        // Ugly hack since I didn't figure out how to get the corresponding group from a ListViewItem...
+        var provider = App.Instance.CurrentProject.CurrentProviders.First(provider => provider.Repositories.Contains(item));
+        var repository = item.Key;
 
         App.Instance.CurrentSelection = (provider, repository);
-
     }
 }

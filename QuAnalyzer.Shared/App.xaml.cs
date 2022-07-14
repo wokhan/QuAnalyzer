@@ -25,8 +25,6 @@ public sealed partial class App : Application
 {
     public Window MainWindow { get; private set; }
 
-    public MainPage MainPage { get; private set; }
-
     public static App Instance => (App)Current;
 
     public List<SolidColorBrush> AvailableColors { get; } = new List<SolidColorBrush> {
@@ -85,15 +83,8 @@ public sealed partial class App : Application
 
         AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
-        UnhandledException += App_UnhandledException;
         //this.ShutdownMode = ShutdownMode.OnMainWindowClose;
         //this.Exit += App_Exit;
-    }
-
-    private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
-    {
-        MainPage?.ShowError("An unexpected error occured and has not been handled. Program might be unstable.");
-        e.Handled = true;
     }
 
     /// <summary>
@@ -111,7 +102,7 @@ public sealed partial class App : Application
 #endif
 
 #if NET6_0_OR_GREATER && WINDOWS
-        MainWindow = new Window();
+        MainWindow = new Window() { Title = "QuAnalyzer" };
         MainWindow.Activate();
 #else
         MainWindow = Microsoft.UI.Xaml.Window.Current;

@@ -1,11 +1,10 @@
 ﻿
 using CommunityToolkit.Mvvm.Input;
 
-using Microsoft.UI.Xaml.Media;
-
 using NuGet.Packaging.Core;
 
 using QuAnalyzer.Core.Helpers;
+using QuAnalyzer.UI.Windows;
 
 using Wokhan.Data.Providers.Bases;
 
@@ -18,40 +17,32 @@ public partial class ProviderPicker : Page
     private IEnumerable<NugetPackage> nugetPackages;
 
     [ObservableProperty]
-    [AlsoNotifyCanExecuteFor(nameof(CreateProviderCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CreateProviderCommand))]
     private DataProviderDefinition selectedProviderDef;
 
     public ProviderPicker()
     {
         this.Loaded += ProviderPicker_Loaded;
-        
+
         InitializeComponent();
     }
 
     private async void ProviderPicker_Loaded(object sender, RoutedEventArgs e)
     {
-        var dialog = (ContentDialog)this.Parent;
-        dialog.Title = "New provider";
-        dialog.PrimaryButtonText = "Next";
-        dialog.PrimaryButtonCommand = CreateProviderCommand;
-        dialog.CloseButtonText = "Cancel";
-        dialog.Width = 800;
-        dialog.Height = 500;
-
+        GenericPopup.UpdateCurrent(this, CreateProviderCommand, "New provider");
+        
         NugetPackages = await App.Instance.ProvidersMan.GetNugetPackages();
     }
 
-    [ICommand(CanExecute = nameof(CanExecuteCreateProvider))]
+    [RelayCommand(CanExecute = nameof(CanExecuteCreateProvider))]
     private void CreateProvider()
     {
-        var instanceName = $"{selectedProviderDef.Name}#{App.Instance.CurrentProject.CurrentProviders.Count}";
-
-        ((ContentDialog)this.Parent).Content = new ProviderEditor(selectedProviderDef.Name, instanceName);
+        Frame.Navigate(typeof(ProviderEditor), selectedProviderDef.Name);
     }
 
     private bool CanExecuteCreateProvider => SelectedProviderDef is not null;
 
-    [ICommand(AllowConcurrentExecutions = false)]
+    [RelayCommand(AllowConcurrentExecutions = false)]
     private async Task InstallPackage(PackageIdentity packageId)
     {
         await App.Instance.ProvidersMan.InstallPackage(packageId);

@@ -16,15 +16,15 @@ public partial class ViewerPage : Page
 
     private void UpdateSelection()
     {
-        var (prov, repo) = ((App)App.Instance).CurrentSelection;
+        var (prov, repo) = App.Instance.CurrentSelection;
         if (prov is not null && repo is not null)
         {
             gridData.CustomHeaders = prov.GetColumns(repo);
-            gridData.Source = prov.GetQueryable(repo);
+            gridData.ItemsSource = prov.GetQueryable(repo);
         }
         else
         {
-            gridData.Source = null;
+            gridData.ItemsSource = null;
         }
     }
 }

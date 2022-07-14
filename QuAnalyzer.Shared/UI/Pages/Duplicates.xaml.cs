@@ -124,7 +124,7 @@ public partial class Duplicates : Page
         return LinqExpression.Lambda<Func<T, object[]>>(LinqExpression.NewArrayInit(typeof(object), propertyGetExpression), param).Compile();
     }
 
-    [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
+    [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
     private async Task Run()
     {
         var (prov, repository) = App.Instance.CurrentSelection;
@@ -166,7 +166,7 @@ public partial class Duplicates : Page
 
             var duplicates = GenericMethodHelper.InvokeGenericStatic<IEnumerable>(typeof(Comparison), nameof(Comparison.GetDuplicates), new[] { data.ElementType }, data, keys, comparer, progressCallback);
 
-            gridData.Source = duplicates.AsQueryable();
+            gridData.ItemsSource = duplicates;
 
             gridData.LoadingProgress = 100;
         }).ConfigureAwait(false);

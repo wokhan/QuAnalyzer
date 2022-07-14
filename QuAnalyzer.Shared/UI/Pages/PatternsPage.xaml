@@ -10,7 +10,7 @@
       mc:Ignorable="d" d:DesignWidth="820" d:DesignHeight="610"
       DataContext="{x:Bind}">
     <controls:DockPanel>
-        <CommandBar>
+        <CommandBar controls:DockPanel.Dock="Top">
             <AppBarButton Command="{x:Bind RunCommand}" Content="Update" ToolTipService.ToolTip="Update now" BorderBrush="Green" Icon="Play" />
             <AppBarToggleButton IsChecked="{x:Bind AutoUpdate}" Content="Auto update" ToolTipService.ToolTip="Analyze automatically" BorderBrush="Blue" Icon="Calculator" />
             <AppBarSeparator />
@@ -38,7 +38,7 @@
                 <ListBox Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="lstDataSources_SelectionChanged" x:Name="lstAttributes" SelectionMode="Single" Width="200" Padding="5">
                     <VisualStateManager.VisualStateGroups>
                         <VisualStateGroup>
-                            <VisualState>
+                            <VisualState x:Name="Default">
                                 <VisualState.StateTriggers>
                                     <triggers:IsNullOrEmptyStateTrigger Value="{x:Bind lstAttributes.ItemsSource}" />
                                 </VisualState.StateTriggers>

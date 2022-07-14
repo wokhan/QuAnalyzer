@@ -19,7 +19,7 @@
                 </StackPanel>
             </AppBarElementContainer>
         </CommandBar>
-        <Grid>
+        <Grid controls:DockPanel.Dock="Left" Width="240">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>

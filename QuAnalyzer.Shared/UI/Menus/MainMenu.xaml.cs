@@ -2,8 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 
 using QuAnalyzer.Core.Helpers;
-using QuAnalyzer.UI.Pages;
-using QuAnalyzer.UI.Windows;
 
 namespace QuAnalyzer.UI.Menus;
 
@@ -13,18 +11,12 @@ public partial class MainMenu : UserControl
     {
         InitializeComponent();
 
-        recentProjects.Items.AddAll(MRUManager.RecentFiles.Select(file => new MenuFlyoutItem() { Text = file.Key, Tag = file.Value }));
+        recentProjects.Items.AddAll(MRUManager.RecentFiles.Select(file => new MenuFlyoutItem() { Text = file.Key, Command = OpenRecentCommand, CommandParameter = file.Key, IsEnabled = file.Value, Icon = new SymbolIcon(Symbol.OpenFile) }));
     }
 
-    [ICommand]
+    [RelayCommand]
     private void OpenRecent(string fileName)
     {
         App.Instance.CurrentProject.Open(fileName);
-    }
-
-    [ICommand]
-    private void About()
-    {
-        MainPage.Instance.ShowAbout();
     }
 }

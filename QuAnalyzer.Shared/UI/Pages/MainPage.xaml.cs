@@ -1,73 +1,73 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 
-using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml.Media;
+
+using QuAnalyzer.UI.Popups;
+
+using System.Configuration;
+
+using Windows.ApplicationModel;
+using Windows.UI;
+
+using WinRT.Interop;
 
 namespace QuAnalyzer.UI.Pages;
 
-/// <summary>
-/// Interaction logic for ModernMain.xaml
-/// </summary>
 public partial class MainPage
 {
-    private bool showMessageInProgress;
-
     public static MainPage Instance { get; private set; }
 
     public string AppName { get; } = $"QuAnalyzer {Assembly.GetExecutingAssembly().GetName().Version}";
+
+    public ObservableCollection<dynamic> Messages { get; } = new ObservableCollection<dynamic>();
 
     public MainPage()
     {
         Instance = this;
 
+        Loaded += MainPage_Loaded;
+
         InitializeComponent();
 
         App.Instance.Tasks.CollectionChanged += Tasks_CollectionChanged;
 
-        Window window = App.Instance.MainWindow;
-        window.ExtendsContentIntoTitleBar = true;  // enable custom titlebar
-        window.SetTitleBar(AppTitleBar);
+        // Only works on Win 11 yet.
+        //if (AppWindowTitleBar.IsCustomizationSupported())
+        //{
+        //    Window window = App.Instance.MainWindow;
+        //    window.ExtendsContentIntoTitleBar = true;
+        //    window.SetTitleBar(AppTitleBar);
+        //}
 
-        //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-        //Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        Application.Current.UnhandledException += CurrentApp_UnhandledException;
+
+        NavView_Navigate((NavigationViewItem)NavView.MenuItems[0]);
+    }
+
+    private void MainPage_Loaded(object sender, RoutedEventArgs e)
+    {
+        var windowId = Win32Interop.GetWindowIdFromWindow(WindowNative.GetWindowHandle(App.Instance.MainWindow));
+
+        AppWindow.GetFromWindowId(windowId).SetIcon(Package.Current.InstalledLocation.Path + "\\IconNew.ico");
+    }
+
+    private void CurrentApp_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        Messages.Add(new { Content = e.Exception.Message, Title = "Unexpected error", Severity = InfoBarSeverity.Error });
+        e.Handled = true;
+    }
+
+    private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
+    {
+        Messages.Add(new { Content = ((Exception)e.ExceptionObject).Message, Title = "Unexpected error", Severity = InfoBarSeverity.Error });
     }
 
     private void Tasks_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
         btnTasks.IsChecked = true;
-    }
-
-    private void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
-    {
-        ForceDialog(e.Exception.Message, "Unexpected error");
-        e.Handled = true;
-    }
-
-    ContentDialog dial;
-
-    private async void ForceDialog(string message, string title)
-    {
-        //var dial = await new CustomDialog().show.GetCurrentDialogAsync<BaseMetroDialog>().ConfigureAwait(true);
-        if (dial is not null)
-        {
-            dial.Title = title;
-            dial.Content = message;
-        }
-        //TODO: might get useless (added when we encounter a bugged loop, inducing multiple error messages being spawned too fast)
-        else if (!showMessageInProgress)
-        {
-            showMessageInProgress = true;
-
-            dial = new ContentDialog() { Title = title, Content = message };
-            await dial.ShowAsync();
-            
-            showMessageInProgress = false;
-        }
-    }
-
-    private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
-    {
-        ForceDialog(((Exception)e.ExceptionObject).Message, "Unexpected error");
-        //this.ShowMessageAsync("Unexpected error", ((Exception)e.ExceptionObject).Message, MessageDialogStyle.Affirmative);
     }
 
 
@@ -83,34 +83,24 @@ public partial class MainPage
     //    }
     //}
 
-    public void ShowAbout()
-    {
-        flyAbout.Visibility = Visibility.Visible;
-    }
-
-    internal Task ShowProgress(string v1, string v2, bool v3)
-    {
-        throw new NotImplementedException();
-    }
-
-    private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    private async void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
         if (args.IsSettingsInvoked)
         {
-            //ContentFrame.Navigate(typeof(SettingsPage));
+            await about.ShowAsync();
         }
         else
         {
             // find NavigationViewItem with Content that equals InvokedItem
             var item = sender.MenuItems.OfType<NavigationViewItem>().First(x => (string)x.Content == (string)args.InvokedItem);
-            NavView_Navigate(item as NavigationViewItem);
+            NavView_Navigate(item);
             App.Instance.CurrentSelectionLinked = NavView.TabIndex < 4;
         }
     }
 
-    internal void ShowError(string message)
-    {
-        gridMain.Children.Add(new InfoBar() { IsOpen = true, Message = message, Severity = InfoBarSeverity.Error });
+    private void NavSettings_Invoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+{
+        settingsContent.Content = args.InvokedItemContainer.Tag;
     }
 
     private void NavView_Navigate(NavigationViewItem item)
@@ -141,5 +131,11 @@ public partial class MainPage
                 ContentFrame.Navigate(typeof(Monitor));
                 break;
         }
+    }
+
+    [RelayCommand]
+    public void CloseInfo(dynamic message)
+    {
+        Messages.Remove(message);
     }
 }

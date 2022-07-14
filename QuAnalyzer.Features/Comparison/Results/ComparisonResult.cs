@@ -13,7 +13,7 @@ public partial class ComparisonResult<T> : ObservableObject
     private string message;
 
     [ObservableProperty]
-    [AlsoNotifyChangeFor(nameof(LocalProgress))]
+    [NotifyPropertyChangedFor(nameof(LocalProgress))]
     private ProgressType progress;
 
     [ObservableProperty]

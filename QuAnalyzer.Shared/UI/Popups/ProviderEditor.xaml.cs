@@ -1,11 +1,12 @@
 ﻿
 using CommunityToolkit.Mvvm.Input;
 
+using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Win32;
 
-using System.Diagnostics.Contracts;
+using QuAnalyzer.UI.Windows;
 
-using Windows.UI.Core;
+using System.Diagnostics.Contracts;
 
 using Wokhan.Data.Providers;
 using Wokhan.Data.Providers.Bases;
@@ -13,23 +14,50 @@ using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages;
 
-/// <summary>
-/// Logique d'interaction pour ProviderEditor.xaml
-/// </summary>
+[ObservableObject]
 public partial class ProviderEditor : Page
 {
-    public string MessageTitle { get; set; }
-    public string MessageContent { get; set; }
-
-    private IDataProvider _currentProvider;
-
-    private Window _owner => Window.Current;
-
-    public IDataProvider CurrentProvider
+    public class CustomDataTemplateSelector : DataTemplateSelector
     {
-        get { return _currentProvider; }
-        set { _currentProvider = value; NotifyPropertyChanged(nameof(CurrentProvider)); NotifyPropertyChanged(nameof(CurrentType)); fillProvider(); }
+        private DataTemplate defaultTemplate;
+        private DataTemplate fileTemplate;
+        private DataTemplate listTemplate;
+        private DataTemplate booleanTemplate;
+
+        public CustomDataTemplateSelector(DataTemplate defaultTemplate, DataTemplate fileTemplate, DataTemplate listTemplate, DataTemplate booleanTemplate)
+        {
+            this.defaultTemplate = defaultTemplate;
+            this.fileTemplate = fileTemplate;
+            this.listTemplate = listTemplate;
+            this.booleanTemplate = booleanTemplate;
+        }
+
+        protected override DataTemplate SelectTemplateCore(object item)
+        {
+            var definition = item as DataProviderMemberDefinition;
+            if (definition.IsFile)
+            {
+                return fileTemplate;
+            }
+
+            if (definition.MemberType == typeof(bool))
+            {
+                return booleanTemplate;
+            }
+
+            if (definition.HasValuesGetter)
+            {
+                return listTemplate;
+            }
+
+            return defaultTemplate;
+        }
     }
+
+    private CustomDataTemplateSelector TemplateSelector;
+
+    [ObservableProperty]
+    private IDataProvider _currentProvider;
 
     private IList<IGrouping<string, DataProviderMemberDefinition>> expParameters = null;
 
@@ -37,18 +65,18 @@ public partial class ProviderEditor : Page
     {
         get
         {
-            expParameters = DataProviders.GetParameters(CurrentProvider);
-            NotifyPropertyChanged(nameof(HasMultipleItems));
+            if (expParameters is null)
+            {
+                expParameters = DataProviders.GetParameters(CurrentProvider);
+                NotifyPropertyChanged(nameof(HasMultipleItems));
+            }
             return expParameters;
         }
     }
 
-    private int pageCount = 0;
-    private readonly bool isNewProvider;
+    private bool isNewProvider;
 
     public bool HasMultipleItems => (expParameters?.Count > 1);
-
-    public DataProviderDefinition CurrentType => CurrentProvider.Definition;
 
     protected void NotifyPropertyChanged(string propertyName)
     {
@@ -64,54 +92,44 @@ public partial class ProviderEditor : Page
 
     public ObservableCollection<RepositoryView> Repositories { get; } = new ObservableCollection<RepositoryView>();
 
-    public ProviderEditor(string providerName, string instanceName) : this(DataProviders.CreateInstance(providerName, new Dictionary<string, object>()), true)
+    protected override void OnNavigatedTo(NavigationEventArgs e)
     {
+        base.OnNavigatedTo(e);
 
+        if (e.Parameter is string)
+        {
+            isNewProvider = true;
+            CurrentProvider = DataProviders.CreateInstance((string)e.Parameter, new Dictionary<string, object>());
+        }
+        else
+        {
+            CurrentProvider = (IDataProvider)e.Parameter;
+        }
     }
 
-    public ProviderEditor(IDataProvider currentProvider, bool isNew = false)
+    private void ProviderEditor_Loaded(object sender, RoutedEventArgs e)
     {
-        Repositories.CollectionChanged += Repositories_CollectionChanged;
+        GenericPopup.UpdateCurrent(this, nextButtonCommand: ShowRepositoryPickerCommand);
 
-        CurrentProvider = currentProvider;
+        if (!isNewProvider)
+        {
+            GenericPopup.UpdateCurrent(this, title: CurrentProvider.Name);
+        }
+    }
+
+    [RelayCommand]
+    private void ShowRepositoryPicker()
+    {
+        Frame.Navigate(typeof(ProviderEditorRepositories), CurrentProvider);
+    }
+
+    public ProviderEditor()
+    {
+        this.Loaded += ProviderEditor_Loaded;
 
         InitializeComponent();
 
-        if (isNew)
-        {
-            isNewProvider = true;
-            btnBack.IsEnabled = true;
-        }
-    }
-
-    private void Repositories_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-    {
-        if (e.NewItems is not null)
-        {
-            foreach (RepositoryView repo in e.NewItems)
-            {
-                CurrentProvider.InvalidateColumnsCache(repo.Key);
-            }
-        }
-
-        if (e.OldItems is not null)
-        {
-            foreach (RepositoryView repo in e.OldItems)
-            {
-                CurrentProvider.InvalidateColumnsCache(repo.Key);
-            }
-        }
-    }
-
-    private void fillProvider()
-    {
-        if (CurrentProvider.Repositories is not null)
-        {
-            foreach (var r in CurrentProvider.Repositories)
-            {
-                Repositories.Add(new RepositoryView() { Key = r.Key, Value = r.Value, Selected = true });
-            }
-        }
+        TemplateSelector = new(DefaultTemplate, FileTemplate, ListTemplate, BooleanTemplate);
     }
 
     public void rdb_Checked(object sender, RoutedEventArgs e)
@@ -128,118 +146,6 @@ public partial class ProviderEditor : Page
         }
     }
 
-
-    private void save()
-    {
-        CurrentProvider.Repositories = Repositories.Where(r => r.Selected).ToDictionary(r => r.Key, r => r.Value);
-
-        if (!App.Instance.CurrentProject.CurrentProviders.Contains(CurrentProvider))
-        {
-            App.Instance.CurrentProject.CurrentProviders.Add(CurrentProvider);
-        }
-        //((App)App.Current).CurrentProject.CurrentProviders[((App)App.Current).CurrentProject.CurrentProviders.IndexOf((IDataProvider)lstProviders.SelectedItem)] = CurrentProvider;
-
-        _owner.Close();
-        //if (lstProviders.SelectedItem is null)
-        ////{
-        ////((App)App.Current).CurrentProject.CurrentProviders[((App)App.Current).CurrentProject.CurrentProviders.IndexOf((IDataProvider)lstProviders.SelectedItem)] = currentProvider;
-        ////lstProviders.Items.Refresh();
-        ////}
-        ////else
-        //{
-        //    ((App)App.Current).CurrentProject.CurrentProviders.Add(currentProvider);
-        //}
-
-        //lstProviders.SelectedItem = currentProvider;
-    }
-
-    bool stopAction;
-
-    [ICommand(AllowConcurrentExecutions = false)]
-    private async Task Retrieve()
-    {
-        MessageTitle = "Please wait";
-        MessageContent = "Retrieving repositories...";
-
-        string res = null;
-        try
-        {
-            await Task.Run(async () =>
-            {
-                var reps = CurrentProvider.GetDefaultRepositories().OrderBy(r => r.Key).Select(r => new RepositoryView() { Key = r.Key, Value = r.Value, Selected = true });
-                foreach (var r in reps)
-                {
-                    await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => Repositories.Add(r));
-
-                    if (stopAction)
-                    {
-                        break;
-                    }
-                }
-            });
-
-            MessageTitle = null;
-        }
-        catch (Exception exc)
-        {
-            res = exc.Message;
-            /*msg.SetMessage(exc.Message);
-            msg.SetProgress(0);
-            msg.SetTitle("Unexpected error");*/
-        }
-
-        if (res is not null)
-        {
-            MessageTitle = "Unexpected error";
-        }
-        /*catch (Exception exc)
-        {
-            ForceDialog("Something went wrong (and this message will get better later). Press OK to continue.", "Unexpected error");
-        }*/
-    }
-
-    /*private async void ForceDialog(string p1, string p2)
-    {
-        var dial = await this.GetCurrentDialogAsync<BaseMetroDialog>();
-        if (dial is not null)
-        {
-            dial.Title = p2;
-            dial.Content = p1;
-            //await this.HideMetroDialogAsync(dial);
-        }
-        else
-        {
-            await this.ShowMessageAsync(p2, p1, MessageDialogStyle.Affirmative);
-        }
-    }
-    */
-
-    [ICommand]
-    private void Clear()
-    {
-        Repositories.Clear();
-    }
-
-    [ICommand]
-    private void SelectAll()
-    {
-        foreach (var r in Repositories)
-        {
-            r.Selected = true;
-        }
-    }
-
-    [ICommand]
-    private void ClearSelection()
-    {
-        foreach (var r in Repositories)
-        {
-            r.Selected = false;
-        }
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
     /*private void btnNewPrv_Click(object sender, RoutedEventArgs e)
     {
         CurrentProvider = (IDataProvider)Activator.CreateInstance(DataProvider.AllProviders.First().Type);
@@ -250,31 +156,8 @@ public partial class ProviderEditor : Page
         fillProvider();
     }*/
 
-    [ICommand]
-    private void RepositoryAdd()
-    {
-        Repositories.Add(new RepositoryView() { Key = "Repository #" + (Repositories.Count + 1), Selected = true });
-    }
 
-    [ICommand]
-    private void ProviderDelete(IDataProvider provider)
-    {
-        App.Instance.CurrentProject.CurrentProviders.Remove(provider);
-    }
-
-    [ICommand]
-    private void RepositoryDelete(RepositoryView item)
-    {
-        Repositories.Remove(item);
-    }
-
-    [ICommand]
-    private void Revert()
-    {
-        _owner.Close();
-    }
-
-    [ICommand]
+    [RelayCommand]
     private void Test()
     {
         string res;
@@ -284,48 +167,13 @@ public partial class ProviderEditor : Page
         txtTestResult.Text = res;
     }
 
-    [ICommand]
+    [RelayCommand]
     private void ShowFileDialog(DataProviderMemberDefinition definition)
     {
         var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = definition.FileFilter };
         if (dial.ShowDialog().Value)
         {
             definition.ValueWrapper = dial.FileName;
-        }
-    }
-
-    private void btnNext_Click(object sender, RoutedEventArgs e)
-    {
-        pageCount++;
-
-        if ((string)btnNext.Content == "Done")
-        {
-            save();
-        }
-        else
-        {
-            dockRepositories.Visibility = Visibility.Visible;
-            gridParameters.Visibility = Visibility.Collapsed;
-            btnBack.IsEnabled = true;
-            btnNext.Content = "Done";
-        }
-    }
-
-    private void btnBack_Click(object sender, RoutedEventArgs e)
-    {
-        if (pageCount-- > 0)
-        {
-            dockRepositories.Visibility = Visibility.Collapsed;
-            gridParameters.Visibility = Visibility.Visible;
-            btnNext.Content = "Next >";
-            if (!isNewProvider)
-            {
-                btnBack.IsEnabled = false;
-            }
-        }
-        else
-        {
-            //this.NavigationService.GoBack();
         }
     }
 }

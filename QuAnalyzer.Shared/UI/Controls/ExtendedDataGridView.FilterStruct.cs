@@ -1,4 +1,6 @@
-﻿namespace QuAnalyzer.UI.Controls;
+﻿using CommunityToolkit.WinUI.UI.Controls;
+
+namespace QuAnalyzer.UI.Controls;
 
 public partial class ExtendedDataGridView
 {
@@ -26,4 +28,6 @@ public partial class ExtendedDataGridView
         { "Less than", "<" },
         { "Less than or equal", "<=" }
     };
+
+    public ObservableCollection<DataGridColumn> Columns => gridData.Columns;
 }

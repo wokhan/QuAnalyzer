@@ -58,7 +58,7 @@ public partial class StatisticsPage : Page
         }
     }
 
-    [ICommand(CanExecute =nameof(CanExecuteRun))]
+    [RelayCommand(CanExecute =nameof(CanExecuteRun))]
     private void Run()
     {
         var (prov, repo) = App.Instance.CurrentSelection;
@@ -72,7 +72,7 @@ public partial class StatisticsPage : Page
         Progress = 0;
         ComputedStats.Clear();
 
-        await Task.Run(async () =>
+        await Task.Run(() =>
         {
             Progress = -1;
 
@@ -81,9 +81,9 @@ public partial class StatisticsPage : Page
             var data = prv.GetQueryable(repo);
 
             var results = headers.ToDictionary(h => h, h => new StatisticsHolder() { Name = h.Name, Source = data });
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ComputedStats.AddAll(results.Values));
+            DispatcherQueue.TryEnqueue(() => ComputedStats.AddAll(results.Values));
 
-            headers.AsParallel().ForAll(h => results[h].Update(h, Dispatcher));
+            headers.AsParallel().ForAll(h => results[h].Update(h));
         }).ConfigureAwait(false);
     }
 }
