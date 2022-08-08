@@ -147,19 +147,19 @@ public partial class Duplicates : Page
             headers = columns.Select(h => h.Name).ToArray();
             keys = headers;
         }
-            
+
         var progressCallback = new Progress<int>((i) => gridData.Status = $"Checked {i} entries");
-            
+
         gridData.LoadingProgress = -1;
 
         await Task.Run(() =>
         {
-            
+
             var data = prov.GetQueryable(repository);
 
             var keysAsString = String.Join(",", keys);
 
-            if (!KeepDuplicates)
+            if (!KeepDuplicates || !KeepColumns)
             {
                 data = data.Select($"new({keysAsString})");
             }
@@ -170,6 +170,14 @@ public partial class Duplicates : Page
             var comparer = DynamicComparer.Create(data.ElementType, keys);
 
             var duplicates = GenericMethodHelper.InvokeGenericStatic<IEnumerable>(typeof(Comparison), nameof(Comparison.GetDuplicates), new[] { data.ElementType }, data, keys, comparer, progressCallback);
+
+            if (!KeepDuplicates)
+            {
+                duplicates = duplicates.AsQueryable()
+                                       .GroupBy($"new({keysAsString})")
+                                       .Select($"new({String.Join(",", keys.Select(key => "Key." + key))},Count() as Count)")
+                                       .OrderBy("Count descending");
+            }
 
             DispatcherQueue.TryEnqueue(() =>
             {

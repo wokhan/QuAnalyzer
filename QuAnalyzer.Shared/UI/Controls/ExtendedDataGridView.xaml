@@ -73,7 +73,7 @@
                             </Style>
                         </controls:DataGrid.Resources>-->
         </controls:DataGrid>
-        <Grid Width="250" Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Visibility="{x:Bind btnAggregate.IsChecked.Value,Converter={StaticResource boolToVisibilityConverter},Mode=OneWay}" Background="{ThemeResource ControlFillColorDefault}">
+        <Grid Width="250" Grid.Row="1" Grid.Column="1" Visibility="{x:Bind btnAggregate.IsChecked.Value,Converter={StaticResource boolToVisibilityConverter},Mode=OneWay}" Background="{ThemeResource ControlFillColorDefault}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />

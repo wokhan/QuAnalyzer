@@ -71,10 +71,22 @@ public partial class ExtendedDataGridView : UserControl
         InitializeComponent();
 
         this.PropertyChanged += ExtendedDataGridView_PropertyChanged;
+        this.Loaded += ExtendedDataGridView_Loaded;
 
         Filters.CollectionChanged += Filters_CollectionChanged;
-
+        
         _ = Reload();
+    }
+
+    IList<ICommandBarElement> primaryCommands;
+    private void ExtendedDataGridView_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (primaryCommands is null)
+        {
+            primaryCommands = commandBar.PrimaryCommands.ToList();
+        }
+
+        commandBar.PrimaryCommands.ReplaceAll(CustomCommandBarElements.Concat(primaryCommands));
     }
 
     private void Filters_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -94,12 +106,6 @@ public partial class ExtendedDataGridView : UserControl
                     ClearAll();
                     await Reload();
                 });
-                break;
-
-            case nameof(CustomCommandBarElements):
-                commandBar.PrimaryCommands.RemoveRange(addedCommandBarElements);
-                addedCommandBarElements = customCommandBarElements.Cast<ICommandBarElement>().ToList();
-                commandBar.PrimaryCommands.AddAll(addedCommandBarElements);
                 break;
 
             default:
@@ -281,6 +287,7 @@ public partial class ExtendedDataGridView : UserControl
         }
 
         gridData.ItemsSource = virtualizedData;
+
         if (SortOrder is not null && gridData.Columns.Any())
         {
             gridData.Columns.First(c => (string)c.Tag == SortOrder).SortDirection = (currentSortDirectionAsc ? DataGridSortDirection.Ascending : DataGridSortDirection.Descending);
@@ -317,7 +324,7 @@ public partial class ExtendedDataGridView : UserControl
 
     private void gridData_Sorting(object sender, DataGridColumnEventArgs e)
     {
-        var sortby = (string)e.Column.Tag;
+        var sortby = ((DataGridBoundColumn)e.Column).Binding.Path.Path;
         currentSortDirectionAsc = (currentSortAttribute == sortby) && !currentSortDirectionAsc;
         currentSortAttribute = sortby;
 
@@ -329,8 +336,7 @@ public partial class ExtendedDataGridView : UserControl
     [ObservableProperty]
     private object customCommandBarContent;
 
-    [ObservableProperty]
-    private IList<ICommandBarElement> customCommandBarElements = new List<ICommandBarElement>();
+    public IList<ICommandBarElement> CustomCommandBarElements { get; } = new List<ICommandBarElement>();
 
     public DataGridSelectionMode SelectionMode
     {
