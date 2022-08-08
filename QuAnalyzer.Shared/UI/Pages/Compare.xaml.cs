@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.HighPerformance;
-using CommunityToolkit.Mvvm.Collections;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 
 using Microsoft.Win32;
 
@@ -9,18 +7,17 @@ using OfficeOpenXml;
 using QuAnalyzer.Core.Extensions;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Comparers;
-using QuAnalyzer.Features.Comparison.Definition;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
 
 using System.Linq.Dynamic.Core;
-using System.Windows.Shell;
 
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages;
 
+[ObservableObject]
 public partial class Compare : Page
 {
 
@@ -30,11 +27,12 @@ public partial class Compare : Page
 
     private readonly Dictionary<string, int> progressDC = new();
 
+    [ObservableProperty]
+    private int currentProgress = 0;
+
     public Compare()
     {
         InitializeComponent();
-
-        lstMappings.SelectionChanged += LstMappings_SelectionChanged;
 
         GroupedComparisonInstancesView = ComparisonInstancesView.GroupBy(x => x.Name);
     }
@@ -44,9 +42,9 @@ public partial class Compare : Page
     {
         var allprv = App.Instance.CurrentProject.CurrentProviders;
 
-        var mapper = App.Instance.CurrentProject.SourceMapper;
+        var mappers = App.Instance.CurrentProject.SourceMapper;
 
-        mapper.Clear();
+        mappers.Clear();
 
         var done = new List<IDataProvider>();
         foreach (var source in allprv)
@@ -54,17 +52,9 @@ public partial class Compare : Page
             if (!done.Contains(source))
             {
                 var map = allprv.Where(target => target != source && target.Repositories.Keys.Intersect(source.Repositories.Keys).Any())
-                                .SelectMany(target => target.Repositories.Keys.Intersect(source.Repositories.Keys).Select(repository => new SourcesMapper()
-                                {
-                                    Name = $"{source.Name} ({repository}) / {target.Name} ({repository})",
-                                    Source = source,
-                                    Target = target,
-                                    SourceRepository = repository,
-                                    TargetRepository = repository,
-                                    AllMappings = source.GetColumns(repository).Select(h => h.Name).Intersect(target.GetColumns(repository).Select(h => h.Name)).Select(k => new SimpleMap(k, k)).ToList()
-                                }));
+                                .SelectMany(target => target.Repositories.Keys.Intersect(source.Repositories.Keys).Select(repository => new SourcesMapper(source, repository, target, repository, true)));
 
-                mapper.AddAll(map);
+                mappers.AddAll(map);
 
                 done.AddRange(map.Select(m => m.Source));
                 done.AddRange(map.Select(m => m.Target));
@@ -72,7 +62,7 @@ public partial class Compare : Page
         }
     }
 
-    //TODO: Use Command="{x:Static DataGrid.SelectAllCommand}" instead
+    //TODO: Figure out what Command using instead 
     private void btnSelectAll_Click(object sender, RoutedEventArgs e)
     {
         //lstMappings.SelectAll();
@@ -157,7 +147,8 @@ public partial class Compare : Page
         var app = App.Instance;
         var (host, callback, cancelTokenSummary) = app.AddTaskAndGetCallback("Exporting Summary");
 
-        allProgress.ExportAsXLSX(folderPath + "\\Summary.xlsx", "Summary", host, callback, cancelTokenSummary);
+        //TODO: check
+        //allProgress.ExportAsXLSX(folderPath + "\\Summary.xlsx", "Summary", host, callback, cancelTokenSummary);
 
         foreach (var cmp in ComparisonInstancesView.Where(c => c.Results.Progress == ProgressType.Done))
         {
@@ -237,14 +228,16 @@ public partial class Compare : Page
     [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
     private async Task Run()
     {
-        prgGlobal.IsIndeterminate = true;
+        CurrentProgress = -1;
 
         var newInstances = new List<ComparerDefinition<object[]>>();
         var comparer = SequenceComparer<object>.Default;
 
+        //TODO:check
         foreach (SourcesMapper mapper in UseSingleMapping ? new[] { SingleMap } : lstMappings.SelectedItems)
         {
             var cp = await ComparerDefinition<object[]>.CreateAsync(mapper, comparer, Map, Convert).ConfigureAwait(true);
+
             // Using ObservableCollections to reflect any live modification in the UI
             cp.Results.InitCollections(() => new ObservableCollection<object[]>());
 
@@ -257,13 +250,13 @@ public partial class Compare : Page
             newInstances.Add(cp);
         }
 
-        prgGlobal.IsIndeterminate = false;
-
+        CurrentProgress = 100;
+        
         var callback = new Progress<ComparerDefinition<object[]>>(Progress);
         await Task.Run(() => Comparison.Run(newInstances, progressCallback: callback, useParallelism: App.Instance.CurrentProject.UseParallelism));
     }
 
-    private bool CanExecuteRun => lstMappings?.SelectedItems.Count > 0;
+    private bool CanExecuteRun => true;//TODO: lstMappings?.SelectedItems.Count > 0;
 
     public void Progress(ComparerDefinition<object[]> comparer)
     {
@@ -278,9 +271,7 @@ public partial class Compare : Page
             default:
                 progressDC[comparer.Name] = comparer.Results.LocalProgress;
 
-                int currentProgress = (int)progressDC.Average(p => p.Value);
-
-                prgGlobal.Value = currentProgress;
+                CurrentProgress = (int)progressDC.Average(p => p.Value);
 
                 //App.Instance.MainWindow.TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
                 //App.Instance.MainWindow.TaskbarItemInfo.ProgressValue = currentProgress / 100.0;
@@ -297,8 +288,10 @@ public partial class Compare : Page
     public ObservableCollection<ComparerDefinition<object[]>> ComparisonInstancesView { get; } = new();
 
     public IEnumerable<IGrouping<string, ComparerDefinition<object[]>>> GroupedComparisonInstancesView { get; }
+    
     public SourcesMapper SingleMap { get; } = new();
 
-    public bool UseSingleMapping { get; set; }
+    [ObservableProperty]
+    private bool useSingleMapping;
 
 }

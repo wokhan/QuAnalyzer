@@ -1,17 +1,15 @@
-﻿using QuAnalyzer.Features.Comparison;
+﻿using CommunityToolkit.Mvvm.Input;
+
+using QuAnalyzer.Core.Helpers;
+
+using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Comparers;
 
-using System.Diagnostics.Contracts;
-using System.Windows.Data;
-using System.Windows.Threading;
-
-using Wokhan.Data.Providers.Bases;
-using CommunityToolkit.Mvvm.Input;
 using System.Linq.Dynamic.Core;
 
+using Wokhan.Data.Providers.Bases;
+
 using LinqExpression = System.Linq.Expressions.Expression;
-using System.Reflection;
-using QuAnalyzer.Core.Helpers;
 
 namespace QuAnalyzer.UI.Pages;
 
@@ -32,6 +30,8 @@ public partial class Duplicates : Page
 
         App.Instance.PropertyChanged += App_PropertyChanged;
         lstColumns.SelectionChanged += LstColumns_SelectionChanged;
+
+        UpdateSelection();
     }
 
     private void LstColumns_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -43,11 +43,16 @@ public partial class Duplicates : Page
     {
         if (e.PropertyName == nameof(App.CurrentSelection))
         {
-            var (prov, repo) = App.Instance.CurrentSelection;
-            if (prov is not null)
-            {
-                lstColumns.ItemsSource = prov.GetColumns(repo);
-            }
+            UpdateSelection();
+        }
+    }
+
+    private void UpdateSelection()
+    {
+        var (prov, repo) = App.Instance.CurrentSelection;
+        if (prov is not null)
+        {
+            lstColumns.ItemsSource = prov.GetColumns(repo);
         }
     }
 
@@ -166,9 +171,11 @@ public partial class Duplicates : Page
 
             var duplicates = GenericMethodHelper.InvokeGenericStatic<IEnumerable>(typeof(Comparison), nameof(Comparison.GetDuplicates), new[] { data.ElementType }, data, keys, comparer, progressCallback);
 
-            gridData.ItemsSource = duplicates;
-
-            gridData.LoadingProgress = 100;
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                gridData.ItemsSource = duplicates;
+                gridData.LoadingProgress = 100;
+            });
         }).ConfigureAwait(false);
     }
 

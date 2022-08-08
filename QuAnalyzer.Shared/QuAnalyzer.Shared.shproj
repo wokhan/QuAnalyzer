@@ -11,7 +11,12 @@
   <Import Project="QuAnalyzer.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\CodeSharing\Microsoft.CodeSharing.CSharp.targets" />
   <ItemGroup>
+    <_Globbed_Compile Remove="Core\Helpers\CustomDataTemplateSelector.cs" />
     <_Globbed_Compile Remove="Core\Helpers\ImageSourceConverter.cs" />
+    <_Globbed_Compile Remove="Core\Helpers\MicaBackground.cs" />
+    <_Globbed_Compile Remove="Core\Helpers\NugetManager.cs" />
+    <_Globbed_Compile Remove="Core\Helpers\NugetPackage.cs" />
+    <_Globbed_Compile Remove="Core\Helpers\NugetPackage1.cs" />
     <_Globbed_Compile Remove="Core\Helpers\PopupHelper.cs" />
     <_Globbed_Compile Remove="Core\Helpers\WindowManager.cs" />
     <_Globbed_Compile Remove="UI\Popups\About - Copier.xaml.cs" />

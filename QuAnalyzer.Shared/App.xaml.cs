@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.UI;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 
 using QuAnalyzer.Core.Helpers;
@@ -27,15 +25,6 @@ public sealed partial class App : Application
 
     public static App Instance => (App)Current;
 
-    public List<SolidColorBrush> AvailableColors { get; } = new List<SolidColorBrush> {
-            //new SolidColorBrush(Color.FromArgb(0xff, 0x41, 0xB1, 0xE1)),
-            new SolidColorBrush(Colors.LightCoral),
-            new SolidColorBrush(Colors.LightSeaGreen),
-            new SolidColorBrush(Colors.LightSlateGray),
-            new SolidColorBrush(Colors.MediumPurple),
-            new SolidColorBrush(Colors.PaleVioletRed)
-        };
-
     public ProjectSettings CurrentProject { get; private set; }
 
     [ObservableProperty]
@@ -44,16 +33,15 @@ public sealed partial class App : Application
     [ObservableProperty]
     private bool _currentSelectionLinked;
     
-    public ResourcesWatcher Performance { get; private set; }
-    public ProvidersManager ProvidersMan { get; private set; }
+    public ResourcesWatcher Performance { get; init; }
 
-    //public string ApplicationInfo { get { return String.Format("{0} {1} v{2}", _appBase.Info.CompanyName, _appBase.Info.ProductName, _appBase.Info.Version); } }
-    public string ApplicationInfo { get; } = $"{Assembly.GetExecutingAssembly().GetName().Name} - v{Assembly.GetExecutingAssembly().GetName().Version}";
+    public string ApplicationInfo { get; init; }
 
     //public string Copyright { get { return _appBase.Info.Copyright; } }
     public string Copyright { get; } = "";
 
     public string HelpLink { get; } = "https://www.wokhan.com";
+
     public ObservableCollection<GlobalTask> Tasks { get; private set; } = new();
 
     /// <summary>
@@ -64,28 +52,30 @@ public sealed partial class App : Application
     {
         InitializeLogging();
 
-        this.InitializeComponent();
+        InitializeComponent();
 
 #if HAS_UNO || NETFX_CORE
         this.Suspending += OnSuspending;
 #endif
 
-
         CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+
+        var assemblyName = Assembly.GetExecutingAssembly().GetName();
+        ApplicationInfo = $"{assemblyName.Name} - v{assemblyName.Version} ({assemblyName.ProcessorArchitecture})";
 
         CurrentProject = new ProjectSettings() { Name = "Unamed project" };
         //Performance = new ResourcesWatcher();
-        ProvidersMan = new ProvidersManager();
 
         //TODO: change to a static initializer
         TestDefinition.Providers = Instance.CurrentProject.CurrentProviders;
         SourcesMapper.Providers = Instance.CurrentProject.CurrentProviders;
 
-        AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+        //AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
         //this.ShutdownMode = ShutdownMode.OnMainWindowClose;
         //this.Exit += App_Exit;
     }
+
 
     /// <summary>
     /// Invoked when the application is launched normally by the end user.  Other entry points
@@ -108,50 +98,54 @@ public sealed partial class App : Application
         MainWindow = Microsoft.UI.Xaml.Window.Current;
 #endif
 
-        var rootFrame = MainWindow.Content as Frame;
-
-        // Do not repeat app initialization when the Window already has content,
-        // just ensure that the window is active
-        if (rootFrame == null)
-        {
-            // Create a Frame to act as the navigation context and navigate to the first page
-            rootFrame = new Frame();
-
-            rootFrame.NavigationFailed += OnNavigationFailed;
-
-            if (args.UWPLaunchActivatedEventArgs.PreviousExecutionState == ApplicationExecutionState.Terminated)
-            {
-                // TODO: Load state from previously suspended application
-            }
-
-            // Place the frame in the current Window
-            MainWindow.Content = rootFrame;
-        }
-
 #if !(NET6_0_OR_GREATER && WINDOWS)
         if (args.UWPLaunchActivatedEventArgs.PrelaunchActivated == false)
 #endif
         {
-            if (rootFrame.Content == null)
+            if (MainWindow.Content is null)
             {
-                // When the navigation stack isn't restored navigate to the first page,
-                // configuring the new page by passing required information as a navigation
-                // parameter
-                rootFrame.Navigate(typeof(MainPage), args.Arguments);
+                MainWindow.Content = new MainPage();
+                MicaBackground.TrySetBackdrop(MainWindow, MicaBackground.BackgroundMode.Mica);
             }
+
             // Ensure the current window is active
             MainWindow.Activate();
         }
-    }
 
-    /// <summary>
-    /// Invoked when Navigation to a certain page fails
-    /// </summary>
-    /// <param name="sender">The Frame which failed navigation</param>
-    /// <param name="e">Details about the navigation failure</param>
-    void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
-    {
-        throw new InvalidOperationException($"Failed to load {e.SourcePageType.FullName}: {e.Exception}");
+//        var rootFrame = MainWindow.Content as Frame;
+
+//        // Do not repeat app initialization when the Window already has content,
+//        // just ensure that the window is active
+//        if (rootFrame == null)
+//        {
+//            // Create a Frame to act as the navigation context and navigate to the first page
+//            rootFrame = new Frame();
+
+//            rootFrame.NavigationFailed += OnNavigationFailed;
+
+//            if (args.UWPLaunchActivatedEventArgs.PreviousExecutionState == ApplicationExecutionState.Terminated)
+//            {
+//                // TODO: Load state from previously suspended application
+//            }
+
+//            // Place the frame in the current Window
+//            MainWindow.Content = rootFrame;
+//        }
+
+//#if !(NET6_0_OR_GREATER && WINDOWS)
+//        if (args.UWPLaunchActivatedEventArgs.PrelaunchActivated == false)
+//#endif
+//        {
+//            if (rootFrame.Content == null)
+//            {
+//                // When the navigation stack isn't restored navigate to the first page,
+//                // configuring the new page by passing required information as a navigation
+//                // parameter
+//                rootFrame.Navigate(typeof(MainPage), args.Arguments);
+//            }
+//            // Ensure the current window is active
+//            MainWindow.Activate();
+//        }
     }
 
     /// <summary>
@@ -237,17 +231,17 @@ public sealed partial class App : Application
 #endif
     }
 
-    private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-    {
-        var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "providers", args.Name.Split(',')[0] + ".dll");
+    //private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+    //{
+    //    var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "providers", args.Name.Split(',')[0] + ".dll");
 
-        if (File.Exists(path))
-        {
-            return Assembly.LoadFrom(path);
-        }
+    //    if (File.Exists(path))
+    //    {
+    //        return Assembly.LoadFrom(path);
+    //    }
 
-        return null;
-    }
+    //    return null;
+    //}
 
 
     /// <summary>

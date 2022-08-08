@@ -72,7 +72,6 @@ public partial class ExtendedDataGridView : UserControl
 
         this.PropertyChanged += ExtendedDataGridView_PropertyChanged;
 
-
         Filters.CollectionChanged += Filters_CollectionChanged;
 
         _ = Reload();
@@ -83,15 +82,28 @@ public partial class ExtendedDataGridView : UserControl
         IsFiltersEmpty = !Filters.Any();
     }
 
+
+    private List<ICommandBarElement> addedCommandBarElements = new();
     private void ExtendedDataGridView_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(ItemsSource))
+        switch (e.PropertyName)
         {
-            DispatcherQueue.TryEnqueue(async () =>
-            {
-                ClearAll();
-                await Reload();
-            });
+            case nameof(ItemsSource):
+                DispatcherQueue.TryEnqueue(async () =>
+                {
+                    ClearAll();
+                    await Reload();
+                });
+                break;
+
+            case nameof(CustomCommandBarElements):
+                commandBar.PrimaryCommands.RemoveRange(addedCommandBarElements);
+                addedCommandBarElements = customCommandBarElements.Cast<ICommandBarElement>().ToList();
+                commandBar.PrimaryCommands.AddAll(addedCommandBarElements);
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -262,7 +274,12 @@ public partial class ExtendedDataGridView : UserControl
         // TODO: ensure there is no impact on perf (as it might require the query to fully executed on some providers)
         ItemsCount = query.Count();
 
-        gridData.SelectedItems.Clear();
+        gridData.SelectedItem = null;
+        if (gridData.SelectionMode == DataGridSelectionMode.Extended)
+        {
+            gridData.SelectedItems.Clear();
+        }
+
         gridData.ItemsSource = virtualizedData;
         if (SortOrder is not null && gridData.Columns.Any())
         {
@@ -295,7 +312,6 @@ public partial class ExtendedDataGridView : UserControl
         gridData?.ExportAsXLSX(path, worksheetName, host, progress, cancellationToken);
     }
 
-
     private string currentSortAttribute = null;
     private bool currentSortDirectionAsc = true;
 
@@ -310,6 +326,11 @@ public partial class ExtendedDataGridView : UserControl
         _ = Reload();
     }
 
+    [ObservableProperty]
+    private object customCommandBarContent;
+
+    [ObservableProperty]
+    private IList<ICommandBarElement> customCommandBarElements = new List<ICommandBarElement>();
 
     public DataGridSelectionMode SelectionMode
     {

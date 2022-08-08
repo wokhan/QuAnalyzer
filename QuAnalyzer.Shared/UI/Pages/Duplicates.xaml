@@ -7,32 +7,19 @@
       mc:Ignorable="d" 
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" xmlns:bases="using:Wokhan.Data.Providers.Bases"
       d:DesignHeight="600" d:DesignWidth="850"
-      x:Name="thisWindow"
+      x:Name="me"
       DataContext="{x:Bind}">
     <controls:DockPanel>
         <CommandBar controls:DockPanel.Dock="Top">
-            <AppBarButton Command="{x:Bind RunCommand}" Content="Run" BorderBrush="Green" Icon="Play" />
+            <AppBarButton Command="{x:Bind RunCommand}" Label="Run" Icon="Play" />
             <AppBarElementContainer>
                 <StackPanel Orientation="Horizontal">
-                    <CheckBox Content=" Keep all duplicates" IsChecked="{x:Bind KeepDuplicates,Mode=TwoWay}" Margin="7" />
-                    <CheckBox Content=" Show other columns" IsChecked="{x:Bind KeepColumns,Mode=TwoWay}" IsEnabled="{x:Bind KeepDuplicates,Mode=OneWay}" Margin="7" />
+                    <CheckBox Content=" Keep all duplicates" FontSize="12" IsChecked="{x:Bind KeepDuplicates,Mode=TwoWay}" Margin="7" />
+                    <CheckBox Content=" Show other columns" FontSize="12" IsChecked="{x:Bind KeepColumns,Mode=TwoWay}" IsEnabled="{x:Bind KeepDuplicates,Mode=OneWay}" Margin="7" />
                 </StackPanel>
             </AppBarElementContainer>
         </CommandBar>
-        <Grid controls:DockPanel.Dock="Left" Width="240">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Padding="5" Text="Attributes" />
-            <ListBox Grid.Row="1"  BorderThickness="0,0,2,0" BorderBrush="LightGray" controls:DockPanel.Dock="Left" VerticalAlignment="Stretch" x:Name="lstColumns" SelectionMode="Extended" MinWidth="200" Padding="5">
-                <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="bases:ColumnDescription">
-                        <CheckBox Content="{x:Bind Name}" IsChecked="{Binding IsSelected,Mode=TwoWay,ElementName=thisWindow}" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </Grid>
-        <UC:ExtendedDataGridView x:Name="gridData" />
+        <ListView Header="Attributes" DisplayMemberPath="Name" BorderThickness="0,0,2,0" BorderBrush="LightGray" controls:DockPanel.Dock="Left" VerticalAlignment="Stretch" x:Name="lstColumns" SelectionMode="Multiple" IsMultiSelectCheckBoxEnabled="True" MinWidth="200" Padding="5" />
+        <UC:ExtendedDataGridView x:Name="gridData" AutoGenerateColumns="True" />
     </controls:DockPanel>
 </Page>

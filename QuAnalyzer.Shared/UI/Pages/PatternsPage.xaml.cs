@@ -4,10 +4,9 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 
 using System.Linq.Dynamic.Core;
 
-using Windows.UI.Core;
-
 namespace QuAnalyzer.UI.Pages;
 
+[ObservableObject]
 public partial class PatternsPage : Page
 {
     private List<string> stringAttributes;
@@ -15,11 +14,16 @@ public partial class PatternsPage : Page
     public int SimThreshold { get; set; }
     public bool AutoUpdate { get; set; }
 
+    [ObservableProperty]
+    private string status;
+
     public PatternsPage()
     {
         InitializeComponent();
 
         App.Instance.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
+
+        UpdateSelection();
     }
 
     private async void UpdateSelection()
@@ -54,7 +58,7 @@ public partial class PatternsPage : Page
             var data = prov.GetQueryable(repo)
                            .Select(attr)
                            .AsEnumerable()
-                           .WithProgress(i => DispatcherQueue.TryEnqueue(() => txtStatus.Text = $"Loaded {i} entries..."))
+                           .WithProgress(i => { Status = $"Loaded {i} entries..."; })
                            .Select(a => a.ToString())
                            .ToList();
 
@@ -73,7 +77,7 @@ public partial class PatternsPage : Page
         }).ConfigureAwait(true);
 
         //gridPatterns.CustomHeaders = prov.GetColumns(repo).Join(stringAttributes, a => a.Name, b => b, (a, b) => a).ToList();
-        gridPatterns.ItemsSource = res;
+        DispatcherQueue.TryEnqueue(() => gridPatterns.ItemsSource = res);
         /*}
         else
         {

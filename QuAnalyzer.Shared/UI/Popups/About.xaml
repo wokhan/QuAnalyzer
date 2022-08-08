@@ -1,25 +1,42 @@
-﻿<ContentDialog x:Class="QuAnalyzer.UI.Popups.About"
+﻿<Page x:Class="QuAnalyzer.UI.Popups.About"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:quanalyzer="using:QuAnalyzer"
-             xmlns:popups="using:QuAnalyzer.UI.Popups"
-             mc:Ignorable="d" d:DesignWidth="350" 
-             CloseButtonText="OK">
-    <ContentDialog.Resources>
-        <Style TargetType="popups:About" BasedOn="{StaticResource DefaultContentDialogStyle}"/>
-    </ContentDialog.Resources>
-    <StackPanel Margin="20">
-        <TextBlock Text="Project settings" Style="{StaticResource SubtitleTextBlockStyle}" />
-        <TextBlock Text="Project accent color" />
-        <!--<ColorPicker HorizontalAlignment="Left" IsAlphaEnabled="False" IsHexInputVisible="False" IsColorChannelTextInputVisible="False" />-->
-        <TextBlock Text="About" Style="{StaticResource SubtitleTextBlockStyle}"/>
-        <TextBlock Text="{x:Bind quanalyzer:App.Instance.ApplicationInfo, FallbackValue='Wokhan QuAnalyzer vX.X.X'}" />
-        <TextBlock Text="{x:Bind quanalyzer:App.Instance.Copyright, FallbackValue='Copyright notice'}" />
-        <TextBlock Text="{x:Bind quanalyzer:App.Instance.HelpLink, FallbackValue='Link'}" />
-        <TextBlock Text="External resources" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-        <TextBlock TextWrapping="Wrap">
+             mc:Ignorable="d" d:DesignWidth="350">
+    <NavigationView PaneDisplayMode="Top" IsSettingsVisible="False" IsBackButtonVisible="Collapsed" ItemInvoked="NavSettings_Invoked">
+        <NavigationView.MenuItems>
+            <NavigationViewItem Content="Settings" x:Name="settings" IsSelected="True">
+                <NavigationViewItem.Tag>
+                    <ScrollViewer>
+                        <StackPanel Margin="20">
+                            <ComboBox Header="Theme" SelectedIndex="{x:Bind SelectedTheme,Mode=TwoWay}" Margin="0,0,0,15">
+                                <x:String>Default</x:String>
+                                <x:String>Light</x:String>
+                                <x:String>Dark</x:String>
+                            </ComboBox>
+                            <ComboBox Header="Background mode" SelectedIndex="{x:Bind BackgroundMode,Mode=TwoWay}" Margin="0,0,0,15">
+                                <x:String>None</x:String>
+                                <x:String>Acrylic</x:String>
+                                <x:String>Mica</x:String>
+                            </ComboBox>
+                            <TextBlock Text="Accent color (for the current project)" Margin="0,10"/>
+                            <ColorPicker HorizontalAlignment="Left" IsAlphaEnabled="False" IsHexInputVisible="False" IsColorChannelTextInputVisible="False" Color="{x:Bind quanalyzer:App.Instance.CurrentProject.AccentColor,Mode=TwoWay}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </NavigationViewItem.Tag>
+            </NavigationViewItem>
+            <NavigationViewItem Content="About">
+                <NavigationViewItem.Tag>
+                    <ScrollViewer>
+                        <StackPanel Margin="20">
+                            <TextBlock Text="About" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                            <TextBlock Text="{x:Bind quanalyzer:App.Instance.ApplicationInfo, FallbackValue='Wokhan QuAnalyzer vX.X.X'}" />
+                            <TextBlock Text="{x:Bind quanalyzer:App.Instance.Copyright, FallbackValue='Copyright notice'}" />
+                            <TextBlock Text="{x:Bind quanalyzer:App.Instance.HelpLink, FallbackValue='Link'}" />
+                            <TextBlock Text="External resources" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock TextWrapping="Wrap">
             This project uses the following libraries:
             <LineBreak />
             - EPPlus
@@ -33,9 +50,15 @@
             - Wokhan.DataProviders
             <LineBreak />
             - Wokhan.UI
-        </TextBlock>
-        <TextBlock TextWrapping="Wrap">
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap">
             Each additional Data Provider plugin belongs to their developer, as stated in corresponding application pages.
-        </TextBlock>
-    </StackPanel>
-</ContentDialog>
+                            </TextBlock>
+                        </StackPanel>
+                    </ScrollViewer>
+                </NavigationViewItem.Tag>
+            </NavigationViewItem>
+        </NavigationView.MenuItems>
+        <ContentControl x:Name="settingsContent" />
+    </NavigationView>
+</Page>

@@ -4,8 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Navigation;
 
 using QuAnalyzer.UI.Windows;
-
-using Wokhan.Data.Providers;
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
 
@@ -20,22 +18,6 @@ public partial class ProviderEditorRepositories : Page
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CurrentType))]
     private IDataProvider _currentProvider;
-
-    private Window _owner => Window.Current;
-
-    private IList<IGrouping<string, DataProviderMemberDefinition>> expParameters = null;
-
-    public IList<IGrouping<string, DataProviderMemberDefinition>> ExpParameters
-    {
-        get
-        {
-            expParameters = DataProviders.GetParameters(CurrentProvider);
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasMultipleItems)));
-            return expParameters;
-        }
-    }
-
-    public bool HasMultipleItems => (expParameters?.Count > 1);
 
     public DataProviderDefinition CurrentType => CurrentProvider.Definition;
 
@@ -151,21 +133,6 @@ public partial class ProviderEditorRepositories : Page
         }*/
     }
 
-    /*private async void ForceDialog(string p1, string p2)
-    {
-        var dial = await this.GetCurrentDialogAsync<BaseMetroDialog>();
-        if (dial is not null)
-        {
-            dial.Title = p2;
-            dial.Content = p1;
-            //await this.HideMetroDialogAsync(dial);
-        }
-        else
-        {
-            await this.ShowMessageAsync(p2, p1, MessageDialogStyle.Affirmative);
-        }
-    }
-    */
     public bool CanExecuteRepositoriesCommands => Repositories.Any();
 
     [RelayCommand(CanExecute = nameof(CanExecuteRepositoriesCommands))]
@@ -193,16 +160,6 @@ public partial class ProviderEditorRepositories : Page
             r.Selected = false;
         }
     }
-
-    /*private void btnNewPrv_Click(object sender, RoutedEventArgs e)
-    {
-        CurrentProvider = (IDataProvider)Activator.CreateInstance(DataProvider.AllProviders.First().Type);
-        CurrentProvider.Name = "Provider #" + (lstProviders.Items.Count + 1);
-
-        App.Current.CurrentProject.CurrentProviders.Add(CurrentProvider);
-
-        fillProvider();
-    }*/
 
     [RelayCommand]
     private void RepositoryAdd()
@@ -232,19 +189,5 @@ public partial class ProviderEditorRepositories : Page
         {
             App.Instance.CurrentProject.CurrentProviders.Add(CurrentProvider);
         }
-        //((App)App.Current).CurrentProject.CurrentProviders[((App)App.Current).CurrentProject.CurrentProviders.IndexOf((IDataProvider)lstProviders.SelectedItem)] = CurrentProvider;
-
-        //GenericPopup.FromPage(this).CloseButtonCommand.Execute(null);
-        //if (lstProviders.SelectedItem is null)
-        ////{
-        ////((App)App.Current).CurrentProject.CurrentProviders[((App)App.Current).CurrentProject.CurrentProviders.IndexOf((IDataProvider)lstProviders.SelectedItem)] = currentProvider;
-        ////lstProviders.Items.Refresh();
-        ////}
-        ////else
-        //{
-        //    ((App)App.Current).CurrentProject.CurrentProviders.Add(currentProvider);
-        //}
-
-        //lstProviders.SelectedItem = currentProvider;
     }
 }

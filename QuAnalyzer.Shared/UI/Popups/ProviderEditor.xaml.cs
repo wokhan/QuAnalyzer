@@ -17,71 +17,20 @@ namespace QuAnalyzer.UI.Pages;
 [ObservableObject]
 public partial class ProviderEditor : Page
 {
-    public class CustomDataTemplateSelector : DataTemplateSelector
-    {
-        private DataTemplate defaultTemplate;
-        private DataTemplate fileTemplate;
-        private DataTemplate listTemplate;
-        private DataTemplate booleanTemplate;
 
-        public CustomDataTemplateSelector(DataTemplate defaultTemplate, DataTemplate fileTemplate, DataTemplate listTemplate, DataTemplate booleanTemplate)
-        {
-            this.defaultTemplate = defaultTemplate;
-            this.fileTemplate = fileTemplate;
-            this.listTemplate = listTemplate;
-            this.booleanTemplate = booleanTemplate;
-        }
-
-        protected override DataTemplate SelectTemplateCore(object item)
-        {
-            var definition = item as DataProviderMemberDefinition;
-            if (definition.IsFile)
-            {
-                return fileTemplate;
-            }
-
-            if (definition.MemberType == typeof(bool))
-            {
-                return booleanTemplate;
-            }
-
-            if (definition.HasValuesGetter)
-            {
-                return listTemplate;
-            }
-
-            return defaultTemplate;
-        }
-    }
-
-    private CustomDataTemplateSelector TemplateSelector;
+    [ObservableProperty]
+    private ProviderEditorParameterTemplateSelector _templateSelector;
 
     [ObservableProperty]
     private IDataProvider _currentProvider;
 
-    private IList<IGrouping<string, DataProviderMemberDefinition>> expParameters = null;
-
-    public IList<IGrouping<string, DataProviderMemberDefinition>> ExpParameters
-    {
-        get
-        {
-            if (expParameters is null)
-            {
-                expParameters = DataProviders.GetParameters(CurrentProvider);
-                NotifyPropertyChanged(nameof(HasMultipleItems));
-            }
-            return expParameters;
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasMultipleItems))]
+    private IList<IGrouping<string, DataProviderMemberDefinition>> expParameters;
 
     private bool isNewProvider;
 
     public bool HasMultipleItems => (expParameters?.Count > 1);
-
-    protected void NotifyPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 
     public class RepositoryView
     {
@@ -95,7 +44,7 @@ public partial class ProviderEditor : Page
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-
+        
         if (e.Parameter is string)
         {
             isNewProvider = true;
@@ -105,6 +54,8 @@ public partial class ProviderEditor : Page
         {
             CurrentProvider = (IDataProvider)e.Parameter;
         }
+
+        ExpParameters = DataProviders.GetParameters(CurrentProvider);
     }
 
     private void ProviderEditor_Loaded(object sender, RoutedEventArgs e)
@@ -113,7 +64,7 @@ public partial class ProviderEditor : Page
 
         if (!isNewProvider)
         {
-            GenericPopup.UpdateCurrent(this, title: CurrentProvider.Name);
+            GenericPopup.UpdateCurrent(this, title: $"Edit provider: {CurrentProvider.Name}");
         }
     }
 
@@ -128,8 +79,6 @@ public partial class ProviderEditor : Page
         this.Loaded += ProviderEditor_Loaded;
 
         InitializeComponent();
-
-        TemplateSelector = new(DefaultTemplate, FileTemplate, ListTemplate, BooleanTemplate);
     }
 
     public void rdb_Checked(object sender, RoutedEventArgs e)
@@ -160,11 +109,22 @@ public partial class ProviderEditor : Page
     [RelayCommand]
     private void Test()
     {
-        string res;
-        txtTestResult.Text = "Testing...";
-        CurrentProvider.Test(out res);
-        //TODO: check if TestCommand has a Result property to return this instead.
-        txtTestResult.Text = res;
+        try
+        {
+            string res;
+            txtTestResult.Text = "Testing...";
+            CurrentProvider.Test(out res);
+            //TODO: check if TestCommand has a Result property to return this instead.
+            txtTestResult.Text = res;
+        }
+        catch (NotImplementedException)
+        {
+            txtTestResult.Text = "This provider does not support testing.";
+        }
+        catch (Exception)
+        {
+            txtTestResult.Text = "An unexpected error occured.";
+        }
     }
 
     [RelayCommand]

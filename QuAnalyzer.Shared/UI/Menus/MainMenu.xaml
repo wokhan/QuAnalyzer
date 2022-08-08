@@ -5,17 +5,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:quanalyzer="using:QuAnalyzer"
              mc:Ignorable="d" d:DesignWidth="600">
-    <Grid>
+    <Grid Background="{x:Bind Background}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <CommandBar>
+        <CommandBar Background="Transparent">
             <AppBarButton Foreground="YellowGreen" ToolTipService.ToolTip="New project" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.CreateNewCommand}" Icon="NewFolder" />
             <AppBarElementContainer>
-                <SplitButton ToolTipService.ToolTip="Open..." Command="{x:Bind quanalyzer:App.Instance.CurrentProject.PickFileCommand}">
-                    <SymbolIcon Symbol="OpenFile" />
+                <SplitButton Foreground="OrangeRed" ToolTipService.ToolTip="Open..." Command="{x:Bind quanalyzer:App.Instance.CurrentProject.PickFileCommand}">
+                    <SymbolIcon Symbol="Folder" />
                     <SplitButton.Flyout>
                         <MenuFlyout x:Name="recentProjects" />
                     </SplitButton.Flyout>
@@ -35,26 +35,6 @@
                     <MenuItem IsCheckable="True" Header="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static quanalyzer:App.Instance}, FallbackValue=True}"  />
                 </MenuItem>-->
         </CommandBar>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-            <TextBox MinWidth="200" Foreground="{ThemeResource SystemColorWindowTextColor}" x:Name="txt" BorderBrush="Transparent" Background="Transparent" FontSize="14" BorderThickness="1" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Text="{x:Bind quanalyzer:App.Instance.CurrentProject.Name, FallbackValue='Unamed project'}">
-                <VisualStateManager.VisualStateGroups>
-                    <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="MouseOver">
-                            <VisualState.Setters>
-                                <Setter Target="Background" Value="LightGray" />
-                                <Setter Target="BorderBrush" Value="DimGray" />
-                            </VisualState.Setters>
-                        </VisualState>
-                        <VisualState x:Name="Focus">
-                            <VisualState.Setters>
-                                <Setter Target="Background" Value="WhiteSmoke" />
-                                <Setter Target="BorderBrush" Value="Gray" />
-                            </VisualState.Setters>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateManager.VisualStateGroups>
-            </TextBox>
-        </StackPanel>
-        <TextBlock VerticalAlignment="Center" Grid.Column="2" Text="{x:Bind quanalyzer:App.Instance.MainWindow.Title}" />
+        <TextBox Grid.Column="1" MinWidth="200" x:Name="txt" BorderBrush="Transparent" Background="Transparent" FontSize="14" BorderThickness="1" VerticalAlignment="Center" Text="{x:Bind quanalyzer:App.Instance.CurrentProject.Name, FallbackValue='Unamed project',Mode=TwoWay}" />
     </Grid>
 </UserControl>

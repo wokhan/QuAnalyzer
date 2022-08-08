@@ -32,18 +32,18 @@ public partial class ProjectSettings : ObservableValidator
     [ObservableProperty]
     private bool useParallelism = true;
 
-    //public byte[] AccentColorBrushSaved
-    //{
-    //    get { return new byte[] { AccentColor.Color.A, AccentColor.Color.R, AccentColor.Color.G, AccentColor.Color.B }; }
-    //    set { AccentColor = new SolidColorBrush(Color.FromArgb(value[0], value[1], value[2], value[3])); }
-    //}
+    public byte[] AccentColorBrushSaved
+    {
+        get { return new byte[] { AccentColor.A, AccentColor.R, AccentColor.G, AccentColor.B }; }
+        set { AccentColor = Color.FromArgb(value[0], value[1], value[2], value[3]); }
+    }
 
-    //[JsonIgnore]
-    //public SolidColorBrush AccentColor
-    //{
-    //    get { return (SolidColorBrush)App.Instance.Resources["AccentColorBrush"]; }
-    //    set { App.Instance.Resources["AccentColorBrush"] = value; }
-    //}
+    [JsonIgnore]
+    public Color AccentColor
+    {
+        get => ((ColorPaletteResources)App.Instance.Resources["ColorPalette"]).Accent.Value;
+        set => ((ColorPaletteResources)App.Instance.Resources["ColorPalette"]).Accent = value;
+    }
 
     public ObservableCollection<IDataProvider> CurrentProviders { get; } = new();
     public ObservableCollection<TestDefinition> TestDefinitions { get; } = new();

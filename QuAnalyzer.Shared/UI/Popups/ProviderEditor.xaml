@@ -4,12 +4,37 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:bases="using:Wokhan.Data.Providers.Bases"
-      xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+      xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations" xmlns:pages="using:QuAnalyzer.UI.Pages"
       x:Name="me" 
       mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="20">
         <Grid.Resources>
             <CollectionViewSource x:Key="parametersCollection" Source="{x:Bind ExpParameters}" IsSourceGrouped="True" />
+            <pages:ProviderEditorParameterTemplateSelector x:Key="templateSelector">
+                <pages:ProviderEditorParameterTemplateSelector.DefaultTemplate>
+                    <DataTemplate x:DataType="bases:DataProviderMemberDefinition">
+                        <TextBox Header="{x:Bind Description}" Text="{Binding ValueWrapper,Mode=TwoWay}" />
+                    </DataTemplate>
+                </pages:ProviderEditorParameterTemplateSelector.DefaultTemplate>
+                <pages:ProviderEditorParameterTemplateSelector.FileTemplate>
+                    <DataTemplate x:DataType="bases:DataProviderMemberDefinition">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <TextBox Header="{x:Bind Description}" x:Name="txtFile" Width="200" Text="{x:Bind ValueWrapper,Mode=TwoWay}" />
+                            <Button Margin="10,0,0,0" Content="Browse" Tag="{x:Bind}" Command="{Binding ShowFileDialogCommand,ElementName=me}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </pages:ProviderEditorParameterTemplateSelector.FileTemplate>
+                <pages:ProviderEditorParameterTemplateSelector.BooleanTemplate>
+                    <DataTemplate x:DataType="bases:DataProviderMemberDefinition">
+                        <CheckBox Content="{x:Bind Description}" IsChecked="{Binding ValueWrapper,Mode=TwoWay}" />
+                    </DataTemplate>
+                </pages:ProviderEditorParameterTemplateSelector.BooleanTemplate>
+                <pages:ProviderEditorParameterTemplateSelector.ListTemplate>
+                    <DataTemplate x:DataType="bases:DataProviderMemberDefinition">
+                        <ComboBox Header="{x:Bind Description}" DisplayMemberPath="Value" SelectedValuePath="Key" ItemsSource="{x:Bind Values}" SelectedValue="{x:Bind ValueWrapper,Mode=TwoWay}" />
+                    </DataTemplate>
+                </pages:ProviderEditorParameterTemplateSelector.ListTemplate>
+            </pages:ProviderEditorParameterTemplateSelector>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -34,48 +59,31 @@
                 <TextBlock Grid.Column="1" Grid.Row="2" Text="{x:Bind CurrentProvider.Definition.Description}" />
             </Grid>
         </Border>
-        <Border Grid.Row="1" Padding="10">
-            <TextBox Header="Name: " Text="{x:Bind CurrentProvider.Name,Mode=TwoWay}" />
-        </Border>
-        <ItemsControl Grid.Row="2" ItemsSource="{Binding Source={StaticResource parametersCollection}}" ItemTemplateSelector="{x:Bind TemplateSelector}">
-            <ItemsControl.Resources>
-                <DataTemplate x:Name="DefaultTemplate" x:DataType="bases:DataProviderMemberDefinition">
-                    <TextBox Header="{x:Bind Description}" Text="{x:Bind ValueWrapper,Mode=TwoWay}" />
-                </DataTemplate>
-                <DataTemplate x:Name="FileTemplate" x:DataType="bases:DataProviderMemberDefinition">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                        <TextBox Header="{x:Bind Description}" x:Name="txtFile" Width="200" Text="{x:Bind ValueWrapper,Mode=TwoWay}" />
-                        <Button Margin="10,0,0,0" Content="Browse" Tag="{x:Bind}" Command="{Binding ShowFileDialogCommand,ElementName=me}" />
-                    </StackPanel>
-                </DataTemplate>
-                <DataTemplate x:Name="ListTemplate" x:DataType="bases:DataProviderMemberDefinition">
-                    <ComboBox Header="{x:Bind Description}" DisplayMemberPath="Value" SelectedValuePath="Key" ItemsSource="{x:Bind Values}" SelectedValue="{x:Bind ValueWrapper,Mode=TwoWay}" />
-                </DataTemplate>
-                <DataTemplate x:Name="BooleanTemplate" x:DataType="bases:DataProviderMemberDefinition">
-                    <CheckBox Content="{x:Bind Description}" IsChecked="{Binding ValueWrapper,Mode=TwoWay}" />
-                </DataTemplate>
-            </ItemsControl.Resources>
-            <ItemsControl.GroupStyle>
+        <TextBox Grid.Row="1" Header="Name: " Text="{x:Bind CurrentProvider.Name,Mode=TwoWay}" />
+        <ListView Grid.Row="2" SelectionMode="None" BorderThickness="0" ItemsSource="{Binding Source={StaticResource parametersCollection}}" ItemTemplateSelector="{StaticResource templateSelector}">
+            <ListView.GroupStyle>
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>
                         <DataTemplate>
-                            <RadioButton x:Name="rdb" Visibility="{Binding HasMultipleItems,ElementName=me}" GroupName="optionsGroup" Content="{Binding Key}" />
+                            <RadioButton x:Name="rdb" IsEnabled="{Binding HasMultipleItems,ElementName=me}" IsChecked="{Binding HasMultipleItems,ElementName=me,Converter={StaticResource booleanNegator},Mode=OneTime}" GroupName="optionsGroup" Content="{Binding Key}" />
                         </DataTemplate>
                     </GroupStyle.HeaderTemplate>
                     <GroupStyle.Panel>
                         <ItemsPanelTemplate>
-                            <ItemsStackPanel Visibility="{Binding IsChecked,ElementName=rdb,Converter={StaticResource valueToVisibilityConverter}}" />
+                            <ItemsStackPanel Visibility="{Binding rdb.IsChecked,Source={RelativeSource Mode=TemplatedParent},Converter={StaticResource boolToVisibilityConverter}}" />
                         </ItemsPanelTemplate>
                     </GroupStyle.Panel>
                 </GroupStyle>
-            </ItemsControl.GroupStyle>
-        </ItemsControl>
-        <!--<StackPanel x:Name="stackOptions" Grid.IsSharedSizeScope="True"  CanHorizontallyScroll="True" />-->
-        <CommandBar Grid.Row="3">
-            <AppBarButton Content="Test" x:Name="btnTest" Icon="Accept" HorizontalAlignment="Left" Command="{x:Bind TestCommand}"  />
-            <AppBarElementContainer>
-                <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
-            </AppBarElementContainer>
-        </CommandBar>
+            </ListView.GroupStyle>
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsStackPanel AreStickyGroupHeadersEnabled="True" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+        </ListView>
+        <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="20">
+            <Button Content="Test" MinWidth="90" x:Name="btnTest" HorizontalAlignment="Left" Command="{x:Bind TestCommand}" />
+            <TextBlock x:Name="txtTestResult" Margin="20,0,0,0" VerticalAlignment="Center" />
+        </StackPanel>
     </Grid>
 </Page>

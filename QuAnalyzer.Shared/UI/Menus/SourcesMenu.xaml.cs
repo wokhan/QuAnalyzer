@@ -1,6 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.Collections;
 using CommunityToolkit.Mvvm.Input;
 
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
+
 using QuAnalyzer.UI.Pages;
 using QuAnalyzer.UI.Windows;
 
@@ -21,6 +24,14 @@ public partial class SourcesMenu : UserControl
         InitializeComponent();
     }
 
+    private void Provider_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        FlyoutBase.ShowAttachedFlyout((Grid)sender);
+    }
+    private void Provider_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        FlyoutBase.GetAttachedFlyout((Grid)sender).Hide();
+    }
 
     [RelayCommand]
     private void ProviderDelete(IDataProvider provider)
@@ -74,13 +85,19 @@ public partial class SourcesMenu : UserControl
 
         //var container = listview.ContainerFromItem(listview.SelectedItem);
         //var group = listview.GroupHeaderContainerFromItemContainer(container);
+        if (listview.SelectedItem is not null)
+        {
+            var item = (KeyValuePair<string, object>)listview.SelectedItem;
 
-        var item = (KeyValuePair<string, object>)listview.SelectedItem;
+            // Ugly hack since I didn't figure out how to get the corresponding group from a ListViewItem...
+            var provider = App.Instance.CurrentProject.CurrentProviders.First(provider => provider.Repositories.Contains(item));
+            var repository = item.Key;
 
-        // Ugly hack since I didn't figure out how to get the corresponding group from a ListViewItem...
-        var provider = App.Instance.CurrentProject.CurrentProviders.First(provider => provider.Repositories.Contains(item));
-        var repository = item.Key;
-
-        App.Instance.CurrentSelection = (provider, repository);
+            App.Instance.CurrentSelection = (provider, repository);
+        }
+        else
+        {
+            App.Instance.CurrentSelection = (null, null);
+        }
     }
 }

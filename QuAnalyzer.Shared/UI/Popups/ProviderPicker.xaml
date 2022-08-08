@@ -3,82 +3,92 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:quanalyzer="using:QuAnalyzer"
+      xmlns:pages="using:QuAnalyzer.UI.Pages"
       xmlns:helpers="using:QuAnalyzer.Core.Helpers" 
       xmlns:bases="using:Wokhan.Data.Providers.Bases"
-      xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+      xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations" xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       x:Name="me"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="20">
+        <Grid.Resources>
+            <pages:ProviderPickerTemplateSelector x:Key="templateSelector">
+                <pages:ProviderPickerTemplateSelector.DataProviderTemplate>
+                    <DataTemplate x:DataType="bases:DataProviderDefinition">
+                        <Grid Margin="15" x:Name="grid">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Image Source="{x:Bind IconPath,Converter={StaticResource imageSourceConverter}}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                            <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" FontWeight="Bold" Text="{x:Bind Name}" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind Copyright}" Margin="5,0" HorizontalAlignment="Left" TextWrapping="Wrap" FontSize="12" />
+                            <TextBlock Grid.Row="2" HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" Text="{x:Bind Description}" />
+                            <Border Grid.ColumnSpan="3" HorizontalAlignment="Right" VerticalAlignment="Center" Background="{ThemeResource AccentAAFillColorDefaultBrush}" CornerRadius="10">
+                                <TextBlock Padding="20,5" Text="{x:Bind Category}" />
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </pages:ProviderPickerTemplateSelector.DataProviderTemplate>
+                <pages:ProviderPickerTemplateSelector.NugetPackageTemplate>
+                    <DataTemplate x:DataType="helpers:NugetPackage">
+                        <Grid Margin="15" x:Name="grid">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Image VerticalAlignment="Center" Margin="0,0,10,0">
+                                <Image.Source>
+                                    <BitmapImage UriSource="{x:Bind IconPath,FallbackValue={x:Null}}" />
+                                </Image.Source>
+                            </Image>
+                            <TextBlock Grid.Column="1" Text="{x:Bind Name}" FontWeight="Bold" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind x:String.Format('Author: {0}',Copyright)}" FontStyle="Italic" FontSize="12" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" TextWrapping="Wrap" Text="{x:Bind Description}" />
+                            <Border Grid.ColumnSpan="3" Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center" Background="{ThemeResource AccentAAFillColorDefaultBrush}" CornerRadius="10">
+                                <TextBlock Padding="20,5" Text="{x:Bind TypeTag}" />
+                            </Border>
+                            <Button Grid.Row="2" Grid.Column="2" Content="Install" Command="{Binding InstallPackageCommand, ElementName=me}" CommandParameter="{x:Bind}" HorizontalAlignment="Right" Visibility="{x:Bind IsInstalled,Mode=OneWay,Converter={StaticResource boolToVisibilityNegateConverter}}" />
+                            <StackPanel Grid.Row="2" Grid.Column="2"  Orientation="Horizontal" Margin="20" Visibility="{x:Bind IsInstalling,Mode=OneWay,Converter={StaticResource boolToVisibilityConverter}}">
+                                <ProgressRing Width="20" Height="20" Margin="5,0,10,0" IsIndeterminate="True" />
+                                <TextBlock Text="Installing package..." VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Button Grid.Row="2" Grid.Column="2" Content="Uninstall" Command="{Binding UninstallPackageCommand, ElementName=me}" CommandParameter="{x:Bind}" HorizontalAlignment="Right" Visibility="{x:Bind IsInstalled,Mode=OneWay,Converter={StaticResource boolToVisibilityConverter}}" />
+                        </Grid>
+                    </DataTemplate>
+                </pages:ProviderPickerTemplateSelector.NugetPackageTemplate>
+            </pages:ProviderPickerTemplateSelector>
+        </Grid.Resources>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Text="Select a provider type below and press Next to continue." />
-        <ScrollViewer x:Name="gridProviders" Grid.Row="2">
-            <StackPanel>
-                <ListView Margin="5" SelectedItem="{x:Bind SelectedProviderDef,Mode=TwoWay}" animations:Connected.ListItemKey="item" animations:Connected.ListItemElementName="grid"  ItemsSource="{x:Bind quanalyzer:App.Instance.ProvidersMan.Providers}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="bases:DataProviderDefinition">
-                            <Grid Margin="15" x:Name="grid">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <Image Source="{x:Bind IconPath,Converter={StaticResource imageSourceConverter}}" VerticalAlignment="Center" Margin="0,0,10,0" />
-                                <TextBlock HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" FontWeight="Bold" Text="{x:Bind Name}" />
-                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind Copyright}" Margin="5,0" HorizontalAlignment="Left" TextWrapping="Wrap" FontSize="10" />
-                                <TextBlock Grid.Row="2" HorizontalAlignment="Left" Grid.Column="1" Margin="5,5" Text="{x:Bind Description}" />
-                                <Border Grid.ColumnSpan="3" HorizontalAlignment="Right" VerticalAlignment="Center" Background="{ThemeResource AccentAAFillColorDefaultBrush}" CornerRadius="20">
-                                    <TextBlock Padding="10" Text="{x:Bind Category}" />
-                                </Border>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ListView>
-                <Expander Padding="10" Header="NuGet packages" HorizontalAlignment="Stretch">
-                    <ItemsControl Background="Transparent" Margin="5" ItemsSource="{x:Bind NugetPackages,Mode=OneWay}">
-                        <!--<ItemsControl.ItemContainerStyle>
-                            <Style TargetType="Items">
-                                -->
-                        <!--<Setter Target="Background" Value="Transparent" />-->
-                        <!--
-                                <Setter Target="HorizontalContentAlignment" Value="Stretch" />
-                            </Style>
-                        </ItemsControl.ItemContainerStyle>-->
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="helpers:NugetPackage">
-                                <StackPanel Margin="10">
-                                    <TextBlock Text="{x:Bind Name}" FontWeight="Bold" />
-                                    <TextBlock TextWrapping="Wrap" Text="{x:Bind Description}" />
-                                    <TextBlock Text="{x:Bind x:String.Format('Author: {0}',Copyright)}" FontStyle="Italic" />
-                                    <AppBarButton Content="Install" BorderBrush="Green" Command="{Binding InstallPackageCommand, ElementName=me}" CommandParameter="{Binding Id}" HorizontalAlignment="Right" Icon="Add" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Expander>
-            </StackPanel>
-        </ScrollViewer>
-        <CommandBar Grid.Row="3">
-            <AppBarElementContainer>
-                <TextBlock x:Name="txtTestResult" VerticalAlignment="Center" />
-            </AppBarElementContainer>
-            <AppBarElementContainer>
-                <StackPanel Orientation="Horizontal" Visibility="{x:Bind InstallPackageCommand.IsRunning,Mode=OneWay}">
-                    <ProgressRing Width="20" Height="20" Margin="5,0,10,0" IsIndeterminate="True" />
-                    <TextBlock Text="Installing package..." VerticalAlignment="Center" />
+        <ListView Header="Select a provider type below and press Next to continue." Margin="5" SelectedItem="{x:Bind SelectedProviderDefinition,Mode=TwoWay}" animations:Connected.ListItemKey="item" animations:Connected.ListItemElementName="grid"  ItemsSource="{x:Bind Providers,Mode=OneWay}" ItemTemplateSelector="{StaticResource templateSelector}" />
+        <controls:SwitchPresenter Grid.Row="1" Value="{x:Bind IsNugetAccessible,Mode=OneWay}" Visibility="{x:Bind NugetPackages,Converter={StaticResource collectionVisibilityConverter},Mode=OneWay}">
+            <controls:Case Value="True">
+                <StackPanel Orientation="Horizontal">
+                    <ProgressRing IsIndeterminate="True" Margin="0,0,10,0" />
+                    <TextBlock Text="Loading Nuget packages..." />
                 </StackPanel>
-            </AppBarElementContainer>
-        </CommandBar>
+            </controls:Case>
+            <controls:Case Value="False" IsDefault="True">
+                <StackPanel Orientation="Horizontal">
+                    <SymbolIcon Symbol="DisconnectDrive" Margin="0,0,10,0" />
+                    <TextBlock Text="Unable to load Nuget packages: please check your connection and firewall configuration." />
+                </StackPanel>
+            </controls:Case>
+        </controls:SwitchPresenter>
     </Grid>
 </Page>

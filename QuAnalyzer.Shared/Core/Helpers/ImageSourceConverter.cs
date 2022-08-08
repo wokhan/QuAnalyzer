@@ -25,7 +25,12 @@ namespace QuAnalyzer.Core.Helpers
             }
 
             var image = new BitmapImage();// new Uri($"ms-appx://{value}")).;
-            image.SetSource(Assembly.Load(match.Groups["assembly"].Value).GetManifestResourceStream(match.Groups["path"].Value).AsRandomAccessStream());
+            try
+            {
+                image.SetSource(Assembly.Load(match.Groups["assembly"].Value).GetManifestResourceStream(match.Groups["path"].Value).AsRandomAccessStream());
+            }
+            catch { }
+
             return image;
             //.Create(Assembly.Load(match.Groups["assembly"].Value).GetManifestResourceStream(match.Groups["path"].Value), BitmapCreateOptions.None, BitmapCacheOption.Default).Frames[0];
         }

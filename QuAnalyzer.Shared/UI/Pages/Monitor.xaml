@@ -20,25 +20,25 @@
             <RowDefinition Height="Auto" />
             <RowDefinition MinHeight="150" Height="*" />
         </Grid.RowDefinitions>
-        <CommandBar Grid.ColumnSpan="3">
-            <AppBarButton x:Name="btnStart" Content="Run" ToolTipService.ToolTip="Start monitoring the selected items" BorderBrush="Green" Icon="Play" Command="{x:Bind RunCommand}" />
+        <CommandBar Grid.ColumnSpan="3" Content="Steps">
+            <AppBarButton Label="Run" ToolTipService.ToolTip="Start monitoring the selected items" Icon="Play" Command="{x:Bind RunCommand}" />
             <!--<Button Content="Run all" ToolTipService.ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" ext:CustomAdorner.Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />-->
-            <AppBarButton x:Name="btnStop" IsEnabled="{x:Bind btnStart.IsEnabled,Converter={StaticResource booleanNegator},Mode=OneWay}" Content="Stop" ToolTipService.ToolTip="Stop monitoring" BorderBrush="Red" Icon="Stop" Command="{x:Bind StopCommand}" />
+            <AppBarButton Label="Stop" IsEnabled="{x:Bind IsRunning,Mode=OneWay}" Content="Stop" ToolTipService.ToolTip="Stop monitoring" BorderBrush="Red" Icon="Stop" Command="{x:Bind StopCommand}" />
             <AppBarSeparator />
-            <AppBarButton Content="Add" ToolTipService.ToolTip="Add a step" BorderBrush="Green" Icon="Add" Command="{x:Bind MonitorAddCommand}" />
-            <AppBarButton Content="Clear" ToolTipService.ToolTip="Remove all" BorderBrush="OrangeRed" Icon="Delete" Command="{x:Bind MonitorClearAllCommand}" />
-            <AppBarToggleButton Content="Comparison mode" IsChecked="{x:Bind UseComparisonMode,Mode=TwoWay}" BorderBrush="Violet" Icon="Shuffle" />
+            <AppBarButton Label="Add" ToolTipService.ToolTip="Add a step" Icon="Add" Command="{x:Bind MonitorAddCommand}" />
+            <AppBarButton Label="Clear" ToolTipService.ToolTip="Remove all" Icon="Delete" Command="{x:Bind MonitorClearAllCommand}" />
+            <AppBarToggleButton Label="Comparison mode" IsChecked="{x:Bind UseComparisonMode,Mode=TwoWay}" Icon="Shuffle" />
             <AppBarSeparator />
-            <AppBarElementContainer>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Occurences: " VerticalAlignment="Center" />
+            <AppBarElementContainer VerticalContentAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Occurrences: " VerticalAlignment="Center" FontSize="12" />
                     <NumberBox SpinButtonPlacementMode="Hidden" Width="40" VerticalContentAlignment="Center" Minimum="1" Value="{x:Bind Occurences,Mode=TwoWay}" Padding="0" Margin="2" VerticalAlignment="Center" />
                 </StackPanel>
             </AppBarElementContainer>
             <AppBarSeparator />
             <AppBarElementContainer>
                 <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
-                    <TextBlock Text="Parallelism: " VerticalAlignment="Center" />
+                    <TextBlock Text="Parallelism: " VerticalAlignment="Center" FontSize="12" />
                     <NumberBox SpinButtonPlacementMode="Hidden" Width="40" VerticalContentAlignment="Center" Minimum="1" Value="{x:Bind MaxParallel,Mode=TwoWay}" VerticalAlignment="Center" Padding="0" Margin="2" />
                 </StackPanel>
             </AppBarElementContainer>
@@ -49,7 +49,7 @@
             <controls:DataGrid.Columns>
                 <controls:DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                 <controls:DataGridComboBoxColumn Header="Provider" x:Name="lstDataProviders" MinWidth="150" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders}" DisplayMemberPath="Name" Binding="{Binding Provider}" />
-                <controls:DataGridComboBoxColumn Header="Repository" MinWidth="150" ItemsSource="{Binding Provider.Repositories.Keys}" />
+                <!--<controls:DataGridComboBoxColumn Header="Repository" MinWidth="150" ItemsSource="{Binding Provider.Repositories.Keys}" />-->
                 <controls:DataGridComboBoxColumn Header="Type" Binding="{Binding Type}" DisplayMemberPath="Value" ItemsSource="{x:Bind monitor:MonitoringModes.MonitoringTypes}" />
                 <controls:DataGridTextColumn Header="Interval" Binding="{Binding Interval}" />
                 <controls:DataGridCheckBoxColumn Header="Run when started" Binding="{Binding RunWhenStarted}" />
@@ -119,19 +119,19 @@
                     </DataTemplate>
                 </controls:DataGrid.RowDetailsTemplate>-->
         </controls:DataGrid>
-        <controls:GridSplitter Grid.Row="2" Height="2" />
+        <controls:GridSplitter Grid.Row="2" />
         <controls:DockPanel Grid.Row="3">
-            <CommandBar controls:DockPanel.Dock="Top">
-                <AppBarButton x:Name="btnGrCopy" Content="Copy" ToolTipService.ToolTip="Copy to clipboard" BorderBrush="Magenta" Icon="Copy" Click="btnGrCopy_Click" />
+            <CommandBar controls:DockPanel.Dock="Top" Content="Results">
+                <AppBarButton x:Name="btnGrCopy" Label="Copy" ToolTipService.ToolTip="Copy to clipboard" Icon="Copy" Click="btnGrCopy_Click" />
                 <AppBarSeparator />
-                <AppBarButton x:Name="btnGrCSV" Content="Excel" ToolTipService.ToolTip="Export to CSV" BorderBrush="Green" Icon="OpenFile" Click="btnGrCSV_Click" />
-                <AppBarButton x:Name="btnGrHTML" Content="HTML" ToolTipService.ToolTip="Export to HTML" BorderBrush="Blue" Icon="OpenFile" Click="btnGrHTML_Click" />
+                <AppBarButton x:Name="btnGrCSV" Label="Excel" ToolTipService.ToolTip="Export to CSV" Icon="OpenFile" Click="btnGrCSV_Click" />
+                <AppBarButton x:Name="btnGrHTML" Label="HTML" ToolTipService.ToolTip="Export to HTML" Icon="OpenFile" Click="btnGrHTML_Click" />
             </CommandBar>
             <!--<CheckBox Content="Group by step name" x:Name="chkGroup" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-25" Checked="chkGroup_Checked" IsChecked="True" />-->
             <controls:DataGrid x:Name="gridResults" ItemsSource="{x:Bind MonitorResultsView}" IsReadOnly="True" AutoGenerateColumns="False">
                 <controls:DataGrid.RowDetailsTemplate>
                     <DataTemplate>
-                        <controls:DataGrid Margin="10,0,0,0" Visibility="Collapsed" BorderThickness="1,0,0,0" BorderBrush="{ThemeResource AccentColorBrush}" IsReadOnly="True">
+                        <controls:DataGrid Margin="10,0,0,0" Visibility="Collapsed" BorderThickness="1,0,0,0" IsReadOnly="True">
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup>
                                     <VisualState>
@@ -213,10 +213,10 @@
                 </controls:DataGrid.GroupStyle>-->
             </controls:DataGrid>
         </controls:DockPanel>
-        <controls:GridSplitter Grid.Row="4" Height="2" />
+        <controls:GridSplitter Grid.Row="4" />
         <controls:DockPanel Grid.Row="5">
-            <CommandBar controls:DockPanel.Dock="Top">
-                <AppBarButton Content="Copy" ToolTipService.ToolTip="Copy to clipboard" BorderBrush="Magenta" Icon="Copy" IsEnabled="False" Command="{x:Bind MonitorCopyCommand}" CommandParameter="{Binding}" />
+            <CommandBar controls:DockPanel.Dock="Top" Content="Results (graph)">
+                <AppBarButton Label="Copy" ToolTipService.ToolTip="Copy to clipboard" Icon="Copy" IsEnabled="False" Command="{x:Bind MonitorCopyCommand}" CommandParameter="{Binding}" />
             </CommandBar>
             <charts:CartesianChart x:Name="chart">
                 <!--Series="{x:Bind ResultSeriesMappings.Values}">-->

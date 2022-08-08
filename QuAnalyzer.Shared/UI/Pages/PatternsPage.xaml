@@ -6,24 +6,23 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
       xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
-      xmlns:ui="using:CommunityToolkit.WinUI.UI"
       mc:Ignorable="d" d:DesignWidth="820" d:DesignHeight="610"
       DataContext="{x:Bind}">
     <controls:DockPanel>
         <CommandBar controls:DockPanel.Dock="Top">
-            <AppBarButton Command="{x:Bind RunCommand}" Content="Update" ToolTipService.ToolTip="Update now" BorderBrush="Green" Icon="Play" />
-            <AppBarToggleButton IsChecked="{x:Bind AutoUpdate}" Content="Auto update" ToolTipService.ToolTip="Analyze automatically" BorderBrush="Blue" Icon="Calculator" />
+            <AppBarButton Command="{x:Bind RunCommand}" Label="Update" ToolTipService.ToolTip="Update now" Icon="Play" />
+            <AppBarToggleButton IsChecked="{x:Bind AutoUpdate,Mode=TwoWay}" Label="Auto update" ToolTipService.ToolTip="Analyze automatically" Icon="Calculator" />
             <AppBarSeparator />
-            <AppBarElementContainer>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Similarity threshold" VerticalAlignment="Center" />
+            <AppBarElementContainer VerticalContentAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Similarity threshold" FontSize="12" Margin="5,0,10,0" />
                     <Slider x:Name="slideSim" ValueChanged="slideSim_ValueChanged" VerticalAlignment="Center" Minimum="1" TickFrequency="1" LargeChange="1" SmallChange="1" Maximum="3" TickPlacement="BottomRight" Width="100" />
                 </StackPanel>
             </AppBarElementContainer>
             <AppBarSeparator/>
-            <AppBarElementContainer>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock x:Name="txtStatus" VerticalAlignment="Center" Margin="5,0,10,0" />
+            <AppBarElementContainer VerticalContentAlignment="Center" >
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{x:Bind Status,Mode=OneWay}" VerticalAlignment="Center" Margin="5,0,10,0" FontSize="12" />
                     <ProgressBar x:Name="prg" Maximum="100" Minimum="0" Width="200" Height="20" BorderThickness="0" />
                 </StackPanel>
             </AppBarElementContainer>
@@ -35,7 +34,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Padding="5" Text="Attributes" />
-                <ListBox Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="lstDataSources_SelectionChanged" x:Name="lstAttributes" SelectionMode="Single" Width="200" Padding="5">
+                <ListView Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="lstDataSources_SelectionChanged" x:Name="lstAttributes" SelectionMode="Single" Width="200" Padding="5">
                     <VisualStateManager.VisualStateGroups>
                         <VisualStateGroup>
                             <VisualState x:Name="Default">
@@ -56,14 +55,9 @@
                             </VisualState>
                         </VisualStateGroup>
                     </VisualStateManager.VisualStateGroups>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox Content="{x:Bind}" ui:FrameworkElementExtensions.AncestorType="ListBoxItem"  IsChecked="{Binding (ui:FrameworkElementExtensions.Ancestor).IsSelected,RelativeSource={RelativeSource Mode=Self},Mode=TwoWay}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                </ListView>
             </Grid>
         </Border>
-        <UC:ExtendedDataGridView x:Name="gridPatterns" />
+        <UC:ExtendedDataGridView x:Name="gridPatterns" AutoGenerateColumns="True" />
     </controls:DockPanel>
 </Page>

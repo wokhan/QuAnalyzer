@@ -1,9 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Navigation;
-
-using QuAnalyzer.UI.Pages;
-using QuAnalyzer.UI.Popups;
 
 namespace QuAnalyzer.UI.Windows
 {
@@ -16,10 +14,13 @@ namespace QuAnalyzer.UI.Windows
         private Visibility _buttonsBarVisibility;
 
         [ObservableProperty]
-        public bool _isLastStep;
+        private bool _isLastStep;
 
         [ObservableProperty]
-        public IRelayCommand _nextButtonCommand;
+        private string _windowTitle;
+
+        [ObservableProperty]
+        private IRelayCommand _nextButtonCommand;
 
         public static readonly DependencyProperty OwningWindowProperty = DependencyProperty.RegisterAttached(nameof(OwningWindowProperty), typeof(GenericPopup), typeof(Page), new PropertyMetadata(null));
 
@@ -29,10 +30,13 @@ namespace QuAnalyzer.UI.Windows
 
             _buttonsBarVisibility = isWizard ? Visibility.Visible : Visibility.Collapsed;
 
-            this.ExtendsContentIntoTitleBar = true;
-            this.SetTitleBar(TitleBar);
-
             InitializeComponent();
+            
+            if (AppWindowTitleBar.IsCustomizationSupported())
+            {
+                this.ExtendsContentIntoTitleBar = true;
+                this.SetTitleBar(TitleBar);
+            }
 
             contents.SetValue(OwningWindowProperty, this);
 
@@ -63,7 +67,7 @@ namespace QuAnalyzer.UI.Windows
 
         internal static GenericPopup FromPage(Page page)
         {
-            return (GenericPopup)page.Frame.GetValue(OwningWindowProperty);
+            return (GenericPopup)page.Frame?.GetValue(OwningWindowProperty);
         }
 
         private void CloseMe(object sender, RoutedEventArgs e)
@@ -81,10 +85,19 @@ namespace QuAnalyzer.UI.Windows
 
             if (title is not null)
             {
-                popup.Title = title;
+                popup.WindowTitle = title;
             }
 
             popup.IsLastStep = isLastStep;
+            popup.NextButton.Content = isLastStep ? "Apply !" : "Next >";
+        }
+
+        private void NextButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsLastStep)
+            {
+                Close();
+            }
         }
     }
 }

@@ -7,7 +7,7 @@
              xmlns:quanalyzer="using:QuAnalyzer"
              mc:Ignorable="d" d:DesignHeight="460"
       x:Name="me">
-    <Grid Background="{ThemeResource SystemControlAltMediumLowAcrylicWindowMediumBrush}">
+    <Grid>
         <Grid.Resources>
             <CollectionViewSource x:Key="groupedItems" ItemsPath="Repositories" Source="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders,Mode=OneWay}" IsSourceGrouped="True" />
         </Grid.Resources>
@@ -16,39 +16,33 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="SOURCES" FontSize="12" />
-        <CommandBar OverflowButtonVisibility="Collapsed">
-            <AppBarButton Content="Add..." Command="{x:Bind SourceNewCommand}" Foreground="Green" Icon="Add" />
+        <CommandBar Content="Sources">
+            <AppBarButton Label="Add..." Command="{x:Bind SourceNewCommand}" Icon="Add" />
             <!--<Button Content="Import..." Command="{Binding ProviderImportCommand}" IsEnabled="False" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Import}"/>-->
         </CommandBar>
-        <ListView Grid.Row="2" ItemsSource="{Binding Source={StaticResource groupedItems}}" SelectionChanged="ListView_SelectionChanged">
+        <ListView Grid.Row="2" ItemsSource="{Binding Source={StaticResource groupedItems}}" SelectionChanged="ListView_SelectionChanged" IsEnabled="{x:Bind quanalyzer:App.Instance.CurrentSelectionLinked,Mode=OneWay}">
+            <!--<ListView.Resources>
+                <Style TargetType="ListViewHeaderItem">
+                    <Setter Target="HorizontalAlignment" Value="Stretch" />
+                </Style>
+            </ListView.Resources>-->
             <ListView.GroupStyle>
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>
                         <DataTemplate x:DataType="contracts:IDataProvider">
-                            <Grid>
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="MouseOver">
-                                            <!--<VisualState.StateTriggers>
-                                                <StateTrigger IsActive="{Binding Source= ,RelativeSource={RelativeSource Mode=TemplatedParent}}"
-                                            </VisualState.StateTriggers>-->
-                                            <VisualState.Setters>
-                                                <Setter Target="buttons.Visibility" Value="Visible" />
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
+                            <Grid Width="200" Background="Transparent" HorizontalAlignment="Stretch" PointerEntered="Provider_PointerEntered">
+                                <FlyoutBase.AttachedFlyout>
+                                    <CommandBarFlyout Placement="Right">
+                                        <AppBarButton Foreground="RoyalBlue" Label="Edit" CommandParameter="{x:Bind}" Command="{Binding ProviderEditCommand,ElementName=me}" Icon="Edit" />
+                                        <AppBarButton Foreground="OrangeRed" Label="Delete" CommandParameter="{x:Bind}" Command="{Binding ProviderDeleteCommand,ElementName=me}" Icon="Delete" />
+                                    </CommandBarFlyout>
+                                </FlyoutBase.AttachedFlyout>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Image Height="20" Stretch="Uniform" VerticalAlignment="Center" Margin="2" Source="{x:Bind Definition.IconPath, Converter={StaticResource imageSourceConverter}}" />
                                 <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" HorizontalAlignment="Left" Grid.Column="1" Margin="5" TextWrapping="Wrap" Text="{x:Bind Name,Mode=OneWay,FallbackValue='N/A'}" VerticalAlignment="Center" />
-                                <CommandBar x:Name="buttons" Visibility="Collapsed" Grid.ColumnSpan="3" HorizontalAlignment="Right" HorizontalContentAlignment="Right" OverflowButtonVisibility="Collapsed" IsDynamicOverflowEnabled="False">
-                                    <AppBarButton Foreground="RoyalBlue" CommandParameter="{x:Bind}" Command="{Binding ProviderEditCommand,ElementName=me}" Icon="Edit" />
-                                    <AppBarButton Foreground="OrangeRed" CommandParameter="{x:Bind}" Command="{Binding ProviderDeleteCommand,ElementName=me}" Icon="Delete" />
-                                </CommandBar>
                             </Grid>
                         </DataTemplate>
                     </GroupStyle.HeaderTemplate>

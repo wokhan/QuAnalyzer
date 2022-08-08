@@ -4,7 +4,9 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Media;
 
+using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.UI.Popups;
+using QuAnalyzer.UI.Windows;
 
 using System.Configuration;
 
@@ -12,6 +14,8 @@ using Windows.ApplicationModel;
 using Windows.UI;
 
 using WinRT.Interop;
+
+using Wokhan.UI.Extensions;
 
 namespace QuAnalyzer.UI.Pages;
 
@@ -31,20 +35,24 @@ public partial class MainPage
 
         InitializeComponent();
 
+        VirtualizedQueryableExtensions.Init(System.Windows.Threading.Dispatcher.CurrentDispatcher);
+
         App.Instance.Tasks.CollectionChanged += Tasks_CollectionChanged;
 
+
         // Only works on Win 11 yet.
-        //if (AppWindowTitleBar.IsCustomizationSupported())
-        //{
-        //    Window window = App.Instance.MainWindow;
-        //    window.ExtendsContentIntoTitleBar = true;
-        //    window.SetTitleBar(AppTitleBar);
-        //}
+        if (AppWindowTitleBar.IsCustomizationSupported())
+        {
+            var window = App.Instance.MainWindow;
+
+            window.ExtendsContentIntoTitleBar = true;
+            window.SetTitleBar(AppTitleBar);
+        }
 
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         Application.Current.UnhandledException += CurrentApp_UnhandledException;
 
-        NavView_Navigate((NavigationViewItem)NavView.MenuItems[0]);
+        NavView_ItemInvoked(NavView, null);
     }
 
     private void MainPage_Loaded(object sender, RoutedEventArgs e)
@@ -83,24 +91,19 @@ public partial class MainPage
     //    }
     //}
 
-    private async void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
-        if (args.IsSettingsInvoked)
+        if (args?.IsSettingsInvoked ?? false)
         {
-            await about.ShowAsync();
+            ContentFrame.Navigate(typeof(About));
         }
         else
         {
             // find NavigationViewItem with Content that equals InvokedItem
-            var item = sender.MenuItems.OfType<NavigationViewItem>().First(x => (string)x.Content == (string)args.InvokedItem);
+            var item = args is not null ? sender.MenuItems.OfType<NavigationViewItem>().First(x => (string)x.Content == (string)args.InvokedItem) : sender.MenuItems.OfType<NavigationViewItem>().First();
             NavView_Navigate(item);
-            App.Instance.CurrentSelectionLinked = NavView.TabIndex < 4;
+            App.Instance.CurrentSelectionLinked = NavView.MenuItems.IndexOf(item) < 4;
         }
-    }
-
-    private void NavSettings_Invoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
-{
-        settingsContent.Content = args.InvokedItemContainer.Tag;
     }
 
     private void NavView_Navigate(NavigationViewItem item)
@@ -138,4 +141,8 @@ public partial class MainPage
     {
         Messages.Remove(message);
     }
+
+
+
+
 }

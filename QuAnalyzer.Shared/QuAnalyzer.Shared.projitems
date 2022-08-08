@@ -21,6 +21,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ComparisonResultsExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\DataGridExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ExcelPackageExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\MicaBackground.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\NugetManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\NugetPackage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderPickerTemplateSelector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditorParameterTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\GenericMethodHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\GlobalTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\ImageSourceConverter.cs" />
@@ -28,21 +33,16 @@
     <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\GenericPopup.xaml.cs">
       <DependentUpon>GenericPopup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\PopupHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\ProvidersManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Project\Exceptions\ProjectLoadException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Project\Exceptions\ProjectSaveException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Project\ProjectSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\StatisticsHolder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UI\CollectionViewSourceCreator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Controls\ExtendedDataGridView.ComputeStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Controls\ExtendedDataGridView.FilterStruct.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Controls\ExtendedDataGridView.xaml.cs">
       <DependentUpon>ExtendedDataGridView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Controls\MappingsEdit.xaml.cs">
-      <DependentUpon>MappingsEdit.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)UI\Menus\MainMenu.xaml.cs">
       <SubType>Code</SubType>
@@ -98,11 +98,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)UI\Controls\ExtendedDataGridView.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Controls\MappingsEdit.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

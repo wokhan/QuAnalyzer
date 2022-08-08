@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using QuAnalyzer.Features.Monitoring.Definition;
 
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 using Wokhan.Data.Providers.Contracts;
 
@@ -35,12 +36,17 @@ public partial class TestDefinition : ObservableObject
         get => ProviderName != null ? provider ??= Providers.First(c => c.Name == ProviderName) : null;
         set
         {
-            provider = value;
-            ProviderName = value is not null ? value.Name : string.Empty;
+            if (provider != value)
+            {
+                provider = value;
+                ProviderName = value is not null ? value.Name : string.Empty;
+                OnPropertyChanged(nameof(Provider));
+            }
         }
     }
 
-    public string? Repository { get; set; }
+    [ObservableProperty]
+    private string? _repository;
 
     // TODO: Why?
     //public Func<IList<Dictionary<string, string>>, Dictionary<string, long>, IQueryable> GetData => (values, statsBag) => Provider.GetQueryable(Repository, values, statsBag);

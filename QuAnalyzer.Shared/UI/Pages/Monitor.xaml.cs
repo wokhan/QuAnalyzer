@@ -4,24 +4,17 @@ using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 
-using Microsoft.UI.Dispatching;
-
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
-
-using System.Threading;
 using System.Windows.Data;
-using System.Windows.Threading;
 
 using Windows.System.Threading;
-using Windows.UI.Core;
-
-using winth = System.Windows.Threading;
 
 namespace QuAnalyzer.UI.Pages;
 
+[ObservableObject]
 public partial class Monitor : Page
 {
     private const int chartTimeSpanMinutes = 1;
@@ -36,6 +29,9 @@ public partial class Monitor : Page
     public double Occurences { get; set; } = 10;
     public double MaxParallel { get; set; } = 1;
     public bool UseComparisonMode { get; set; }
+
+    [ObservableProperty]
+    private bool isRunning;
 
     public Monitor()
     {
@@ -66,6 +62,8 @@ public partial class Monitor : Page
     [RelayCommand(CanExecute = nameof(CanExecuteRun))]
     private void Run()
     {
+        IsRunning = true;
+
         var mitems = gridSteps.SelectedItems.Cast<TestDefinition>();
 
         MonitorResultsView.Clear();
@@ -99,6 +97,8 @@ public partial class Monitor : Page
             timers = mitems.Select(m => ThreadPoolTimer.CreatePeriodicTimer(timer => Timer_Tick(timer, m), TimeSpan.FromSeconds(m.Interval))).ToList();
 
         }
+
+        IsRunning = false;
     }
 
     private bool CanExecuteRun => gridSteps?.SelectedItems.Count > 0;

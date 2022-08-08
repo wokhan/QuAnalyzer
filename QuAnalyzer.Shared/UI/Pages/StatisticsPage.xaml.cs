@@ -3,8 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 
 using QuAnalyzer.Features.Statistics;
 
-using Windows.UI.Core;
-
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Pages;
@@ -16,37 +14,26 @@ public partial class StatisticsPage : Page
 
     [ObservableProperty]
     private string _chartType = "Pie";
-    
+
     [ObservableProperty]
     private bool _ignoreEmptyInChart = true;
-    
+
     [ObservableProperty]
     private int _progress;
 
     [ObservableProperty]
     private bool _autoCompute;
-    
 
-    //      public ObservableDictionary<string, Series> ComputedStatsForGraph { get; } = new ObservableDictionary<string, Series>();
     public ObservableCollection<StatisticsHolder> ComputedStats { get; } = new ObservableCollection<StatisticsHolder>();
 
-   
+
     public StatisticsPage()
     {
-        //ComputedStats = new Dictionary<string, ResultsStruct>();
-
         InitializeComponent();
 
-        //LiveCharts.HasMapFor<Values>((v, point) => { point.PrimaryValue = v.Frequency; });
-
-        //ComputedStats.CollectionChanged += ComputedStats_CollectionChanged;
         App.Instance.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(App.CurrentSelection)) { UpdateSelection(); } };
-    }
 
-    private void ComputedStats_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-    {
-        //((ResultsStruct)e.NewItems[0]).Frequencies.CollectionChanged += null;
-        //            ComputedStatsForGraph.AddAll(e.NewItems.Cast<ResultsStruct>().Select(x => new PieSeries(Mappers.Pie<ResultsStruct>().Value(data => data))));
+        UpdateSelection();
     }
 
     private void UpdateSelection()
@@ -55,10 +42,13 @@ public partial class StatisticsPage : Page
         if (prov is not null && _autoCompute)
         {
             Computedata(prov, repo);
+
         }
+
+        RunCommand.NotifyCanExecuteChanged();
     }
 
-    [RelayCommand(CanExecute =nameof(CanExecuteRun))]
+    [RelayCommand(CanExecute = nameof(CanExecuteRun))]
     private void Run()
     {
         var (prov, repo) = App.Instance.CurrentSelection;
@@ -74,16 +64,20 @@ public partial class StatisticsPage : Page
 
         await Task.Run(() =>
         {
-            Progress = -1;
-
             var headers = prv.GetColumns(repo);
 
             var data = prv.GetQueryable(repo);
 
             var results = headers.ToDictionary(h => h, h => new StatisticsHolder() { Name = h.Name, Source = data });
-            DispatcherQueue.TryEnqueue(() => ComputedStats.AddAll(results.Values));
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                Progress = -1;
 
-            headers.AsParallel().ForAll(h => results[h].Update(h));
+                ComputedStats.AddAll(results.Values);
+                headers.AsParallel().ForAll(h => results[h].Update(h));
+
+                Progress = 100;
+            });
         }).ConfigureAwait(false);
     }
 }

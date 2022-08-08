@@ -3,8 +3,8 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" xmlns:bases="using:Wokhan.Data.Providers.Bases"
-      mc:Ignorable="d"  x:Name="me"
+      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" xmlns:pages="using:QuAnalyzer.UI.Pages"
+      mc:Ignorable="d" x:Name="me"
       d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -24,7 +24,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <!--<Image Grid.RowSpan="2" Source="{Binding CurrentType.IconPath, Converter={StaticResource imageSourceConverter}}" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />-->
+                <Image Source="{x:Bind CurrentProvider.Definition.IconPath,Converter={StaticResource imageSourceConverter}}" VerticalAlignment="Center" Margin="0,0,10,0" />
                 <TextBlock Grid.Column="1" Text="{x:Bind CurrentProvider.Definition.Name}" FontWeight="Bold" />
                 <TextBlock Grid.Column="1" Grid.Row="1" Text="{x:Bind CurrentProvider.Definition.Copyright}" FontSize="10" />
                 <TextBlock Grid.Column="1" Grid.Row="2" Text="{x:Bind CurrentProvider.Definition.Description}" />
@@ -35,46 +35,35 @@
         </Border>
         <controls:DockPanel x:Name="dockRepositories" Grid.Row="2">
             <CommandBar controls:DockPanel.Dock="Top">
-                <AppBarButton Content="Add" ToolTipService.ToolTip="Add a repository" BorderBrush="Green" Icon="Add" Command="{x:Bind RepositoryAddCommand}"  />
-                <AppBarButton Content="Retrieve" ToolTipService.ToolTip="Retrieve repositories" BorderBrush="Green" Icon="Download" Command="{x:Bind RetrieveCommand}"  />
-                <AppBarButton Content="Clear" ToolTipService.ToolTip="Remove all repositories" BorderBrush="OrangeRed" Icon="Clear" Command="{x:Bind ClearCommand}"  />
+                <AppBarButton Label="Add" ToolTipService.ToolTip="Add a repository" Icon="Add" Command="{x:Bind RepositoryAddCommand}"  />
+                <AppBarButton Label="Retrieve" ToolTipService.ToolTip="Retrieve repositories" Icon="Download" Command="{x:Bind RetrieveCommand}"  />
+                <AppBarButton Label="Clear" ToolTipService.ToolTip="Remove all repositories" Icon="Clear" Command="{x:Bind ClearCommand}"  />
                 <AppBarSeparator />
-                <AppBarButton Content="Sel. all" ToolTipService.ToolTip="Select all" BorderBrush="Blue" Icon="SelectAll" Command="{x:Bind SelectAllCommand}" />
-                <AppBarButton Content="Unsel. all" ToolTipService.ToolTip="Unselect all" BorderBrush="Blue" Icon="ClearSelection" Command="{x:Bind ClearSelectionCommand}" />
+                <AppBarButton Label="Sel. all" ToolTipService.ToolTip="Select all" Icon="SelectAll" Command="{x:Bind SelectAllCommand}" />
+                <AppBarButton Label="Unsel. all" ToolTipService.ToolTip="Unselect all" Icon="ClearSelection" Command="{x:Bind ClearSelectionCommand}" />
             </CommandBar>
-            <controls:DataGrid x:Name="gridRepositories" AutoGenerateColumns="False" ItemsSource="{x:Bind Repositories,Mode=OneWay}" SelectionMode="Single" CanUserReorderColumns="False">
+            <controls:DataGrid AutoGenerateColumns="False" ItemsSource="{x:Bind Repositories,Mode=OneWay}" SelectionMode="Single" CanUserReorderColumns="False">
                 <controls:DataGrid.Columns>
-                    <controls:DataGridCheckBoxColumn Binding="{Binding Selected,UpdateSourceTrigger=PropertyChanged}" Width="80" Header="Selected" />
+                    <controls:DataGridCheckBoxColumn Binding="{Binding Selected,UpdateSourceTrigger=PropertyChanged}" CanUserReorder="False" Width="80" Header="Selected" />
                     <controls:DataGridTextColumn Binding="{Binding Key, UpdateSourceTrigger=PropertyChanged}" Width="30*" Header="Name" />
-                    <controls:DataGridTextColumn Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Width="70*" Header="Definition">
-                        <controls:DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Target="TextTrimming" Value="CharacterEllipsis" />
-                                <Setter Target="TextWrapping" Value="NoWrap" />
-                                <Setter Target="Height" Value="14" />
-                            </Style>
-                        </controls:DataGridTextColumn.ElementStyle>
-                        <controls:DataGridTextColumn.EditingElementStyle>
-                            <Style TargetType="TextBox">
-                                <Setter Target="TextWrapping" Value="Wrap" />
-                                <Setter Target="AcceptsReturn" Value="true" />
-                            </Style>
-                        </controls:DataGridTextColumn.EditingElementStyle>
-                    </controls:DataGridTextColumn>
+                    <controls:DataGridTextColumn Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Width="70*" Header="Definition" />
                     <controls:DataGridTemplateColumn IsReadOnly="True" CanUserResize="False">
                         <controls:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <AppBarButton x:Name="btnDeleteRepo" CommandParameter="{Binding}" Command="{Binding RepositoryDeleteCommand,ElementName=me}"  Foreground="OrangeRed" Icon="Delete" />
+                                <Button CommandParameter="{Binding}" Command="{Binding RepositoryDeleteCommand,ElementName=me}"  Foreground="OrangeRed">
+                                    <SymbolIcon Symbol="Delete" />
+                                </Button>
                             </DataTemplate>
                         </controls:DataGridTemplateColumn.CellTemplate>
                     </controls:DataGridTemplateColumn>
                 </controls:DataGrid.Columns>
             </controls:DataGrid>
         </controls:DockPanel>
-        <Grid Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400" Visibility="{x:Bind MessageTitle,Converter={StaticResource valueToVisibilityConverter},Mode=OneWay}">
+        <Grid Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" Width="400">
+            <!--Visibility="{x:Bind MessageTitle,Converter={StaticResource stringToVisibilityConverter},Mode=OneWay}">-->
             <StackPanel Margin="10">
-                <TextBlock Text="{x:Bind MessageTitle}" VerticalAlignment="Stretch" />
-                <TextBlock Text="{x:Bind MessageContent}" VerticalAlignment="Stretch" />
+                <TextBlock Text="{x:Bind MessageTitle,Mode=OneWay}" VerticalAlignment="Stretch" />
+                <TextBlock Text="{x:Bind MessageContent,Mode=OneWay}" VerticalAlignment="Stretch" />
                 <ProgressBar x:Name="progress" VerticalAlignment="Top" />
                 <Button Content="Cancel" HorizontalAlignment="Center" />
             </StackPanel>

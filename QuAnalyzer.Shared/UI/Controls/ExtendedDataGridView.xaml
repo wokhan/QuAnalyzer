@@ -17,7 +17,6 @@
             <Setter Target="BorderBrush" Value="Gray" />
             <Setter Target="BorderThickness" Value="1" />
             <Setter Target="CornerRadius" Value="5" />
-            <Setter Target="Background" Value="LightYellow" />
         </Style>
         <!--<Style TargetType="controls:DataGridColumnHeader" BasedOn="controls:DataGridColumnHeader">
             <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGrid_PreviewMouseLeftButtonDown" />
@@ -35,24 +34,37 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <CommandBar Grid.ColumnSpan="2">
-            <AppBarButton Label="Copy" ToolTipService.ToolTip="Copy to clipboard" Foreground="RosyBrown" Icon="Copy" Command="{x:Bind CopyCommand}" />
-            <AppBarSeparator />
-            <AppBarButton Label="Excel" ToolTipService.ToolTip="Export to CSV" Foreground="Green" Icon="OpenFile" Command="{x:Bind ExportCSVCommand}" />
-            <AppBarButton Label="HTML" ToolTipService.ToolTip="Export to HTML" Foreground="LightBlue" Icon="OpenFile" Command="{x:Bind ExportHTMLCommand}" />
-            <AppBarSeparator Visibility="{x:Bind EnableAdvancedFilters,Converter={StaticResource valueToVisibilityConverter}}" />
-            <AppBarToggleButton x:Name="btnAggregate" IsChecked="False" Label="Group/Filter" ToolTipService.ToolTip="Show aggregation and filtering options" Icon="Filter" Visibility="{x:Bind EnableAdvancedFilters,Converter={StaticResource valueToVisibilityConverter}}" />
+        <CommandBar Grid.ColumnSpan="2" x:Name="commandBar" Content="{x:Bind CustomCommandBarContent,Mode=OneWay}">
+            <CommandBar.PrimaryCommands>
+                <AppBarButton Label="Copy" ToolTipService.ToolTip="Copy to clipboard" Icon="Copy" Command="{x:Bind CopyCommand}" />
+                <AppBarSeparator />
+                <AppBarButton Label="Export..." Icon="OpenFile">
+                    <AppBarButton.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Excel" ToolTipService.ToolTip="Export to CSV" Icon="OpenFile" Command="{x:Bind ExportCSVCommand}" />
+                            <MenuFlyoutItem Text="HTML" ToolTipService.ToolTip="Export to HTML" Icon="OpenFile" Command="{x:Bind ExportHTMLCommand}" />
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+                <AppBarSeparator Visibility="{x:Bind EnableAdvancedFilters,Converter={StaticResource boolToVisibilityConverter}}" />
+                <AppBarToggleButton x:Name="btnAggregate" IsChecked="False" Label="Group/Filter" ToolTipService.ToolTip="Show aggregation and filtering options" Icon="Filter" Visibility="{x:Bind EnableAdvancedFilters,Converter={StaticResource boolToVisibilityConverter}}" />
+            </CommandBar.PrimaryCommands>
         </CommandBar>
-        <StackPanel Orientation="Horizontal" Grid.Row="2" Height="30" VerticalAlignment="Center">
+        <Grid Grid.Row="2" Grid.ColumnSpan="2" Height="30" VerticalAlignment="Center" HorizontalAlignment="Stretch" Background="{ThemeResource ControlFillColorDefault}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
             <TextBlock VerticalAlignment="Center" Margin="20,0">
-                    <Run Text="{x:Bind LoadingProgress,Mode=OneWay}" />
-                    <Run Text=" / " />
-                    <Run Text="{x:Bind ItemsCount,Mode=OneWay}" />
-                    <Run Text=" item(s) found" />
+                    <Run Text="{x:Bind LoadingProgress,Mode=OneWay}" FontSize="12" />
+                    <Run Text=" / " FontSize="12" />
+                    <Run Text="{x:Bind ItemsCount,Mode=OneWay}" FontSize="12" />
+                    <Run Text=" item(s) loaded" FontSize="12" />
             </TextBlock>
-            <TextBlock VerticalAlignment="Center" Text="{x:Bind x:String.Format('Status: {0}', Status),Mode=OneWay}" />
-            <ProgressBar HorizontalAlignment="Right" VerticalAlignment="Center" Height="20" Value="{x:Bind LoadingProgress,Mode=OneWay}" IsIndeterminate="{x:Bind LoadingProgress.Equals(-1),Mode=OneWay}" Margin="5,0" Width="200" />
-        </StackPanel>
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{x:Bind x:String.Format('Status: {0}',Status),Mode=OneWay,TargetNullValue='-'}" FontSize="12" />
+            <ProgressBar Background="Black" Height="5" Grid.Column="2" HorizontalAlignment="Right" Value="{x:Bind LoadingProgress,Mode=OneWay}" IsIndeterminate="{x:Bind LoadingProgress.Equals(-1),Mode=OneWay}" Margin="10,0" Width="200" />
+        </Grid>
         <controls:DataGrid Grid.Row="1" Sorting="gridData_Sorting" x:Name="gridData" IsReadOnly="True" CanUserSortColumns="True" CanUserReorderColumns="True" BorderThickness="0" ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto">
             <!--<controls:DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
@@ -61,7 +73,7 @@
                             </Style>
                         </controls:DataGrid.Resources>-->
         </controls:DataGrid>
-        <Grid Width="250" Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Visibility="{x:Bind btnAggregate.IsChecked.Value,Converter={StaticResource valueToVisibilityConverter},Mode=OneWay}">
+        <Grid Width="250" Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Visibility="{x:Bind btnAggregate.IsChecked.Value,Converter={StaticResource boolToVisibilityConverter},Mode=OneWay}" Background="{ThemeResource ControlFillColorDefault}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -143,14 +155,14 @@
                                 <controls:Case IsDefault="True">
                                     <ListBox ItemsSource="{x:Bind Grouping}" AllowDrop="True" x:Name="lstGrouping" Drop="lstGrouping_Drop">
                                         <ListBox.ItemTemplate>
-                                            <DataTemplate>
+                                            <DataTemplate x:DataType="x:String">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Text="{Binding}" />
-                                                    <AppBarButton Grid.Column="1" Foreground="OrangeRed" CommandParameter="{Binding}" Command="{Binding DeleteGroupCommand,ElementName=me}" Icon="Delete" />
+                                                    <TextBlock Text="{x:Bind}" />
+                                                    <AppBarButton Grid.Column="1" Foreground="OrangeRed" CommandParameter="{x:Bind}" Command="{Binding DeleteGroupCommand,ElementName=me}" Icon="Delete" />
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -189,7 +201,7 @@
                                     <controls:DataGridTemplateColumn>
                                         <controls:DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <AppBarButton Foreground="OrangeRed" CommandParameter="{x:Bind}" Command="{Binding DeleteAggregationCommand,ElementName=me}"  Icon="Delete" />
+                                                <AppBarButton CommandParameter="{x:Bind}" Command="{Binding DeleteAggregationCommand,ElementName=me}"  Icon="Delete" />
                                             </DataTemplate>
                                         </controls:DataGridTemplateColumn.CellTemplate>
                                     </controls:DataGridTemplateColumn>
@@ -199,12 +211,10 @@
                     </Expander>
                 </StackPanel>
             </ScrollViewer>
-            <Border Grid.Row="1" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
-                <CommandBar HorizontalAlignment="Center">
-                    <AppBarButton Label="Apply" Icon="Forward" Foreground="Green" Command="{x:Bind ReloadCommand}"/>
-                    <AppBarButton Label="Clear" Icon="Cancel" Foreground="Red" Command="{x:Bind ClearAllCommand}" />
-                </CommandBar>
-            </Border>
+            <CommandBar Grid.Row="1" HorizontalAlignment="Center" Background="Transparent">
+                <AppBarButton Label="Apply" Icon="Forward" Command="{x:Bind ReloadCommand}"/>
+                <AppBarButton Label="Clear" Icon="Cancel" Command="{x:Bind ClearAllCommand}" />
+            </CommandBar>
         </Grid>
     </Grid>
 </UserControl>

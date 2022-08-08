@@ -6,7 +6,7 @@
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:quanalyzer="using:QuAnalyzer" 
       xmlns:comparison="using:QuAnalyzer.Features.Comparison" 
-      xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" xmlns:collections="using:System.Collections"
+      xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" xmlns:collections="using:System.Collections" xmlns:pages="using:QuAnalyzer.UI.Popups"
       x:Class="QuAnalyzer.UI.Pages.Compare"
       x:Name="thisPage"
       mc:Ignorable="d"
@@ -28,66 +28,60 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" MinHeight="240" />
-            <RowDefinition Height="4" />
+            <RowDefinition Height="Auto" />
             <RowDefinition MinHeight="100" />
         </Grid.RowDefinitions>
-        <CommandBar Grid.ColumnSpan="3">
-            <AppBarButton HorizontalAlignment="Center" ToolTipService.ToolTip="Start comparisons for the selected items" BorderBrush="Green" Command="{x:Bind RunCommand}" Icon="Play" Content="Run" />
+        <CommandBar Content="Settings" DefaultLabelPosition="Right">
+            <AppBarButton HorizontalAlignment="Center" ToolTipService.ToolTip="Start comparisons for the selected items" Command="{x:Bind RunCommand}" Icon="Play" Label="Run" />
             <AppBarSeparator />
-            <AppBarToggleButton Content="Single-mapping mode" x:Name="btnToggleMode" ToolTipService.ToolTip="Single-mapping mode" BorderBrush="Blue" Foreground="Blue" Icon="DisableUpdates" IsChecked="{Binding UseSingleMapping}" />
+            <AppBarToggleButton Label="Single-mapping mode" ToolTipService.ToolTip="Single-mapping mode" Icon="DisableUpdates" IsChecked="{x:Bind UseSingleMapping,Mode=TwoWay}" />
             <AppBarSeparator />
-            <AppBarButton Content="Add" ToolTipService.ToolTip="Add a mapping" BorderBrush="Green" Icon="Add" IsEnabled="{x:Bind UseSingleMapping,Converter={StaticResource booleanNegator}}" Command="{x:Bind CreateMappingCommand}" />
-            <AppBarButton Content="Automap" ToolTipService.ToolTip="Automap" BorderBrush="Green" Icon="Shuffle" IsEnabled="{x:Bind UseSingleMapping,Converter={StaticResource booleanNegator}}" Command="{x:Bind AutoMapCommand}" />
+            <AppBarButton Label="Add" ToolTipService.ToolTip="Add a mapping" Icon="Add" IsEnabled="{x:Bind UseSingleMapping,Converter={StaticResource booleanNegator},Mode=OneWay}" Command="{x:Bind CreateMappingCommand}" />
+            <AppBarButton Label="Automap" ToolTipService.ToolTip="Automap" Icon="Shuffle" IsEnabled="{x:Bind UseSingleMapping,Converter={StaticResource booleanNegator},Mode=OneWay}" Command="{x:Bind AutoMapCommand}" />
             <AppBarSeparator />
-            <AppBarButton Content="Sel. all" ToolTipService.ToolTip="Select all" BorderBrush="Blue" Icon="SelectAll" Click="btnSelectAll_Click" IsEnabled="{x:Bind UseSingleMapping,Converter={StaticResource booleanNegator}}" />
-            <AppBarButton Content="Unsel. all" ToolTipService.ToolTip="Unselect all" BorderBrush="Blue" Icon="ClearSelection" Click="btnUnSel_Click" IsEnabled="{x:Bind UseSingleMapping,Converter={StaticResource booleanNegator}}" />
+            <AppBarButton Label="Sel. all" ToolTipService.ToolTip="Select all" Icon="SelectAll" Click="btnSelectAll_Click" IsEnabled="{x:Bind UseSingleMapping,Converter={StaticResource booleanNegator},Mode=OneWay}" />
+            <AppBarButton Label="Unsel. all" ToolTipService.ToolTip="Unselect all" Icon="ClearSelection" Click="btnUnSel_Click" IsEnabled="{x:Bind UseSingleMapping,Converter={StaticResource booleanNegator},Mode=OneWay}" />
         </CommandBar>
-        <TabView Grid.Row="1" VerticalAlignment="Stretch" BorderThickness="0" HorizontalAlignment="Stretch" Padding="0">
-            <TabViewItem x:Name="tabMapping" IsSelected="{x:Bind btnToggleMode.IsChecked,Converter={StaticResource booleanNegator}}">
-                <controls:DataGrid SelectionMode="Extended" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.SourceMapper}" ColumnWidth="18*" AutoGenerateColumns="False" x:Name="lstMappings">
-                    <controls:DataGrid.Columns>
-                        <controls:DataGridTextColumn Binding="{Binding Name}" Header="Mapping name" IsReadOnly="True" />
-                        <controls:DataGridTextColumn Binding="{Binding SourceName}" Header="Source" IsReadOnly="True" />
-                        <controls:DataGridTextColumn Binding="{Binding SourceRepository}" Header="Source repository" IsReadOnly="True" />
-                        <controls:DataGridTextColumn Binding="{Binding TargetName}" Header="Target" IsReadOnly="True" />
-                        <controls:DataGridTextColumn Binding="{Binding TargetRepository}" Header="Target repository" IsReadOnly="True" />
-                        <controls:DataGridTemplateColumn Header="Stream" Width="Auto">
-                            <controls:DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="comparison:SourcesMapper">
-                                    <ToggleSwitch Padding="5,0" Foreground="Black" IsOn="{x:Bind IsOrdered, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                </DataTemplate>
-                            </controls:DataGridTemplateColumn.CellTemplate>
-                        </controls:DataGridTemplateColumn>
-                        <controls:DataGridTemplateColumn IsReadOnly="True" CanUserResize="False" Width="100">
-                            <controls:DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="comparison:SourcesMapper">
-                                    <StackPanel Orientation="Horizontal">
-                                        <AppBarButton Command="{Binding EditMappingCommand,ElementName=thisPage}" CommandParameter="{x:Bind}" Foreground="Blue" Icon="Edit" />
-                                        <AppBarButton Command="{Binding DeleteMappingCommand,ElementName=thisPage}" CommandParameter="{x:Bind}" Foreground="OrangeRed" Icon="Delete" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </controls:DataGridTemplateColumn.CellTemplate>
-                        </controls:DataGridTemplateColumn>
-                    </controls:DataGrid.Columns>
-                </controls:DataGrid>
-            </TabViewItem>
-            <TabViewItem IsSelected="{x:Bind btnToggleMode.IsChecked.GetValueOrDefault()}">
-                <UC:MappingsEdit Mapping="{x:Bind SingleMap}" />
-            </TabViewItem>
-        </TabView>
+        <controls:DataGrid Grid.Row="1" Visibility="{x:Bind UseSingleMapping,Mode=OneWay,Converter={StaticResource boolToVisibilityNegateConverter}}" SelectionMode="Extended" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.SourceMapper,Mode=OneWay}" ColumnWidth="18*" AutoGenerateColumns="False" x:Name="lstMappings" SelectionChanged="LstMappings_SelectionChanged">
+            <controls:DataGrid.Columns>
+                <controls:DataGridTextColumn Binding="{Binding Name}" Header="Mapping name" IsReadOnly="True" />
+                <controls:DataGridTextColumn Binding="{Binding SourceName}" Header="Source" IsReadOnly="True" />
+                <controls:DataGridTextColumn Binding="{Binding SourceRepository}" Header="Source repository" IsReadOnly="True" />
+                <controls:DataGridTextColumn Binding="{Binding TargetName}" Header="Target" IsReadOnly="True" />
+                <controls:DataGridTextColumn Binding="{Binding TargetRepository}" Header="Target repository" IsReadOnly="True" />
+                <controls:DataGridTemplateColumn Header="Stream" Width="Auto">
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="comparison:SourcesMapper">
+                            <ToggleSwitch Padding="5,0" Foreground="Black" IsOn="{x:Bind IsOrdered, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+                <controls:DataGridTemplateColumn IsReadOnly="True" CanUserResize="False" Width="100">
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="comparison:SourcesMapper">
+                            <StackPanel Orientation="Horizontal">
+                                <AppBarButton Command="{Binding EditMappingCommand,ElementName=thisPage}" CommandParameter="{x:Bind}" Foreground="Blue" Icon="Edit" />
+                                <AppBarButton Command="{Binding DeleteMappingCommand,ElementName=thisPage}" CommandParameter="{x:Bind}" Foreground="OrangeRed" Icon="Delete" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+            </controls:DataGrid.Columns>
+        </controls:DataGrid>
+        <pages:MappingsEditor Grid.Row="1" Visibility="{x:Bind UseSingleMapping,Mode=OneWay,Converter={StaticResource boolToVisibilityConverter}}" InitialMapping="{x:Bind SingleMap}" />
         <controls:GridSplitter Grid.Row="2" />
         <controls:DockPanel Grid.Column="0" Grid.Row="3">
-            <CommandBar>
-                <AppBarElementContainer>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Global progress" />
-                        <ProgressBar x:Name="prgGlobal" Maximum="100" Height="22" Width="292" />
-                    </StackPanel>
-                </AppBarElementContainer>
-                <AppBarSeparator />
-                <AppBarButton Content="Create report" ToolTipService.ToolTip="Create report" BorderBrush="BlueViolet" Icon="SaveLocal" Command="{x:Bind GlobalReportCommand}" />
-            </CommandBar>
-            <UC:ExtendedDataGridView ItemsSource="{x:Bind GroupedComparisonInstancesView,Mode=OneWay}" ColumnWidth="*" AutoGenerateColumns="False" x:Name="allProgress" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="None" SelectionMode="Single">
+            <UC:ExtendedDataGridView ItemsSource="{x:Bind GroupedComparisonInstancesView,Mode=OneWay}" ColumnWidth="*" AutoGenerateColumns="False" x:Name="allProgress" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" GridLinesVisibility="None" SelectionMode="Extended" CustomCommandBarContent="Results">
+                <UC:ExtendedDataGridView.CustomCommandBarElements>
+                    <AppBarElementContainer>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Global progress" FontSize="12" />
+                            <ProgressBar FontSize="12" Maximum="100" Height="22" Width="292" Value="{x:Bind CurrentProgress,Mode=OneWay}" />
+                        </StackPanel>
+                    </AppBarElementContainer>
+                    <AppBarSeparator />
+                    <AppBarButton Label="Create report" ToolTipService.ToolTip="Create report" Icon="SaveLocal" Command="{x:Bind GlobalReportCommand}" />
+                </UC:ExtendedDataGridView.CustomCommandBarElements>
                 <UC:ExtendedDataGridView.RowGroupHeaderStyles>
                     <!-- Override the default Style for groups headers -->
                     <Style TargetType="controls:DataGridRowGroupHeader">

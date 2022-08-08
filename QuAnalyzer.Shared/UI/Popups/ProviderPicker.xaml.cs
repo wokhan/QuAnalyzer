@@ -1,7 +1,6 @@
 ﻿
 using CommunityToolkit.Mvvm.Input;
-
-using NuGet.Packaging.Core;
+using CommunityToolkit.WinUI.Connectivity;
 
 using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.UI.Windows;
@@ -14,15 +13,23 @@ namespace QuAnalyzer.UI.Pages;
 public partial class ProviderPicker : Page
 {
     [ObservableProperty]
-    private IEnumerable<NugetPackage> nugetPackages;
+    [NotifyPropertyChangedFor(nameof(Providers))]
+    private IEnumerable<NugetPackage> nugetPackages = Enumerable.Empty<NugetPackage>();
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CreateProviderCommand))]
-    private DataProviderDefinition selectedProviderDef;
+    private object selectedProviderDefinition;
+
+    [ObservableProperty]
+    private bool isNugetAccessible = true;
+
+    private IEnumerable<object> Providers => ProvidersManager.Providers.Cast<object>().Concat(NugetPackages);
 
     public ProviderPicker()
     {
         this.Loaded += ProviderPicker_Loaded;
+
+        //ProvidersManager.Providers.CollectionChanged += (_, _) => OnPropertyChanged(nameof(Providers));
 
         InitializeComponent();
     }
@@ -30,21 +37,41 @@ public partial class ProviderPicker : Page
     private async void ProviderPicker_Loaded(object sender, RoutedEventArgs e)
     {
         GenericPopup.UpdateCurrent(this, CreateProviderCommand, "New provider");
-        
-        NugetPackages = await App.Instance.ProvidersMan.GetNugetPackages();
+
+        if (NetworkHelper.Instance.ConnectionInformation.IsInternetAvailable)
+        {
+            isNugetAccessible = true;
+            NugetPackages = await NugetManager.SearchPackages("Wokhan.Data.Providers.", "Wokhan.Data.Providers");
+        }
+        else
+        {
+            IsNugetAccessible = false;
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteCreateProvider))]
     private void CreateProvider()
     {
-        Frame.Navigate(typeof(ProviderEditor), selectedProviderDef.Name);
+        Frame.Navigate(typeof(ProviderEditor), ((DataProviderDefinition)selectedProviderDefinition).Name);
     }
 
-    private bool CanExecuteCreateProvider => SelectedProviderDef is not null;
+    private bool CanExecuteCreateProvider => SelectedProviderDefinition is DataProviderDefinition;
 
     [RelayCommand(AllowConcurrentExecutions = false)]
-    private async Task InstallPackage(PackageIdentity packageId)
+    private async Task InstallPackage(NugetPackage package)
     {
-        await App.Instance.ProvidersMan.InstallPackage(packageId);
+        var cachePath = $"{AppDomain.CurrentDomain.BaseDirectory}\\providers\\packages";
+        var installPath = $"{AppDomain.CurrentDomain.BaseDirectory}\\providers\\{package.Identity.Id}";
+
+        //TODO: make this framework agnostic        
+        await ProvidersManager.InstallFromNuget(package, "netcoreapp3.1", cachePath, installPath);
+
+        OnPropertyChanged(nameof(Providers));
+    }
+
+    [RelayCommand(AllowConcurrentExecutions = false)]
+    private async Task UninstallPackage(NugetPackage package)
+    {
+
     }
 }

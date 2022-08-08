@@ -4,13 +4,28 @@
     <LangVersion>10</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="5.8.4" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+    
     <PackageReference Include="Uno.CommunityToolkit.WinUI.UI.Controls" Version="7.1.100-dev.15.g12261e2626" />
+    <PackageReference Include="Uno.CommunityToolkit.WinUI.Connectivity" Version="7.1.100-dev.15.g12261e2626" />
+    <PackageReference Include="Uno.CommunityToolkit.WinUI.UI" Version="7.1.100-dev.15.g12261e2626" />
+    <PackageReference Include="Uno.CommunityToolkit.WinUI.UI.Animations" Version="7.1.100-dev.15.g12261e2626" />
+    
     <PackageReference Include="Uno.WinUI.Skia.Wpf" Version="4.3.6" />
     <PackageReference Include="Uno.WinUI.RemoteControl" Version="4.3.6" Condition="'$(Configuration)'=='Debug'" />
     <PackageReference Include="Uno.UI.Adapter.Microsoft.Extensions.Logging" Version="4.3.6" />
+    <PackageReference Include="Uno.Core.Extensions.Logging.Singleton" Version="4.0.1" />
+
+    <PackageReference Include="EPPlus" Version="6.0.5" />
+    
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.Uno.WinUI" Version="2.0.0-beta.330" />
+    
+    <PackageReference Include="Wokhan.Data.Providers" Version="0.8.7-beta" />
+    <PackageReference Include="Wokhan.UI" Version="0.9.4-beta" />
+    
+    <PackageReference Include="NuGet.Protocol" Version="6.2.1" />
+    <PackageReference Include="NuGet.Resolver" Version="6.2.1" />
   </ItemGroup>
   <ItemGroup>
     <UpToDateCheckInput Include="..\QuAnalyzer.Shared\**\*.xaml" />

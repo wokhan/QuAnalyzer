@@ -6,7 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{281C94EA-3B55-4048-B8A0-9EF55BF3DA60}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		global.json = global.json
 		WinUI migration.txt = WinUI migration.txt
 	EndProjectSection
 EndProject

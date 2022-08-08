@@ -1,38 +1,55 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 
+using Microsoft.UI.Xaml.Navigation;
+
 using QuAnalyzer.Features.Monitoring;
+using QuAnalyzer.UI.Windows;
 
 using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Popups;
 
+[ObservableObject]
 public partial class MonitoringDetails : Page
 {
 
-    private readonly TestDefinition initialItem;
-    public TestDefinition CurrentItem { get; set; }
+    private TestDefinition initialItem;
 
-    private Window _owner => Window.Current;
+    [ObservableProperty]
+    private TestDefinition _currentItem;
 
-    public MonitoringDetails(TestDefinition TestDefinition = null)
+    public MonitoringDetails()
     {
+        InitializeComponent();
+    }
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        var TestDefinition = e.Parameter as TestDefinition;
+
         initialItem = TestDefinition ?? new TestDefinition() { Name = "Monitor #" + (App.Instance.CurrentProject.TestDefinitions.Count + 1) };
         CurrentItem = initialItem.Clone();
 
-        InitializeComponent();
+        base.OnNavigatedTo(e);
 
+        GenericPopup.UpdateCurrent(this, title: $"{CurrentItem.Name} - Edit");
+
+        UpdateAttributes();
+    }
+
+    private void UpdateAttributes()
+    {
         if (CurrentItem.Provider is not null && !String.IsNullOrEmpty(CurrentItem.Repository))
         {
             lstAttributes.ItemsSource = CurrentItem.Provider.GetColumns(CurrentItem.Repository)
                                                             .ToDictionary(h => h.Name, h => CurrentItem.AttributesList.Contains(h.Name));
         }
-
     }
 
     [RelayCommand]
     private void Cancel()
     {
-        _owner.Close();
+        GenericPopup.FromPage(this).Close();
     }
 
     [RelayCommand]
@@ -50,16 +67,13 @@ public partial class MonitoringDetails : Page
         {
             projectMappers.Add(CurrentItem);
         }
-        _owner.Close();
+
+        GenericPopup.FromPage(this).Close();
     }
 
     private void lstSrcRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (lstSrcRepo.SelectedItem is not null)
-        {
-            lstAttributes.ItemsSource = ((IDataProvider)lstSrc.SelectedItem).GetColumns((string)lstSrcRepo.SelectedItem)
-                                                                            .ToDictionary(h => h.Name, h => CurrentItem.AttributesList.Contains(h.Name));
-        }
+        UpdateAttributes();
     }
 
 }
