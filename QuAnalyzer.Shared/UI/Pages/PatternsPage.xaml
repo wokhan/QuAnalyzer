@@ -15,15 +15,8 @@
             <AppBarSeparator />
             <AppBarElementContainer VerticalContentAlignment="Center">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Similarity threshold" FontSize="12" Margin="5,0,10,0" />
+                    <TextBlock Text="Similarity threshold" FontSize="12" Margin="5,0,10,0" VerticalAlignment="Center" />
                     <Slider x:Name="slideSim" ValueChanged="slideSim_ValueChanged" VerticalAlignment="Center" Minimum="1" TickFrequency="1" LargeChange="1" SmallChange="1" Maximum="3" TickPlacement="BottomRight" Width="100" />
-                </StackPanel>
-            </AppBarElementContainer>
-            <AppBarSeparator/>
-            <AppBarElementContainer VerticalContentAlignment="Center" >
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="{x:Bind Status,Mode=OneWay}" VerticalAlignment="Center" Margin="5,0,10,0" FontSize="12" />
-                    <ProgressBar x:Name="prg" Maximum="100" Minimum="0" Width="200" Height="20" BorderThickness="0" />
                 </StackPanel>
             </AppBarElementContainer>
         </CommandBar>
@@ -58,6 +51,6 @@
                 </ListView>
             </Grid>
         </Border>
-        <UC:ExtendedDataGridView x:Name="gridPatterns" AutoGenerateColumns="True" />
+        <UC:ExtendedDataGridView x:Name="gridPatterns" AutoGenerateColumns="True" ItemsSource="{x:Bind Data,Mode=OneWay}" />
     </controls:DockPanel>
 </Page>

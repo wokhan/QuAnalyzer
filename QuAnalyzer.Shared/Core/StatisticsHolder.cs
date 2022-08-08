@@ -19,7 +19,7 @@ public partial class StatisticsHolder : ObservableObject
     
     private async void UpdateStats(string attribute)
     {
-        Statistics = await Task.Run(() => StatsResult.GetStats(Source, attribute));
+        Statistics = await Task.Run(() => StatsResult.GetStats(Source, attribute, Source.ElementType.GetProperty(attribute).PropertyType));
     }
 
     private async void UpdateOccurences(ColumnDescription column)

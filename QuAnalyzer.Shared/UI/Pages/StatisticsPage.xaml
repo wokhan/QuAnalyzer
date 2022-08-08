@@ -15,16 +15,21 @@
             <AppBarToggleButton IsChecked="{x:Bind AutoCompute,Mode=TwoWay}" Label="Auto update" ToolTipService.ToolTip="Compute statistics automatically" Icon="Calculator" />
             <AppBarSeparator />
             <AppBarElementContainer VerticalContentAlignment="Center">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Type: " FontSize="12" Margin="5,0,10,0" />
-                    <ComboBox IsEditable="False" ItemsSource="{x:Bind ChartTypes}" SelectedItem="{x:Bind ChartType,Mode=TwoWay}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Type: " FontSize="12" Margin="5,0,10,0" VerticalAlignment="Center" />
+                    <ComboBox IsEditable="False" FontSize="12" ItemsSource="{x:Bind ChartTypes}" SelectedItem="{x:Bind ChartType,Mode=TwoWay}" />
                 </StackPanel>
             </AppBarElementContainer>
             <!--<ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding IgnoreEmptyInChart}" Content="Ignore empty values" ToolTipService.ToolTip="Ignore empty values in the graphics" ext:CustomAdorner.Image="{iconPacks:Material Kind=GraphOutline}" />-->
         </CommandBar>
-        <StackPanel Orientation="Horizontal" controls:DockPanel.Dock="Bottom">
-            <ProgressBar Value="{x:Bind Progress,Mode=OneWay}" Maximum="100" Width="500" />
-        </StackPanel>
+        <Grid controls:DockPanel.Dock="Bottom" Height="30" VerticalAlignment="Center" HorizontalAlignment="Stretch" Background="{ThemeResource ControlFillColorDefault}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Text="{x:Bind x:String.Format('Status: {0}',Status),Mode=OneWay,TargetNullValue='-'}" FontSize="12" />
+            <ProgressBar Background="Black" Grid.Column="1" HorizontalAlignment="Right" Value="{x:Bind Progress,Mode=OneWay}" IsIndeterminate="{x:Bind Progress.Equals(-1),Mode=OneWay}" Margin="10,0" Width="200" />
+        </Grid>
         <ScrollViewer>
             <ItemsControl ItemsSource="{x:Bind ComputedStats}">
                 <ItemsControl.ItemsPanel>
@@ -34,7 +39,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="stats:StatisticsHolder">
-                        <Border Margin="10" Background="{ThemeResource CardBackgroundFillColorDefault}" CornerRadius="5">
+                        <Border Margin="10" Background="{ThemeResource CardBackgroundFillColorDefault}" CornerRadius="5" Height="400">
                             <Grid Margin="10">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -43,23 +48,23 @@
                                 </Grid.RowDefinitions>
                                 <TextBlock FontSize="14" HorizontalAlignment="Center" Text="{x:Bind Name}" />
 
-                                <controls:SwitchPresenter Value="{Binding ChartType,ElementName=me}">
+                                <controls:SwitchPresenter Grid.Row="1" Value="{Binding ChartType,ElementName=me}">
                                     <controls:Case Value="Pie" IsDefault="True">
-                                        <chart:PieChart Grid.Row="1" Height="200" Series="{Binding Series}">
+                                        <chart:PieChart Height="250" Series="{Binding Series}">
                                             <chart:PieChart.DataContext>
                                                 <test:DynamicSeriesWrapper Type="Pie" Source="{Binding DataContext,RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                                             </chart:PieChart.DataContext>
                                         </chart:PieChart>
                                     </controls:Case>
                                     <controls:Case Value="Doughnut">
-                                        <chart:PieChart Grid.Row="1" Height="200" Series="{Binding Series}">
+                                        <chart:PieChart Height="250" Series="{Binding Series}">
                                             <chart:PieChart.DataContext>
                                                 <test:DynamicSeriesWrapper Type="Doughnut" Source="{Binding DataContext,RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                                             </chart:PieChart.DataContext>
                                         </chart:PieChart>
                                     </controls:Case>
                                     <controls:Case Value="Bar">
-                                        <chart:CartesianChart Grid.Row="1" Height="200" Series="{Binding Series}" XAxes="{Binding XAxes}" YAxes="{Binding YAxes}" >
+                                        <chart:CartesianChart Height="250" Series="{Binding Series}" XAxes="{Binding XAxes}" YAxes="{Binding YAxes}" >
                                             <chart:CartesianChart.DataContext>
                                                 <test:DynamicSeriesWrapper Type="Bar" Source="{Binding DataContext,RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                                             </chart:CartesianChart.DataContext>
@@ -74,15 +79,15 @@
                                         </Style>
                                     </controls:UniformGrid.Resources>
                                     <TextBlock Text="Distinct count: " FontWeight="Bold" />
-                                    <TextBlock Text="{x:Bind Statistics.DistinctCount}" Grid.Column="1" />
+                                    <TextBlock Text="{x:Bind Statistics.DistinctCount.ToString()}" Grid.Column="1" />
                                     <TextBlock Text="Empty values: " FontWeight="Bold" />
-                                    <TextBlock Text="{x:Bind Statistics.EmptyCount}" Grid.Column="1" />
+                                    <TextBlock Text="{x:Bind Statistics.EmptyCount.ToString()}" Grid.Column="1" />
                                     <TextBlock Text="Minimum: " FontWeight="Bold" />
-                                    <TextBlock Text="{x:Bind Statistics.Min}" Grid.Column="1" />
+                                    <TextBlock Text="{x:Bind Statistics.Min.ToString()}" Grid.Column="1" />
                                     <TextBlock Text="Maximum: " FontWeight="Bold" Grid.Row="1" />
-                                    <TextBlock Text="{x:Bind Statistics.Max}" Grid.Row="1" Grid.Column="1"/>
+                                    <TextBlock Text="{x:Bind Statistics.Max.ToString()}" Grid.Row="1" Grid.Column="1"/>
                                     <TextBlock Text="Average: " FontWeight="Bold" Grid.Row="2" />
-                                    <TextBlock Text="{x:Bind Statistics.Average}" Grid.Row="2" Grid.Column="1" />
+                                    <TextBlock Text="{x:Bind Statistics.Average.ToString()}" Grid.Row="2" Grid.Column="1" />
                                 </controls:UniformGrid>
                             </Grid>
                         </Border>

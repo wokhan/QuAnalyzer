@@ -19,6 +19,9 @@ public partial class StatisticsPage : Page
     private bool _ignoreEmptyInChart = true;
 
     [ObservableProperty]
+    private string _status;
+
+    [ObservableProperty]
     private int _progress;
 
     [ObservableProperty]
@@ -42,7 +45,6 @@ public partial class StatisticsPage : Page
         if (prov is not null && _autoCompute)
         {
             Computedata(prov, repo);
-
         }
 
         RunCommand.NotifyCanExecuteChanged();
@@ -59,6 +61,7 @@ public partial class StatisticsPage : Page
 
     private async void Computedata(IDataProvider prv, string repo)
     {
+        Status = "Preparing...";
         Progress = 0;
         ComputedStats.Clear();
 
@@ -71,12 +74,14 @@ public partial class StatisticsPage : Page
             var results = headers.ToDictionary(h => h, h => new StatisticsHolder() { Name = h.Name, Source = data });
             DispatcherQueue.TryEnqueue(() =>
             {
+                Status = "Analyzing...";
                 Progress = -1;
 
                 ComputedStats.AddAll(results.Values);
                 headers.AsParallel().ForAll(h => results[h].Update(h));
 
-                Progress = 100;
+                Status = "Done!";
+                Progress = 1;
             });
         }).ConfigureAwait(false);
     }

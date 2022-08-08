@@ -38,9 +38,10 @@ public record StatsResult(int Count, object? Min, object? Max, object? Average, 
     public static StatsResult GetStats(IQueryable data, string attribute, Type type)
     {
         var mx = typeof(StatsResult).GetMethod(nameof(GetTypedStats), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
-                                                       .MakeGenericMethod(data.GetInnerType(), type);
+                                                       .MakeGenericMethod(data.ElementType, type);
         return (StatsResult)mx.Invoke(null, new object[] { data, attribute });
     }
+
     public static StatsResult GetStats(IQueryable data, string attribute)
     {
         return new StatsResult(Min: data.Min(attribute), Max: data.Max(attribute), Average: GetAverage(data, attribute), Count: data.Count(), DistinctCount: data.Select(attribute).Distinct().Count(), EmptyCount: data.Count($"{attribute} == null"));// || {attribute} == \"\""));

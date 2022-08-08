@@ -15,6 +15,12 @@ public partial class PatternsPage : Page
     public bool AutoUpdate { get; set; }
 
     [ObservableProperty]
+    private IEnumerable data;
+
+    [ObservableProperty]
+    private double progress;
+
+    [ObservableProperty]
     private string status;
 
     public PatternsPage()
@@ -51,39 +57,28 @@ public partial class PatternsPage : Page
         var (prov, repo) = App.Instance.CurrentSelection;
         var attr = (string)lstAttributes.SelectedValue;
 
-        prg.IsIndeterminate = true;
+        gridPatterns.LoadingProgress = -1;
+        gridPatterns.Status = "Analyzing...";
 
-        var res = await Task.Run(() =>
+        await Task.Run(() =>
         {
-            var data = prov.GetQueryable(repo)
+            DispatcherQueue.TryEnqueue(() => Progress = 0);
+
+            Data = prov.GetQueryable(repo)
                            .Select(attr)
                            .AsEnumerable()
-                           .WithProgress(i => { Status = $"Loaded {i} entries..."; })
-                           .Select(a => a.ToString())
+                           .AsParallel()
+                           .Select(value => value.ToString())
+                           .Select(stringValue => new { stringValue, reg = Features.Patterns.Patterns.GetRegEx(stringValue, SimThreshold) })
+                           .GroupBy(s => s.reg)
+                           .Select(g => new { Pattern = g.Key, Count = g.Count(), Sample = g.First().stringValue })
+                           .OrderByDescending(g => g.Count)
                            .ToList();
+        });
 
-            DispatcherQueue.TryEnqueue(() =>
-            {
-                prg.IsIndeterminate = false;
-                prg.Maximum = data.Count;
-            });
+        gridPatterns.LoadingProgress = 0;
+        gridPatterns.Status = "Done!";
 
-            return data.WithProgress(i => DispatcherQueue.TryEnqueue(() => prg.Value = i))
-                       .Select(d => new { val = d, reg = Features.Patterns.Patterns.GetRegEx(d, SimThreshold) })
-                       .ToList()
-                       .GroupBy(s => s.reg)
-                       .Select(g => new { Pattern = g.Key, Count = g.Count(), Sample = g.First().val })
-                       .OrderByDescending(g => g.Count);
-        }).ConfigureAwait(true);
-
-        //gridPatterns.CustomHeaders = prov.GetColumns(repo).Join(stringAttributes, a => a.Name, b => b, (a, b) => a).ToList();
-        DispatcherQueue.TryEnqueue(() => gridPatterns.ItemsSource = res);
-        /*}
-        else
-        {
-            //gridPatterns.CustomHeaders = null;
-            gridPatterns.Source = null;
-        }*/
     }
 
     private bool CanExecuteRun => lstAttributes?.SelectedItems.Count > 0;

@@ -1,8 +1,5 @@
 ﻿namespace QuAnalyzer.UI.Pages;
 
-/// <summary>
-/// Logique d'interaction pour DataViewer.xaml
-/// </summary>
 public partial class ViewerPage : Page
 {
     public ViewerPage()
