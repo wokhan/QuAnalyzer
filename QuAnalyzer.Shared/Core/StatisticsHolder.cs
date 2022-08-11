@@ -1,10 +1,4 @@
-﻿using Microsoft.UI.Dispatching;
-
-using System.Windows.Threading;
-
-using Windows.UI.Core;
-
-using Wokhan.Data.Providers.Bases;
+﻿using Wokhan.Data.Providers.Bases;
 
 namespace QuAnalyzer.Features.Statistics;
 

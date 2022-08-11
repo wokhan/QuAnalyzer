@@ -21,9 +21,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ComparisonResultsExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\DataGridExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ExcelPackageExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\QueryableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\MicaBackground.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\NugetManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\NugetPackage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\ResourcesWatcher.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderPickerTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditorParameterTemplateSelector.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\GenericMethodHelper.cs" />
@@ -64,7 +66,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)UI\Pages\PatternsPage.xaml.cs">
       <DependentUpon>PatternsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Pages\SourceOrTargetPicker.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Pages\StatisticsPage.xaml.cs">
       <DependentUpon>StatisticsPage.xaml</DependentUpon>
     </Compile>

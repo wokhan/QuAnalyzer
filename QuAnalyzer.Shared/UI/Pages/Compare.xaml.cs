@@ -1,7 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 
-using Microsoft.Win32;
-
 using OfficeOpenXml;
 
 using QuAnalyzer.Core.Extensions;
@@ -12,6 +10,8 @@ using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
 
 using System.Linq.Dynamic.Core;
+
+using Windows.Storage.Pickers;
 
 using Wokhan.Data.Providers.Contracts;
 
@@ -33,8 +33,6 @@ public partial class Compare : Page
     public Compare()
     {
         InitializeComponent();
-
-        GroupedComparisonInstancesView = ComparisonInstancesView.GroupBy(x => x.Name);
     }
 
     [RelayCommand]
@@ -98,7 +96,7 @@ public partial class Compare : Page
     private void Delete(ComparerDefinition<object[]> r)
     {
         progressDC.Remove(r.Name);
-        ComparisonInstancesView.RemoveRange(ComparisonInstancesView.Where(re => r.Name.Equals((string)re.Name)).ToList());
+        ComparisonInstances.RemoveRange(ComparisonInstances.Where(re => r.Name.Equals((string)re.Name)).ToList());
     }
 
     [RelayCommand]
@@ -132,17 +130,20 @@ public partial class Compare : Page
         GenericPopup.OpenNew<MappingsEditor>(mapping);
     }
 
-
     [RelayCommand]
-    private void GlobalReport()
+    private async void GlobalReport()
     {
-        var dial = new OpenFileDialog() { CheckFileExists = false, CheckPathExists = true, ValidateNames = false, FileName = "Pick a folder to save reports in. Existing files will be overwritten." };
-        if (dial.ShowDialog() is not true)
+        var dial = new FolderPicker();
+        //{ FileName = "Pick a folder to save reports in. Existing files will be overwritten." };
+
+        var folder = await dial.PickSingleFolderAsync(); 
+        
+        if (folder is null)
         {
             return;
         }
 
-        var folderPath = Directory.GetParent(dial.FileName);
+        var folderPath = Directory.GetParent(folder.Path);
 
         var app = App.Instance;
         var (host, callback, cancelTokenSummary) = app.AddTaskAndGetCallback("Exporting Summary");
@@ -150,7 +151,7 @@ public partial class Compare : Page
         //TODO: check
         //allProgress.ExportAsXLSX(folderPath + "\\Summary.xlsx", "Summary", host, callback, cancelTokenSummary);
 
-        foreach (var cmp in ComparisonInstancesView.Where(c => c.Results.Progress == ProgressType.Done))
+        foreach (var cmp in ComparisonInstances.Where(c => c.Results.Progress == ProgressType.Done))
         {
             /*if (!openWindows.ContainsKey(cmp))
             {
@@ -176,7 +177,7 @@ public partial class Compare : Page
             var (_, cb6, cb6CancelToken) = app.AddTaskAndGetCallback($"Exporting Source clones to {file.Name}");
             var (_, cb7, cb7CancelToken) = app.AddTaskAndGetCallback($"Exporting Target clones to {file.Name}");
 
-            Task.Run(() =>
+            await Task.Run(() =>
             {
                 using (var xl = new ExcelPackage(file))
                 {
@@ -234,7 +235,7 @@ public partial class Compare : Page
         var comparer = SequenceComparer<object>.Default;
 
         //TODO:check
-        foreach (SourcesMapper mapper in UseSingleMapping ? new[] { SingleMap } : lstMappings.SelectedItems)
+        foreach (SourcesMapper mapper in App.Instance.CurrentProject.UseSingleMapping ? new[] { App.Instance.CurrentProject.SingleMapper } : lstMappings.SelectedItems)
         {
             var cp = await ComparerDefinition<object[]>.CreateAsync(mapper, comparer, Map, Convert).ConfigureAwait(true);
 
@@ -243,9 +244,7 @@ public partial class Compare : Page
 
             cp.Name = $"[{cpdCount++}] {cp.Name}";
 
-            // Adding it twice... because we need two rows in the table (...)
-            ComparisonInstancesView.Add(cp);
-            ComparisonInstancesView.Add(cp);
+            ComparisonInstances.Add(cp);
 
             newInstances.Add(cp);
         }
@@ -285,13 +284,5 @@ public partial class Compare : Page
         }
     }
 
-    public ObservableCollection<ComparerDefinition<object[]>> ComparisonInstancesView { get; } = new();
-
-    public IEnumerable<IGrouping<string, ComparerDefinition<object[]>>> GroupedComparisonInstancesView { get; }
-    
-    public SourcesMapper SingleMap { get; } = new();
-
-    [ObservableProperty]
-    private bool useSingleMapping;
-
+    public ObservableCollection<ComparerDefinition<object[]>> ComparisonInstances { get; } = new();
 }

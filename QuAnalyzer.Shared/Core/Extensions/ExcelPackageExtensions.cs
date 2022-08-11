@@ -1,15 +1,12 @@
 ﻿using CommunityToolkit.WinUI.UI.Controls;
 
-using Microsoft.Win32;
-
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
-using System.Windows.Threading;
-
+using Windows.Storage.Pickers;
 using Windows.UI;
 
-using Wokhan.UI.Extensions;
+using WinRT.Interop;
 
 namespace QuAnalyzer.Generic.Extensions;
 
@@ -186,14 +183,23 @@ public static class ExcelPackageExtensions
         return false;
     }
 
-    public static void ExportAsXLSX<T>(this IEnumerable<T> src, string[] headers, int keysCount, string worksheetName, Func<T, int, string, ExcelStyle, object> GetValueSetStyle, string path = null, IProgress<double> progress = null)
+    public static async void ExportAsXLSX<T>(this IEnumerable<T> src, string[] headers, int keysCount, string worksheetName, Func<T, int, string, ExcelStyle, object> GetValueSetStyle, string path = null, IProgress<double> progress = null)
     {
         if (path is null)
         {
-            var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = "Excel 2007 File|*.xlsx" };
-            if (dial.ShowDialog() is true)
+            var filePicker = new FileSavePicker();
+
+#if WINDOWS
+            var hwnd = WindowNative.GetWindowHandle(App.Instance.MainWindow);
+            InitializeWithWindow.Initialize(filePicker, hwnd);
+#endif
+
+            filePicker.FileTypeChoices.Add("Excel 2007", new[] { ".xlsx" });
+
+            var file = await filePicker.PickSaveFileAsync();
+            if (file is not null)
             {
-                path = dial.FileName;
+                path = file.Path;
             }
             else
             {

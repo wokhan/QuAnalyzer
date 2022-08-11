@@ -2,20 +2,11 @@
 
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml.Media;
-
-using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.UI.Popups;
-using QuAnalyzer.UI.Windows;
-
-using System.Configuration;
 
 using Windows.ApplicationModel;
-using Windows.UI;
 
 using WinRT.Interop;
-
-using Wokhan.UI.Extensions;
 
 namespace QuAnalyzer.UI.Pages;
 
@@ -34,8 +25,6 @@ public partial class MainPage
         Loaded += MainPage_Loaded;
 
         InitializeComponent();
-
-        VirtualizedQueryableExtensions.Init(System.Windows.Threading.Dispatcher.CurrentDispatcher);
 
         App.Instance.Tasks.CollectionChanged += Tasks_CollectionChanged;
 

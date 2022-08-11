@@ -1,9 +1,6 @@
 ﻿
 using CommunityToolkit.Mvvm.Input;
 
-using Microsoft.UI.Xaml.Media;
-using Microsoft.Win32;
-
 using Newtonsoft.Json;
 
 using QuAnalyzer.Core.Helpers;
@@ -13,7 +10,10 @@ using QuAnalyzer.Features.Monitoring;
 
 using System.ComponentModel.DataAnnotations;
 
+using Windows.Storage.Pickers;
 using Windows.UI;
+
+using WinRT.Interop;
 
 using Wokhan.Data.Providers.Contracts;
 
@@ -50,21 +50,30 @@ public partial class ProjectSettings : ObservableValidator
     public ObservableCollection<SourcesMapper> SourceMapper { get; } = new();
     //public ObservableCollection<TestCasesCollection> PerformanceItems { get; } = new();
 
+    [ObservableProperty]
+    private bool useSingleMapping;
+
+    public SourcesMapper SingleMapper { get; set; } = new();
 
     [RelayCommand]
-    private void PickFile()
+    private async void PickFile()
     {
-        var dial = new OpenFileDialog()
+        var filePicker = new FileOpenPicker()
         {
-            CheckFileExists = true,
-            ValidateNames = true,
-            AddExtension = true,
-            Filter = "QuAnalyzer project file|*.qap"
+            SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
         };
 
-        if (dial.ShowDialog().Value)
+#if WINDOWS
+        var hwnd = WindowNative.GetWindowHandle(App.Instance.MainWindow);
+        InitializeWithWindow.Initialize(filePicker, hwnd);
+#endif
+
+        filePicker.FileTypeFilter.Add(".qap");
+
+        var file = await filePicker.PickSingleFileAsync();
+        if (file is not null)
         {
-            Open(dial.FileName);
+            Open(file.Path);
         }
     }
 
@@ -85,6 +94,7 @@ public partial class ProjectSettings : ObservableValidator
             this.Name = restProject.Name;
             this.CurrentProviders.ReplaceAll(restProject.CurrentProviders);
             this.SourceMapper.ReplaceAll(restProject.SourceMapper);
+            this.SingleMapper = restProject.SingleMapper;
             this.TestDefinitions.ReplaceAll(restProject.TestDefinitions);
 
             this.FilePath = p;
@@ -141,12 +151,25 @@ public partial class ProjectSettings : ObservableValidator
     }
 
     [RelayCommand]
-    public void SaveAs()
+    public async void SaveAs()
     {
-        var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = "QuAnalyzer project file|*.qap" };
-        if (dial.ShowDialog().Value)
+        var filePicker = new FileSavePicker()
         {
-            this.Save(dial.FileName);
+            SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+            SuggestedFileName = App.Instance.CurrentProject.Name + ".qap"
+        };
+
+#if WINDOWS
+        var hwnd = WindowNative.GetWindowHandle(App.Instance.MainWindow);
+        InitializeWithWindow.Initialize(filePicker, hwnd);
+#endif
+
+        filePicker.FileTypeChoices.Add("QuAnalyzer project file", new[] { ".qap" });
+        
+        var file = await filePicker.PickSaveFileAsync();
+        if (file is not null)
+        {
+            this.Save(file.Path);
         }
     }
 }

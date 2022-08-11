@@ -4,11 +4,12 @@ using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 
+using Microsoft.UI.Xaml.Data;
+
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
-using System.Windows.Data;
 
 using Windows.System.Threading;
 
@@ -71,7 +72,7 @@ public partial class Monitor : Page
         InitChart(mitems);
 
         startDate = DateTimeOffset.Now.Ticks;
-        BindingOperations.EnableCollectionSynchronization(MonitorResultsView, MonitorResultsView);
+        //BindingOperations.EnableCollectionSynchronization(MonitorResultsView, MonitorResultsView);
 
         if (UseComparisonMode)
         {

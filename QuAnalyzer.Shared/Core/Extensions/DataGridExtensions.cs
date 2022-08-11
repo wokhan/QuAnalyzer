@@ -1,13 +1,13 @@
 ﻿using CommunityToolkit.WinUI.UI.Controls;
 
-using Microsoft.Win32;
-
 using OfficeOpenXml;
 
 using System.Threading;
-using System.Windows.Input;
 
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage.Pickers;
+
+using WinRT.Interop;
 
 namespace QuAnalyzer.Generic.Extensions;
 
@@ -24,10 +24,19 @@ public static class DataGridExtensions
 
         if (path is null)
         {
-            var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = p1 };
-            if (dial.ShowDialog() is true)
+            var filePicker = new FileSavePicker();
+
+#if WINDOWS
+            var hwnd = WindowNative.GetWindowHandle(App.Instance.MainWindow);
+            InitializeWithWindow.Initialize(filePicker, hwnd);
+#endif
+
+            filePicker.FileTypeChoices.Add(p1, new[] { p1 });
+
+            var file = await filePicker.PickSaveFileAsync();
+            if (file is not null)
             {
-                path = dial.FileName;
+                path = file.Path;
             }
         }
 
@@ -68,17 +77,26 @@ public static class DataGridExtensions
         }
     }*/
 
-    public static void ExportAsXLSX(this DataGrid grid, string path = null, string worksheetName = null, Panel host = null, IProgress<double> progress = null, CancellationTokenSource cancellationToken = null)
+    public static async void ExportAsXLSX(this DataGrid grid, string path = null, string worksheetName = null, Panel host = null, IProgress<double> progress = null, CancellationTokenSource cancellationToken = null)
     {
         //var canceled = false;
         //try
         {
             if (path is null)
             {
-                var dial = new SaveFileDialog() { CheckFileExists = false, ValidateNames = true, AddExtension = true, Filter = "Excel 2007 File|*.xlsx" };
-                if (dial.ShowDialog() is true)
+                var filePicker = new FileSavePicker();
+
+#if WINDOWS
+                var hwnd = WindowNative.GetWindowHandle(App.Instance.MainWindow);
+                InitializeWithWindow.Initialize(filePicker, hwnd);
+#endif
+
+                filePicker.FileTypeChoices.Add("Excel 2007", new[] { ".xlsx" });
+
+                var file = await filePicker.PickSaveFileAsync();
+                if (file is not null)
                 {
-                    path = dial.FileName;
+                    path = file.Path;
                 }
                 else
                 {

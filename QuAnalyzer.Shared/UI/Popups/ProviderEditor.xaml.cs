@@ -2,11 +2,14 @@
 using CommunityToolkit.Mvvm.Input;
 
 using Microsoft.UI.Xaml.Navigation;
-using Microsoft.Win32;
 
 using QuAnalyzer.UI.Windows;
 
 using System.Diagnostics.Contracts;
+
+using Windows.Storage.Pickers;
+
+using WinRT.Interop;
 
 using Wokhan.Data.Providers;
 using Wokhan.Data.Providers.Bases;
@@ -128,12 +131,24 @@ public partial class ProviderEditor : Page
     }
 
     [RelayCommand]
-    private void ShowFileDialog(DataProviderMemberDefinition definition)
+    private async void ShowFileDialog(DataProviderMemberDefinition definition)
     {
-        var dial = new OpenFileDialog() { CheckFileExists = true, ValidateNames = true, AddExtension = true, Filter = definition.FileFilter };
-        if (dial.ShowDialog().Value)
+        var filePicker = new FileOpenPicker()
         {
-            definition.ValueWrapper = dial.FileName;
+            SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+        };
+
+#if WINDOWS
+        var hwnd = WindowNative.GetWindowHandle(App.Instance.MainWindow);
+        InitializeWithWindow.Initialize(filePicker, hwnd);
+#endif
+
+        filePicker.FileTypeFilter.Add(definition.FileFilter);
+
+        var file = await filePicker.PickSingleFileAsync();
+        if (file is not null)
+        {
+            definition.ValueWrapper = file.Path;
         }
     }
 }

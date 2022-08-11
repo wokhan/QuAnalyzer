@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.UI.Xaml.Navigation;
 
 using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Core.Project;
@@ -11,10 +10,8 @@ using System.Globalization;
 using System.Threading;
 
 using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
 
 using Wokhan.Data.Providers.Contracts;
-using Wokhan.UI.Diagnostics;
 
 namespace QuAnalyzer;
 
@@ -64,7 +61,7 @@ public sealed partial class App : Application
         ApplicationInfo = $"{assemblyName.Name} - v{assemblyName.Version} ({assemblyName.ProcessorArchitecture})";
 
         CurrentProject = new ProjectSettings() { Name = "Unamed project" };
-        //Performance = new ResourcesWatcher();
+        Performance = new ResourcesWatcher();
 
         //TODO: change to a static initializer
         TestDefinition.Providers = Instance.CurrentProject.CurrentProviders;

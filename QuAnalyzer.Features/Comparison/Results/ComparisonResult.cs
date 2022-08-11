@@ -3,14 +3,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 using QuAnalyzer.Features.Comparison.Results;
 
-using Wokhan.Collections.Generic.Extensions;
-
 namespace QuAnalyzer.Features.Comparison;
 
-public partial class ComparisonResult<T> : ObservableObject
+[ObservableObject]
+public partial class ComparisonResult<T>
 {
     [ObservableProperty]
-    private string message;
+    private string? message;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(LocalProgress))]
@@ -28,6 +27,7 @@ public partial class ComparisonResult<T> : ObservableObject
     public int LocalProgress => (int)progress + subProgress;
 
     public ItemResult<T> Source { get; } = new ItemResult<T>();
+
     public ItemResult<T> Target { get; } = new ItemResult<T>();
 
     [ObservableProperty]

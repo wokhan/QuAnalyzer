@@ -22,7 +22,15 @@ public partial class SourcesMapper : ObservableObject
     private IDataProvider? source;
 
     private string? sourceName;
-    public string? SourceName { get => source?.Name ?? sourceName; init => sourceName = value; }
+    public string? SourceName
+    {
+        get => source?.Name ?? sourceName;
+        set
+        {
+            sourceName = value;
+            Source = Providers?.FirstOrDefault(c => c.Name == sourceName);
+        }
+    }
 
     public string? SourceRepository { get; set; }
 
@@ -31,7 +39,15 @@ public partial class SourcesMapper : ObservableObject
     private IDataProvider? target;
 
     private string? targetName;
-    public string? TargetName { get => target?.Name ?? targetName; init => targetName = value; }
+    public string? TargetName
+    {
+        get => target?.Name ?? targetName;
+        set
+        {
+            targetName = value;
+            Target = Providers?.FirstOrDefault(c => c.Name == targetName);
+        }
+    }
 
     public string? TargetRepository { get; set; }
 
@@ -43,16 +59,6 @@ public partial class SourcesMapper : ObservableObject
     public SourcesMapper(string? name = null)
     {
         Name = name ?? "New mapping";
-    }
-
-    [JsonConstructor]
-    public SourcesMapper(string? name, string sourceName, string targetName) : this(name)
-    {
-        SourceName = sourceName;
-        TargetName = targetName;
-
-        Target = Providers?.FirstOrDefault(c => c.Name == TargetName);
-        Source = Providers?.FirstOrDefault(c => c.Name == SourceName);
     }
 
     public SourcesMapper(IDataProvider source, string sourceRepository, IDataProvider target, string targetRepository, bool autoMapColumns = false, string? name = null, IEnumerable<SimpleMap>? allMappings = null)

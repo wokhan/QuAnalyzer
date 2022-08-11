@@ -73,12 +73,6 @@ public partial class SourcesMenu : UserControl
         //}
     }
 
-    private void Repository_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        //TODO: fix
-        //startPoint = e.GetPosition(null);
-    }
-
     private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var listview = (ListView)sender;

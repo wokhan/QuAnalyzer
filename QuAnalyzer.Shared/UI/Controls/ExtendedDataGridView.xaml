@@ -63,7 +63,7 @@
                     <Run Text=" item(s) loaded" FontSize="12" />
             </TextBlock>
             <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{x:Bind x:String.Format('Status: {0}',Status),Mode=OneWay,TargetNullValue='-'}" FontSize="12" />
-            <ProgressBar Background="Black" Height="5" Grid.Column="2" HorizontalAlignment="Right" Value="{x:Bind LoadingProgress,Mode=OneWay}" IsIndeterminate="{x:Bind LoadingProgress.Equals(-1),Mode=OneWay}" Margin="10,0" Width="200" />
+            <ProgressBar x:Name="progressBar" Background="Black" Height="5" Grid.Column="2" HorizontalAlignment="Right" Value="{x:Bind LoadingProgress,Mode=OneWay}" IsIndeterminate="{x:Bind LoadingProgress.Equals(-1),Mode=OneWay}" Margin="10,0" Width="200" />
         </Grid>
         <controls:DataGrid Grid.Row="1" Sorting="gridData_Sorting" x:Name="gridData" IsReadOnly="True" CanUserSortColumns="True" CanUserReorderColumns="True" BorderThickness="0" ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto">
             <!--<controls:DataGrid.Resources>

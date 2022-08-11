@@ -4,6 +4,7 @@ using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml.Data;
 
+using QuAnalyzer.Core.Extensions;
 using QuAnalyzer.Generic.Extensions;
 
 using System.Linq.Dynamic.Core;
@@ -13,7 +14,6 @@ using Windows.Devices.Input;
 
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Linq.Extensions;
-using Wokhan.UI.Extensions;
 
 namespace QuAnalyzer.UI.Controls;
 
@@ -74,8 +74,8 @@ public partial class ExtendedDataGridView : UserControl
         this.Loaded += ExtendedDataGridView_Loaded;
 
         Filters.CollectionChanged += Filters_CollectionChanged;
-        
-        _ = Reload();
+
+        Reload();
     }
 
     IList<ICommandBarElement> primaryCommands;
@@ -104,7 +104,7 @@ public partial class ExtendedDataGridView : UserControl
                 DispatcherQueue.TryEnqueue(async () =>
                 {
                     ClearAll();
-                    await Reload();
+                    Reload();
                 });
                 break;
 
@@ -142,12 +142,6 @@ public partial class ExtendedDataGridView : UserControl
         //this.CopyToClipboard();
     }
 
-    //private Point startPoint;
-    private void DataGrid_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        //startPoint = e.GetPosition(null);
-    }
-
     private void DataGrid_MouseMove(object sender, MouseEventArgs e)
     {
         //if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed && (Math.Abs(e.MouseDelta.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
@@ -182,8 +176,8 @@ public partial class ExtendedDataGridView : UserControl
         Filters.Add(new FilterStruct() { Attribute = attr, Type = CustomHeaders.First(c => c.Name == attr).Type });
     }
 
-    [RelayCommand(AllowConcurrentExecutions = false)]
-    private async Task Reload()
+    [RelayCommand]
+    private void Reload()
     {
         if (ItemsSource is null)
         {
@@ -244,24 +238,9 @@ public partial class ExtendedDataGridView : UserControl
             }*/
         }
 
-        LoadingProgress = 0;
-        Status = "Loading data...";
-
         if (SortOrder is not null)
         {
             query = query.OrderBy(SortOrder + (currentSortDirectionAsc ? "" : " descending"));
-        }
-
-        IEnumerable virtualizedData;
-        // Virtualization doesn't work with arrays (and would be useless anyway as it's already in-memory)            
-        if (query.ElementType.IsArray)
-        {
-            virtualizedData = query;
-        }
-        else
-        {
-            //TODO: get rid of the actual virtualization implementation (not .Net Core compliant)
-            virtualizedData = query.AsVirtualized();
         }
 
         //TODO: review for non-arrays when CustomHeaders are used as it seems incorrect
@@ -272,7 +251,7 @@ public partial class ExtendedDataGridView : UserControl
             {
                 Header = h.DisplayName,
                 Binding = new Binding() { Path = new PropertyPath(query.ElementType.IsArray ? $"[{i}]" : h.Name) },
-                Tag = h.Name,
+                //Tag = h.Name,
                 FontWeight = (h.IsKey ? FontWeights.Bold : FontWeights.Normal)
             }));
         }
@@ -286,14 +265,32 @@ public partial class ExtendedDataGridView : UserControl
             gridData.SelectedItems.Clear();
         }
 
-        gridData.ItemsSource = virtualizedData;
-
         if (SortOrder is not null && gridData.Columns.Any())
         {
-            gridData.Columns.First(c => (string)c.Tag == SortOrder).SortDirection = (currentSortDirectionAsc ? DataGridSortDirection.Ascending : DataGridSortDirection.Descending);
+            gridData.Columns.First(c => ((DataGridBoundColumn)c).Binding.Path.Path == SortOrder).SortDirection = (currentSortDirectionAsc ? DataGridSortDirection.Ascending : DataGridSortDirection.Descending);
         }
 
-        Status = "Done !";
+        gridData.ItemsSource = query.AsIncremental(200, onLoad, onDone, onError);
+    }
+
+    private void onLoad()
+    {
+        Status = "Retrieving...";
+        LoadingProgress = -1;
+        progressBar.ShowError = false;
+    }
+
+    private void onDone()
+    {
+        Status = "Done";
+        LoadingProgress = 0;
+        progressBar.ShowError = false;
+    }
+
+    private void onError(Exception e)
+    {
+        Status = "Error";
+        progressBar.ShowError = true;   
     }
 
     [RelayCommand]
@@ -330,7 +327,7 @@ public partial class ExtendedDataGridView : UserControl
 
         e.Column.SortDirection = currentSortDirectionAsc ? DataGridSortDirection.Ascending : DataGridSortDirection.Descending;
 
-        _ = Reload();
+        Reload();
     }
 
     [ObservableProperty]
