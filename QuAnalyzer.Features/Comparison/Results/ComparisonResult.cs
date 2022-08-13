@@ -36,17 +36,4 @@ public partial class ComparisonResult<T>
     public string[]? MergedHeaders { get; set; }
 
     public IEnumerable<Diff<T>>? MergedDiff { get; set; } = null;
-    
-    public void InitCollections(Func<IList<T>> collectionCtor)
-    {
-        //Differences = collectionCtor();
-        Source.Differences = collectionCtor();
-        Target.Differences = collectionCtor();
-        Source.Missing = collectionCtor();
-        Target.Missing = collectionCtor();
-        Source.Duplicates = collectionCtor();
-        Target.Duplicates = collectionCtor();
-        Source.PerfectDups = collectionCtor();
-        Target.PerfectDups = collectionCtor();
-    }
 }

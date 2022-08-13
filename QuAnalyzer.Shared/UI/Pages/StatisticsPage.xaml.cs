@@ -3,8 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 
 using QuAnalyzer.Features.Statistics;
 
-using Wokhan.Data.Providers.Contracts;
-
 namespace QuAnalyzer.UI.Pages;
 
 [ObservableObject]
@@ -41,35 +39,40 @@ public partial class StatisticsPage : Page
 
     private void UpdateSelection()
     {
-        var (prov, repo) = App.Instance.CurrentSelection;
-        if (prov is not null && _autoCompute)
+        if (this.Parent is null)
         {
-            Computedata(prov, repo);
+            return;
+        }
+
+        if (_autoCompute)
+        {
+            Run();
         }
 
         RunCommand.NotifyCanExecuteChanged();
     }
 
-    [RelayCommand(CanExecute = nameof(CanExecuteRun))]
-    private void Run()
-    {
-        var (prov, repo) = App.Instance.CurrentSelection;
-        Computedata(prov, repo);
-    }
-
     private bool CanExecuteRun => App.Instance.CurrentSelection is not (null, null);
 
-    private async void Computedata(IDataProvider prv, string repo)
+    [RelayCommand(CanExecute = nameof(CanExecuteRun))]
+    private async void Run()
     {
+        var (provider, repository) = App.Instance.CurrentSelection;
+
+        if (provider is null)
+        {
+            return;
+        }
+
         Status = "Preparing...";
         Progress = 0;
         ComputedStats.Clear();
 
         await Task.Run(() =>
         {
-            var headers = prv.GetColumns(repo);
+            var headers = provider.GetColumns(repository);
 
-            var data = prv.GetQueryable(repo);
+            var data = provider.GetQueryable(repository);
 
             var results = headers.ToDictionary(h => h, h => new StatisticsHolder() { Name = h.Name, Source = data });
             DispatcherQueue.TryEnqueue(() =>

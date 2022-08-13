@@ -189,9 +189,16 @@ public partial class ExtendedDataGridView : UserControl
             return;
         }
 
-        gridData.AutoGenerateColumns = this.AutoGenerateColumns;
-
+        //gridData.IncrementalLoadingTrigger = IncrementalLoadingTrigger.None;
+        //gridData.ItemsSource = null;
         gridData.Columns.Clear();
+        gridData.SelectedItem = null;
+        if (gridData.SelectionMode == DataGridSelectionMode.Extended)
+        {
+            gridData.SelectedItems.Clear();
+        }
+
+        gridData.AutoGenerateColumns = this.AutoGenerateColumns;
 
         gridData.IsEnabled = true;
         gridData.IsHitTestVisible = true;
@@ -258,18 +265,13 @@ public partial class ExtendedDataGridView : UserControl
 
         // TODO: ensure there is no impact on perf (as it might require the query to fully executed on some providers)
         ItemsCount = query.Count();
-
-        gridData.SelectedItem = null;
-        if (gridData.SelectionMode == DataGridSelectionMode.Extended)
-        {
-            gridData.SelectedItems.Clear();
-        }
-
+        
         if (SortOrder is not null && gridData.Columns.Any())
         {
             gridData.Columns.First(c => ((DataGridBoundColumn)c).Binding.Path.Path == SortOrder).SortDirection = (currentSortDirectionAsc ? DataGridSortDirection.Ascending : DataGridSortDirection.Descending);
         }
 
+        //gridData.IncrementalLoadingTrigger = IncrementalLoadingTrigger.Edge;
         gridData.ItemsSource = query.AsIncremental(200, onLoad, onDone, onError);
     }
 

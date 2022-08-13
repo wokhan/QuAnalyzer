@@ -13,7 +13,7 @@ namespace QuAnalyzer.Features.Monitoring;
 
 public partial class TestDefinition : ObservableObject
 {
-    public static ObservableCollection<IDataProvider>? Providers { get; set; }
+    private static ObservableCollection<IDataProvider>? providers;
 
     public bool RunWhenStarted { get; set; }
 
@@ -30,10 +30,15 @@ public partial class TestDefinition : ObservableObject
 
     private IDataProvider? provider;
 
+    public static void Init(ObservableCollection<IDataProvider> currentProviders)
+    {
+        providers = currentProviders;
+    }
+
     [JsonIgnore]
     public IDataProvider? Provider
     {
-        get => ProviderName != null ? provider ??= Providers.First(c => c.Name == ProviderName) : null;
+        get => ProviderName != null ? provider ??= providers.First(c => c.Name == ProviderName) : null;
         set
         {
             if (provider != value)

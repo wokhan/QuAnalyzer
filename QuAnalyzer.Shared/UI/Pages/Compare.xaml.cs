@@ -3,6 +3,7 @@
 using OfficeOpenXml;
 
 using QuAnalyzer.Core.Extensions;
+using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Comparers;
 using QuAnalyzer.Generic.Extensions;
@@ -106,7 +107,7 @@ public partial class Compare : Page
     }
 
     [RelayCommand]
-    private async void Details(ComparerDefinition<object[]> cmp)
+    private void Details(ComparerDefinition<object[]> cmp)
     {
         if (!openWindows.ContainsKey(cmp))
         {
@@ -146,7 +147,7 @@ public partial class Compare : Page
         var folderPath = Directory.GetParent(folder.Path);
 
         var app = App.Instance;
-        var (host, callback, cancelTokenSummary) = app.AddTaskAndGetCallback("Exporting Summary");
+        var (host, callback, cancelTokenSummary) = GlobalTask.AddTaskAndGetCallback("Exporting Summary");
 
         //TODO: check
         //allProgress.ExportAsXLSX(folderPath + "\\Summary.xlsx", "Summary", host, callback, cancelTokenSummary);
@@ -169,13 +170,13 @@ public partial class Compare : Page
 
             var file = new FileInfo(p);
             //if (cmp.Results.MergedDiff is not null)
-            var (_, cb1, cb1CancelToken) = app.AddTaskAndGetCallback($"Exporting Differences to {file.Name}");
-            var (_, cb2, cb2CancelToken) = app.AddTaskAndGetCallback($"Exporting Missing from source to {file.Name}");
-            var (_, cb3, cb3CancelToken) = app.AddTaskAndGetCallback($"Exporting Missing from target to {file.Name}");
-            var (_, cb4, cb4CancelToken) = app.AddTaskAndGetCallback($"Exporting Source duplicates to {file.Name}");
-            var (_, cb5, cb5CancelToken) = app.AddTaskAndGetCallback($"Exporting Target duplicates to {file.Name}");
-            var (_, cb6, cb6CancelToken) = app.AddTaskAndGetCallback($"Exporting Source clones to {file.Name}");
-            var (_, cb7, cb7CancelToken) = app.AddTaskAndGetCallback($"Exporting Target clones to {file.Name}");
+            var (_, cb1, cb1CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Differences to {file.Name}");
+            var (_, cb2, cb2CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Missing from source to {file.Name}");
+            var (_, cb3, cb3CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Missing from target to {file.Name}");
+            var (_, cb4, cb4CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Source duplicates to {file.Name}");
+            var (_, cb5, cb5CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Target duplicates to {file.Name}");
+            var (_, cb6, cb6CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Source clones to {file.Name}");
+            var (_, cb7, cb7CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Target clones to {file.Name}");
 
             await Task.Run(() =>
             {
@@ -238,9 +239,6 @@ public partial class Compare : Page
         foreach (SourcesMapper mapper in App.Instance.CurrentProject.UseSingleMapping ? new[] { App.Instance.CurrentProject.SingleMapper } : lstMappings.SelectedItems)
         {
             var cp = await ComparerDefinition<object[]>.CreateAsync(mapper, comparer, Map, Convert).ConfigureAwait(true);
-
-            // Using ObservableCollections to reflect any live modification in the UI
-            cp.Results.InitCollections(() => new ObservableCollection<object[]>());
 
             cp.Name = $"[{cpdCount++}] {cp.Name}";
 

@@ -31,9 +31,8 @@
             <Rectangle Grid.Column="1" x:Name="AppTitleBar" />
             <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="20,0,10,0" VerticalAlignment="Center" Text="{x:Bind quanalyzer:App.Instance.MainWindow.Title}" />
         </Grid>
-        <Grid Grid.Row="1" x:Name="stackExports" />
         <menus:SourcesMenu Grid.Row="1" Grid.RowSpan="2" />
-        <NavigationView Grid.Row="1" Grid.Column="1" x:Name="NavView" PaneDisplayMode="Top" ItemInvoked="NavView_ItemInvoked">
+        <NavigationView Grid.Row="1" Grid.Column="1" x:Name="NavView" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" ItemInvoked="NavView_ItemInvoked">
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="ViewAll" Content="DISPLAY" Tag="display" IsSelected="True" />
                 <NavigationViewItem Icon="Copy" Content="DUPLICATES" Tag="duplicates" />
@@ -43,13 +42,15 @@
                 <NavigationViewItem Icon="View" Content="MONITORING" Tag="monitoring" />
             </NavigationView.MenuItems>
         </NavigationView>
-        <Frame Grid.Row="2" Grid.Column="1" x:Name="ContentFrame" Background="{ThemeResource SystemChromeLowColor}" CornerRadius="5,0,0,0">
-            <Frame.ContentTransitions>
-                <TransitionCollection>
-                    <NavigationThemeTransition/>
-                </TransitionCollection>
-            </Frame.ContentTransitions>
-        </Frame>
+        <Border Grid.Row="2" Grid.Column="1" Background="{ThemeResource SystemChromeLowColor}" CornerRadius="5,0,0,0">
+            <ContentControl HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" x:Name="ContentFrame">
+                <ContentControl.ContentTransitions>
+                    <TransitionCollection>
+                        <ContentThemeTransition />
+                    </TransitionCollection>
+                </ContentControl.ContentTransitions>
+            </ContentControl>
+        </Border>
         <Grid x:Name="flyExports" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="350" Visibility="{Binding IsChecked,ElementName=btnTasks,Converter={StaticResource boolToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="32"/>
@@ -61,7 +62,7 @@
             </StackPanel>
             <Border Background="{ThemeResource AccentAcrylicBackgroundFillColorBaseBrush}" Grid.Row="2">
                 <ScrollViewer HorizontalScrollBarVisibility="Hidden">
-                    <ItemsControl ItemsSource="{x:Bind quanalyzer:App.Instance.Tasks,Mode=OneWay}">
+                    <ItemsControl ItemsSource="{x:Bind helpers:GlobalTask.Tasks}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="helpers:GlobalTask">
                                 <StackPanel Margin="20,2,20,2">
@@ -82,36 +83,14 @@
             </Grid.ColumnDefinitions>
             <TextBlock Text="{x:Bind quanalyzer:App.Instance.CurrentProject.FilePath,FallbackValue='No project has been loaded nor saved.'}" Margin="0,0,20,0" />
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock FontSize="12" Text="{x:Bind x:String.Format('Memory: {0}', quanalyzer:App.Instance.Performance.MemoryUseFormatted), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />
-                <TextBlock FontSize="12" Text="{x:Bind x:String.Format('CPU: {0}%,', quanalyzer:App.Instance.Performance.CPUUsage), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />
-                <TextBlock FontSize="12" Text="{x:Bind x:String.Format('Threads: {0}', quanalyzer:App.Instance.Performance.ThreadsCount), Mode=OneWay,FallbackValue='-'}" Margin="0,0,20,0" />
-                <ToggleButton x:Name="btnTasks" IsChecked="False" BorderThickness="0" Padding="0">
-                    <!--<ToggleButton.Style>
-                            <Style BasedOn="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" TargetType="ToggleButton">
-                                <Style.Triggers>
-                                    <MultiTrigger>
-                                        <MultiTrigger.Conditions>
-                                            <Condition Property="IsChecked" Value="False" />
-                                            <Condition Property="IsMouseOver" Value="False" />
-                                        </MultiTrigger.Conditions>
-                                        <MultiTrigger.Setters>
-                                            <Setter Target="Background" Value="Transparent" />
-                                        </MultiTrigger.Setters>
-                                    </MultiTrigger>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Target="Background" Value="LightGray" />
-                                    </Trigger>
-                                    <Trigger Property="IsChecked" Value="True">
-                                        <Setter Target="Background" Value="LightGray" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ToggleButton.Style-->
-                    <StackPanel Orientation="Horizontal">
-                        <SymbolIcon Margin="0,0,5,0" Foreground="White" Symbol="List" />
-                        <TextBlock Text="Tasks" Foreground="White" FontSize="12" VerticalAlignment="Center" />
-                    </StackPanel>
-                </ToggleButton>
+                <TextBlock FontSize="12" Text="{x:Bind x:String.Format('Memory: {0}', helpers:ResourcesWatcher.Instance.MemoryUseFormatted), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />
+                <TextBlock FontSize="12" Text="{x:Bind x:String.Format('CPU: {0}%,', helpers:ResourcesWatcher.Instance.CPUUsage), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />
+                <TextBlock FontSize="12" Text="{x:Bind x:String.Format('Threads: {0}', helpers:ResourcesWatcher.Instance.ThreadsCount), Mode=OneWay,FallbackValue='-'}" Margin="0,0,20,0" />
+                <ToggleButton x:Name="btnTasks" IsChecked="False" BorderThickness="0" Padding="0" IsEnabled="{x:Bind helpers:GlobalTask.Tasks,Converter={StaticResource emptyCollectionToBoolConverter}}" />
+                <StackPanel Orientation="Horizontal">
+                    <SymbolIcon Margin="0,0,5,0" Foreground="White" Symbol="List" />
+                    <TextBlock Text="Tasks" Foreground="White" FontSize="12" VerticalAlignment="Center" />
+                </StackPanel>
             </StackPanel>
         </Grid>
         <ItemsRepeater VerticalAlignment="Bottom" Margin="30" ItemsSource="{x:Bind Messages,Mode=OneWay}" Grid.RowSpan="3" Grid.ColumnSpan="2">

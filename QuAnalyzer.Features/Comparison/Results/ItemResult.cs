@@ -1,6 +1,8 @@
 ﻿
 using CommunityToolkit.Mvvm.ComponentModel;
 
+using System.Collections.ObjectModel;
+
 namespace QuAnalyzer.Features.Comparison;
 
 public partial class ItemResult<T> : ObservableObject
@@ -9,18 +11,18 @@ public partial class ItemResult<T> : ObservableObject
     private int count;
 
     [ObservableProperty]
-    private IList<T> differences = new List<T>();
+    private ObservableCollection<T> differences = new();
 
     //TODO: rename DuplicatesByKey?
     [ObservableProperty]
-    private IList<T> duplicates = new List<T>();
+    private ObservableCollection<T> duplicates = new();
 
     //TODO: rename FullDuplicates? Clones?
     [ObservableProperty]
-    private IList<T> perfectDups = new List<T>();
+    private ObservableCollection<T> perfectDups = new();
 
     [ObservableProperty]
-    private IList<T> missing = new List<T>();
+    private ObservableCollection<T> missing = new();
 
     public IEnumerable<T>? Samples { get; internal set; }
 

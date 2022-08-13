@@ -34,6 +34,11 @@ public partial class PatternsPage : Page
 
     private async void UpdateSelection()
     {
+        if (this.Parent is null)
+        {
+            return;
+        }
+
         RunCommand.NotifyCanExecuteChanged();
 
         var (prov, repo) = App.Instance.CurrentSelection;

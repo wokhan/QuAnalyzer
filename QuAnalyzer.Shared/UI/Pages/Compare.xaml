@@ -48,13 +48,13 @@
                 <controls:DataGridTextColumn Binding="{Binding SourceRepository}" Header="Source repository" IsReadOnly="True" />
                 <controls:DataGridTextColumn Binding="{Binding TargetName}" Header="Target" IsReadOnly="True" />
                 <controls:DataGridTextColumn Binding="{Binding TargetRepository}" Header="Target repository" IsReadOnly="True" />
-                <controls:DataGridTemplateColumn Header="Stream" Width="Auto">
+                <!--<controls:DataGridTemplateColumn Header="Stream" Width="Auto">
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="comparison:SourcesMapper">
                             <ToggleSwitch Padding="5,0" Foreground="Black" IsOn="{x:Bind IsOrdered, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
-                </controls:DataGridTemplateColumn>
+                </controls:DataGridTemplateColumn>-->
                 <controls:DataGridTemplateColumn IsReadOnly="True" CanUserResize="False" Width="100">
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="comparison:SourcesMapper">
@@ -170,7 +170,7 @@
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Item" />
-                                <TextBlock Text="{Binding SourceName}" Grid.Row="1" />
+                                <!--<TextBlock Text="{Binding SourceName}" Grid.Row="1" />
                                 <TextBlock Text="{Binding TargetName}" Grid.Row="2" />
                                 <TextBlock Text="Start time" Grid.Column="1" />
                                 <TextBlock Text="{Binding Results.Source.StartTime,Mode=OneWay}" Grid.Row="1" Grid.Column="1" />
@@ -182,7 +182,7 @@
                                 <TextBlock Text="{Binding Results.Source.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="3" />
                                 <TextBlock Text="{Binding Results.Target.Count,Mode=OneWay}" Grid.Row="2" Grid.Column="3" />
                                 <TextBlock Text="Matches" Grid.Column="4" />
-                                <TextBlock Text="{Binding MatchingCount,Mode=OneWay,FallbackValue=0}" Grid.Row="1" Grid.RowSpan="2" Grid.Column="4" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Results.MatchingCount,Mode=OneWay,FallbackValue=0}" Grid.Row="1" Grid.RowSpan="2" Grid.Column="4" VerticalAlignment="Center" />
                                 <TextBlock Text="Differences" Grid.Column="5" />
                                 <TextBlock Text="{Binding Results.Source.Differences.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="5" Grid.RowSpan="2" Style="{StaticResource RedWhenNotZero}" VerticalAlignment="Center" />
                                 <TextBlock Text="Missing" Grid.Column="6" />
@@ -193,7 +193,7 @@
                                 <TextBlock Text="{Binding Results.Target.Duplicates.Count,Mode=OneWay}" Grid.Row="2" Grid.Column="7" Style="{StaticResource RedWhenNotZero}" />
                                 <TextBlock Text="Duplicates" Grid.Column="8"  />
                                 <TextBlock Text="{Binding Results.Source.PerfectDups.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="8" Style="{StaticResource RedWhenNotZero}" />
-                                <TextBlock Text="{Binding Results.Target.PerfectDups.Count,Mode=OneWay}" Grid.Row="2" Grid.Column="8" Style="{StaticResource RedWhenNotZero}" />
+                                <TextBlock Text="{Binding Results.Target.PerfectDups.Count,Mode=OneWay}" Grid.Row="2" Grid.Column="8" Style="{StaticResource RedWhenNotZero}" />-->
                             </Grid>
                         </StackPanel>
                     </DataTemplate>

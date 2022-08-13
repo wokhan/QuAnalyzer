@@ -2,6 +2,8 @@
 
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml.Navigation;
+
 using QuAnalyzer.UI.Popups;
 
 using Windows.ApplicationModel;
@@ -12,6 +14,14 @@ namespace QuAnalyzer.UI.Pages;
 
 public partial class MainPage
 {
+    private About aboutPage;
+    private ViewerPage viewerPage;
+    private PatternsPage patternsPage;
+    private StatisticsPage statisticsPage;
+    private Duplicates duplicatesPages;
+    private Compare comparePage;
+    private Monitor monitorPage;
+
     public static MainPage Instance { get; private set; }
 
     public string AppName { get; } = $"QuAnalyzer {Assembly.GetExecutingAssembly().GetName().Version}";
@@ -25,9 +35,6 @@ public partial class MainPage
         Loaded += MainPage_Loaded;
 
         InitializeComponent();
-
-        App.Instance.Tasks.CollectionChanged += Tasks_CollectionChanged;
-
 
         // Only works on Win 11 yet.
         if (AppWindowTitleBar.IsCustomizationSupported())
@@ -62,29 +69,11 @@ public partial class MainPage
         Messages.Add(new { Content = ((Exception)e.ExceptionObject).Message, Title = "Unexpected error", Severity = InfoBarSeverity.Error });
     }
 
-    private void Tasks_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-    {
-        btnTasks.IsChecked = true;
-    }
-
-
-    //private void setTheme(object sender, RoutedEventArgs e)
-    //{
-    //    ThemeManager.ChangeTheme(Application.Current, ThemeManager.Accents.First(), ThemeManager.AppThemes.First());
-
-    //    if (Close is not null)
-    //    {
-    //        ctxRecentFiles.IsOpen = false;
-    //        ctxSaveAs.IsOpen = false;
-    //        Close(this, null);
-    //    }
-    //}
-
     private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
         if (args?.IsSettingsInvoked ?? false)
         {
-            ContentFrame.Navigate(typeof(About));
+            ContentFrame.Content = aboutPage ??= new About();
         }
         else
         {
@@ -100,27 +89,27 @@ public partial class MainPage
         switch (item.Tag)
         {
             case "display":
-                ContentFrame.Navigate(typeof(ViewerPage));
+                ContentFrame.Content = viewerPage ??= new ViewerPage();
                 break;
 
             case "patterns":
-                ContentFrame.Navigate(typeof(PatternsPage));
+                ContentFrame.Content = patternsPage ??= new PatternsPage();
                 break;
 
             case "statistics":
-                ContentFrame.Navigate(typeof(StatisticsPage));
+                ContentFrame.Content = statisticsPage ??= new StatisticsPage();
                 break;
 
             case "duplicates":
-                ContentFrame.Navigate(typeof(Duplicates));
+                ContentFrame.Content = duplicatesPages ??= new Duplicates();
                 break;
 
             case "comparison":
-                ContentFrame.Navigate(typeof(Compare));
+                ContentFrame.Content = comparePage ??= new Compare();
                 break;
 
             case "monitoring":
-                ContentFrame.Navigate(typeof(Monitor));
+                ContentFrame.Content = monitorPage ??= new Monitor();
                 break;
         }
     }
@@ -130,8 +119,4 @@ public partial class MainPage
     {
         Messages.Remove(message);
     }
-
-
-
-
 }

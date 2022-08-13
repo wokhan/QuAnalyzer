@@ -24,7 +24,7 @@ public partial class ProjectSettings : ObservableValidator
 {
     [ObservableProperty]
     [Required]
-    private string name;
+    private string name = "Untitled project";
 
     [ObservableProperty]
     private string filePath;
@@ -48,7 +48,6 @@ public partial class ProjectSettings : ObservableValidator
     public ObservableCollection<IDataProvider> CurrentProviders { get; } = new();
     public ObservableCollection<TestDefinition> TestDefinitions { get; } = new();
     public ObservableCollection<SourcesMapper> SourceMapper { get; } = new();
-    //public ObservableCollection<TestCasesCollection> PerformanceItems { get; } = new();
 
     [ObservableProperty]
     private bool useSingleMapping;
@@ -78,7 +77,7 @@ public partial class ProjectSettings : ObservableValidator
     }
 
     [RelayCommand]
-    public void Open(string p)
+    public void Open(string path)
     {
         try
         {
@@ -87,19 +86,13 @@ public partial class ProjectSettings : ObservableValidator
                 TypeNameHandling = TypeNameHandling.Auto
             };
 
-            using var stream = new JsonTextReader(new StreamReader(p));
+            using var stream = new JsonTextReader(new StreamReader(path));
 
-            var restProject = ser.Deserialize<ProjectSettings>(stream);
+            var project = ser.Deserialize<ProjectSettings>(stream);
 
-            this.Name = restProject.Name;
-            this.CurrentProviders.ReplaceAll(restProject.CurrentProviders);
-            this.SourceMapper.ReplaceAll(restProject.SourceMapper);
-            this.SingleMapper = restProject.SingleMapper;
-            this.TestDefinitions.ReplaceAll(restProject.TestDefinitions);
-
-            this.FilePath = p;
-
-            MRUManager.AddRecentFile(this.FilePath);
+            MRUManager.AddRecentFile(path);
+            
+            App.Instance.CurrentProject = project;
         }
         catch (Exception e)
         {
@@ -141,13 +134,7 @@ public partial class ProjectSettings : ObservableValidator
     [RelayCommand]
     public void CreateNew()
     {
-        FilePath = String.Empty;
-        Name = "Untitled project";
-
-        CurrentProviders.Clear();
-        SourceMapper.Clear();
-
-        GC.Collect();
+        App.Instance.CurrentProject = new ProjectSettings();
     }
 
     [RelayCommand]
@@ -165,7 +152,7 @@ public partial class ProjectSettings : ObservableValidator
 #endif
 
         filePicker.FileTypeChoices.Add("QuAnalyzer project file", new[] { ".qap" });
-        
+
         var file = await filePicker.PickSaveFileAsync();
         if (file is not null)
         {

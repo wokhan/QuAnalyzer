@@ -49,6 +49,11 @@ public partial class Duplicates : Page
 
     private void UpdateSelection()
     {
+        if (this.Parent is null)
+        {
+            return;
+        }
+
         var (prov, repo) = App.Instance.CurrentSelection;
         if (prov is not null)
         {

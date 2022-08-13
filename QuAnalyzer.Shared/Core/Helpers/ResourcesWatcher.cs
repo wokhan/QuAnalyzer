@@ -4,6 +4,8 @@ namespace QuAnalyzer.Core.Helpers;
 
 public class ResourcesWatcher : ObservableObject
 {
+    public static ResourcesWatcher Instance { get; } = new ResourcesWatcher();
+
     private PerformanceCounter cpuCounter;
 
     private PerformanceCounter memoryCounter;
@@ -18,7 +20,7 @@ public class ResourcesWatcher : ObservableObject
 
     private DispatcherTimer timer;
 
-    public ResourcesWatcher()
+    private ResourcesWatcher()
     {
         string processName;
         using (Process process = Process.GetCurrentProcess())

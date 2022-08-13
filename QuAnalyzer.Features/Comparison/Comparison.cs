@@ -119,7 +119,7 @@ public static class Comparison
             item.StartTime = DateTime.Now;
 
             var data = dataGetter();
-            if (!f.IsOrdered)
+            //if (!f.IsOrdered)
             {
                 data = data.OrderByAll();//.ToList();
             }

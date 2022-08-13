@@ -13,7 +13,7 @@ namespace QuAnalyzer.Features.Comparison;
 
 public partial class SourcesMapper : ObservableObject
 {
-    public static ObservableCollection<IDataProvider>? Providers { get; set; }
+    private static ObservableCollection<IDataProvider>? providers;
 
     public string Name { get; set; }
 
@@ -28,7 +28,7 @@ public partial class SourcesMapper : ObservableObject
         set
         {
             sourceName = value;
-            Source = Providers?.FirstOrDefault(c => c.Name == sourceName);
+            Source = providers?.FirstOrDefault(c => c.Name == sourceName);
         }
     }
 
@@ -45,7 +45,7 @@ public partial class SourcesMapper : ObservableObject
         set
         {
             targetName = value;
-            Target = Providers?.FirstOrDefault(c => c.Name == targetName);
+            Target = providers?.FirstOrDefault(c => c.Name == targetName);
         }
     }
 
@@ -55,6 +55,11 @@ public partial class SourcesMapper : ObservableObject
 
     [ObservableProperty]
     private bool _isOrdered = false;
+
+    public static void Init(ObservableCollection<IDataProvider> currentProviders)
+    {
+        providers = currentProviders;
+    }
 
     public SourcesMapper(string? name = null)
     {

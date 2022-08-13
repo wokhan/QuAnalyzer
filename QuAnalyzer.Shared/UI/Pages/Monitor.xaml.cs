@@ -4,8 +4,6 @@ using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 
-using Microsoft.UI.Xaml.Data;
-
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;

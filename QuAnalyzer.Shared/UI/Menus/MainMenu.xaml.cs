@@ -11,12 +11,6 @@ public partial class MainMenu : UserControl
     {
         InitializeComponent();
 
-        recentProjects.Items.AddAll(MRUManager.RecentFiles.Select(file => new MenuFlyoutItem() { Text = file.Key, Command = OpenRecentCommand, CommandParameter = file.Key, IsEnabled = file.Value, Icon = new SymbolIcon(Symbol.OpenFile) }));
-    }
-
-    [RelayCommand]
-    private void OpenRecent(string fileName)
-    {
-        App.Instance.CurrentProject.Open(fileName);
+        recentProjects.Items.AddAll(MRUManager.RecentFiles.Select(file => new MenuFlyoutItem() { Text = file.Key, Command = App.Instance.CurrentProject.OpenCommand, CommandParameter = file.Key, IsEnabled = file.Value, Icon = new SymbolIcon(Symbol.OpenFile) }));
     }
 }
