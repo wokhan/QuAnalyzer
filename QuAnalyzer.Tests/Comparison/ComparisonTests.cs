@@ -40,7 +40,7 @@ public class ComparisonTests
     [InlineData(new[] { "a", "b", "c", "d" }, 1, 4, new[] { "a", "b", "c", "d" })]
     public void GetSamplesTest(object[] sourceData, double samplesPct, int expectedLength, object[]? expectedSamples = null)
     {
-        var samples = Comparison.GetSamples(samplesPct, sourceData);
+        var samples = Comparison.GetSamples(samplesPct, null, sourceData);
         Assert.Equal(expectedLength, samples[0].Count());
 
         if (expectedSamples is not null)

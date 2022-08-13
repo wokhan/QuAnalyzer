@@ -51,10 +51,10 @@ public partial class SourcesMapper : ObservableObject
 
     public string? TargetRepository { get; set; }
 
-    public ObservableCollection<SimpleMap> AllMappings { get; } = new();
-
     [ObservableProperty]
     private bool _isOrdered = false;
+
+    public ObservableCollection<SimpleMap> AllMappings { get; } = new();
 
     public static void Init(ObservableCollection<IDataProvider> currentProviders)
     {

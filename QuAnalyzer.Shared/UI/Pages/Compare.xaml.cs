@@ -147,7 +147,7 @@ public partial class Compare : Page
         var folderPath = Directory.GetParent(folder.Path);
 
         var app = App.Instance;
-        var (host, callback, cancelTokenSummary) = GlobalTask.AddTaskAndGetCallback("Exporting Summary");
+        var task = GlobalTask.AddNew("Exporting Summary");
 
         //TODO: check
         //allProgress.ExportAsXLSX(folderPath + "\\Summary.xlsx", "Summary", host, callback, cancelTokenSummary);
@@ -170,38 +170,38 @@ public partial class Compare : Page
 
             var file = new FileInfo(p);
             //if (cmp.Results.MergedDiff is not null)
-            var (_, cb1, cb1CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Differences to {file.Name}");
-            var (_, cb2, cb2CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Missing from source to {file.Name}");
-            var (_, cb3, cb3CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Missing from target to {file.Name}");
-            var (_, cb4, cb4CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Source duplicates to {file.Name}");
-            var (_, cb5, cb5CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Target duplicates to {file.Name}");
-            var (_, cb6, cb6CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Source clones to {file.Name}");
-            var (_, cb7, cb7CancelToken) = GlobalTask.AddTaskAndGetCallback($"Exporting Target clones to {file.Name}");
+            var task1 = GlobalTask.AddNew($"Exporting Differences to {file.Name}");
+            var task2 = GlobalTask.AddNew($"Exporting Missing from source to {file.Name}");
+            var task3 = GlobalTask.AddNew($"Exporting Missing from target to {file.Name}");
+            var task4 = GlobalTask.AddNew($"Exporting Source duplicates to {file.Name}");
+            var task5 = GlobalTask.AddNew($"Exporting Target duplicates to {file.Name}");
+            var task6 = GlobalTask.AddNew($"Exporting Source clones to {file.Name}");
+            var task7 = GlobalTask.AddNew($"Exporting Target clones to {file.Name}");
 
             await Task.Run(() =>
             {
                 using (var xl = new ExcelPackage(file))
                 {
                     cmp.Results.InitDiff(cmp);
-                    xl.AddWorksheet(cmp.Results.MergedDiff, cmp.Results.MergedHeaders.Prepend("Name").ToArray(), cmp.SourceKeys.Count, "Differences", (x, i, h, s) => { if (x.IsDiff[i]) { s.Font.Color.SetColor(System.Drawing.Color.Red); } return x.Values[i]; }, cb1);
+                    xl.AddWorksheet(cmp.Results.MergedDiff, cmp.Results.MergedHeaders.Prepend("Name").ToArray(), cmp.SourceKeys.Count, "Differences", (x, i, h, s) => { if (x.IsDiff[i]) { s.Font.Color.SetColor(System.Drawing.Color.Red); } return x.Values[i]; }, task1.ProgressCallback);
 
                     //if (cmp.Results.Source.Missing is not null)
-                    xl.AddWorksheet(cmp.Results.Source.Missing.Cast<object[]>(), cmp.SourceHeaders, cmp.SourceKeys.Count, "Missing from source", (x, i, h, s) => x[i], cb2);
+                    xl.AddWorksheet(cmp.Results.Source.Missing, cmp.SourceHeaders, cmp.SourceKeys.Count, "Missing from source", (x, i, h, s) => x[i], task2.ProgressCallback);
 
                     //if (dgMissingTarget.ItemsSource is not null)
-                    xl.AddWorksheet(cmp.Results.Target.Missing.Cast<object[]>(), cmp.TargetHeaders, 0, "Missing from target", (x, i, h, s) => x[i], cb3);
+                    xl.AddWorksheet(cmp.Results.Target.Missing, cmp.TargetHeaders, 0, "Missing from target", (x, i, h, s) => x[i], task3.ProgressCallback);
 
                     //if (dgSourceDups.ItemsSource is not null)
-                    xl.AddWorksheet(cmp.Results.Source.Duplicates.Cast<object[]>(), cmp.SourceHeaders, 0, "Source duplicates", (x, i, h, s) => x[i], cb4);
+                    xl.AddWorksheet(cmp.Results.Source.Duplicates, cmp.SourceHeaders, 0, "Source duplicates", (x, i, h, s) => x[i], task4.ProgressCallback);
 
                     //if (dgTargetDups.ItemsSource is not null)
-                    xl.AddWorksheet(cmp.Results.Target.Duplicates.Cast<object[]>(), cmp.TargetHeaders, 0, "Target duplicates", (x, i, h, s) => x[i], cb5);
+                    xl.AddWorksheet(cmp.Results.Target.Duplicates, cmp.TargetHeaders, 0, "Target duplicates", (x, i, h, s) => x[i], task5.ProgressCallback);
 
                     //if (dgSourcePerfectDups.ItemsSource is not null)
-                    xl.AddWorksheet(cmp.Results.Source.PerfectDups.Cast<object[]>(), cmp.SourceHeaders, 0, "Source clones", (x, i, h, s) => x[i], cb6);
+                    xl.AddWorksheet(cmp.Results.Source.PerfectDups, cmp.SourceHeaders, 0, "Source clones", (x, i, h, s) => x[i], task6.ProgressCallback);
 
                     //if (dgTargetPerfectDups.ItemsSource is not null)
-                    xl.AddWorksheet(cmp.Results.Target.PerfectDups.Cast<object[]>(), cmp.TargetHeaders, 0, "Target clones", (x, i, h, s) => x[i], cb7);
+                    xl.AddWorksheet(cmp.Results.Target.PerfectDups, cmp.TargetHeaders, 0, "Target clones", (x, i, h, s) => x[i], task7.ProgressCallback);
 
                     //xl.AddWorksheet(dgDiff, "Differences");
                     //xl.AddWorksheet(dgMissingSource, "Missing from source");
@@ -253,7 +253,8 @@ public partial class Compare : Page
         await Task.Run(() => Comparison.Run(newInstances, progressCallback: callback, useParallelism: App.Instance.CurrentProject.UseParallelism));
     }
 
-    private bool CanExecuteRun => true;//TODO: lstMappings?.SelectedItems.Count > 0;
+    //TODO: fix for single mapper use
+    private bool CanExecuteRun => true;// (App.Instance.CurrentProject.UseSingleMapping && App.Instance.CurrentProject.SingleMapper.AllMappings.Any()) || (!App.Instance.CurrentProject.UseSingleMapping && lstMappings?.SelectedItems.Count > 0);
 
     public void Progress(ComparerDefinition<object[]> comparer)
     {
@@ -264,9 +265,8 @@ public partial class Compare : Page
                 progressDC.Remove(comparer.Name);
                 break;
 
-            case ProgressType.Done:
             default:
-                progressDC[comparer.Name] = comparer.Results.LocalProgress;
+                progressDC[comparer.Name] = (int)comparer.Results.Progress;
 
                 CurrentProgress = (int)progressDC.Average(p => p.Value);
 

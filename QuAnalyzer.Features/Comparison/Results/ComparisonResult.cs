@@ -12,19 +12,16 @@ public partial class ComparisonResult<T>
     private string? message;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(LocalProgress))]
     private ProgressType progress;
 
     [ObservableProperty]
-    private int subProgress;
+    private int scannedCount;
 
     [ObservableProperty]
     private int matchingCount;
 
     [ObservableProperty]
     private long totalTime;
-
-    public int LocalProgress => (int)progress + subProgress;
 
     public ItemResult<T> Source { get; } = new ItemResult<T>();
 

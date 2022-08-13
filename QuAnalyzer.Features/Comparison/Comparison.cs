@@ -54,12 +54,13 @@ public static class Comparison
 
                 var localCallback = callback;
                 var localDef = definition; // Copying reference to a local to be able to use it in the lambda above (might be the wrong way though)
-                token.Register(() => SetProgress(localDef, ProgressType.Canceling, 0, localCallback));
+                
+                token.Register(() => SetProgress(localDef, ProgressType.Canceling, localCallback));
 
                 var r = definition.Results;
                 var totaltime = Stopwatch.StartNew();
 
-                SetProgress(definition, ProgressType.LoadingData, 0, callback);
+                SetProgress(definition, ProgressType.LoadingData, callback);
 
                 var t1 = LoadData(definition, definition.Results.Source, definition.GetSourceData, token);
                 var t2 = LoadData(definition, definition.Results.Target, definition.GetTargetData, token);
@@ -68,44 +69,40 @@ public static class Comparison
                 allTasks.Wait();
                 var (srcData, trgData) = allTasks.Result;
 
-                SetProgress(definition, ProgressType.LoadingDone, 1, callback);
-
                 if (srcData is not null && trgData is not null)
                 {
                     if (samplesPct > 0)
                     {
-                        SetProgress(definition, ProgressType.GettingSamples, 0, callback);
+                        SetProgress(definition, ProgressType.GettingSamples, callback);
 
-                        var samples = GetSamples(samplesPct, srcData, trgData);
+                        var samples = GetSamples(samplesPct, callback, srcData, trgData);
                         srcData = r.Source.Samples = samples[0];
                         trgData = r.Target.Samples = samples[1];
 
-                        SetProgress(definition, ProgressType.GettingSamples, 15, callback);
+                        SetProgress(definition, ProgressType.GettingSamples, callback);
                     }
 
-                    SetProgress(definition, ProgressType.Comparing, 0, callback);
-
-                    CompareOrdered(definition, srcData, trgData, token);
+                    CompareOrdered(definition, srcData, trgData, token, callback);
                 }
 
-                SetProgress(definition, ProgressType.Done, 0, callback);
+                SetProgress(definition, ProgressType.Done, callback);
 
                 totaltime.Stop();
                 definition.Results.TotalTime = totaltime.ElapsedMilliseconds;
             }
             catch (OperationCanceledException)
             {
-                SetProgress(definition, ProgressType.Canceled, 0, callback);
+                SetProgress(definition, ProgressType.Canceled, callback);
             }
             catch (InvalidDataException ed)
             {
                 definition.Results.Message = "The following attribute could not be loaded: " + ed.Message + "\r\nThe inner exception is: " + ed.InnerException.Message + "\r\nPlease check your providers and mappings.";
-                SetProgress(definition, ProgressType.Failed, 0, callback);
+                SetProgress(definition, ProgressType.Failed, callback);
             }
             catch (Exception e)
             {
                 definition.Results.Message = e.Message + "\r\nStacktrace: " + e.StackTrace;
-                SetProgress(definition, ProgressType.Failed, 0, callback);
+                SetProgress(definition, ProgressType.Failed, callback);
             }
         }
     }
@@ -136,24 +133,28 @@ public static class Comparison
         });
     }
 
-    private static void SetProgress<T>(ComparerDefinition<T> f, ProgressType progressType, int p, IProgress<ComparerDefinition<T>>? progressCallback)
+    private static void SetProgress<T>(ComparerDefinition<T> f, ProgressType progressType, IProgress<ComparerDefinition<T>>? progressCallback, int? count = null)
     {
-        f.Results.Progress = progressType;
-        f.Results.SubProgress = p;
+        //f.Results.Progress = progressType;
+        if (count is not null)
+        {
+            f.Results.ScannedCount = (int)count;
+        }
 
+        //TODO: check if I can rely on Observable properties directly instead of a callback (but it should mean having a listener on the said properties changes (use a Weak listener maybe?)
         progressCallback?.Report(f);
     }
 
     /// <summary>
     /// Gets the specified number of sample data from one or many collections (at the same index for each of those).
     /// Usefull when only a partial comparison is required.
-    /// Warning: Sources data MUST be sorted the same for all or it will obviously fail!
+    /// Warning: Sources data MUST be sorted the same for all or it will obviously fail
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="samplesPercentage">Number of requested data samples</param>
     /// <param name="collections">Source collections (sorted)</param>
     /// <returns></returns>
-    public static IEnumerable<T>[] GetSamples<T>(double samplesPercentage, params IEnumerable<T>[] collections)
+    public static IEnumerable<T>[] GetSamples<T>(double samplesPercentage, IProgress<ComparerDefinition<T>>? callback, params IEnumerable<T>[] collections)
     {
         Contract.Requires(samplesPercentage <= 1);
         Contract.Requires(samplesPercentage > 0);
@@ -189,8 +190,10 @@ public static class Comparison
     /// <param name="trgData"></param>
     /// <param name="progressCallback"></param>
     /// <param name="token"></param>
-    public static void CompareOrdered<T>(ComparerDefinition<T> f, IEnumerable<T>? srcData = null, IEnumerable<T>? trgData = null, CancellationToken? token = null) where T : class
+    public static void CompareOrdered<T>(ComparerDefinition<T> f, IEnumerable<T>? srcData = null, IEnumerable<T>? trgData = null, CancellationToken? token = null, IProgress<ComparerDefinition<T>>? callback = null) where T : class
     {
+        SetProgress(f, ProgressType.Comparing, callback, 0);
+
         using var srcEnum = (srcData ?? f.GetSourceData()).GetEnumerator();
         using var trgEnum = (trgData ?? f.GetTargetData()).GetEnumerator();
 
@@ -205,9 +208,13 @@ public static class Comparison
 
         var keepGoing = issrc || istrg;
 
+        int count = 0;
+
         while (keepGoing)
         {
             token?.ThrowIfCancellationRequested();
+
+            SetProgress(f, ProgressType.Comparing, callback, count++);
 
             if (advanceSource && issrc)
             {
