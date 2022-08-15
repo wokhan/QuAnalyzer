@@ -1,11 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-using Newtonsoft.Json;
-
 using QuAnalyzer.Features.Monitoring.Definition;
-
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 
 using Wokhan.Data.Providers.Contracts;
 
@@ -13,8 +8,6 @@ namespace QuAnalyzer.Features.Monitoring;
 
 public partial class TestDefinition : ObservableObject
 {
-    private static ObservableCollection<IDataProvider>? providers;
-
     public bool RunWhenStarted { get; set; }
 
     public ObservableDictionary<TestDefinition, bool> PrecedingSteps { get; private set; } = new();
@@ -26,29 +19,8 @@ public partial class TestDefinition : ObservableObject
 
     public ValueSelectors.Selector? Selector { get; set; }
 
-    public string? ProviderName { get; set; }
-
+    [ObservableProperty]
     private IDataProvider? provider;
-
-    public static void Init(ObservableCollection<IDataProvider> currentProviders)
-    {
-        providers = currentProviders;
-    }
-
-    [JsonIgnore]
-    public IDataProvider? Provider
-    {
-        get => ProviderName != null ? provider ??= providers.First(c => c.Name == ProviderName) : null;
-        set
-        {
-            if (provider != value)
-            {
-                provider = value;
-                ProviderName = value is not null ? value.Name : string.Empty;
-                OnPropertyChanged(nameof(Provider));
-            }
-        }
-    }
 
     [ObservableProperty]
     private string? _repository;
@@ -96,7 +68,7 @@ public partial class TestDefinition : ObservableObject
             PrecedingSteps = new(this.PrecedingSteps),
             Interval = this.Interval,
             Name = this.Name,
-            ProviderName = this.ProviderName,
+            Provider = this.Provider,
             Repository = this.Repository,
             RunWhenStarted = this.RunWhenStarted,
             Selector = this.Selector,

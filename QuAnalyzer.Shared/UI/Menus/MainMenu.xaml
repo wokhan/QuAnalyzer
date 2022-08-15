@@ -12,9 +12,9 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <CommandBar Background="Transparent">
-            <AppBarButton Foreground="YellowGreen" ToolTipService.ToolTip="New project" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.CreateNewCommand}" Icon="NewFolder" />
+            <AppBarButton Foreground="YellowGreen" ToolTipService.ToolTip="New project" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.CreateNewCommand,Mode=OneWay}" Icon="NewFolder" />
             <AppBarElementContainer>
-                <SplitButton Foreground="OrangeRed" ToolTipService.ToolTip="Open..." Command="{x:Bind quanalyzer:App.Instance.CurrentProject.PickFileCommand}">
+                <SplitButton Foreground="OrangeRed" ToolTipService.ToolTip="Open..." Command="{x:Bind quanalyzer:App.Instance.CurrentProject.PickFileCommand,Mode=OneWay}">
                     <SymbolIcon Symbol="Folder" />
                     <SplitButton.Flyout>
                         <MenuFlyout x:Name="recentProjects" />
@@ -22,11 +22,11 @@
                 </SplitButton>
             </AppBarElementContainer>
             <AppBarElementContainer>
-                <SplitButton Foreground="DodgerBlue" ToolTipService.ToolTip="Save" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.SaveCommand}">
+                <SplitButton Foreground="DodgerBlue" ToolTipService.ToolTip="Save" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.SaveCommand,Mode=OneWay}">
                     <SymbolIcon Symbol="Save" />
                     <SplitButton.Flyout>
                         <MenuFlyout>
-                            <MenuFlyoutItem Text="Save as..." Icon="Save" Foreground="DodgerBlue" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.SaveAsCommand}" />
+                            <MenuFlyoutItem Text="Save as..." Icon="Save" Foreground="DodgerBlue" Command="{x:Bind quanalyzer:App.Instance.CurrentProject.SaveAsCommand,Mode=OneWay}" />
                         </MenuFlyout>
                     </SplitButton.Flyout>
                 </SplitButton>

@@ -24,6 +24,8 @@ public class ComparisonTests
 
         Comparison.Run(new[] { comparer });
 
+        Assert.Equal(ProgressType.Done, comparer.Results.Progress);
+        Assert.Equal(Math.Max(sourceData.Count(), targetData.Count()), comparer.Results.ScannedCount);
         Assert.Equal(expMatches, comparer.Results.MatchingCount);
         Assert.Equal(expSrcDiffs, comparer.Results.Source.Differences.Count);
         Assert.Equal(expTrgDiffs, comparer.Results.Target.Differences.Count);
@@ -57,6 +59,8 @@ public class ComparisonTests
 
         Comparison.CompareOrdered(comparer);
 
+        Assert.Equal(ProgressType.Done, comparer.Results.Progress);
+        Assert.Equal(Math.Max(sourceData.Count(), targetData.Count()), comparer.Results.ScannedCount);
         Assert.Equal(expMatches, comparer.Results.MatchingCount);
         Assert.Equal(expSrcDiffs, comparer.Results.Source.Differences.Count);
         Assert.Equal(expTrgDiffs, comparer.Results.Target.Differences.Count);

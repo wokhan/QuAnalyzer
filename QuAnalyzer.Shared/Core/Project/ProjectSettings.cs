@@ -26,33 +26,29 @@ public partial class ProjectSettings : ObservableValidator
     [Required]
     private string name = "Untitled project";
 
-    [ObservableProperty]
-    private string filePath;
+    [JsonIgnore]
+    public string FilePath { get; private set; }
 
     [ObservableProperty]
     private bool useParallelism = true;
 
-    public byte[] AccentColorBrushSaved
-    {
-        get { return new byte[] { AccentColor.A, AccentColor.R, AccentColor.G, AccentColor.B }; }
-        set { AccentColor = Color.FromArgb(value[0], value[1], value[2], value[3]); }
-    }
-
-    [JsonIgnore]
     public Color AccentColor
     {
         get => ((ColorPaletteResources)App.Instance.Resources["ColorPalette"]).Accent.Value;
         set => ((ColorPaletteResources)App.Instance.Resources["ColorPalette"]).Accent = value;
     }
 
+    [JsonProperty(ItemIsReference = true)]
     public ObservableCollection<IDataProvider> CurrentProviders { get; } = new();
+
     public ObservableCollection<TestDefinition> TestDefinitions { get; } = new();
+
     public ObservableCollection<SourcesMapper> SourceMapper { get; } = new();
 
     [ObservableProperty]
     private bool useSingleMapping;
 
-    public SourcesMapper SingleMapper { get; set; } = new();
+    public SourcesMapper SingleMapper { get; } = new();
 
     [RelayCommand]
     private async void PickFile()
@@ -83,12 +79,15 @@ public partial class ProjectSettings : ObservableValidator
         {
             var ser = new JsonSerializer
             {
-                TypeNameHandling = TypeNameHandling.Auto
+                TypeNameHandling = TypeNameHandling.Auto,
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
             };
 
             using var stream = new JsonTextReader(new StreamReader(path));
 
             var project = ser.Deserialize<ProjectSettings>(stream);
+            
+            project.FilePath = path;
 
             MRUManager.AddRecentFile(path);
             
@@ -101,11 +100,11 @@ public partial class ProjectSettings : ObservableValidator
     }
 
     [RelayCommand]
-    public void Save(string p = null)
+    public void Save(string path = null)
     {
         try
         {
-            if (string.IsNullOrEmpty(FilePath) && string.IsNullOrEmpty(p))
+            if (string.IsNullOrEmpty(FilePath) && string.IsNullOrEmpty(path))
             {
                 this.SaveAs();
                 return;
@@ -113,12 +112,13 @@ public partial class ProjectSettings : ObservableValidator
 
             var ser = new JsonSerializer
             {
-                TypeNameHandling = TypeNameHandling.Auto
+                TypeNameHandling = TypeNameHandling.Auto, 
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
             };
 
-            if (p is not null)
+            if (path is not null)
             {
-                this.FilePath = p;
+                this.FilePath = path;
             }
 
             using var str = new JsonTextWriter(new StreamWriter(this.FilePath, false));

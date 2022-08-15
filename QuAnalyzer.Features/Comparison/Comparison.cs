@@ -4,9 +4,9 @@ using CommunityToolkit.HighPerformance.Helpers;
 using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Linq.Dynamic.Core;
 using System.Runtime.CompilerServices;
 
-using Wokhan.Collections.Generic.Extensions;
 using Wokhan.Core.Extensions;
 
 namespace QuAnalyzer.Features.Comparison;
@@ -52,9 +52,9 @@ public static class Comparison
             {
                 CancellationToken token = definition.TokenSource.Token;
 
+                // Copying references to local variables to be able to use it in the lambda below (might be the wrong way though)
                 var localCallback = callback;
-                var localDef = definition; // Copying reference to a local to be able to use it in the lambda above (might be the wrong way though)
-                
+                var localDef = definition;
                 token.Register(() => SetProgress(localDef, ProgressType.Canceling, localCallback));
 
                 var r = definition.Results;
@@ -62,8 +62,8 @@ public static class Comparison
 
                 SetProgress(definition, ProgressType.LoadingData, callback);
 
-                var t1 = LoadData(definition, definition.Results.Source, definition.GetSourceData, token);
-                var t2 = LoadData(definition, definition.Results.Target, definition.GetTargetData, token);
+                var t1 = LoadData(definition, definition.SourceKeys.Concat(definition.SourceHeaders.Except(definition.SourceKeys)), definition.Results.Source, definition.SourceQuery, token);
+                var t2 = LoadData(definition, definition.TargetKeys.Concat(definition.TargetHeaders.Except(definition.TargetKeys)), definition.Results.Target, definition.TargetQuery, token);
 
                 var allTasks = Task.WhenAll(t1, t2);
                 allTasks.Wait();
@@ -85,8 +85,6 @@ public static class Comparison
                     CompareOrdered(definition, srcData, trgData, token, callback);
                 }
 
-                SetProgress(definition, ProgressType.Done, callback);
-
                 totaltime.Stop();
                 definition.Results.TotalTime = totaltime.ElapsedMilliseconds;
             }
@@ -107,18 +105,19 @@ public static class Comparison
         }
     }
 
-    private static Task<IEnumerable<T>> LoadData<T>(ComparerDefinition<T> f, ItemResult<T> item, Func<IEnumerable<T>> dataGetter, CancellationToken token) where T : class
+    private static Task<IEnumerable<T>> LoadData<T>(ComparerDefinition<T> definition, IEnumerable<string> orderBy, ItemResult<T> item, Func<IEnumerable<T>> dataGetter, CancellationToken token) where T : class
     {
         return Task.Run(() =>
         {
             var start = Stopwatch.StartNew();
-            
+
             item.StartTime = DateTime.Now;
 
             var data = dataGetter();
             //if (!f.IsOrdered)
             {
-                data = data.OrderByAll();//.ToList();
+                //TODO: fix as it doesn't work anymore! Should be easier once an IQueryable is used everywhere?
+                //data = data.AsQueryable().OrderBy(String.Join(",", orderBy));
             }
 
             // TODO: cancelation should be done in the data loading implementation (to keep a Queryable here after)
@@ -126,20 +125,16 @@ public static class Comparison
             var res = data.Select((a, i) => { token.ThrowIfCancellationRequested(); item.Count = i + 1; return a; }); //.ToList();
 
             start.Stop();
-            
+
             item.LoadingTime = start.ElapsedMilliseconds;
-            
+
             return res;
         });
     }
 
-    private static void SetProgress<T>(ComparerDefinition<T> f, ProgressType progressType, IProgress<ComparerDefinition<T>>? progressCallback, int? count = null)
+    private static void SetProgress<T>(ComparerDefinition<T> f, ProgressType progressType, IProgress<ComparerDefinition<T>>? progressCallback)
     {
-        //f.Results.Progress = progressType;
-        if (count is not null)
-        {
-            f.Results.ScannedCount = (int)count;
-        }
+        f.Results.Progress = progressType;
 
         //TODO: check if I can rely on Observable properties directly instead of a callback (but it should mean having a listener on the said properties changes (use a Weak listener maybe?)
         progressCallback?.Report(f);
@@ -173,7 +168,7 @@ public static class Comparison
         {
             indices.Add(rdm.Next(min));
         }
-        
+
         // TODO: Probably not the right way to do this. Maybe ordering should be forced here
         // (despite impact on perf when already done), and using ElementAt might not be the best way since it will create
         // as many requests as we need samples.
@@ -185,17 +180,17 @@ public static class Comparison
     /// Comparison of already ordered sets (both sets have to be ordered the same or it will FAIL with no clue)
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="f"></param>
+    /// <param name="definition"></param>
     /// <param name="srcData"></param>
     /// <param name="trgData"></param>
     /// <param name="progressCallback"></param>
     /// <param name="token"></param>
-    public static void CompareOrdered<T>(ComparerDefinition<T> f, IEnumerable<T>? srcData = null, IEnumerable<T>? trgData = null, CancellationToken? token = null, IProgress<ComparerDefinition<T>>? callback = null) where T : class
+    public static void CompareOrdered<T>(ComparerDefinition<T> definition, IEnumerable<T>? srcData = null, IEnumerable<T>? trgData = null, CancellationToken? token = null, IProgress<ComparerDefinition<T>>? callback = null) where T : class
     {
-        SetProgress(f, ProgressType.Comparing, callback, 0);
+        SetProgress(definition, ProgressType.Comparing, callback);
 
-        using var srcEnum = (srcData ?? f.GetSourceData()).GetEnumerator();
-        using var trgEnum = (trgData ?? f.GetTargetData()).GetEnumerator();
+        using var srcEnum = (srcData ?? definition.SourceQuery()).GetEnumerator();
+        using var trgEnum = (trgData ?? definition.TargetQuery()).GetEnumerator();
 
         var srcPrev = default(T);
         var trgPrev = default(T);
@@ -212,49 +207,50 @@ public static class Comparison
 
         while (keepGoing)
         {
+            //TODO: use srcEnum/trgEnum.Current to map and convert data while enumerating as it will be done only once, or do that in the comparer itself?
             token?.ThrowIfCancellationRequested();
 
-            SetProgress(f, ProgressType.Comparing, callback, count++);
+            definition.Results.ScannedCount = ++count;
 
             if (advanceSource && issrc)
             {
-                CheckDuplicate(f.Results.Source, srcPrev, srcEnum.Current, f.Comparer, f.SourceKeys?.Count);
+                CheckDuplicate(definition.Results.Source, srcPrev, srcEnum.Current, definition.Comparer, definition.SourceKeys?.Count);
             }
 
             if (advanceTarget && istrg)
             {
-                CheckDuplicate(f.Results.Target, trgPrev, trgEnum.Current, f.Comparer, f.SourceKeys?.Count);
+                CheckDuplicate(definition.Results.Target, trgPrev, trgEnum.Current, definition.Comparer, definition.SourceKeys?.Count);
             }
 
             srcPrev = srcEnum.Current;
             trgPrev = trgEnum.Current;
 
-            var compResult = f.Comparer.Compare(srcEnum.Current, trgEnum.Current);
+            var compResult = definition.Comparer.Compare(srcEnum.Current, trgEnum.Current);
 
             switch (compResult)
             {
                 case 0:
-                    f.Results.MatchingCount++;
+                    definition.Results.MatchingCount++;
                     advanceSource = true;
                     advanceTarget = true;
                     break;
 
-                case > 0 or < 0 when f.SourceKeys is not null && Math.Abs(compResult) < f.SourceKeys.Count:
-                    f.Results.Differences.Add((srcEnum.Current, trgEnum.Current, compResult));
+                case > 0 or < 0 when definition.SourceKeys is not null && Math.Abs(compResult) < definition.SourceKeys.Count:
+                    definition.Results.Differences.Add((srcEnum.Current, trgEnum.Current, compResult));
                     advanceSource = true;
                     advanceTarget = true;
                     break;
 
                 // Warning: do not use equality as some comparers will give back an actual index
                 case > 0:
-                    f.Results.Source.Missing.Add(trgEnum.Current);
+                    definition.Results.Source.Missing.Add(trgEnum.Current);
                     advanceSource = false;
                     advanceTarget = true;
                     break;
 
                 // Warning: do not use equality as some comparers will give back an actual index
                 case < 0:
-                    f.Results.Target.Missing.Add(srcEnum.Current);
+                    definition.Results.Target.Missing.Add(srcEnum.Current);
                     advanceSource = true;
                     advanceTarget = false;
                     break;
@@ -278,15 +274,21 @@ public static class Comparison
         // We reached the end of either enumeration: every other records are missing.
         while (issrc)
         {
-            f.Results.Target.Missing.Add(srcEnum.Current);
+            definition.Results.ScannedCount = ++count;
+            definition.Results.Target.Missing.Add(srcEnum.Current);
+
             issrc = srcEnum.MoveNext();
         }
 
         while (istrg)
         {
-            f.Results.Source.Missing.Add(trgEnum.Current);
+            definition.Results.ScannedCount = ++count;
+            definition.Results.Source.Missing.Add(trgEnum.Current);
+
             istrg = trgEnum.MoveNext();
         }
+
+        SetProgress(definition, ProgressType.Done, callback);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -335,5 +337,5 @@ public static class Comparison
         }
 
         return ret.Duplicates.Concat(ret.PerfectDups);
-    } 
+    }
 }

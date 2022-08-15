@@ -56,12 +56,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock VerticalAlignment="Center" Margin="20,0">
-                    <Run Text="{x:Bind LoadingProgress,Mode=OneWay}" FontSize="12" />
-                    <Run Text=" / " FontSize="12" />
-                    <Run Text="{x:Bind ItemsCount,Mode=OneWay}" FontSize="12" />
-                    <Run Text=" item(s) loaded" FontSize="12" />
-            </TextBlock>
+            <TextBlock VerticalAlignment="Center" Margin="20,0" FontSize="12" Text="{x:Bind x:String.Format(x:Null, '{0} / {1} item(s) loaded', LoadedCount, ItemsCount), Mode=OneWay}" />
             <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{x:Bind x:String.Format('Status: {0}',Status),Mode=OneWay,TargetNullValue='-'}" FontSize="12" />
             <ProgressBar x:Name="progressBar" Background="Black" Height="5" Grid.Column="2" HorizontalAlignment="Right" Value="{x:Bind LoadingProgress,Mode=OneWay}" IsIndeterminate="{x:Bind LoadingProgress.Equals(-1),Mode=OneWay}" Margin="10,0" Width="200" />
         </Grid>

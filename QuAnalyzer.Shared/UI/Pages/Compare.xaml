@@ -80,7 +80,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Margin="10" CornerRadius="5">
-                            <VisualStateManager.VisualStateGroups>
+                            <!--<VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup>
                                     <VisualState>
                                         <VisualState.StateTriggers>
@@ -104,7 +104,7 @@
                                         </VisualState.Setters>
                                     </VisualState>
                                 </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
+                            </VisualStateManager.VisualStateGroups>-->
                             <!--<controls:DataGridCell BorderThickness="0" Margin="0" Padding="0">-->
                             <Grid Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Padding="10">
                                 <Grid.ColumnDefinitions>

@@ -1,7 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-using Newtonsoft.Json;
-
 using QuAnalyzer.Features.Comparison.Definition;
 
 using System.Collections.ObjectModel;
@@ -13,41 +11,15 @@ namespace QuAnalyzer.Features.Comparison;
 
 public partial class SourcesMapper : ObservableObject
 {
-    private static ObservableCollection<IDataProvider>? providers;
-
     public string Name { get; set; }
 
-    [JsonIgnore]
     [ObservableProperty]
     private IDataProvider? source;
 
-    private string? sourceName;
-    public string? SourceName
-    {
-        get => source?.Name ?? sourceName;
-        set
-        {
-            sourceName = value;
-            Source = providers?.FirstOrDefault(c => c.Name == sourceName);
-        }
-    }
-
     public string? SourceRepository { get; set; }
 
-    [JsonIgnore]
     [ObservableProperty]
     private IDataProvider? target;
-
-    private string? targetName;
-    public string? TargetName
-    {
-        get => target?.Name ?? targetName;
-        set
-        {
-            targetName = value;
-            Target = providers?.FirstOrDefault(c => c.Name == targetName);
-        }
-    }
 
     public string? TargetRepository { get; set; }
 
@@ -55,11 +27,6 @@ public partial class SourcesMapper : ObservableObject
     private bool _isOrdered = false;
 
     public ObservableCollection<SimpleMap> AllMappings { get; } = new();
-
-    public static void Init(ObservableCollection<IDataProvider> currentProviders)
-    {
-        providers = currentProviders;
-    }
 
     public SourcesMapper(string? name = null)
     {

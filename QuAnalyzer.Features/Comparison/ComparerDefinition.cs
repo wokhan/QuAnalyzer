@@ -17,10 +17,10 @@ public class ComparerDefinition<T>
     public CancellationTokenSource TokenSource { get; } = new CancellationTokenSource();
     public IComparer Comparer { get; set; }
 
-    //TODO: check if directly using an IEnumerable or IQueryable wouldn't be alright (only exception I see is if data has to be fully retrieved before the enumeration takes place)
-    public Func<IEnumerable<T>> GetSourceData { get; set; }
+    //TODO: use a queryable instead
+    public Func<IEnumerable<T>> SourceQuery { get; set; }
     //TODO: Same remark
-    public Func<IEnumerable<T>> GetTargetData { get; set; }
+    public Func<IEnumerable<T>> TargetQuery { get; set; }
     public ComparisonResult<T> Results { get; } = new ComparisonResult<T>();
 
     public ComparerDefinition()
@@ -32,7 +32,7 @@ public class ComparerDefinition<T>
         return await Task.Run(() => new ComparerDefinition<T>(s, comparer, mapFunc));
     }
 
-    private ComparerDefinition(SourcesMapper s, IComparer comparer, Func<IQueryable, List<string>, IEnumerable<T>> mapFunc, Func<IEnumerable, Type[], IEnumerable<T>>? converter = null)
+    public ComparerDefinition(SourcesMapper s, IComparer comparer, Func<IQueryable, List<string>, IEnumerable<T>> mapFunc, Func<IEnumerable, Type[], IEnumerable<T>>? converter = null)
     {
         var fieldsSrc = s.AllMappings.Select(m => m.Source).ToList();
         var fieldsTrg = s.AllMappings.Select(m => m.Target).ToList();
@@ -81,13 +81,13 @@ public class ComparerDefinition<T>
         {
             _ArgumentNullException.ThrowIfNull(converter);
 
-            GetSourceData = () => converter(mapFunc(srcDataGetter, fieldsSrc), allTypesTrg);
-            GetTargetData = () => converter(mapFunc(trgDataGetter, fieldsTrg), allTypesTrg);
+            SourceQuery = () => converter(mapFunc(srcDataGetter, fieldsSrc), allTypesTrg);
+            TargetQuery = () => converter(mapFunc(trgDataGetter, fieldsTrg), allTypesTrg);
         }
         else
         {
-            GetSourceData = () => mapFunc(srcDataGetter, fieldsSrc);
-            GetTargetData = () => mapFunc(trgDataGetter, fieldsTrg);
+            SourceQuery = () => mapFunc(srcDataGetter, fieldsSrc);
+            TargetQuery = () => mapFunc(trgDataGetter, fieldsTrg);
         }
         IsOrdered = s.IsOrdered;
     }

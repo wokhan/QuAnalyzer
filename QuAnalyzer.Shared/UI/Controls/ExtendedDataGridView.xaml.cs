@@ -39,6 +39,9 @@ public partial class ExtendedDataGridView : UserControl
     [ObservableProperty]
     private long _itemsCount;
 
+    [ObservableProperty]
+    private long _loadedCount;
+
     public ObservableCollection<string> Grouping { get; } = new();
 
     public ObservableCollection<FilterStruct> Filters { get; } = new();
@@ -70,7 +73,6 @@ public partial class ExtendedDataGridView : UserControl
     {
         InitializeComponent();
 
-        this.PropertyChanged += ExtendedDataGridView_PropertyChanged;
         this.Loaded += ExtendedDataGridView_Loaded;
 
         Filters.CollectionChanged += Filters_CollectionChanged;
@@ -96,26 +98,20 @@ public partial class ExtendedDataGridView : UserControl
 
 
     private List<ICommandBarElement> addedCommandBarElements = new();
-    private void ExtendedDataGridView_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    partial void OnItemsSourceChanged(IEnumerable value)
     {
-        switch (e.PropertyName)
+        DispatcherQueue.TryEnqueue(async () =>
         {
-            case nameof(ItemsSource):
-                DispatcherQueue.TryEnqueue(async () =>
-                {
-                    ClearAll();
-                    Reload();
-                });
-                break;
-
-            default:
-                break;
-        }
+            ClearAll();
+            Reload();
+        });
     }
 
     [RelayCommand]
     private void ClearAll()
     {
+        ItemsCount = 0;
+        LoadedCount = 0;
         Grouping.Clear();
         Compute.Clear();
         Filters.Clear();
@@ -175,6 +171,7 @@ public partial class ExtendedDataGridView : UserControl
         var attr = await e.DataView.GetTextAsync();
         Filters.Add(new FilterStruct() { Attribute = attr, Type = CustomHeaders.First(c => c.Name == attr).Type });
     }
+
 
     [RelayCommand]
     private void Reload()
@@ -236,14 +233,6 @@ public partial class ExtendedDataGridView : UserControl
         }
 
         query = query.AggregateBy(Grouping, Compute.Where(c => c.Aggregate is not null).ToDictionary(c => c.Attribute, c => c.Aggregate));
-        {
-            /*if (!prov.IsDirectlyBindable)
-            {
-                dispHeaders = allHeaders.Keys.ToList();
-
-                Dispatcher.Invoke(GenHeaders);
-            }*/
-        }
 
         if (SortOrder is not null)
         {
@@ -263,9 +252,13 @@ public partial class ExtendedDataGridView : UserControl
             }));
         }
 
-        // TODO: ensure there is no impact on perf (as it might require the query to fully executed on some providers)
-        ItemsCount = query.Count();
-        
+        // Computing count on another thread to avoid blocking the main one (if counting cost is significant)
+        _ = Task.Run(() =>
+        {
+            var count = query.Count();
+            DispatcherQueue.TryEnqueue(() => ItemsCount = count);
+        });
+
         if (SortOrder is not null && gridData.Columns.Any())
         {
             gridData.Columns.First(c => ((DataGridBoundColumn)c).Binding.Path.Path == SortOrder).SortDirection = (currentSortDirectionAsc ? DataGridSortDirection.Ascending : DataGridSortDirection.Descending);
@@ -287,12 +280,13 @@ public partial class ExtendedDataGridView : UserControl
         Status = "Done";
         LoadingProgress = 0;
         progressBar.ShowError = false;
+        LoadedCount = Math.Min(ItemsCount, LoadedCount + 200);
     }
 
     private void onError(Exception e)
     {
         Status = "Error";
-        progressBar.ShowError = true;   
+        progressBar.ShowError = true;
     }
 
     [RelayCommand]

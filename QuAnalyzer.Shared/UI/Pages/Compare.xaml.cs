@@ -238,7 +238,7 @@ public partial class Compare : Page
         //TODO:check
         foreach (SourcesMapper mapper in App.Instance.CurrentProject.UseSingleMapping ? new[] { App.Instance.CurrentProject.SingleMapper } : lstMappings.SelectedItems)
         {
-            var cp = await ComparerDefinition<object[]>.CreateAsync(mapper, comparer, Map, Convert).ConfigureAwait(true);
+            var cp = new ComparerDefinition<object[]>(mapper, comparer, Map, Convert);
 
             cp.Name = $"[{cpdCount++}] {cp.Name}";
 

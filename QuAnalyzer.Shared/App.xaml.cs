@@ -2,8 +2,6 @@
 
 using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Core.Project;
-using QuAnalyzer.Features.Comparison;
-using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.UI.Pages;
 
 using System.Globalization;
@@ -58,11 +56,7 @@ public sealed partial class App : Application
 
         // Always start with a fresh project
         CurrentProject = new ProjectSettings();
-
-        TestDefinition.Init(Instance.CurrentProject.CurrentProviders);
-        SourcesMapper.Init(Instance.CurrentProject.CurrentProviders);
     }
-
 
     /// <summary>
     /// Invoked when the application is launched normally by the end user.  Other entry points

@@ -2,7 +2,6 @@
 
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml.Navigation;
 
 using QuAnalyzer.UI.Popups;
 
