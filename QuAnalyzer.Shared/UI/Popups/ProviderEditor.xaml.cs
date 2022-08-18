@@ -9,7 +9,9 @@ using System.Diagnostics.Contracts;
 
 using Windows.Storage.Pickers;
 
+#if NET6_0_OR_GREATER
 using WinRT.Interop;
+#endif
 
 using Wokhan.Data.Providers;
 using Wokhan.Data.Providers.Bases;

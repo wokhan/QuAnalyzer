@@ -13,9 +13,12 @@
                     <converters:BoolNegationConverter x:Key="booleanNegator" />
                     <converters:BoolToVisibilityConverter x:Key="boolToVisibilityConverter" />
                     <converters:BoolToObjectConverter x:Key="boolToVisibilityNegateConverter" TrueValue="Collapsed" FalseValue="Visible" />
+                    <converters:DoubleToObjectConverter x:Key="doubleGreaterThan99" GreaterThan="99" TrueValue="True" FalseValue="False" />
+                    <converters:DoubleToObjectConverter x:Key="doubleLessThan100" GreaterThan="100" TrueValue="True" FalseValue="False" />
                     <converters:StringVisibilityConverter x:Key="stringVisibilityConverter" />
                     <converters:EmptyCollectionToObjectConverter x:Key="collectionVisibilityConverter" EmptyValue="Visible" NotEmptyValue="Collapsed"  />
                     <converters:EmptyCollectionToObjectConverter x:Key="emptyCollectionToBoolConverter" EmptyValue="False" NotEmptyValue="True" />
+                    <converters:StringFormatConverter x:Key="stringFormatConverter" />
 
                     <helpers:ImageSourceConverter x:Key="imageSourceConverter" />
 

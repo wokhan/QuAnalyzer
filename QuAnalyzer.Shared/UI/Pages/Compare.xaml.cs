@@ -21,6 +21,7 @@ namespace QuAnalyzer.UI.Pages;
 [ObservableObject]
 public partial class Compare : Page
 {
+    public ObservableCollection<LocalComparerDefinition> ComparisonInstances { get; } = new();
 
     private int cpdCount = 0;
 
@@ -73,19 +74,13 @@ public partial class Compare : Page
         //lstMappings.UnselectAll();
     }
 
+
     [RelayCommand]
     private void Cancel(ComparerDefinition<object[]> r)
     {
-        //TODO: replace by CancelCommand.IsRunning on the corresponding button
-        //src.IsEnabled = false;
-        //TODO: replace by RunCommand.Cancel() once implemented in the Comparison class logic.
         r.TokenSource.Cancel(true);
     }
 
-    private static IEnumerable<object[]> Convert(IEnumerable src, Type[] types)
-    {
-        return ((IEnumerable<IEnumerable<object>>)src).Select(c => c.Zip(types, (a, t) => a.SafeConvert(t)).ToArray());
-    }
 
     [RelayCommand]
     private void CreateMapping()
@@ -137,8 +132,8 @@ public partial class Compare : Page
         var dial = new FolderPicker();
         //{ FileName = "Pick a folder to save reports in. Existing files will be overwritten." };
 
-        var folder = await dial.PickSingleFolderAsync(); 
-        
+        var folder = await dial.PickSingleFolderAsync();
+
         if (folder is null)
         {
             return;
@@ -222,23 +217,29 @@ public partial class Compare : Page
         RunCommand.NotifyCanExecuteChanged();
     }
 
-    private static IEnumerable<object[]> Map(IQueryable sourceQuery, List<string> fields)
+    private static IEnumerable<object[]> Map(IQueryable src, string[] fields)
     {
-        return sourceQuery.AsObjectCollection(fields.ToArray());
+        return QueryableExtensions.AsObjectCollection(src, fields);
     }
 
-    [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanExecuteRun))]
-    private async Task Run()
+    private static object[] Convert(object src, Type[] types)
+    {
+        return ((object[])src).Zip(types, (a, t) => a.SafeConvert(t)).ToArray();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanExecuteRun))]
+    private async void Run()
     {
         CurrentProgress = -1;
 
         var newInstances = new List<ComparerDefinition<object[]>>();
+
         var comparer = SequenceComparer<object>.Default;
 
         //TODO:check
         foreach (SourcesMapper mapper in App.Instance.CurrentProject.UseSingleMapping ? new[] { App.Instance.CurrentProject.SingleMapper } : lstMappings.SelectedItems)
         {
-            var cp = new ComparerDefinition<object[]>(mapper, comparer, Map, Convert);
+            var cp = new LocalComparerDefinition(mapper, comparer, Map, Convert);
 
             cp.Name = $"[{cpdCount++}] {cp.Name}";
 
@@ -248,9 +249,11 @@ public partial class Compare : Page
         }
 
         CurrentProgress = 100;
-        
+
         var callback = new Progress<ComparerDefinition<object[]>>(Progress);
-        await Task.Run(() => Comparison.Run(newInstances, progressCallback: callback, useParallelism: App.Instance.CurrentProject.UseParallelism));
+
+        //TODO: run asynchronously! As of now it breaks the app if I do so, I don't understand why (with a "InvalidCastException" when updating a property actually not even used in the UI?!)
+        await Task.Run(() => Comparison.Run(newInstances, progressCallback: callback, useParallelism: App.Instance.CurrentProject.UseParallelism)).ConfigureAwait(true);
     }
 
     //TODO: fix for single mapper use
@@ -280,7 +283,12 @@ public partial class Compare : Page
 
                 break;
         }
+        
+        // Since ObservableObjects cannot raise property change from another thread without calling DispatcherQueue.TryEnqueue,
+        // I'm doing it the other way around: the UI component calls for the change notification itself.
+        // For our purpose it should be OK since almost all properties are subject to change anyway.
+        // Might be better to use a timed refresh though (every 200ms ?) to avoid raising for nothing.
+        comparer.RaiseResultChanged();
     }
 
-    public ObservableCollection<ComparerDefinition<object[]>> ComparisonInstances { get; } = new();
 }

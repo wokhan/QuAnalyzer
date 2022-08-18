@@ -3,8 +3,11 @@ using System.Linq.Expressions;
 
 using Wokhan.Core.Extensions;
 
-namespace QuAnalyzer.Features.Comparison.Comparers;
+#if !NET6_0_OR_GREATER
+using ArgumentNullException = QuAnalyzer.Features.Exceptions.ExceptionsHelper._ArgumentNullException;
+#endif
 
+namespace QuAnalyzer.Features.Comparison.Comparers;
 
 public static class DynamicComparer
 {
@@ -41,8 +44,8 @@ public class DynamicComparer<TA, TB> : IComparer where TA : class where TB : cla
 
     public int Compare(object? x, object? y)
     {
-        _ArgumentNullException.ThrowIfNull(x);
-        _ArgumentNullException.ThrowIfNull(y);
+        ArgumentNullException.ThrowIfNull(x);
+        ArgumentNullException.ThrowIfNull(y);
 
         switch (x)
         {

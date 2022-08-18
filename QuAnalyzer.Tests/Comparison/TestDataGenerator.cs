@@ -12,8 +12,7 @@ internal class TestDataGenerator : IEnumerable<object[]>
     public IList<object[]> SourceData { get; init; }
     public IList<object[]> TargetData { get; init; }
     public int Matches { get; internal set; }
-    public int SourceDiffs { get; internal set; }
-    public int TargetDiffs { get; internal set; }
+    public int Diffs { get; internal set; }
     public int SourceDups { get; internal set; }
     public int TargetDups { get; internal set; }
     public int SourceMissing { get; internal set; }

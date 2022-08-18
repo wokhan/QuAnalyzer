@@ -7,8 +7,6 @@ using System.Diagnostics.Contracts;
 using System.Linq.Dynamic.Core;
 using System.Runtime.CompilerServices;
 
-using Wokhan.Core.Extensions;
-
 namespace QuAnalyzer.Features.Comparison;
 
 public static class Comparison
@@ -62,13 +60,9 @@ public static class Comparison
 
                 SetProgress(definition, ProgressType.LoadingData, callback);
 
-                var t1 = LoadData(definition, definition.SourceKeys.Concat(definition.SourceHeaders.Except(definition.SourceKeys)), definition.Results.Source, definition.SourceQuery, token);
-                var t2 = LoadData(definition, definition.TargetKeys.Concat(definition.TargetHeaders.Except(definition.TargetKeys)), definition.Results.Target, definition.TargetQuery, token);
-
-                var allTasks = Task.WhenAll(t1, t2);
-                allTasks.Wait();
-                var (srcData, trgData) = allTasks.Result;
-
+                var srcData = definition.SourceEnumerable;
+                var trgData = definition.TargetEnumerable;
+                
                 if (srcData is not null && trgData is not null)
                 {
                     if (samplesPct > 0)
@@ -103,33 +97,6 @@ public static class Comparison
                 SetProgress(definition, ProgressType.Failed, callback);
             }
         }
-    }
-
-    private static Task<IEnumerable<T>> LoadData<T>(ComparerDefinition<T> definition, IEnumerable<string> orderBy, ItemResult<T> item, Func<IEnumerable<T>> dataGetter, CancellationToken token) where T : class
-    {
-        return Task.Run(() =>
-        {
-            var start = Stopwatch.StartNew();
-
-            item.StartTime = DateTime.Now;
-
-            var data = dataGetter();
-            //if (!f.IsOrdered)
-            {
-                //TODO: fix as it doesn't work anymore! Should be easier once an IQueryable is used everywhere?
-                //data = data.AsQueryable().OrderBy(String.Join(",", orderBy));
-            }
-
-            // TODO: cancelation should be done in the data loading implementation (to keep a Queryable here after)
-            // BTW, since enumerating will not take place here... we only mesure the preparation time. Doesn't make sense.
-            var res = data.Select((a, i) => { token.ThrowIfCancellationRequested(); item.Count = i + 1; return a; }); //.ToList();
-
-            start.Stop();
-
-            item.LoadingTime = start.ElapsedMilliseconds;
-
-            return res;
-        });
     }
 
     private static void SetProgress<T>(ComparerDefinition<T> f, ProgressType progressType, IProgress<ComparerDefinition<T>>? progressCallback)
@@ -189,8 +156,8 @@ public static class Comparison
     {
         SetProgress(definition, ProgressType.Comparing, callback);
 
-        using var srcEnum = (srcData ?? definition.SourceQuery()).GetEnumerator();
-        using var trgEnum = (trgData ?? definition.TargetQuery()).GetEnumerator();
+        using var srcEnum = (srcData ?? definition.SourceEnumerable).GetEnumerator();
+        using var trgEnum = (trgData ?? definition.TargetEnumerable).GetEnumerator();
 
         var srcPrev = default(T);
         var trgPrev = default(T);
@@ -207,18 +174,19 @@ public static class Comparison
 
         while (keepGoing)
         {
-            //TODO: use srcEnum/trgEnum.Current to map and convert data while enumerating as it will be done only once, or do that in the comparer itself?
             token?.ThrowIfCancellationRequested();
-
-            definition.Results.ScannedCount = ++count;
 
             if (advanceSource && issrc)
             {
+                definition.Results.Source.Count++;
+
                 CheckDuplicate(definition.Results.Source, srcPrev, srcEnum.Current, definition.Comparer, definition.SourceKeys?.Count);
             }
 
             if (advanceTarget && istrg)
             {
+                definition.Results.Target.Count++;
+
                 CheckDuplicate(definition.Results.Target, trgPrev, trgEnum.Current, definition.Comparer, definition.SourceKeys?.Count);
             }
 
@@ -269,23 +237,33 @@ public static class Comparison
             }
 
             keepGoing = issrc && istrg;
+
+            definition.Results.ScannedCount++;
+
+            SetProgress(definition, ProgressType.Comparing, callback);
         }
 
         // We reached the end of either enumeration: every other records are missing.
         while (issrc)
         {
-            definition.Results.ScannedCount = ++count;
+            definition.Results.Source.Count++;
+            definition.Results.ScannedCount++;
             definition.Results.Target.Missing.Add(srcEnum.Current);
 
             issrc = srcEnum.MoveNext();
+
+            SetProgress(definition, ProgressType.Comparing, callback);
         }
 
         while (istrg)
         {
-            definition.Results.ScannedCount = ++count;
+            definition.Results.Target.Count++;
+            definition.Results.ScannedCount++;
             definition.Results.Source.Missing.Add(trgEnum.Current);
 
             istrg = trgEnum.MoveNext();
+
+            SetProgress(definition, ProgressType.Comparing, callback);
         }
 
         SetProgress(definition, ProgressType.Done, callback);

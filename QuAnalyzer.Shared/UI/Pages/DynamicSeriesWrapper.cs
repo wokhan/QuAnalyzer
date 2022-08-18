@@ -6,7 +6,7 @@ using QuAnalyzer.Features.Statistics;
 
 namespace QuAnalyzer.UI.Pages;
 
-public class DynamicSeriesWrapper : DependencyObject
+public partial class DynamicSeriesWrapper : DependencyObject
 {
     private string type;
     private static Axis xAxis;

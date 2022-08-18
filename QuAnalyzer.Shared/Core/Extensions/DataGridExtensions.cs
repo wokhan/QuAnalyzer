@@ -7,7 +7,9 @@ using System.Threading;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 
+#if NET6_0_OR_GREATER
 using WinRT.Interop;
+#endif
 
 namespace QuAnalyzer.Generic.Extensions;
 

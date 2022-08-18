@@ -41,9 +41,9 @@
             </Grid.RowDefinitions>
             <TextBlock Text="SOURCE" Foreground="White" Grid.ColumnSpan="2" />
             <TextBlock Text="Provider:" Grid.Row="1" VerticalAlignment="Center" />
-            <ComboBox x:Name="lstSrc" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders,Mode=OneWay}" SelectedItem="{x:Bind Mapping.Source,Mode=TwoWay}" ItemTemplate="{StaticResource AttributesTemplate}" HorizontalAlignment="Stretch" />
+            <ComboBox x:Name="lstSrc" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders,Mode=OneWay}" SelectedItem="{x:Bind Mapping.Source,Mode=TwoWay}" ItemTemplate="{StaticResource AttributesTemplate}" HorizontalAlignment="Stretch" SelectionChanged="DefinitionSelectionChanged" />
             <TextBlock Text="Repository:" Grid.Row="2" VerticalAlignment="Center" />
-            <ComboBox x:Name="lstSrcRepo" Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{x:Bind Mapping.Source.Repositories.Keys,Mode=OneWay}" SelectedItem="{x:Bind Mapping.SourceRepository,Mode=TwoWay}" SelectionChanged="lstSrcRepo_SelectionChanged" DataContext="{x:Bind lstSrc.SelectedItem}" HorizontalAlignment="Stretch" />
+            <ComboBox x:Name="lstSrcRepo" Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{x:Bind Mapping.Source.Repositories.Keys,Mode=OneWay}" SelectedItem="{x:Bind Mapping.SourceRepository,Mode=TwoWay}" DataContext="{x:Bind lstSrc.SelectedItem}" HorizontalAlignment="Stretch" SelectionChanged="DefinitionSelectionChanged" />
         </Grid>
         <SymbolIcon Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Symbol="Next" Width="32" Height="32" Foreground="Gray" />
         <Grid Grid.Row="1" VerticalAlignment="Top" Grid.Column="2" Padding="10" Margin="10" CornerRadius="5" Background="{ThemeResource CardBackgroundFillColorSecondary}">
@@ -58,9 +58,9 @@
             </Grid.RowDefinitions>
             <TextBlock Text="TARGET" Foreground="White" Grid.ColumnSpan="2" />
             <TextBlock Text="Provider:" Grid.Row="1" VerticalAlignment="Center" />
-            <ComboBox x:Name="lstTrg" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders,Mode=OneWay}" SelectedItem="{x:Bind Mapping.Target,Mode=TwoWay}" ItemTemplate="{StaticResource AttributesTemplate}" HorizontalAlignment="Stretch" />
+            <ComboBox x:Name="lstTrg" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders,Mode=OneWay}" SelectedItem="{x:Bind Mapping.Target,Mode=TwoWay}" ItemTemplate="{StaticResource AttributesTemplate}" HorizontalAlignment="Stretch" SelectionChanged="DefinitionSelectionChanged" />
             <TextBlock Text="Repository:" Grid.Row="2" VerticalAlignment="Center" />
-            <ComboBox x:Name="lstTrgRepo" Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{x:Bind Mapping.Target.Repositories.Keys,Mode=OneWay}" SelectedItem="{x:Bind Mapping.TargetRepository,Mode=TwoWay}" SelectionChanged="lstTrgRepo_SelectionChanged" DataContext="{x:Bind lstTrg.SelectedItem}" HorizontalAlignment="Stretch"/>
+            <ComboBox x:Name="lstTrgRepo" Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{x:Bind Mapping.Target.Repositories.Keys,Mode=OneWay}" SelectedItem="{x:Bind Mapping.TargetRepository,Mode=TwoWay}" DataContext="{x:Bind lstTrg.SelectedItem}" HorizontalAlignment="Stretch"  SelectionChanged="DefinitionSelectionChanged"/>
         </Grid>
         <controls:DockPanel Grid.Row="3" Grid.ColumnSpan="3">
             <CommandBar controls:DockPanel.Dock="Top" Content="Mappings" DefaultLabelPosition="Right">
@@ -69,14 +69,14 @@
                 <AppBarButton Label="Map by name" ToolTipService.ToolTip="Map by name" Icon="Character" Command="{x:Bind MapByNameCommand}" />
                 <AppBarButton Label="Remove all" ToolTipService.ToolTip="Clear all" IsEnabled="{x:Bind Mapping.AllMappings,Converter={StaticResource emptyCollectionToBoolConverter},Mode=OneWay}" Icon="Delete" Command="{x:Bind RemoveMappingCommand}" />
             </CommandBar>
-            <controls:DataGrid x:Name="gridMappings" ItemsSource="{x:Bind Mapping.AllMappings}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AutoGenerateColumns="False">
+            <controls:DataGrid x:Name="gridMappings" ItemsSource="{x:Bind Mapping.AllMappings}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AutoGenerateColumns="False" SelectionMode="Single">
                 <controls:DataGrid.Columns>
-                    <controls:DataGridComboBoxColumn Width="*" Header="Source field" ItemsSource="{x:Bind SourceAttributes}" Binding="{Binding Source,Mode=TwoWay}">
+                    <controls:DataGridComboBoxColumn Width="*" Header="Source field" ItemsSource="{x:Bind SourceAttributes,Mode=OneWay}" Binding="{Binding Source,Mode=TwoWay}">
                         <!--<controls:DataGridComboBoxColumn.EditingElementStyle>
                             <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
                         </controls:DataGridComboBoxColumn.EditingElementStyle>-->
                     </controls:DataGridComboBoxColumn>
-                    <controls:DataGridComboBoxColumn Width="*" Header="Target field" ItemsSource="{x:Bind TargetAttributes}" Binding="{Binding Target,Mode=TwoWay}">
+                    <controls:DataGridComboBoxColumn Width="*" Header="Target field" ItemsSource="{x:Bind TargetAttributes,Mode=OneWay}" Binding="{Binding Target,Mode=TwoWay}">
                         <!--<controls:DataGridComboBoxColumn.EditingElementStyle>
                             <Style BasedOn="{StaticResource MahApps.Styles.ComboBox}" TargetType="ComboBox" />
                         </controls:DataGridComboBoxColumn.EditingElementStyle>-->

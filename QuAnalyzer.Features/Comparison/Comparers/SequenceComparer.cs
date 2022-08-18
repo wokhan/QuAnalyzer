@@ -1,5 +1,9 @@
 ﻿using System.Collections;
 
+#if !NET6_0_OR_GREATER
+using ArgumentNullException = QuAnalyzer.Features.Exceptions.ExceptionsHelper._ArgumentNullException;
+#endif
+
 namespace QuAnalyzer.Features.Comparison.Comparers;
 
 public class SequenceComparer<TItem> : IComparer<IEnumerable<TItem>>, IComparer //where TItem : IComparable<TItem>
@@ -8,13 +12,13 @@ public class SequenceComparer<TItem> : IComparer<IEnumerable<TItem>>, IComparer 
 
     public SequenceComparer()
     {
-        
+
     }
 
     public int Compare(IEnumerable<TItem>? x, IEnumerable<TItem>? y)
     {
-        _ArgumentNullException.ThrowIfNull(x);
-        _ArgumentNullException.ThrowIfNull(y);
+        ArgumentNullException.ThrowIfNull(x);
+        ArgumentNullException.ThrowIfNull(y);
 
         switch (x)
         {
@@ -48,7 +52,7 @@ public class SequenceComparer<TItem> : IComparer<IEnumerable<TItem>>, IComparer 
                 }
                 else
                 {
-                    internalResult = (e1.Current as IComparable).CompareTo(e2.Current);
+                    internalResult = (e1.Current as IComparable)?.CompareTo(e2.Current) ?? 1;
                 }
             }
         }

@@ -15,8 +15,6 @@ namespace QuAnalyzer.UI.Popups;
 [ObservableObject]
 public partial class MappingsEditor : Page
 {
-    private SourcesMapper initialMap;
-
     [ObservableProperty]
     private bool isPopup;
 
@@ -38,9 +36,9 @@ public partial class MappingsEditor : Page
         set { SetValue(InitialMappingProperty, value); cloneMappingForEdit(); }
     }
 
-    public ObservableCollection<string> SourceAttributes { get; } = new();
+    public IEnumerable<string> SourceAttributes => Mapping.Source?.GetColumns(Mapping.SourceRepository).Select(column => column.Name);
 
-    public ObservableCollection<string> TargetAttributes { get; } = new();
+    public IEnumerable<string> TargetAttributes => Mapping.Target?.GetColumns(Mapping.SourceRepository).Select(column => column.Name);
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -53,6 +51,18 @@ public partial class MappingsEditor : Page
             gridMain.Margin = new Thickness(20);
             GenericPopup.UpdateCurrent(this, isLastStep: true, nextButtonCommand: SaveCommand);
             GenericPopup.UpdateCurrent(this, title: $"Edit mapping: {Mapping.Name}");
+        }
+    }
+
+
+    private void DefinitionSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.RemovedItems.Any())
+        {
+            Mapping.AllMappings.Clear();
+
+            OnPropertyChanged(nameof(SourceAttributes));
+            OnPropertyChanged(nameof(TargetAttributes));
         }
     }
 
@@ -74,16 +84,6 @@ public partial class MappingsEditor : Page
         Mapping.AllMappings.Clear();
     }
 
-    private void lstSrcRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        SetAttributes((IDataProvider)lstSrc.SelectedItem, (string)lstSrcRepo.SelectedItem, SourceAttributes);
-    }
-
-    private void lstTrgRepo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        SetAttributes((IDataProvider)lstTrg.SelectedItem, (string)lstTrgRepo.SelectedItem, TargetAttributes);
-    }
-
     [RelayCommand]
     private void MapByName()
     {
@@ -94,7 +94,7 @@ public partial class MappingsEditor : Page
     [RelayCommand]
     private void MapByPosition()
     {
-        Mapping.AllMappings.ReplaceAll(SourceAttributes.Take(TargetAttributes.Count).Zip(TargetAttributes, (s, i) => new SimpleMap(s, i)));
+        Mapping.AllMappings.ReplaceAll(SourceAttributes.Take(TargetAttributes.Count()).Zip(TargetAttributes, (s, i) => new SimpleMap(s, i)));
     }
 
     private void MappingsEditor_Loaded(object sender, RoutedEventArgs e)
@@ -119,16 +119,6 @@ public partial class MappingsEditor : Page
         else
         {
             projectMappers.Add(Mapping);
-        }
-    }
-
-    private void SetAttributes(IDataProvider prov, string repo, ObservableCollection<string> attributes)
-    {
-        attributes.Clear();
-
-        if (prov is not null && repo is not null)
-        {
-            attributes.AddAll(prov.GetColumns(repo).Select(a => a.Name));
         }
     }
 }

@@ -1,6 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+#if !NET6_0_OR_GREATER
+
+using System.Runtime.CompilerServices;
 
 namespace QuAnalyzer.Features.Exceptions;
+
 internal partial class ExceptionsHelper
 {
     internal partial class _ArgumentNullException
@@ -14,3 +18,5 @@ internal partial class ExceptionsHelper
         }
     }
 }
+
+#endif

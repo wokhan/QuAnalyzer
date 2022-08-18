@@ -1,94 +1,89 @@
 ﻿
+using CommunityToolkit.Mvvm.ComponentModel;
+
 using System.Collections;
 using System.Linq.Dynamic.Core;
 
+#if !NET6_0_OR_GREATER
+using ArgumentNullException = QuAnalyzer.Features.Exceptions.ExceptionsHelper._ArgumentNullException;
+#endif
+
 namespace QuAnalyzer.Features.Comparison;
 
-public class ComparerDefinition<T>
+public class ComparerDefinition<T> : ObservableObject
 {
     public string Name { get; set; }
     public string SourceName { get; set; }
     public string TargetName { get; set; }
     public IList<string>? SourceKeys { get; set; }
     public IList<string>? TargetKeys { get; set; }
+    public Func<object, List<string>, Type[], T>? Converter { get; }
     public IList<string> SourceHeaders { get; set; }
     public IList<string> TargetHeaders { get; set; }
     public bool IsOrdered { get; set; }
-    public CancellationTokenSource TokenSource { get; } = new CancellationTokenSource();
+    public CancellationTokenSource TokenSource { get; } = new();
     public IComparer Comparer { get; set; }
-
-    //TODO: use a queryable instead
-    public Func<IEnumerable<T>> SourceQuery { get; set; }
-    //TODO: Same remark
-    public Func<IEnumerable<T>> TargetQuery { get; set; }
-    public ComparisonResult<T> Results { get; } = new ComparisonResult<T>();
+    public IEnumerable<T> SourceEnumerable { get; set; }
+    public IEnumerable<T> TargetEnumerable { get; set; }
+    public ComparisonResult<T> Results { get; } = new();
 
     public ComparerDefinition()
     {
     }
 
-    public static async Task<ComparerDefinition<T>> CreateAsync(SourcesMapper s, IComparer comparer, Func<IQueryable, List<string>, IEnumerable<T>> mapFunc, Func<IEnumerable, Type[], IEnumerable<T>>? converter = null)
+    public ComparerDefinition(SourcesMapper s, IComparer comparer, Func<IQueryable, string[], IEnumerable<T>> map, Func<object, Type[], T>? convert = null)
     {
-        return await Task.Run(() => new ComparerDefinition<T>(s, comparer, mapFunc));
-    }
+        var sourceMapFields = s.AllMappings.Select(m => m.Source).ToArray();
+        var targetMapFields = s.AllMappings.Select(m => m.Target).ToArray();
 
-    public ComparerDefinition(SourcesMapper s, IComparer comparer, Func<IQueryable, List<string>, IEnumerable<T>> mapFunc, Func<IEnumerable, Type[], IEnumerable<T>>? converter = null)
-    {
-        var fieldsSrc = s.AllMappings.Select(m => m.Source).ToList();
-        var fieldsTrg = s.AllMappings.Select(m => m.Target).ToList();
+        var sourceColumns = s.Source.GetColumns(s.SourceRepository);
+        var targetColumns = s.Target.GetColumns(s.TargetRepository);
 
-        var srcHeaders = s.Source.GetColumns(s.SourceRepository);
-        var trgHeaders = s.Target.GetColumns(s.TargetRepository);
-
-        var allTypesSrc = fieldsSrc.Select(m => srcHeaders.First(h => h.Name == m).Type).ToArray();
-        var allTypesTrg = fieldsTrg.Select(m => trgHeaders.First(h => h.Name == m).Type).ToArray();
-
-        string[]? srcKeys = null;
-        string[]? trgKeys = null;
+        string[]? sourceKeys = null;
+        string[]? targetKeys = null;
         if (s.AllMappings.Any(a => a.IsKey))
         {
-            srcKeys = s.AllMappings.Where(a => a.IsKey).Select(m => m.Source).ToArray();
-            trgKeys = s.AllMappings.Where(a => a.IsKey).Select(m => m.Target).ToArray();
-        }
-
-
-        var srcDataGetter = s.Source.GetQueryable(s.SourceRepository);//, srcKeys is not null ? srcKeys.ToDictionary(sk => sk, sk => srcHeaders.First(h => h.Name == sk).Type) : null);
-        var trgDataGetter = s.Target.GetQueryable(s.TargetRepository);//, trgKeys is not null ? trgKeys.ToDictionary(sk => sk, sk => trgHeaders.First(h => h.Name == sk).Type) : null);
-        if (s.IsOrdered)
-        {
-            if (srcKeys is not null && trgKeys is not null)
-            {
-                srcDataGetter = srcDataGetter.OrderBy(String.Join(",", srcHeaders.Select(h => h.Name).Intersect(srcKeys)));
-                trgDataGetter = trgDataGetter.OrderBy(String.Join(",", trgHeaders.Select(h => h.Name).Intersect(trgKeys)));
-            }
-            else
-            {
-                srcDataGetter = srcDataGetter.OrderBy(String.Join(",", srcHeaders.Select(h => h.Name)));
-                trgDataGetter = trgDataGetter.OrderBy(String.Join(",", trgHeaders.Select(h => h.Name)));
-            }
+            sourceKeys = s.AllMappings.Where(a => a.IsKey).Select(m => m.Source).ToArray();
+            targetKeys = s.AllMappings.Where(a => a.IsKey).Select(m => m.Target).ToArray();
         }
 
         Name = s.Name;
         SourceName = $"{s.Source.Name} ({s.SourceRepository})";
         TargetName = $"{s.Target.Name} ({s.TargetRepository})";
-        SourceHeaders = fieldsSrc;
-        TargetHeaders = fieldsTrg;
-        SourceKeys = srcKeys;
-        TargetKeys = trgKeys;
+        SourceHeaders = sourceMapFields;
+        TargetHeaders = targetMapFields;
+        SourceKeys = sourceKeys;
+        TargetKeys = targetKeys;
         Comparer = comparer ?? Comparer<T>.Default;
 
-        if (!allTypesSrc.SequenceEqual(allTypesTrg))
-        {
-            _ArgumentNullException.ThrowIfNull(converter);
+        var srcData = s.Source.GetQueryable(s.SourceRepository)
+                              .OrderBy(String.Join(",", sourceKeys.Concat(sourceColumns.Select(h => h.Name)).Except(sourceKeys)));
 
-            SourceQuery = () => converter(mapFunc(srcDataGetter, fieldsSrc), allTypesTrg);
-            TargetQuery = () => converter(mapFunc(trgDataGetter, fieldsTrg), allTypesTrg);
-        }
-        else
+        var trgData = s.Target.GetQueryable(s.TargetRepository)
+                              .OrderBy(String.Join(",", targetKeys.Concat(targetColumns.Select(h => h.Name)).Except(targetKeys)));
+
+        var sourceMapTypes = sourceMapFields.Join(sourceColumns, field => field, header => header.Name, (field, header) => header.Type).ToArray();
+        var targetMapTypes = targetMapFields.Join(targetColumns, field => field, header => header.Name, (field, header) => header.Type).ToArray();
+
+        // Normalize the current items types (to be able to compare them)
+        if (!sourceMapTypes.SequenceEqual(targetMapTypes))
         {
-            SourceQuery = () => mapFunc(srcDataGetter, fieldsSrc);
-            TargetQuery = () => mapFunc(trgDataGetter, fieldsTrg);
+            ArgumentNullException.ThrowIfNull(convert);
+
+            SourceEnumerable = map(srcData, sourceMapFields).Select(item => convert(item, targetMapTypes));
+        } else
+        {
+            SourceEnumerable = map(srcData, sourceMapFields);
         }
-        IsOrdered = s.IsOrdered;
+
+        TargetEnumerable = map(trgData, targetMapFields);
+
+        //IsOrdered = s.IsOrdered;
+    }
+
+
+    public void RaiseResultChanged()
+    {
+        OnPropertyChanged(nameof(Results));
     }
 }

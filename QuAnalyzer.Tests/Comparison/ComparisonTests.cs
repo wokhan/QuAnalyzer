@@ -18,7 +18,7 @@ public class ComparisonTests
     //TODO: adds nothing compared to CompareOrderedTest. To be reviewed.
     [Theory()]
     [ClassData(typeof(ComparisonTestsData))]
-    public void RunTest(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData, int expMatches, int expSrcDiffs, int expTrgDiffs, int expSrcDups, int expTrgDups, int expSrcMissing, int expTrgMissing)
+    public void RunTest(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData, int expMatches, int expDiffs, int expSrcDups, int expTrgDups, int expSrcMissing, int expTrgMissing)
     {
         var comparer = SharedHelper.GetComparer(sourceData, targetData);
 
@@ -27,12 +27,11 @@ public class ComparisonTests
         Assert.Equal(ProgressType.Done, comparer.Results.Progress);
         Assert.Equal(Math.Max(sourceData.Count(), targetData.Count()), comparer.Results.ScannedCount);
         Assert.Equal(expMatches, comparer.Results.MatchingCount);
-        Assert.Equal(expSrcDiffs, comparer.Results.Source.Differences.Count);
-        Assert.Equal(expTrgDiffs, comparer.Results.Target.Differences.Count);
+        Assert.Equal(expDiffs, comparer.Results.Differences.Count);
         Assert.Equal(expSrcDups, comparer.Results.Source.PerfectDups.Count);
         Assert.Equal(expTrgDups, comparer.Results.Target.PerfectDups.Count);
-        //Assert.Equal(expSrcDups, comparer.Results.Source.Duplicates.Count);
-        //Assert.Equal(expTrgDups, comparer.Results.Target.Duplicates.Count);
+        Assert.Equal(expSrcDups, comparer.Results.Source.Duplicates.Count);
+        Assert.Equal(expTrgDups, comparer.Results.Target.Duplicates.Count);
         Assert.Equal(expSrcMissing, comparer.Results.Source.Missing.Count);
         Assert.Equal(expTrgMissing, comparer.Results.Target.Missing.Count);
     }
@@ -53,7 +52,7 @@ public class ComparisonTests
 
     [Theory()]
     [ClassData(typeof(ComparisonTestsData))]
-    public void CompareOrderedTest(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData, int expMatches, int expSrcDiffs, int expTrgDiffs, int expSrcDups, int expTrgDups, int expSrcMissing, int expTrgMissing)
+    public void CompareOrderedTest(IEnumerable<object[]> sourceData, IEnumerable<object[]> targetData, int expMatches, int expDiffs, int expSrcDups, int expTrgDups, int expSrcMissing, int expTrgMissing)
     {
         var comparer = SharedHelper.GetComparer(sourceData, targetData);
 
@@ -62,12 +61,11 @@ public class ComparisonTests
         Assert.Equal(ProgressType.Done, comparer.Results.Progress);
         Assert.Equal(Math.Max(sourceData.Count(), targetData.Count()), comparer.Results.ScannedCount);
         Assert.Equal(expMatches, comparer.Results.MatchingCount);
-        Assert.Equal(expSrcDiffs, comparer.Results.Source.Differences.Count);
-        Assert.Equal(expTrgDiffs, comparer.Results.Target.Differences.Count);
+        Assert.Equal(expDiffs, comparer.Results.Differences.Count);
         Assert.Equal(expSrcDups, comparer.Results.Source.PerfectDups.Count);
         Assert.Equal(expTrgDups, comparer.Results.Target.PerfectDups.Count);
-        //Assert.Equal(expSrcDups, comparer.Results.Source.Duplicates.Count);
-        //Assert.Equal(expTrgDups, comparer.Results.Target.Duplicates.Count);
+        Assert.Equal(expSrcDups, comparer.Results.Source.Duplicates.Count);
+        Assert.Equal(expTrgDups, comparer.Results.Target.Duplicates.Count);
         Assert.Equal(expSrcMissing, comparer.Results.Source.Missing.Count);
         Assert.Equal(expTrgMissing, comparer.Results.Target.Missing.Count);
     }

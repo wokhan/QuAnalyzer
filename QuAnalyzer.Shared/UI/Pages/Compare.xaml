@@ -6,22 +6,16 @@
       xmlns:quanalyzer="using:QuAnalyzer" 
       xmlns:comparison="using:QuAnalyzer.Features.Comparison" 
       xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
-      xmlns:popups="using:QuAnalyzer.UI.Popups"
+      xmlns:popups="using:QuAnalyzer.UI.Popups" xmlns:pages="using:QuAnalyzer.UI.Pages"
       x:Class="QuAnalyzer.UI.Pages.Compare"
       x:Name="thisPage"
       mc:Ignorable="d"
       d:DesignWidth="800"
       d:DesignHeight="600">
     <Page.Resources>
-        <Style x:Key="RedWhenNotZero" TargetType="TextBlock">
-            <Setter Target="Foreground" Value="OrangeRed" />
-            <!--<Style.Triggers>
-                <DataTrigger Binding="{Binding Content.Text,RelativeSource={x:Static RelativeSource.Self}}" Value="0">
-                    <Setter Target="Foreground" Value="Black" />
-                </DataTrigger>
-            </Style.Triggers>-->
+        <Style x:Key="Header" TargetType="TextBlock">
+            <Setter Target="FontWeight" Value="Bold" />
         </Style>
-        <!--<local:SourceOrTargetPicker x:Key="SourceOrTargetPicker" />-->
     </Page.Resources>
     <Grid x:Name="gridMain">
         <Grid.RowDefinitions>
@@ -76,66 +70,38 @@
             <Grid controls:DockPanel.Dock="Bottom" Height="30" VerticalAlignment="Center" HorizontalAlignment="Stretch" Background="{ThemeResource ControlFillColorDefault}">
                 <ProgressBar Background="Black" Grid.Column="1" HorizontalAlignment="Right" Value="{x:Bind CurrentProgress,Mode=OneWay}" IsIndeterminate="{x:Bind CurrentProgress.Equals(-1),Mode=OneWay}" Margin="10,0" Width="200" />
             </Grid>
-            <ItemsControl ItemsSource="{x:Bind ComparisonInstances}" x:Name="allProgress">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Margin="10" CornerRadius="5">
-                            <!--<VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup>
-                                    <VisualState>
-                                        <VisualState.StateTriggers>
-                                            <triggers:IsEqualStateTrigger Value="{Binding Results.Progress,Mode=OneWay}" To="Done" />
-                                            <triggers:IsNotEqualStateTrigger Value="{Binding Results.Message,Mode=OneWay}" To="{x:Null}" />
-                                        </VisualState.StateTriggers>
-                                        <VisualState.Setters>
-                                            <Setter Target="progressAndCancel.Visibility" Value="Collapsed" />
-                                            <Setter Target="details.Visibility" Value="Visible" />
-                                            <Setter Target="delete.IsEnabled" Value="True" />
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
-                                <VisualStateGroup>
-                                    <VisualState>
-                                        <VisualState.StateTriggers>
-                                            <triggers:IsNotEqualStateTrigger Value="{Binding Results.Message,Mode=OneWay}" To="{x:Null}" />
-                                        </VisualState.StateTriggers>
-                                        <VisualState.Setters>
-                                            <Setter Target="error.Visibility" Value="Visible" />
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>-->
-                            <!--<controls:DataGridCell BorderThickness="0" Margin="0" Padding="0">-->
-                            <Grid Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Padding="10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock FontWeight="Bold" Text="{Binding Name,FallbackValue='Mapping title'}" HorizontalAlignment="Left" VerticalAlignment="Top"  />
-                                <TextBlock Text="{Binding Results.TotalTime,Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5,0,0,10"/>
-                                <!--sys:String.Format('Ellapsed time: {0}ms',-->
-                                <!-- Progress and cancel button -->
-                                <StackPanel x:Name="progressAndCancel" Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
-                                    <TextBlock Text="{Binding Results.Progress,Mode=OneWay}" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding Results.ScannedCount,Mode=OneWay}" VerticalAlignment="Center" />
-                                    <ProgressBar Value="{Binding Results.Progress,Mode=OneWay}" Maximum="100" Width="200" Margin="10,0" />
-                                    <AppBarButton Command="{Binding CancelCommand,ElementName=thisPage}" CommandParameter="{Binding}" Foreground="OrangeRed" Icon="Stop" />
-                                </StackPanel>
-                                <!--Results-->
-                                <StackPanel x:Name="details" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="Collapsed">
-                                    <!--<TextBlock FontWeight="Bold" Text="{x:Bind sys:String.Format('Matches: {0}', Results.MatchingCount), FallbackValue='-', Mode=OneWay}" Padding="5" VerticalAlignment="Center" />-->
-                                    <AppBarButton Command="{Binding DetailsCommand,ElementName=thisPage}" CommandParameter="{Binding}" Icon="View" Foreground="Green" />
-                                </StackPanel>
-                                <!--Error-->
-                                <StackPanel x:Name="error" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="Collapsed">
-                                    <SymbolIcon ToolTipService.ToolTip="{Binding Results.Message,Mode=OneWay}" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red" Symbol="Flag">
-                                        <SymbolIcon.Resources>
-                                            <Storyboard x:Key="sbBlink" AutoReverse="True" BeginTime="00:00:02" RepeatBehavior="Forever" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)">
-                                                <ColorAnimation From="Transparent" To="Red" Duration="0:0:2"/>
-                                            </Storyboard>
-                                        </SymbolIcon.Resources>
-                                        <!--<ContentControl.Style>
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{x:Bind ComparisonInstances,Mode=OneWay}" x:Name="allProgress">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="pages:LocalComparerDefinition">
+                            <StackPanel Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Margin="10" CornerRadius="5">
+                                <Grid Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Padding="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock FontWeight="Bold" Text="{x:Bind Name,FallbackValue='Mapping title'}" HorizontalAlignment="Left" />
+                                    <TextBlock Grid.Row="1" Text="{x:Bind Results.TotalTime,Mode=OneWay,Converter={StaticResource stringFormatConverter},ConverterParameter='Duration: {0} ms'}" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                    <!--Progress and cancel button-->
+                                    <StackPanel x:Name="progressAndCancel" Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                                        <TextBlock Text="{x:Bind Results.Progress,Mode=OneWay}" Margin="0,0,10,0" />
+                                        <TextBlock Text="{x:Bind Results.ScannedCount,Mode=OneWay,Converter={StaticResource stringFormatConverter},ConverterParameter='({0} items scanned)'}" />
+                                    </StackPanel>
+                                    <ProgressBar Grid.Column="1" Grid.Row="1" Value="{x:Bind Results.ProgressAsInt,Mode=OneWay}" Maximum="100" Width="200" Margin="10,5" VerticalAlignment="Top" />
+                                    <!--Error-->
+                                    <StackPanel x:Name="error" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{x:Bind Results.Message,Mode=OneWay,Converter={StaticResource stringVisibilityConverter}}">
+                                        <SymbolIcon ToolTipService.ToolTip="{x:Bind Results.Message,Mode=OneWay}" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red" Symbol="Flag">
+                                            <SymbolIcon.Resources>
+                                                <Storyboard x:Key="sbBlink" AutoReverse="True" BeginTime="00:00:02" RepeatBehavior="Forever" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)">
+                                                    <ColorAnimation From="Transparent" To="Red" Duration="0:0:2"/>
+                                                </Storyboard>
+                                            </SymbolIcon.Resources>
+                                            <!--<ContentControl.Style>
                                                                 <Style TargetType="ContentControl">
                                                                     <Style.Triggers>
                                                                         <Trigger Property="Visibility" Value="Visible">
@@ -149,57 +115,54 @@
                                                                     </Style.Triggers>
                                                                 </Style>
                                                             </ContentControl.Style>-->
-                                    </SymbolIcon>
-                                </StackPanel>
-                                <AppBarButton x:Name="delete" Grid.Column="2" Height="40" IsEnabled="False" Command="{Binding DeleteCommand,ElementName=thisPage}" CommandParameter="{Binding}" Width="40" Foreground="OrangeRed" Icon="Delete" />
-                            </Grid>
-                            <Grid Padding="10">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Item" />
-                                <!--<TextBlock Text="{Binding SourceName}" Grid.Row="1" />
-                                <TextBlock Text="{Binding TargetName}" Grid.Row="2" />
-                                <TextBlock Text="Start time" Grid.Column="1" />
-                                <TextBlock Text="{Binding Results.Source.StartTime,Mode=OneWay}" Grid.Row="1" Grid.Column="1" />
-                                <TextBlock Text="{Binding Results.Target.StartTime,Mode=OneWay}" Grid.Row="2" Grid.Column="1" />
-                                <TextBlock Text="Duration (ms)" Grid.Column="2" />
-                                <TextBlock Text="{Binding Results.Source.LoadingTime,Mode=OneWay}" Grid.Row="1" Grid.Column="2" />
-                                <TextBlock Text="{Binding Results.Target.LoadingTime,Mode=OneWay}" Grid.Row="2" Grid.Column="2" />
-                                <TextBlock Text="Count" Grid.Column="3" />
-                                <TextBlock Text="{Binding Results.Source.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="3" />
-                                <TextBlock Text="{Binding Results.Target.Count,Mode=OneWay}" Grid.Row="2" Grid.Column="3" />
-                                <TextBlock Text="Matches" Grid.Column="4" />
-                                <TextBlock Text="{Binding Results.MatchingCount,Mode=OneWay,FallbackValue=0}" Grid.Row="1" Grid.RowSpan="2" Grid.Column="4" VerticalAlignment="Center" />
-                                <TextBlock Text="Differences" Grid.Column="5" />
-                                <TextBlock Text="{Binding Results.Source.Differences.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="5" Grid.RowSpan="2" Style="{StaticResource RedWhenNotZero}" VerticalAlignment="Center" />
-                                <TextBlock Text="Missing" Grid.Column="6" />
-                                <TextBlock Text="{Binding Results.Source.Missing.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="6" Style="{StaticResource RedWhenNotZero}" />
-                                <TextBlock Text="{Binding Results.Target.Missing.Count,Mode=OneWay}" Grid.Row="2" Grid.Column="6" Style="{StaticResource RedWhenNotZero}" />
-                                <TextBlock Text="Look-alikes" Grid.Column="7" />
-                                <TextBlock Text="{Binding Results.Source.Duplicates.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="7" Style="{StaticResource RedWhenNotZero}" />
-                                <TextBlock Text="{Binding Results.Target.Duplicates.Count,Mode=OneWay}" Grid.Row="2" Grid.Column="7" Style="{StaticResource RedWhenNotZero}" />
-                                <TextBlock Text="Duplicates" Grid.Column="8"  />
-                                <TextBlock Text="{Binding Results.Source.PerfectDups.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="8" Style="{StaticResource RedWhenNotZero}" />
-                                <TextBlock Text="{Binding Results.Target.PerfectDups.Count,Mode=OneWay}" Grid.Row="2" Grid.Column="8" Style="{StaticResource RedWhenNotZero}" />-->
-                            </Grid>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                                        </SymbolIcon>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Grid.RowSpan="2" Orientation="Horizontal">
+                                        <AppBarButton IsEnabled="{x:Bind Results.ProgressAsInt,Mode=OneWay,Converter={StaticResource doubleLessThan100}}" Height="50" Width="50" Command="{Binding CancelCommand,ElementName=thisPage}" CommandParameter="{x:Bind}" Foreground="OrangeRed" Icon="Stop" />
+                                        <AppBarButton IsEnabled="{x:Bind Results.ProgressAsInt,Mode=OneWay,Converter={StaticResource doubleGreaterThan99}}" Height="50" Width="50" Command="{Binding DetailsCommand,ElementName=thisPage}" CommandParameter="{x:Bind}" Foreground="Green" Icon="View" />
+                                        <AppBarButton IsEnabled="{x:Bind Results.ProgressAsInt,Mode=OneWay,Converter={StaticResource doubleGreaterThan99}}" Height="50" Width="50" Command="{Binding DeleteCommand,ElementName=thisPage}" CommandParameter="{x:Bind}" Foreground="OrangeRed" Icon="Delete" />
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Padding="10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Item" Style="{StaticResource Header}" />
+                                    <TextBlock Text="{x:Bind x:String.Format('Source: {0}', SourceName)}" Grid.Row="1" />
+                                    <TextBlock Text="{x:Bind x:String.Format('Target: {0}', TargetName)}" Grid.Row="2" />
+                                    <TextBlock Text="Count" Grid.Column="1" Style="{StaticResource Header}" />
+                                    <TextBlock Text="{x:Bind Results.Source.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="1" />
+                                    <TextBlock Text="{x:Bind Results.Target.Count,Mode=OneWay}" Grid.Row="2" Grid.Column="1" />
+                                    <TextBlock Text="Matches" Grid.Column="2" Style="{StaticResource Header}" />
+                                    <TextBlock Text="{x:Bind Results.MatchingCount,Mode=OneWay,FallbackValue=0}" Grid.Row="1" Grid.RowSpan="2" Grid.Column="2" VerticalAlignment="Center" />
+                                    <TextBlock Text="Differences" Grid.Column="3" Style="{StaticResource Header}" />
+                                    <TextBlock Text="{x:Bind Results.Differences.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="3" Grid.RowSpan="2" VerticalAlignment="Center" />
+                                    <TextBlock Text="Missing" Grid.Column="4" Style="{StaticResource Header}" />
+                                    <TextBlock Text="{x:Bind Results.Source.Missing.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="4" />
+                                    <TextBlock Text="{x:Bind Results.Target.Missing.Count,Mode=OneWay}" Grid.Row="2" Grid.Column="4" />
+                                    <TextBlock Text="Look-alikes" Grid.Column="5" Style="{StaticResource Header}" />
+                                    <TextBlock Text="{x:Bind Results.Source.Duplicates.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="5" />
+                                    <TextBlock Text="{x:Bind Results.Target.Duplicates.Count,Mode=OneWay}" Grid.Row="2" Grid.Column="5" />
+                                    <TextBlock Text="Duplicates" Grid.Column="6" Style="{StaticResource Header}" />
+                                    <TextBlock Text="{x:Bind Results.Source.PerfectDups.Count,Mode=OneWay}" Grid.Row="1" Grid.Column="6" />
+                                    <TextBlock Text="{x:Bind Results.Target.PerfectDups.Count,Mode=OneWay}" Grid.Row="2" Grid.Column="6" />
+                                </Grid>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </controls:DockPanel>
     </Grid>
 </Page>

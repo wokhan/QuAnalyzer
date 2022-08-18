@@ -9,8 +9,8 @@ internal class SharedHelper
     {
         return new ComparerDefinition<object[]>()
         {
-            SourceQuery = () => sourceData,
-            TargetQuery = () => targetData,
+            SourceEnumerable = sourceData.AsQueryable(),
+            TargetEnumerable = targetData.AsQueryable(),
             IsOrdered = true,
             Comparer = SequenceComparer<object>.Default
         };

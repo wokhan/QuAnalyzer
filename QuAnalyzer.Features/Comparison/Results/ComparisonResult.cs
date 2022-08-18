@@ -5,32 +5,29 @@ using QuAnalyzer.Features.Comparison.Results;
 
 namespace QuAnalyzer.Features.Comparison;
 
-[ObservableObject]
-public partial class ComparisonResult<T>
+public partial class ComparisonResult<T> : ObservableObject
 {
-    [ObservableProperty]
-    private string? message;
+    public string? Message { get; internal set; }
 
-    [ObservableProperty]
-    private ProgressType progress;
+    public int ProgressAsInt => (int)Progress;
 
-    [ObservableProperty]
-    private int scannedCount;
+    public ProgressType Progress { get; internal set; }
 
-    [ObservableProperty]
-    private int matchingCount;
+    public int ScannedCount { get; internal set; }
 
-    [ObservableProperty]
-    private long totalTime;
+    public int MatchingCount { get; internal set; }
 
-    public ItemResult<T> Source { get; } = new ItemResult<T>();
+    public DateTime StartTime { get; internal set; }
 
-    public ItemResult<T> Target { get; } = new ItemResult<T>();
+    public long TotalTime { get; internal set; }
 
-    [ObservableProperty]
-    private IList<(T First, T Second, int Index)> differences = new List<(T, T, int)>();
+    public ItemResult<T> Source { get; } = new();
+
+    public ItemResult<T> Target { get; } = new();
+
+    public IList<(T First, T Second, int Index)> Differences { get; internal set; } = new List<(T, T, int)>();
 
     public string[]? MergedHeaders { get; set; }
 
-    public IEnumerable<Diff<T>>? MergedDiff { get; set; } = null;
+    public IEnumerable<Diff<T>>? MergedDiff { get; set; }
 }
