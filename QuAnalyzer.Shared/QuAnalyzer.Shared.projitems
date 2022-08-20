@@ -21,7 +21,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ComparisonResultsExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\DataGridExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ExcelPackageExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\QueryableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\MicaBackground.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\NugetManager.cs" />

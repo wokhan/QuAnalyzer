@@ -1,14 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 
-using LiveChartsCore.Geo;
-
 using Microsoft.UI.Xaml.Navigation;
 
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Definition;
 using QuAnalyzer.UI.Windows;
-
-using Wokhan.Data.Providers.Contracts;
 
 namespace QuAnalyzer.UI.Popups;
 

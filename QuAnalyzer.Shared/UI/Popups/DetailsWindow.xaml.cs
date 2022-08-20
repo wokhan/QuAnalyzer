@@ -3,11 +3,13 @@ using CommunityToolkit.WinUI.UI.Controls;
 
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Navigation;
 
 using QuAnalyzer.Core.Extensions;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Results;
 using QuAnalyzer.UI.Controls;
+using QuAnalyzer.UI.Windows;
 
 using Wokhan.Data.Providers.Bases;
 
@@ -25,13 +27,30 @@ public partial class DetailsWindow : Page
         set { _gridDiffExported = value; NotifyPropertyChanged("GridDiffExported"); }
     }*/
 
-    public DetailsWindow(ComparerDefinition<object[]> comparer)
+    public DetailsWindow()
     {
-        Comparer = comparer;
-
         InitializeComponent();
 
-        InitGrids(comparer);
+        NavView_ItemInvoked(NavView, null);
+    }
+
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+
+        Comparer = e.Parameter as ComparerDefinition<object[]>;
+
+        GenericPopup.UpdateCurrent(this, title: $"Comparison details: {Comparer.Name} (Source: {Comparer.SourceName} / Target: {Comparer.TargetName})");
+
+        InitGrids(Comparer);
+    }
+
+    private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    {
+        var navItems = sender.MenuItems.OfType<NavigationViewItem>();
+        var item = args is not null ? navItems.First(x => (string)x.Content == (string)args.InvokedItem) : navItems.First();
+        ContentFrame.Content = item.Tag;
     }
 
     private void InitGrids(ComparerDefinition<object[]> r)
@@ -125,7 +144,7 @@ public partial class DetailsWindow : Page
         if (data is not null && data.Any())
         {
             gridData.CustomHeaders = headers.Select((h, i) => new ColumnDescription() { Name = $"it[{i}]", DisplayName = h + (i < keysCount ? "*" : "") }).ToList();
-            gridData.ItemsSource = data.AsQueryable();
+            gridData.ItemsSource = data;
         }
         else
         {

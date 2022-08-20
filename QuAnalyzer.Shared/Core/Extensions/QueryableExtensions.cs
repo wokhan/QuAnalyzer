@@ -1,10 +1,6 @@
 ﻿using CommunityToolkit.Common.Collections;
 using CommunityToolkit.WinUI;
 
-using Microsoft.UI.Xaml.Data;
-
-using QuAnalyzer.UI.Pages;
-
 using System.Linq.Expressions;
 using System.Threading;
 

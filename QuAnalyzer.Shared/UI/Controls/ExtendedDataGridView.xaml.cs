@@ -34,6 +34,9 @@ public partial class ExtendedDataGridView : UserControl
     private string _status;
 
     [ObservableProperty]
+    private bool _sourceIsQueryable;
+    
+    [ObservableProperty]
     private int _loadingProgress;
 
     [ObservableProperty]
@@ -100,11 +103,8 @@ public partial class ExtendedDataGridView : UserControl
     private List<ICommandBarElement> addedCommandBarElements = new();
     partial void OnItemsSourceChanged(IEnumerable value)
     {
-        DispatcherQueue.TryEnqueue(async () =>
-        {
-            ClearAll();
-            Reload();
-        });
+        ClearAll();
+        Reload();
     }
 
     [RelayCommand]
@@ -178,11 +178,8 @@ public partial class ExtendedDataGridView : UserControl
     {
         if (ItemsSource is null)
         {
-            gridData.AutoGenerateColumns = false;
-            gridData.ItemsSource = Enumerable.Range(0, 100);
-            gridData.Columns.Add(new DataGridTextColumn() { Header = "..." });
+            Status = "Waiting for data...";
             gridData.IsHitTestVisible = false;
-            ItemsCount = 0;
             return;
         }
 
@@ -203,11 +200,8 @@ public partial class ExtendedDataGridView : UserControl
         LoadingProgress = -1;
         Status = "Initializing...";
 
-        if (ItemsSource as IQueryable is null)
-        {
-            Status = "Source is not queryable and will be enumerated.";
-        }
-
+        SourceIsQueryable = ItemsSource is IQueryable;
+        
         IQueryable query = ItemsSource.AsQueryable();
 
         if (Filters.Any())
@@ -218,6 +212,7 @@ public partial class ExtendedDataGridView : UserControl
 
         if (!string.IsNullOrEmpty(CustomFilter))
         {
+            //TODO: Hum... that try/catch block is useless => it will never throw since enumeration doesn't take place here... Check that!
             try
             {
                 query = query.Where(CustomFilter);
@@ -270,7 +265,7 @@ public partial class ExtendedDataGridView : UserControl
 
     private void onLoad()
     {
-        Status = "Retrieving...";
+        Status = SourceIsQueryable ? "Querying..." : "Enumerating...";
         LoadingProgress = -1;
         progressBar.ShowError = false;
     }

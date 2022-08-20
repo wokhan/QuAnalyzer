@@ -11,7 +11,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Border x:Name="TitleBar" VerticalAlignment="Center">
-            <TextBlock Margin="10" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{x:Bind WindowTitle,Mode=OneWay}" />
+            <TextBlock Margin="10" Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind WindowTitle,Mode=OneWay}" />
         </Border>
         <Frame Grid.Row="1" x:Name="contents" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
             <Frame.ContentTransitions>

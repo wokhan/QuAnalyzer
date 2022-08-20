@@ -6,25 +6,20 @@
       xmlns:UC="using:QuAnalyzer.UI.Controls"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600" 
+      Background="{ThemeResource SystemChromeAltMediumHighColor}"
       x:Name="me">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="{Binding ActualHeight,ElementName=tabDiff}" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition Width="5"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
-        <TabView Grid.RowSpan="2" x:Name="tabs" Padding="0">
-            <TabViewItem x:Name="tabDiff" Header="DIFFERENCES">
-                <TabViewItem.IconSource>
-                    <SymbolIconSource Symbol="Preview" />
-                </TabViewItem.IconSource>
-                <Border>
-                    <controls:DockPanel>
-                        <!--<controls:DockPanel.Resources>
+        <NavigationView x:Name="NavView" IsSettingsVisible="False" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" ItemInvoked="NavView_ItemInvoked">
+            <NavigationView.MenuItems>
+                <NavigationViewItem x:Name="tabDiff" Content="DIFFERENCES" Icon="Preview" IsSelected="True">
+                    <NavigationViewItem.Tag>
+                        <Border>
+                            <controls:DockPanel>
+                                <!--<controls:DockPanel.Resources>
                             <Style TargetType="DataGridRow">
                                 <Setter Target="Background" Value="White" />
                                 <Style.Triggers>
@@ -37,73 +32,69 @@
                                 </Style.Triggers>
                             </Style>
                         </controls:DockPanel.Resources>-->
-                        <UC:ExtendedDataGridView x:Name="dgDiff" AutoGenerateColumns="False" FrozenColumnCount="1" />
-                    </controls:DockPanel>
-                </Border>
-            </TabViewItem>
-            <TabViewItem x:Name="tabMissingSrc" Header="MISSING ENTRIES">
-                <TabViewItem.IconSource>
-                    <SymbolIconSource Symbol="ClearSelection" />
-                </TabViewItem.IconSource>
-                <Border>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="180*" />
-                            <RowDefinition Height="5" />
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="179*" />
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="{x:Bind x:String.Format('Items missing from {0}', Comparer.SourceName),FallbackValue=Source}" />
-                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgMissingSource" AutoGenerateColumns="False" FrozenColumnCount="1" />
-                        <controls:GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="5" />
-                        <TextBlock Grid.Row="3" Text="{x:Bind x:String.Format('Items missing from {0}',Comparer.TargetName),FallbackValue=Target}" />
-                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgMissingTarget" AutoGenerateColumns="False" FrozenColumnCount="1" />
-                    </Grid>
-                </Border>
-            </TabViewItem>
-            <TabViewItem x:Name="tabDupTrg" Header="SIMILAR ENTRIES">
-                <TabViewItem.IconSource>
-                    <SymbolIconSource Symbol="List" />
-                </TabViewItem.IconSource>
-                <Border>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="180*" />
-                            <RowDefinition Height="5" />
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="179*" />
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="{x:Bind Comparer.SourceName,FallbackValue=Source}" />
-                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourceDups" AutoGenerateColumns="False" FrozenColumnCount="1" />
-                        <controls:GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="5" />
-                        <TextBlock Grid.Row="3" Text="{x:Bind Comparer.TargetName,FallbackValue=Target}" />
-                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetDups" AutoGenerateColumns="False" FrozenColumnCount="1" />
-                    </Grid>
-                </Border>
-            </TabViewItem>
-            <TabViewItem x:Name="tabDupPrfSrc" Header="DUPLICATES">
-                <TabViewItem.IconSource>
-                    <SymbolIconSource Symbol="Copy" />
-                </TabViewItem.IconSource>
-                <Border>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="180*" />
-                            <RowDefinition Height="5" />
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="179*" />
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="{x:Bind Comparer.SourceName,FallbackValue=Source}" />
-                        <UC:ExtendedDataGridView Grid.Row="1" x:Name="dgSourcePerfectDups" AutoGenerateColumns="False" FrozenColumnCount="1" />
-                        <controls:GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="5" />
-                        <TextBlock Grid.Row="3" Text="{x:Bind Comparer.TargetName,FallbackValue=Target}" />
-                        <UC:ExtendedDataGridView Grid.Row="4" x:Name="dgTargetPerfectDups" AutoGenerateColumns="False" FrozenColumnCount="1" />
-                    </Grid>
-                </Border>
-            </TabViewItem>
-        </TabView>
+                                <UC:ExtendedDataGridView x:Name="dgDiff" AutoGenerateColumns="False" FrozenColumnCount="1" />
+                            </controls:DockPanel>
+                        </Border>
+                    </NavigationViewItem.Tag>
+                </NavigationViewItem>
+                <NavigationViewItem x:Name="tabMissingSrc" Content="MISSING ENTRIES" Icon="ClearSelection">
+                    <NavigationViewItem.Tag>
+                        <Border>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="180*" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="179*" />
+                                </Grid.RowDefinitions>
+                                <UC:ExtendedDataGridView CustomCommandBarContent="{x:Bind x:String.Format('Items missing from {0}', Comparer.SourceName),FallbackValue=Source}" x:Name="dgMissingSource" AutoGenerateColumns="False" FrozenColumnCount="1" />
+                                <controls:GridSplitter Grid.Row="1" />
+                                <UC:ExtendedDataGridView Grid.Row="2" CustomCommandBarContent="{x:Bind x:String.Format('Items missing from {0}',Comparer.TargetName),FallbackValue=Target}" x:Name="dgMissingTarget" AutoGenerateColumns="False" FrozenColumnCount="1" />
+                            </Grid>
+                        </Border>
+                    </NavigationViewItem.Tag>
+                </NavigationViewItem>
+                <NavigationViewItem x:Name="tabDupTrg" Content="SIMILAR ENTRIES" Icon="List">
+                    <NavigationViewItem.Tag>
+                        <Border>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="180*" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="179*" />
+                                </Grid.RowDefinitions>
+                                <UC:ExtendedDataGridView CustomCommandBarContent="{x:Bind Comparer.SourceName,FallbackValue=Source}" x:Name="dgSourceDups" AutoGenerateColumns="False" FrozenColumnCount="1" />
+                                <controls:GridSplitter Grid.Row="1" />
+                                <UC:ExtendedDataGridView Grid.Row="2" CustomCommandBarContent="{x:Bind Comparer.TargetName,FallbackValue=Source}" x:Name="dgTargetDups" AutoGenerateColumns="False" FrozenColumnCount="1" />
+                            </Grid>
+                        </Border>
+                    </NavigationViewItem.Tag>
+                </NavigationViewItem>
+                <NavigationViewItem x:Name="tabDupPrfSrc" Content="DUPLICATES" Icon="Copy">
+                    <NavigationViewItem.Tag>
+                        <Border>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="180*" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="179*" />
+                                </Grid.RowDefinitions>
+                                <UC:ExtendedDataGridView CustomCommandBarContent="{x:Bind Comparer.SourceName,FallbackValue=Source}" x:Name="dgSourcePerfectDups" AutoGenerateColumns="False" FrozenColumnCount="1" />
+                                <controls:GridSplitter Grid.Row="1" />
+                                <UC:ExtendedDataGridView Grid.Row="2" CustomCommandBarContent="{x:Bind Comparer.TargetName,FallbackValue=Target}" x:Name="dgTargetPerfectDups" AutoGenerateColumns="False" FrozenColumnCount="1" />
+                            </Grid>
+                        </Border>
+                    </NavigationViewItem.Tag>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+        </NavigationView>
+        <Border Grid.Row="1" Background="{ThemeResource SystemChromeLowColor}">
+            <ContentControl HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" x:Name="ContentFrame">
+                <ContentControl.ContentTransitions>
+                    <TransitionCollection>
+                        <ContentThemeTransition HorizontalOffset="100" VerticalOffset="0" />
+                    </TransitionCollection>
+                </ContentControl.ContentTransitions>
+            </ContentControl>
+        </Border>
     </Grid>
 </Page>
