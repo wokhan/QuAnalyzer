@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI;
 using CommunityToolkit.WinUI.UI.Controls;
 
 using Microsoft.UI.Text;
@@ -7,7 +8,10 @@ using Microsoft.UI.Xaml.Data;
 using QuAnalyzer.Core.Extensions;
 using QuAnalyzer.Generic.Extensions;
 
+using System.Globalization;
 using System.Linq.Dynamic.Core;
+using System.Reflection;
+using System.Security.Cryptography;
 using System.Threading;
 
 using Windows.Devices.Input;
@@ -28,14 +32,11 @@ public partial class ExtendedDataGridView : UserControl
     private bool _enableAdvancedFilters;
 
     [ObservableProperty]
-    private List<ColumnDescription> _customHeaders;
-
-    [ObservableProperty]
     private string _status;
 
     [ObservableProperty]
     private bool _sourceIsQueryable;
-    
+
     [ObservableProperty]
     private int _loadingProgress;
 
@@ -57,6 +58,12 @@ public partial class ExtendedDataGridView : UserControl
     [ObservableProperty]
     private string _customFilterError;
 
+    public event EventHandler<DataGridRowEventArgs> LoadingRow
+    {
+        add => gridData.LoadingRow += value;
+        remove => gridData.LoadingRow -= value;
+    }
+
     public ObservableCollection<ComputeStruct> Compute { get; } = new();
 
     private string SortOrder
@@ -68,7 +75,13 @@ public partial class ExtendedDataGridView : UserControl
                 return currentSortAttribute;
             }
 
-            return (Grouping.FirstOrDefault() ?? CustomHeaders?.FirstOrDefault()?.Name);
+            //TODO: review for arrays
+            var sortby = (Grouping.FirstOrDefault() ?? ((DataGridBoundColumn)Columns?.FirstOrDefault())?.Binding.Path.Path);
+            if (sortby?.StartsWith('[') ?? false)
+            {
+                sortby = "it" + sortby;
+            }
+            return sortby;
         }
     }
 
@@ -80,7 +93,15 @@ public partial class ExtendedDataGridView : UserControl
 
         Filters.CollectionChanged += Filters_CollectionChanged;
 
-        Reload();
+        //Reload();
+    }
+
+    private void gridData_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+    {
+        if (SortOrder is not null && (e.Column as DataGridBoundColumn)?.Binding.Path.Path == SortOrder)
+        {
+            e.Column.SortDirection = (currentSortDirectionAsc ? DataGridSortDirection.Ascending : DataGridSortDirection.Descending);
+        }
     }
 
     IList<ICommandBarElement> primaryCommands;
@@ -166,10 +187,15 @@ public partial class ExtendedDataGridView : UserControl
         Compute.Add(new ComputeStruct() { Attribute = attr, Aggregate = null });
     }
 
+    private Type GetBindingTargetType(DataGridBoundColumn column)
+    {
+        return column.Binding.Source.GetType().GetProperty(column.Binding.Path.Path).GetType();
+    }
+
     private async void gridFilters_Drop(object sender, DragEventArgs e)
     {
         var attr = await e.DataView.GetTextAsync();
-        Filters.Add(new FilterStruct() { Attribute = attr, Type = CustomHeaders.First(c => c.Name == attr).Type });
+        Filters.Add(new FilterStruct() { Attribute = attr, Type = GetBindingTargetType((DataGridBoundColumn)Columns.First(c => (string)c.Header == attr)) });
     }
 
 
@@ -180,28 +206,25 @@ public partial class ExtendedDataGridView : UserControl
         {
             Status = "Waiting for data...";
             gridData.IsHitTestVisible = false;
+            gridData.IsEnabled = false;
             return;
         }
 
-        //gridData.IncrementalLoadingTrigger = IncrementalLoadingTrigger.None;
-        //gridData.ItemsSource = null;
-        gridData.Columns.Clear();
-        gridData.SelectedItem = null;
-        if (gridData.SelectionMode == DataGridSelectionMode.Extended)
-        {
-            gridData.SelectedItems.Clear();
-        }
-
-        gridData.AutoGenerateColumns = this.AutoGenerateColumns;
+        //gridData.SelectedItem = null;
+        //if (gridData.SelectionMode == DataGridSelectionMode.Extended)
+        //{
+        //    gridData.SelectedItems.Clear();
+        //}
 
         gridData.IsEnabled = true;
         gridData.IsHitTestVisible = true;
 
+        LoadedCount = 0;
         LoadingProgress = -1;
         Status = "Initializing...";
 
         SourceIsQueryable = ItemsSource is IQueryable;
-        
+
         IQueryable query = ItemsSource.AsQueryable();
 
         if (Filters.Any())
@@ -234,32 +257,13 @@ public partial class ExtendedDataGridView : UserControl
             query = query.OrderBy(SortOrder + (currentSortDirectionAsc ? "" : " descending"));
         }
 
-        //TODO: review for non-arrays when CustomHeaders are used as it seems incorrect
-        //BTW, CustomHeaders seem useless to me (should directly use Columns, right?)
-        if (!gridData.AutoGenerateColumns && this.CustomHeaders is not null)
-        {
-            gridData.Columns.AddAll(CustomHeaders.Select((h, i) => new DataGridTextColumn()
-            {
-                Header = h.DisplayName,
-                Binding = new Binding() { Path = new PropertyPath(query.ElementType.IsArray ? $"[{i}]" : h.Name) },
-                //Tag = h.Name,
-                FontWeight = (h.IsKey ? FontWeights.Bold : FontWeights.Normal)
-            }));
-        }
-
-        // Computing count on another thread to avoid blocking the main one (if counting cost is significant)
+        //Computing count on another thread to avoid blocking the main one(if counting cost is significant)
         _ = Task.Run(() =>
         {
             var count = query.Count();
             DispatcherQueue.TryEnqueue(() => ItemsCount = count);
         });
 
-        if (SortOrder is not null && gridData.Columns.Any())
-        {
-            gridData.Columns.First(c => ((DataGridBoundColumn)c).Binding.Path.Path == SortOrder).SortDirection = (currentSortDirectionAsc ? DataGridSortDirection.Ascending : DataGridSortDirection.Descending);
-        }
-
-        //gridData.IncrementalLoadingTrigger = IncrementalLoadingTrigger.Edge;
         gridData.ItemsSource = query.AsIncremental(200, onLoad, onDone, onError);
     }
 
@@ -313,6 +317,11 @@ public partial class ExtendedDataGridView : UserControl
     private void gridData_Sorting(object sender, DataGridColumnEventArgs e)
     {
         var sortby = ((DataGridBoundColumn)e.Column).Binding.Path.Path;
+        //TODO: looks ugly... Maybe find another way for arrays?!
+        if (sortby.StartsWith('['))
+        {
+            sortby = "it" + sortby;
+        }
         currentSortDirectionAsc = (currentSortAttribute == sortby) && !currentSortDirectionAsc;
         currentSortAttribute = sortby;
 
@@ -362,8 +371,11 @@ public partial class ExtendedDataGridView : UserControl
         set => gridData.FrozenColumnCount = value;
     }
 
-    [ObservableProperty]
-    public bool _autoGenerateColumns;
+    public bool AutoGenerateColumns
+    {
+        get => gridData.AutoGenerateColumns;
+        set => gridData.AutoGenerateColumns = value;
+    }
 
     public DataGridLength ColumnWidth
     {
@@ -375,4 +387,7 @@ public partial class ExtendedDataGridView : UserControl
     public IEnumerable _itemsSource;
 
     public ObservableCollection<Style> RowGroupHeaderStyles => gridData.RowGroupHeaderStyles;
+
+    public ObservableCollection<DataGridColumn> Columns => gridData.Columns;
+
 }

@@ -62,7 +62,7 @@ public static class Comparison
 
                 var srcData = definition.SourceEnumerable;
                 var trgData = definition.TargetEnumerable;
-                
+
                 if (srcData is not null && trgData is not null)
                 {
                     if (samplesPct > 0)
@@ -170,8 +170,6 @@ public static class Comparison
 
         var keepGoing = issrc || istrg;
 
-        int count = 0;
-
         while (keepGoing)
         {
             token?.ThrowIfCancellationRequested();
@@ -247,10 +245,14 @@ public static class Comparison
         while (issrc)
         {
             definition.Results.Source.Count++;
-            definition.Results.ScannedCount++;
             definition.Results.Target.Missing.Add(srcEnum.Current);
 
             issrc = srcEnum.MoveNext();
+
+            if (issrc)
+            {
+                definition.Results.ScannedCount++;
+            }
 
             SetProgress(definition, ProgressType.Comparing, callback);
         }
@@ -258,10 +260,14 @@ public static class Comparison
         while (istrg)
         {
             definition.Results.Target.Count++;
-            definition.Results.ScannedCount++;
             definition.Results.Source.Missing.Add(trgEnum.Current);
 
             istrg = trgEnum.MoveNext();
+
+            if (istrg)
+            {
+                definition.Results.ScannedCount++;
+            }
 
             SetProgress(definition, ProgressType.Comparing, callback);
         }

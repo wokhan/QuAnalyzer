@@ -29,5 +29,4 @@ public partial class ExtendedDataGridView
         { "Less than or equal", "<=" }
     };
 
-    public ObservableCollection<DataGridColumn> Columns => gridData.Columns;
 }

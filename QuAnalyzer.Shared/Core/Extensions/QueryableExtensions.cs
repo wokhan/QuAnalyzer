@@ -22,8 +22,14 @@ public static class QueryableExtensions
         var source = Activator.CreateInstance(sourceGenericType, query);
 
         var collectionGenericType = typeof(IncrementalLoadingCollection<,>).MakeGenericType(sourceGenericType, elementType);
+        
+        var ret = (IEnumerable)Activator.CreateInstance(collectionGenericType, source, itemsPerPage, onStartLoading, onEndLoading, onError);
 
-        return (IEnumerable)Activator.CreateInstance(collectionGenericType, source, itemsPerPage, onStartLoading, onEndLoading, onError);
+        // Hack to allow data to be loaded first
+        var refreshMethod = collectionGenericType.GetMethod("RefreshAsync");
+        refreshMethod.Invoke(ret, null);
+
+        return ret;
     }
 
     public class IncrementalSource<T> : IIncrementalSource<T>

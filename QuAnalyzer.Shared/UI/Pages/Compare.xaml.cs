@@ -6,6 +6,7 @@ using QuAnalyzer.Core.Extensions;
 using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Comparers;
+using QuAnalyzer.Features.Comparison.Results;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
 using QuAnalyzer.UI.Windows;
@@ -177,8 +178,23 @@ public partial class Compare : Page
             {
                 using (var xl = new ExcelPackage(file))
                 {
-                    cmp.Results.InitDiff(cmp);
-                    xl.AddWorksheet(cmp.Results.MergedDiff, cmp.Results.MergedHeaders.Prepend("Name").ToArray(), cmp.SourceKeys.Count, "Differences", (x, i, h, s) => { if (x.IsDiff[i]) { s.Font.Color.SetColor(System.Drawing.Color.Red); } return x.Values[i]; }, task1.ProgressCallback);
+                    var sourceName = cmp.SourceName;
+                    var targetName = cmp.TargetName;
+
+                    //TODO: Review & test
+                    var mergedHeaders = cmp.SourceHeaders.Zip(cmp.TargetHeaders, (src, trg) => src + (src != trg ? "/" + trg : String.Empty)).ToArray();
+
+                    var mergedDiff = cmp.Results.Differences.SelectMany(x => new[] {
+                                    x.Source.Select(fs => new Diff(Origin: sourceName, Value: fs)).ToArray(),
+                                    x.Source.Zip(x.Target)
+                                            .Select((fs, i) => new Diff(
+                                        Origin: targetName,
+                                        Value: fs.Second,
+                                        IsDiff: i >= x.Index && !Equals(fs.First, fs.Second)
+                                    )).ToArray()
+                                });
+
+                    xl.AddWorksheet(mergedDiff, mergedHeaders.Prepend("Name").ToArray(), cmp.SourceKeys.Count, "Differences", (x, i, h, s) => { if (x[i].IsDiff) { s.Font.Color.SetColor(System.Drawing.Color.Red); } return x[i].Value; }, task1.ProgressCallback);
 
                     //if (cmp.Results.Source.Missing is not null)
                     xl.AddWorksheet(cmp.Results.Source.Missing, cmp.SourceHeaders, cmp.SourceKeys.Count, "Missing from source", (x, i, h, s) => x[i], task2.ProgressCallback);

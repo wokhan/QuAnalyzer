@@ -65,11 +65,11 @@ public partial class PatternsPage : Page
         gridPatterns.LoadingProgress = -1;
         gridPatterns.Status = "Analyzing...";
 
-        await Task.Run(() =>
+        Data = await Task.Run(() =>
         {
             DispatcherQueue.TryEnqueue(() => Progress = 0);
 
-            Data = prov.GetQueryable(repo)
+            return prov.GetQueryable(repo)
                            .Select(attr)
                            .AsEnumerable()
                            .AsParallel()

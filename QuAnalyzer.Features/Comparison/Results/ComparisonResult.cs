@@ -25,9 +25,5 @@ public partial class ComparisonResult<T> : ObservableObject
 
     public ItemResult<T> Target { get; } = new();
 
-    public IList<(T First, T Second, int Index)> Differences { get; internal set; } = new List<(T, T, int)>();
-
-    public string[]? MergedHeaders { get; set; }
-
-    public IEnumerable<Diff<T>>? MergedDiff { get; set; }
+    public IList<(T Source, T Target, int Index)> Differences { get; internal set; } = new List<(T, T, int)>();
 }

@@ -24,17 +24,8 @@
         </Style>-->
     </UserControl.Resources>
     <!-- Setting the template directly through DataGrid.Template doesn't work, using a Style to do so (as it might in fact be expected for a control which is NOT a usercontrol) -->
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        <CommandBar Grid.ColumnSpan="2" x:Name="commandBar" Content="{x:Bind CustomCommandBarContent,Mode=OneWay}">
+    <controls:DockPanel>
+        <CommandBar controls:DockPanel.Dock="Top" x:Name="commandBar" Content="{x:Bind CustomCommandBarContent,Mode=OneWay}">
             <CommandBar.PrimaryCommands>
                 <AppBarButton Label="Copy" ToolTipService.ToolTip="Copy to clipboard" Icon="Copy" Command="{x:Bind CopyCommand}" />
                 <AppBarSeparator />
@@ -50,25 +41,17 @@
                 <AppBarToggleButton x:Name="btnAggregate" IsChecked="False" Label="Group/Filter" ToolTipService.ToolTip="Show aggregation and filtering options" Icon="Filter" Visibility="{x:Bind EnableAdvancedFilters,Converter={StaticResource boolToVisibilityConverter}}" />
             </CommandBar.PrimaryCommands>
         </CommandBar>
-        <Grid Grid.Row="2" Grid.ColumnSpan="2" Height="30" VerticalAlignment="Center" HorizontalAlignment="Stretch" Background="{ThemeResource ControlFillColorDefault}">
+        <Grid controls:DockPanel.Dock="Bottom" Height="30" VerticalAlignment="Center" HorizontalAlignment="Stretch" Background="{ThemeResource ControlFillColorDefault}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock VerticalAlignment="Center" Margin="20,0" FontSize="12" Text="{x:Bind x:String.Format(x:Null, '{0} / {1} item(s) loaded', LoadedCount, ItemsCount), Mode=OneWay}" />
             <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{x:Bind x:String.Format('Status: {0}',Status),Mode=OneWay,TargetNullValue='-'}" FontSize="12" />
-            <ProgressBar x:Name="progressBar" Background="Black" Height="5" Grid.Column="2" HorizontalAlignment="Right" Value="{x:Bind LoadingProgress,Mode=OneWay}" IsIndeterminate="{x:Bind LoadingProgress.Equals(-1),Mode=OneWay}" Margin="10,0" Width="200" />
+            <ProgressBar x:Name="progressBar" Height="5" Background="{ThemeResource SystemChromeBlackHighColor}" Grid.Column="2" Value="{x:Bind LoadingProgress,Mode=OneWay}" IsIndeterminate="{x:Bind LoadingProgress.Equals(-1),Mode=OneWay}" Margin="10,0" Width="200" />
         </Grid>
-        <controls:DataGrid Grid.Row="1" Sorting="gridData_Sorting" x:Name="gridData" IsReadOnly="True" CanUserSortColumns="True" CanUserReorderColumns="True" BorderThickness="0" ColumnWidth="Auto" HorizontalScrollBarVisibility="Auto">
-            <!--<controls:DataGrid.Resources>
-                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
-                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGrid_PreviewMouseLeftButtonDown" />
-                                <EventSetter Event="PreviewMouseMove" Handler="DataGrid_MouseMove" />
-                            </Style>
-                        </controls:DataGrid.Resources>-->
-        </controls:DataGrid>
-        <Grid Width="250" Grid.Row="1" Grid.Column="1" Visibility="{x:Bind btnAggregate.IsChecked.Value,Converter={StaticResource boolToVisibilityConverter},Mode=OneWay}" Background="{ThemeResource ControlFillColorDefault}">
+        <Grid controls:DockPanel.Dock="Right" Width="250" Visibility="{x:Bind btnAggregate.IsChecked.Value,Converter={StaticResource boolToVisibilityConverter},Mode=OneWay}" Background="{ThemeResource ControlFillColorDefault}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -211,5 +194,13 @@
                 <AppBarButton Label="Clear" Icon="Cancel" Command="{x:Bind ClearAllCommand}" />
             </CommandBar>
         </Grid>
-    </Grid>
+        <controls:DataGrid Sorting="gridData_Sorting" AutoGeneratingColumn="gridData_AutoGeneratingColumn" x:Name="gridData" IsReadOnly="True" CanUserSortColumns="True" CanUserReorderColumns="True" BorderThickness="0" ColumnWidth="Auto">
+            <!--<controls:DataGrid.Resources>
+                            <Style TargetType="DataGridColumn" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DataGrid_PreviewMouseLeftButtonDown" />
+                                <EventSetter Event="PreviewMouseMove" Handler="DataGrid_MouseMove" />
+                            </Style>
+                        </controls:DataGrid.Resources>-->
+        </controls:DataGrid>
+    </controls:DockPanel>
 </UserControl>

@@ -3,9 +3,8 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:UC="using:QuAnalyzer.UI.Controls"
       mc:Ignorable="d"
       d:DesignHeight="600" d:DesignWidth="850"
       x:Name="thisWindow">
-    <UC:ExtendedDataGridView x:Name="gridData" EnableAdvancedFilters="True" />
+    <TabView x:Name="tabs" TabCloseRequested="tabs_TabCloseRequested" AddTabButtonClick="tabs_AddTabButtonClick" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" />
 </Page>

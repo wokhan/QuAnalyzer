@@ -4,7 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:UC="using:QuAnalyzer.UI.Controls"
-      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
       mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600" 
       Background="{ThemeResource SystemChromeAltMediumHighColor}"
       x:Name="me">
@@ -18,22 +18,7 @@
                 <NavigationViewItem x:Name="tabDiff" Content="DIFFERENCES" Icon="Preview" IsSelected="True">
                     <NavigationViewItem.Tag>
                         <Border>
-                            <controls:DockPanel>
-                                <!--<controls:DockPanel.Resources>
-                            <Style TargetType="DataGridRow">
-                                <Setter Target="Background" Value="White" />
-                                <Style.Triggers>
-                                    <Trigger Property="ItemsControl.AlternationIndex" Value="2">
-                                        <Setter Target="Background" Value="#EEE" />
-                                    </Trigger>
-                                    <Trigger Property="ItemsControl.AlternationIndex" Value="3">
-                                        <Setter Target="Background" Value="#EEE" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </controls:DockPanel.Resources>-->
-                                <UC:ExtendedDataGridView x:Name="dgDiff" AutoGenerateColumns="False" FrozenColumnCount="1" />
-                            </controls:DockPanel>
+                            <UC:ExtendedDataGridView x:Name="dgDiff" AutoGenerateColumns="False" FrozenColumnCount="1" />
                         </Border>
                     </NavigationViewItem.Tag>
                 </NavigationViewItem>

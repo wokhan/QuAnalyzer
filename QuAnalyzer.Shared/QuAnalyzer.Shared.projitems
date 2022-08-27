@@ -18,7 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ComparisonResultsExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ColumnDefinitionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\DataGridExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ExcelPackageExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\QueryableExtensions.cs" />
