@@ -4,6 +4,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections;
 using System.Linq.Dynamic.Core;
 
+using Wokhan.Collections.Generic.Extensions;
+
 #if !NET6_0_OR_GREATER
 using ArgumentNullException = QuAnalyzer.Features.Exceptions.ExceptionsHelper._ArgumentNullException;
 #endif
@@ -33,34 +35,31 @@ public class ComparerDefinition<T> : ObservableObject
 
     public ComparerDefinition(SourcesMapper s, IComparer comparer, Func<IQueryable, string[], IEnumerable<T>> map, Func<object, Type[], T>? convert = null)
     {
-        var sourceMapFields = s.AllMappings.Select(m => m.Source).ToArray();
-        var targetMapFields = s.AllMappings.Select(m => m.Target).ToArray();
+        var keycount = s.AllMappings.Count(m => m.IsKey);
 
-        var sourceColumns = s.Source.GetColumns(s.SourceRepository);
-        var targetColumns = s.Target.GetColumns(s.TargetRepository);
-
-        string[]? sourceKeys = null;
-        string[]? targetKeys = null;
-        if (s.AllMappings.Any(a => a.IsKey))
-        {
-            sourceKeys = s.AllMappings.Where(a => a.IsKey).Select(m => m.Source).ToArray();
-            targetKeys = s.AllMappings.Where(a => a.IsKey).Select(m => m.Target).ToArray();
-        }
+        var sourceMapFields = s.AllMappings.OrderByDescending(m => m.IsKey).Select(m => m.Source).ToArray();
+        var targetMapFields = s.AllMappings.OrderByDescending(m => m.IsKey).Select(m => m.Target).ToArray();
 
         Name = s.Name;
         SourceName = $"{s.Source.Name} ({s.SourceRepository})";
         TargetName = $"{s.Target.Name} ({s.TargetRepository})";
         SourceHeaders = sourceMapFields;
         TargetHeaders = targetMapFields;
-        SourceKeys = sourceKeys;
-        TargetKeys = targetKeys;
+        //To bad [..keycount] isn't supported by Uno for WPF since it relies on netstandard2.0 (need 2.1)
+        SourceKeys = sourceMapFields.Take(keycount).ToArray();
+        TargetKeys = targetMapFields.Take(keycount).ToArray();
         Comparer = comparer ?? Comparer<T>.Default;
 
         var srcData = s.Source.GetQueryable(s.SourceRepository)
-                              .OrderBy(String.Join(",", sourceKeys.Concat(sourceColumns.Select(h => h.Name)).Except(sourceKeys)));
+                              .Select($"new({String.Join(",", sourceMapFields.Distinct())})")
+                              .OrderByAll();
 
         var trgData = s.Target.GetQueryable(s.TargetRepository)
-                              .OrderBy(String.Join(",", targetKeys.Concat(targetColumns.Select(h => h.Name)).Except(targetKeys)));
+                              .Select($"new({String.Join(",", targetMapFields.Distinct())})")
+                              .OrderByAll();
+
+        var sourceColumns = s.Source.GetColumns(s.SourceRepository);
+        var targetColumns = s.Target.GetColumns(s.TargetRepository);
 
         var sourceMapTypes = sourceMapFields.Join(sourceColumns, field => field, header => header.Name, (field, header) => header.Type).ToArray();
         var targetMapTypes = targetMapFields.Join(targetColumns, field => field, header => header.Name, (field, header) => header.Type).ToArray();
@@ -71,7 +70,8 @@ public class ComparerDefinition<T> : ObservableObject
             ArgumentNullException.ThrowIfNull(convert);
 
             SourceEnumerable = map(srcData, sourceMapFields).Select(item => convert(item, targetMapTypes));
-        } else
+        }
+        else
         {
             SourceEnumerable = map(srcData, sourceMapFields);
         }
@@ -80,7 +80,6 @@ public class ComparerDefinition<T> : ObservableObject
 
         //IsOrdered = s.IsOrdered;
     }
-
 
     public void RaiseResultChanged()
     {

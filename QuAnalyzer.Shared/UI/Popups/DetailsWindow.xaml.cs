@@ -141,11 +141,11 @@ public partial class DetailsWindow : Page
 
         if (data is not null && data.Any())
         {
-            for (int i = 1; i < headers.Length; i++)
+            for (int i = 0; i < headers.Length; i++)
             {
                 var col = new CustomColumn()
                 {
-                    Index = i,
+                    Index = i + 1,
                     Header = headers[i],
                     IsKey = (i < keysCount)
                 };
