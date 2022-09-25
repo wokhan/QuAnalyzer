@@ -25,7 +25,8 @@ public partial class ViewerPage : Page
         {
             var grid = new ExtendedDataGridView()
             {
-                ItemsSource = prov.GetQueryable(repo)
+                ItemsSource = prov.GetQueryable(repo),
+                EnableAdvancedFilters = true
             };
 
             var newTab = new TabViewItem()

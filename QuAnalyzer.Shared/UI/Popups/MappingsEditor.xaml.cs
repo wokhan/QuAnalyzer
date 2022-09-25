@@ -98,9 +98,11 @@ public partial class MappingsEditor : Page
         IsPopup = GenericPopup.FromPage(this) is not null;
     }
 
-    [RelayCommand]
-    private void RemoveMapping(SimpleMap mapping)
+
+    private void removeMapping_Click(object sender, RoutedEventArgs e)
     {
+        var mapping = (SimpleMap)((Button)sender).CommandParameter;
+
         Mapping.AllMappings.Remove(mapping);
     }
 

@@ -35,6 +35,8 @@ public partial class Compare : Page
 
     public Compare()
     {
+        ProgressCallback = new Progress<ComparerDefinition<object[]>>(HandleProgress);
+
         InitializeComponent();
     }
 
@@ -264,18 +266,18 @@ public partial class Compare : Page
             newInstances.Add(cp);
         }
 
+        await Task.Run(() => Comparison.Run(newInstances, progressCallback: ProgressCallback, useParallelism: App.Instance.CurrentProject.UseParallelism)).ConfigureAwait(true);
+
         CurrentProgress = 100;
-
-        var callback = new Progress<ComparerDefinition<object[]>>(Progress);
-
-        //TODO: run asynchronously! As of now it breaks the app if I do so, I don't understand why (with a "InvalidCastException" when updating a property actually not even used in the UI?!)
-        await Task.Run(() => Comparison.Run(newInstances, progressCallback: callback, useParallelism: App.Instance.CurrentProject.UseParallelism)).ConfigureAwait(true);
     }
 
     //TODO: fix for single mapper use
     private bool CanExecuteRun => true;// (App.Instance.CurrentProject.UseSingleMapping && App.Instance.CurrentProject.SingleMapper.AllMappings.Any()) || (!App.Instance.CurrentProject.UseSingleMapping && lstMappings?.SelectedItems.Count > 0);
 
-    public void Progress(ComparerDefinition<object[]> comparer)
+
+    IProgress<ComparerDefinition<object[]>> ProgressCallback;
+
+    public void HandleProgress(ComparerDefinition<object[]> comparer)
     {
         switch (comparer.Results.Progress)
         {

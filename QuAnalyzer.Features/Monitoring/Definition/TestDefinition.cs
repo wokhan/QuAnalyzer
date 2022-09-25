@@ -8,6 +8,7 @@ namespace QuAnalyzer.Features.Monitoring;
 
 public partial class TestDefinition : ObservableObject
 {
+    public bool IsSelected { get; set; }
     public bool RunWhenStarted { get; set; }
 
     public ObservableDictionary<TestDefinition, bool> PrecedingSteps { get; private set; } = new();
@@ -17,7 +18,9 @@ public partial class TestDefinition : ObservableObject
     [ObservableProperty]
     private string name;
 
-    public ValueSelectors.Selector? Selector { get; set; }
+    //TODO: still useful? See comment on TestsCollection class
+    //Warning: if reenabled, check the resulting serialization as it tries to serialize the whole type as of now...
+    public ValueSelectors.Selector? Selector { get; set; }// = ValueSelectors.SequentialSelector;
 
     [ObservableProperty]
     private IDataProvider? provider;
@@ -27,7 +30,7 @@ public partial class TestDefinition : ObservableObject
 
     // TODO: Why?
     //public Func<IList<Dictionary<string, string>>, Dictionary<string, long>, IQueryable> GetData => (values, statsBag) => Provider.GetQueryable(Repository, values, statsBag);
-    public IQueryable GetData(IList<Dictionary<string, string>>? values, Dictionary<string, long> statsBag)
+    internal IQueryable GetData(IList<Dictionary<string, string>>? values, Dictionary<string, long> statsBag)
     {
         return Provider.GetQueryable(Repository, values, statsBag);
     }
@@ -39,15 +42,6 @@ public partial class TestDefinition : ObservableObject
 
     [ObservableProperty]
     private string type = MonitoringModes.PING;
-
-
-    //public void AttachEvent(Action<TestResults> monitor_OnAdd, Action<TestResults> monitor_OnResult)
-    //{
-    //    OnAdd -= monitor_OnAdd;
-    //    OnAdd += monitor_OnAdd;
-    //    OnResult -= monitor_OnResult;
-    //    OnResult += monitor_OnResult;
-    //}
 
     public string Attributes { get; set; } = "";
 

@@ -2,6 +2,8 @@
 
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
+using LiveChartsCore.Kernel;
+using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 
 using QuAnalyzer.Features.Monitoring;
@@ -16,46 +18,57 @@ namespace QuAnalyzer.UI.Pages;
 [ObservableObject]
 public partial class Monitor : Page
 {
-    private const int chartTimeSpanMinutes = 1;
-    private long startDate;
+    private TimeSpan chartTimeSpanSeconds = TimeSpan.FromSeconds(30);
+
+    private ThreadPoolTimer panningDelayTimer;
     private ThreadPoolTimer globalTimer;
     private List<ThreadPoolTimer> timers = new();
     private Dictionary<TestDefinition, (TestCase Item, int Index)> instances;
 
     public ObservableCollection<TestResults> MonitorResultsView { get; } = new();
+    public ObservableCollection<ISeries> MonitorResultsSeries { get; } = new();
 
-    public ObservableDictionary<string, ISeries[]> ResultSeriesMappings { get; } = new();
+    private readonly Dictionary<string, (LineSeries<ObservablePoint> DurationSeries, ColumnSeries<ObservablePoint> ResultSseries)> resultSeriesMappings = new();
     public double Occurences { get; set; } = 10;
     public double MaxParallel { get; set; } = 1;
-    public bool UseComparisonMode { get; set; }
 
     [ObservableProperty]
+    private bool useComparisonMode;
+
+    [ObservableProperty]
+    private bool autoScrollResults = true;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RunCommand))]
+    [NotifyCanExecuteChangedFor(nameof(StopCommand))]
     private bool isRunning;
+
+    private static Axis yLogAxis = new()
+    {
+        //MinStep = 1,
+        MinLimit = 0,
+        //Labeler = value => Math.Pow(10, value).ToString()
+    };
+
+    public ICartesianAxis[] YAxes { get; } = { new Axis(), yLogAxis };
+
+    private static Axis xTimeAxis = new()
+    {
+        Labeler = value => new DateTime((long)value).ToLongTimeString()
+    };
+
+    public ICartesianAxis[] XAxes { get; } = { xTimeAxis };
 
     public Monitor()
     {
-        MonitorResultsView.CollectionChanged += MonitorResultsView_CollectionChanged;
+        ProgressCallback = new Progress<(TestCase, TestResults)>(HandleProgress);
 
         InitializeComponent();
     }
 
-    private void MonitorResultsView_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void gridSteps_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (e.Action == NotifyCollectionChangedAction.Add)
-        {
-            var results = e.NewItems.Cast<TestResults>().ToList();
-            results.ForEach(t =>
-            {
-                var serie = ResultSeriesMappings[t.Name][0];
-                var serie2 = ResultSeriesMappings[t.Name][1];
-
-                ((ObservableCollection<DateTimePoint>)serie.Values).Add(new DateTimePoint(t.LastCheck.DateTime, t.LastCheck.Ticks - startDate + 1));
-
-                var d = new ObservablePoint(t.LastCheck.DateTime.Ticks, 0);
-                ((ObservableCollection<ObservablePoint>)serie2.Values).Add(d);
-                t.Duration.CollectionChanged += (s, e) => { if (t.Duration.ContainsKey("_TOTAL_DEFAULT")) { d.Y = t.Duration["_TOTAL_DEFAULT"]; } };
-            });
-        }
+        RunCommand.NotifyCanExecuteChanged();
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteRun))]
@@ -63,111 +76,149 @@ public partial class Monitor : Page
     {
         IsRunning = true;
 
-        var mitems = gridSteps.SelectedItems.Cast<TestDefinition>();
-
         MonitorResultsView.Clear();
 
-        InitChart(mitems);
+        var selectedTests = gridSteps.SelectedItems.Cast<TestDefinition>().ToList();
 
-        startDate = DateTimeOffset.Now.Ticks;
-        //BindingOperations.EnableCollectionSynchronization(MonitorResultsView, MonitorResultsView);
+        // https://github.com/beto-rodriguez/LiveCharts2/issues/579
+        xTimeAxis.MinLimit = DateTime.Now.Ticks;
+        xTimeAxis.MaxLimit = DateTime.Now.Add(TimeSpan.FromSeconds(60)).Ticks;
+
+        InitSeries(selectedTests);
 
         if (UseComparisonMode)
         {
-            //globalTimer = new winth.DispatcherTimer(TimeSpan.FromSeconds(mitems.Max(m => m.Interval)), winth.DispatcherPriority.Background, globalCompTimer_Tick, Dispatcher) { IsEnabled = true, Tag = mitems };
-            globalTimer = ThreadPoolTimer.CreatePeriodicTimer(globalTimer_Tick, TimeSpan.FromSeconds(mitems.Max(m => m.Interval)));
+            globalTimer = ThreadPoolTimer.CreatePeriodicTimer(_ => RunPeriodicCompared(selectedTests), TimeSpan.FromSeconds(selectedTests.Max(m => m.Interval)));
         }
         else
         {
-            var gcd = mitems.Select(m => m.Interval).GreatestCommonDiv();
-            // TODO: Used to be * 30... Why?
-            //globalTimer = new DispatcherTimer(TimeSpan.FromSeconds(gcd), DispatcherPriority.Background, globalTimer_Tick, Dispatcher) { IsEnabled = true };
-            globalTimer = ThreadPoolTimer.CreatePeriodicTimer(globalTimer_Tick, TimeSpan.FromSeconds(gcd));
+            var gcd = selectedTests.Select(m => m.Interval).GreatestCommonDiv();
+            panningDelayTimer = ThreadPoolTimer.CreateTimer(_ => globalTimer = ThreadPoolTimer.CreatePeriodicTimer(setChartPanning, TimeSpan.FromSeconds(gcd)), chartTimeSpanSeconds);
 
-            //globalTimer_Tick(null, null);
+            instances = selectedTests.ToDictionary(test => test, test => (test.CreateInstance(), 1));
 
-            instances = mitems.ToDictionary(m => m, m => (m.CreateInstance(), 1));
             foreach (var instance in instances)
             {
                 instance.Value.Item.AttachPrecedingStepInstances(instance.Key.PrecedingSteps.Select(step => instances[step.Key].Item));
             }
 
-            //timers = mitems.Select(m => new DispatcherTimer(TimeSpan.FromSeconds(m.Interval), DispatcherPriority.Background, Timer_Tick, Dispatcher) { Tag = m, IsEnabled = true }).ToList();
-            timers = mitems.Select(m => ThreadPoolTimer.CreatePeriodicTimer(timer => Timer_Tick(timer, m), TimeSpan.FromSeconds(m.Interval))).ToList();
-
+            timers = selectedTests.Select(test =>
+            {
+                if (test.RunWhenStarted)
+                {
+                    RunPeriodic(test);
+                }
+                return ThreadPoolTimer.CreatePeriodicTimer(_ => RunPeriodic(test), TimeSpan.FromSeconds(test.Interval));
+            }).ToList();
         }
-
-        IsRunning = false;
     }
 
-    private bool CanExecuteRun => gridSteps?.SelectedItems.Count > 0;
+    private bool CanExecuteRun => !IsRunning && gridSteps?.SelectedItems.Count > 0;
 
     private int globalPerfCounter;
-    private async void globalCompTimer_Tick(ThreadPoolTimer timer, TestDefinition[] monitors)
+    private async void RunPeriodicCompared(IEnumerable<TestDefinition> tests)
     {
-        var monitorInstances = monitors.Select(m => m.CreateInstance()).ToList();
-
-        var progress = new Progress<TestResults>(monitor_OnAdd);
+        var testInstances = tests.Select(m => m.CreateInstance()).ToList();
 
         //TODO : Values !!!!
-        await Task.Run(() => Monitoring.Run(new TestCasesCollection() { TestCases = monitorInstances }, globalPerfCounter++, (int)Occurences, (int)MaxParallel, progress)).ConfigureAwait(false);
+        await Task.Run(() => Monitoring.Run(testInstances, null, null, globalPerfCounter++, (int)Occurences, (int)MaxParallel, ProgressCallback)).ConfigureAwait(false);
     }
 
-    private async void Timer_Tick(ThreadPoolTimer timer, TestDefinition monitor)
+    private async void RunPeriodic(TestDefinition test)
     {
-        var (monitorInstance, cnt) = instances[monitor];
-        if (monitorInstance.Status == TestCaseStatus.DONE)
+        var (testInstance, cnt) = instances[test];
+        switch (testInstance.Status)
         {
-            monitorInstance.PropertyChanged -= UpdateStatus;
-            monitorInstance = monitor.CreateInstance();
-            monitorInstance.PropertyChanged += UpdateStatus;
+            // Still running, ignoring this occurence
+            case TestCaseStatus.RUNNING:
+                return;
 
-            instances[monitor] = (monitorInstance, cnt++);
-            monitorInstance.AttachPrecedingStepInstances(monitor.PrecedingSteps.Select(step => instances[step.Key].Item));
-        }
-        else if (monitorInstance.Status == TestCaseStatus.RUNNING)
-        {
-            return;
-        }
+            // Creates a new instance as the preceding one is done running
+            case TestCaseStatus.DONE:
+                testInstance = test.CreateInstance();
 
-        if (!monitorInstance.AllPrecedingStepsDone)
-        {
-            monitorInstance.Status = TestCaseStatus.WAITING;
-            return;
+                instances[test] = (testInstance, cnt++);
+                testInstance.AttachPrecedingStepInstances(test.PrecedingSteps.Select(step => instances[step.Key].Item));
+                break;
         }
 
-        monitorInstance.Status = TestCaseStatus.RUNNING;
-
-        List<Dictionary<string, string>> values = null;
-
-        var progress = new Progress<TestResults>(monitor_OnAdd);
         //TODO : Values !!!!
-        await Task.Run(() => Monitoring.Run(new TestCasesCollection() { TestCases = { monitorInstance }, ValuesSet = values }, cnt++, 1, 1, progress)).ConfigureAwait(false);
-
-        monitorInstance.Status = TestCaseStatus.DONE;
+        await Task.Run(() => Monitoring.Run(new[] { testInstance }, null, null, cnt++, 1, 1, ProgressCallback)).ConfigureAwait(false);
     }
 
-    private void UpdateStatus(object sender, PropertyChangedEventArgs e)
+    void logmap(DateTimePoint logPoint, ChartPoint chartPoint)
     {
-        if (e.PropertyName == nameof(TestCase.Status))
+        chartPoint.PrimaryValue = logPoint.Value.HasValue ? Math.Log(logPoint.Value.Value, 10) : 0;
+        chartPoint.SecondaryValue = logPoint.DateTime.Ticks;
+    }
+
+    private void InitSeries(IEnumerable<TestDefinition> tests)
+    {
+        foreach (var test in tests)
         {
-            var instance = (TestCase)sender;
-            instance.Definition.Status = instance.Status;
+            if (!resultSeriesMappings.ContainsKey(test.Name))
+            {
+                var durationSeries = new LineSeries<ObservablePoint>() { GeometrySize = 4, Name = test.Name + " (Duration)", Values = new ObservableCollection<ObservablePoint>() };
+                var resultSeries = new ColumnSeries<ObservablePoint>() { Name = test.Name + " (Result)", Values = new ObservableCollection<ObservablePoint>() };
+
+                MonitorResultsSeries.Add(durationSeries);
+                MonitorResultsSeries.Add(resultSeries);
+
+                resultSeriesMappings.Add(test.Name, (durationSeries, resultSeries));
+            }
         }
     }
 
-    private void InitChart(IEnumerable<TestDefinition> mitems)
+    IProgress<(TestCase, TestResults)> ProgressCallback;
+    private void HandleProgress((TestCase test, TestResults results) testAndResults)
     {
-        ResultSeriesMappings.AddAll(mitems.ToDictionary(t => t.Name, t => new ISeries[] {
-                    new StepLineSeries<DateTimePoint>() { ScalesYAt = 1, Name = t.Name + " (Freq)", Values = new ObservableCollection<DateTimePoint>() },
-                    new LineSeries<ObservablePoint>() { Name = t.Name + " (Duration)", Values = new ObservableCollection<ObservablePoint>() }
-                }));
-    }
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            if (!MonitorResultsView.Contains(testAndResults.results))
+            {
+                var lastCheck = testAndResults.results.LastCheck;
 
-    private void monitor_OnAdd(TestResults results)
-    {
-        MonitorResultsView.Add(results);
-        gridResults.ScrollIntoView(results, gridResults.Columns[0]);
+                MonitorResultsView.Add(testAndResults.results);
+                gridResults.ScrollIntoView(testAndResults.results, null);
+
+                var series = resultSeriesMappings[testAndResults.results.Name];
+
+                var serieDurationValues = (ObservableCollection<ObservablePoint>)series.DurationSeries.Values;
+                var serieResultValues = (ObservableCollection<ObservablePoint>)series.ResultSseries.Values;
+
+                var durationPoint = new ObservablePoint(lastCheck.Ticks, testAndResults.results.Duration);
+                serieDurationValues.Add(durationPoint);
+
+                var resultPoint = new ObservablePoint(lastCheck.Ticks, testAndResults.results.ResultCount);
+                serieResultValues.Add(resultPoint);
+
+                if (testAndResults.results.Duration == -1)
+                {
+                    testAndResults.results.PropertyChanged += (s, e) =>
+                    {
+                        DispatcherQueue.TryEnqueue(() =>
+                        {
+                            switch (e.PropertyName)
+                            {
+                                case nameof(TestResults.ResultCount):
+                                    resultPoint.Y = ((TestResults)s).ResultCount;
+                                    break;
+
+                                case nameof(TestResults.Duration):
+                                    durationPoint.Y = ((TestResults)s).Duration;
+                                    break;
+                            }
+                        });
+                    };
+                }
+            }
+
+            testAndResults.test.Definition.Status = testAndResults.test.Status;
+
+            testAndResults.test.RaisePropertyChanged();
+            testAndResults.results.RaisePropertyChanged();
+
+        });
     }
 
     [RelayCommand]
@@ -176,11 +227,38 @@ public partial class Monitor : Page
         GenericPopup.OpenNew<MonitoringDetails>();
     }
 
-    [RelayCommand(CanExecute = nameof(CanExecuteClearAll))]
-    private void MonitorClearAll()
+    [RelayCommand]
+    private async void MonitorClearAllResults()
     {
-        App.Instance.CurrentProject.TestDefinitions.Clear();
-        MonitorClearAllCommand.NotifyCanExecuteChanged();
+        if (await Confirm("Are you sure you want to clear all results?"))
+        {
+            MonitorResultsSeries.Clear();
+            MonitorResultsView.Clear();
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanExecuteClearAll))]
+    private async void MonitorClearAll()
+    {
+        if (await Confirm("Are you sure you want to remove ALL monitoring definitions?"))
+        {
+            App.Instance.CurrentProject.TestDefinitions.Clear();
+            MonitorClearAllCommand.NotifyCanExecuteChanged();
+        }
+    }
+
+    private async Task<bool> Confirm(string message)
+    {
+        var dialog = new ContentDialog()
+        {
+            Title = "Confirmation",
+            Content = $"{message}\r\nThis can not be undone.",
+            PrimaryButtonText = "Yes",
+            SecondaryButtonText = "No",
+            XamlRoot = this.XamlRoot
+        };
+
+        return await dialog.ShowAsync() == ContentDialogResult.Primary;
     }
 
     private bool CanExecuteClearAll => App.Instance.CurrentProject?.TestDefinitions?.Count > 0;
@@ -191,38 +269,65 @@ public partial class Monitor : Page
 
     }
 
-    [RelayCommand]
-    private void MonitorEdit(TestDefinition definition)
+    /// <summary>
+    /// Have to use a click handler as an ICommand doesn't work in a DataGridTemplateColumn for some teason...
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    protected void monitorEdit_Click(object sender, RoutedEventArgs e)
     {
-        GenericPopup.OpenNew<MonitoringDetails>();
+        var editButton = (Button)sender;
+        var target = (TestDefinition)editButton.CommandParameter;
+
+        GenericPopup.OpenNew<MonitoringDetails>(target);
     }
 
-    [RelayCommand]
-    private void MonitorDelete(TestDefinition mtoremove)
+    /// <summary>
+    /// Have to use a click handler as an ICommand doesn't work in a DataGridTemplateColumn for some teason...
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    protected void monitorDelete_Click(object sender, RoutedEventArgs e)
     {
+        var editButton = (Button)sender;
+        var target = (TestDefinition)editButton.CommandParameter;
+
         foreach (var m in App.Instance.CurrentProject.TestDefinitions)//.Where(m => m.PrecedingSteps.Any()))
         {
-            m.PrecedingSteps.Remove(mtoremove);
+            m.PrecedingSteps.Remove(target);
         }
-        App.Instance.CurrentProject.TestDefinitions.Remove(mtoremove);
+        App.Instance.CurrentProject.TestDefinitions.Remove(target);
     }
 
-    private void globalTimer_Tick(ThreadPoolTimer _)
+    /// <summary>
+    /// Have to use a click handler as an ICommand doesn't work in a DataGridTemplateColumn for some teason...
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    protected void resultsDetails_Click(object sender, RoutedEventArgs e)
     {
-        var xAxis = chart.XAxes.First();
-        xAxis.MinLimit = DateTime.Now.Ticks;
-        xAxis.MaxLimit = DateTime.Now.AddMinutes(chartTimeSpanMinutes).Ticks;
-        //chart.ScrollHorizontalFrom = DateTime.Now.Ticks;
-        //chart.ScrollHorizontalTo = DateTime.Now.AddMinutes(chartTimeSpanMinutes).Ticks;
+        GenericPopup.OpenNew<MonitorResultsViewer>(((Button)sender).CommandParameter);
     }
 
-    [RelayCommand]
+    private void setChartPanning(ThreadPoolTimer _)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            xTimeAxis.MinLimit = DateTime.Now.Subtract(chartTimeSpanSeconds).Ticks;
+            xTimeAxis.MaxLimit = DateTime.Now.Add(chartTimeSpanSeconds).Ticks;
+        });
+    }
+
+    [RelayCommand(CanExecute = nameof(IsRunning))]
     private void Stop()
     {
-        globalTimer.Cancel();
+        panningDelayTimer?.Cancel();
+        globalTimer?.Cancel();
 
         timers.ForEach(timer => timer.Cancel());
         timers.Clear();
+
+        IsRunning = false;
     }
 
     private void btnGrHTML_Click(object sender, RoutedEventArgs e) => gridResults.ExportAsHTML();

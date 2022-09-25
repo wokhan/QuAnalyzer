@@ -6,8 +6,7 @@ namespace QuAnalyzer.Features.Monitoring;
 
 public partial class TestCase : ObservableObject
 {
-    [ObservableProperty]
-    private TestCaseStatus status;
+    public TestCaseStatus Status { get; set; } = TestCaseStatus.NOT_STARTED;
 
     public event Action<TestCase, TestResults>? OnResult;
     public event Action<TestCase, TestResults>? OnAdd;
@@ -63,5 +62,10 @@ public partial class TestCase : ObservableObject
         {
             m.OnResult += preceding_Done;
         }
+    }
+
+    public void RaisePropertyChanged()
+    {
+        OnPropertyChanged(nameof(Status));
     }
 }

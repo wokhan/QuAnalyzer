@@ -4,9 +4,9 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:UC="using:QuAnalyzer.UI.Controls"
-      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
+      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
       mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600" 
-      Background="{ThemeResource SystemChromeAltMediumHighColor}"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
       x:Name="me">
     <Grid>
         <Grid.RowDefinitions>

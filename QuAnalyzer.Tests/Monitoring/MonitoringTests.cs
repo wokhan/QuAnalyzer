@@ -14,7 +14,7 @@ public class MonitoringTests
         var item = new TestDefinition() { Type = "COUNTALL", RunWhenStarted = true, Provider = new RandomDataProvider(), Repository = "Address book" };
         var instance = item.CreateInstance();
 
-        Monitoring.Run(new TestCasesCollection() { TestCases = { instance } }, 1, 1, 1);
+        Monitoring.Run(new[] { instance }, null, null, 1, 1, 1);
 
         Assert.Equal(TestCaseStatus.DONE, instance.Status);
     }

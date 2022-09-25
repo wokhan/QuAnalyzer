@@ -67,7 +67,7 @@
                 <AppBarButton Label="Add" ToolTipService.ToolTip="Add a mapping" Icon="Add" Command="{x:Bind AddMappingCommand}" />
                 <AppBarButton Label="Map by position" ToolTipService.ToolTip="Map by position" Icon="Sort" Command="{x:Bind MapByPositionCommand}" />
                 <AppBarButton Label="Map by name" ToolTipService.ToolTip="Map by name" Icon="Character" Command="{x:Bind MapByNameCommand}" />
-                <AppBarButton Label="Remove all" ToolTipService.ToolTip="Clear all" IsEnabled="{x:Bind Mapping.AllMappings,Converter={StaticResource emptyCollectionToBoolConverter},Mode=OneWay}" Icon="Delete" Command="{x:Bind RemoveMappingCommand}" />
+                <AppBarButton Label="Remove all" ToolTipService.ToolTip="Clear all" IsEnabled="{x:Bind Mapping.AllMappings,Converter={StaticResource emptyCollectionToBoolConverter},Mode=OneWay}" Icon="Delete" Command="{x:Bind ClearAllCommand}" />
             </CommandBar>
             <controls:DataGrid x:Name="gridMappings" ItemsSource="{x:Bind Mapping.AllMappings}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AutoGenerateColumns="False" SelectionMode="Single">
                 <controls:DataGrid.Columns>
@@ -85,9 +85,11 @@
                     <controls:DataGridTemplateColumn Width="Auto" IsReadOnly="True" CanUserResize="False">
                         <controls:DataGridTemplateColumn.CellTemplate>
                             <DataTemplate x:DataType="definition:SimpleMap">
-                                <Button Foreground="OrangeRed" Command="{Binding RemoveCommand,ElementName=me}" CommandParameter="{x:Bind}">
-                                    <SymbolIcon Symbol="Delete" />
-                                </Button>
+                                <Border Background="{ThemeResource SystemChromeAltMediumHighColor}" Padding="4" VerticalAlignment="Center">
+                                    <Button Click="removeMapping_Click" CommandParameter="{x:Bind}">
+                                        <SymbolIcon Symbol="Delete" Foreground="OrangeRed" />
+                                    </Button>
+                                </Border>
                             </DataTemplate>
                         </controls:DataGridTemplateColumn.CellTemplate>
                     </controls:DataGridTemplateColumn>

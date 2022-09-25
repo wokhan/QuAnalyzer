@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Navigation;
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.UI.Windows;
 
-using Wokhan.Data.Providers.Contracts;
+using Windows.UI.Popups;
 
 namespace QuAnalyzer.UI.Popups;
 
@@ -31,7 +31,7 @@ public partial class MonitoringDetails : Page
         CurrentItem = initialItem.Clone();
 
         base.OnNavigatedTo(e);
-
+        
         GenericPopup.UpdateCurrent(this, title: $"{CurrentItem.Name} - Edit");
 
         UpdateAttributes();
@@ -55,17 +55,27 @@ public partial class MonitoringDetails : Page
     [RelayCommand]
     private void Save()
     {
+        if (CurrentItem.Type == MonitoringModes.CHECKVAL && !lstAttributes.SelectedItems.Any())
+        {
+            _ = new ContentDialog() { Content = "The selected monitoring type requires at least one attribute to be selected.", Title = "Missing attributes", CloseButtonText = "OK", XamlRoot = this.XamlRoot }.ShowAsync();
+            return;
+        }
+
+        //TODO: Why a dictionary?
         CurrentItem.PrecedingSteps.AddAll(lstPrec.SelectedItems.Cast<TestDefinition>().Select(_ => KeyValuePair.Create(_, false)));
         CurrentItem.Attributes = String.Join(",", lstAttributes.SelectedItems.Cast<KeyValuePair<string, bool>>().Select(s => s.Key));
 
-        var projectMappers = App.Instance.CurrentProject.TestDefinitions;
-        if (projectMappers.Contains(initialItem))
+        var definitions = App.Instance.CurrentProject.TestDefinitions;
+        var index = definitions.IndexOf(initialItem);
+        if (index != -1)
         {
-            projectMappers[projectMappers.IndexOf(initialItem)] = CurrentItem;
+            // Cannot use definitions[index] assignation as it breaks community Toolkit's DataGrid for some reason
+            definitions.RemoveAt(index);
+            definitions.Insert(index, CurrentItem);
         }
         else
         {
-            projectMappers.Add(CurrentItem);
+            definitions.Add(CurrentItem);
         }
 
         GenericPopup.FromPage(this).Close();

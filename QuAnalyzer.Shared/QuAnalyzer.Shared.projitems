@@ -85,6 +85,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\MonitoringDetails.xaml.cs">
       <DependentUpon>MonitoringDetails.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\MonitorResultsViewer.xaml.cs">
+      <DependentUpon>MonitorResultsViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditor.xaml.cs">
       <DependentUpon>ProviderEditor.xaml</DependentUpon>
     </Compile>
@@ -168,6 +171,10 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)UI\Popups\MonitorResultsViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditorRepositories.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>

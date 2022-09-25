@@ -3,11 +3,11 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:monitor="using:QuAnalyzer.Features.Monitoring"
+      xmlns:wctprimitives="using:CommunityToolkit.WinUI.UI.Controls.Primitives"
       xmlns:quanalyzer="using:QuAnalyzer"
-      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
-      xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers" 
+      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:charts="using:LiveChartsCore.SkiaSharpView.WinUI"
+      xmlns:monitoring="using:QuAnalyzer.Features.Monitoring"
       mc:Ignorable="d"
       d:DesignHeight="700" d:DesignWidth="800"
       x:Name="me">
@@ -23,129 +23,103 @@
         <CommandBar Grid.ColumnSpan="3" Content="Steps">
             <AppBarButton Label="Run" ToolTipService.ToolTip="Start monitoring the selected items" Icon="Play" Command="{x:Bind RunCommand}" />
             <!--<Button Content="Run all" ToolTipService.ToolTip="Start monitoring all items" IsEnabled="{Binding Items.IsEmpty,ElementName=gridSteps,Converter={StaticResource booleanNegator}}" BorderBrush="Green" ext:CustomAdorner.Image="{StaticResource appbar_control_play}" Click="btnStartAll_Click" />-->
-            <AppBarButton Label="Stop" IsEnabled="{x:Bind IsRunning,Mode=OneWay}" Content="Stop" ToolTipService.ToolTip="Stop monitoring" BorderBrush="Red" Icon="Stop" Command="{x:Bind StopCommand}" />
+            <AppBarButton Label="Stop" Content="Stop" ToolTipService.ToolTip="Stop monitoring" BorderBrush="Red" Icon="Stop" Command="{x:Bind StopCommand}" IsEnabled="{x:Bind IsRunning,Mode=OneWay}" />
             <AppBarSeparator />
             <AppBarButton Label="Add" ToolTipService.ToolTip="Add a step" Icon="Add" Command="{x:Bind MonitorAddCommand}" />
-            <AppBarButton Label="Clear" ToolTipService.ToolTip="Remove all" Icon="Delete" Command="{x:Bind MonitorClearAllCommand}" />
-            <AppBarToggleButton Label="Comparison mode" IsChecked="{x:Bind UseComparisonMode,Mode=TwoWay}" Icon="Shuffle" />
+            <AppBarButton Label="Remove all" ToolTipService.ToolTip="Remove all" Icon="Delete" Command="{x:Bind MonitorClearAllCommand}" />
             <AppBarSeparator />
+            <AppBarToggleButton Label="Comparison mode" IsChecked="{x:Bind UseComparisonMode,Mode=TwoWay}" Icon="Shuffle" />
             <AppBarElementContainer VerticalContentAlignment="Center">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Occurrences: " VerticalAlignment="Center" FontSize="12" />
-                    <NumberBox SpinButtonPlacementMode="Hidden" Width="40" VerticalContentAlignment="Center" Minimum="1" Value="{x:Bind Occurences,Mode=TwoWay}" Padding="0" Margin="2" VerticalAlignment="Center" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Occurrences:" Margin="10,0" VerticalAlignment="Center" FontSize="12" />
+                    <NumberBox SpinButtonPlacementMode="Compact" VerticalContentAlignment="Center" Minimum="1" Value="{x:Bind Occurences,Mode=TwoWay}" Padding="0" Margin="2" VerticalAlignment="Center" IsEnabled="{x:Bind UseComparisonMode,Mode=OneWay}" />
                 </StackPanel>
             </AppBarElementContainer>
             <AppBarSeparator />
             <AppBarElementContainer>
                 <StackPanel Margin="10,0,0,0" Orientation="Horizontal">
-                    <TextBlock Text="Parallelism: " VerticalAlignment="Center" FontSize="12" />
-                    <NumberBox SpinButtonPlacementMode="Hidden" Width="40" VerticalContentAlignment="Center" Minimum="1" Value="{x:Bind MaxParallel,Mode=TwoWay}" VerticalAlignment="Center" Padding="0" Margin="2" />
+                    <TextBlock Text="Parallelism:" Margin="10,0" VerticalAlignment="Center" FontSize="12" />
+                    <NumberBox SpinButtonPlacementMode="Compact" VerticalContentAlignment="Center" Minimum="1" Value="{x:Bind MaxParallel,Mode=TwoWay}" VerticalAlignment="Center" Padding="0" Margin="2" />
                 </StackPanel>
             </AppBarElementContainer>
             <!--<Rectangle />
             <ToggleButton Content="Enable chart" ToolTipService.ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" ext:CustomAdorner.Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />-->
         </CommandBar>
-        <controls:DataGrid Grid.Row="1" SelectionMode="Extended" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.TestDefinitions}" x:Name="gridSteps" AutoGenerateColumns="False" ColumnWidth="18*" IsReadOnly="True">
+        <controls:DataGrid Grid.Row="1" SelectionMode="Single" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.TestDefinitions,Mode=OneWay}" x:Name="gridSteps" SelectionChanged="gridSteps_SelectionChanged" AutoGenerateColumns="False" HeadersVisibility="All" IsReadOnly="True">
+            <controls:DataGrid.Resources>
+                <Color x:Key="DataGridRowHoveredBackgroundColor">Transparent</Color>
+                <Color x:Key="DataGridRowSelectedBackgroundColor">Transparent</Color>
+                <Color x:Key="DataGridRowSelectedHoveredBackgroundColor">Transparent</Color>
+            </controls:DataGrid.Resources>
+            <controls:DataGrid.RowHeaderStyle>
+                <Style TargetType="wctprimitives:DataGridRowHeader">
+                    <Setter Property="Width" Value="30" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected}" />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </controls:DataGrid.RowHeaderStyle>
+            <!--<controls:DataGrid.RowStyle>
+                <Style TargetType="controls:DataGridRow">
+                    <Setter Property="ToolTipService.ToolTip">
+                        <Setter.Value>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="{x:Bind x:String.Format('Attributes: {0}',Attributes)}" />
+                                <TextBlock Grid.Row="1" VerticalAlignment="Center" Text="{x:Bind x:String.Format('{0} preceding steps selected', PrecedingSteps.Count),Mode=OneWay}" />
+                            </Grid>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </controls:DataGrid.RowStyle>-->
             <controls:DataGrid.Columns>
-                <controls:DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-                <controls:DataGridComboBoxColumn Header="Provider" x:Name="lstDataProviders" MinWidth="150" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders}" DisplayMemberPath="Name" Binding="{Binding Provider}" />
-                <!--<controls:DataGridComboBoxColumn Header="Repository" MinWidth="150" ItemsSource="{Binding Provider.Repositories.Keys}" />-->
-                <controls:DataGridComboBoxColumn Header="Type" Binding="{Binding Type}" DisplayMemberPath="Value" ItemsSource="{x:Bind monitor:MonitoringModes.MonitoringTypes}" />
+                <controls:DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                <controls:DataGridTextColumn Header="Provider" MinWidth="150" Binding="{Binding Provider.Name}" />
+                <controls:DataGridTextColumn Header="Repository" MinWidth="150" Binding="{Binding Repository}" />
+                <controls:DataGridTextColumn Header="Type" Binding="{Binding Type,Mode=TwoWay}" />
                 <controls:DataGridTextColumn Header="Interval" Binding="{Binding Interval}" />
                 <controls:DataGridCheckBoxColumn Header="Run when started" Binding="{Binding RunWhenStarted}" />
-                <controls:DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" />
-                <controls:DataGridTemplateColumn Width="100">
+                <controls:DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" IsReadOnly="True" />
+                <controls:DataGridTemplateColumn Header="Actions"  Width="Auto" IsReadOnly="True">
                     <controls:DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <AppBarButton CommandParameter="{Binding}" Command="{Binding MonitorEditCommnad,ElementName=me}" Foreground="Blue" Icon="Edit" />
-                                <AppBarButton Command="{Binding MonitorDeleteCommand,ElementName=me}" CommandParameter="{Binding}" Foreground="OrangeRed" Icon="Delete" />
+                        <DataTemplate x:DataType="monitoring:TestDefinition">
+                            <StackPanel Orientation="Horizontal" Background="{ThemeResource SystemChromeAltMediumHighColor}" Padding="4">
+                                <Button CommandParameter="{x:Bind}" Click="monitorEdit_Click" Margin="0,0,4,0">
+                                    <SymbolIcon Symbol="Edit" Foreground="BlueViolet" />
+                                </Button>
+                                <Button CommandParameter="{x:Bind}" Click="monitorDelete_Click">
+                                    <SymbolIcon Symbol="Delete" Foreground="OrangeRed" />
+                                </Button>
                             </StackPanel>
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
             </controls:DataGrid.Columns>
-            <!--<controls:DataGrid.RowDetailsTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="Attributes:" />
-                            <ListBox Grid.Row="2" x:Name="lstAttributes" SelectionMode="Multiple">
-                                <ListBox.Resources>
-                                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-                                        <Setter Target="IsSelected" Value="{Binding Value, Mode=OneWay}" />
-                                    </Style>
-                                </ListBox.Resources>
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-                                            <CheckBox IsChecked="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
-                                            <TextBlock Text="{Binding Key}" Grid.Column="1" />
-                                        </Grid>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                            <StackPanel Grid.Row="3" Orientation="Horizontal">
-                                <TextBlock Text="Filter:" />
-                                <TextBox x:Name="txtFilter" Text="{Binding Filter}" />
-                            </StackPanel>
-                            <TextBlock Grid.Column="1" Content="Preceding steps:" />
-                            -->
-            <!--<controls:DataGrid Grid.Row="2" Grid.Column="1" x:Name="lstPrec" Height="70" ItemsSource="{Binding CurrentProject.TestDefinitions, Source={x:Static quanalyzer:App.Instance}}">
-                                <controls:DataGridCheckBoxColumn Header="Select" Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=DataGridRow}}" />
-                                <controls:DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-                                <controls:DataGridTemplateColumn>
-                                    <controls:DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding UseData}" />
-                                        </DataTemplate>
-                                    </controls:DataGridTemplateColumn.CellTemplate>
-                                </controls:DataGridTemplateColumn>
-                            </controls:DataGrid>-->
-            <!--
-                        </Grid>
-                    </DataTemplate>
-                </controls:DataGrid.RowDetailsTemplate>-->
         </controls:DataGrid>
         <controls:GridSplitter Grid.Row="2" />
         <controls:DockPanel Grid.Row="3">
             <CommandBar controls:DockPanel.Dock="Top" Content="Results">
+                <AppBarButton Label="Remove all" Icon="Delete" Command="{x:Bind MonitorClearAllResultsCommand}" />
+                <AppBarSeparator />
+                <AppBarToggleButton Label="Autoscroll" IsChecked="{x:Bind AutoScrollResults,Mode=TwoWay}" Icon="Forward" />
+                <AppBarSeparator />
                 <AppBarButton x:Name="btnGrCopy" Label="Copy" ToolTipService.ToolTip="Copy to clipboard" Icon="Copy" Click="btnGrCopy_Click" />
                 <AppBarSeparator />
                 <AppBarButton x:Name="btnGrCSV" Label="Excel" ToolTipService.ToolTip="Export to CSV" Icon="OpenFile" Click="btnGrCSV_Click" />
                 <AppBarButton x:Name="btnGrHTML" Label="HTML" ToolTipService.ToolTip="Export to HTML" Icon="OpenFile" Click="btnGrHTML_Click" />
             </CommandBar>
             <!--<CheckBox Content="Group by step name" x:Name="chkGroup" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-25" Checked="chkGroup_Checked" IsChecked="True" />-->
-            <controls:DataGrid x:Name="gridResults" ItemsSource="{x:Bind MonitorResultsView}" IsReadOnly="True" AutoGenerateColumns="False">
+            <controls:DataGrid x:Name="gridResults" ItemsSource="{x:Bind MonitorResultsView}" RowDetailsVisibilityMode="VisibleWhenSelected" IsReadOnly="True" AutoGenerateColumns="False">
                 <controls:DataGrid.RowDetailsTemplate>
-                    <DataTemplate>
-                        <controls:DataGrid Margin="10,0,0,0" Visibility="Collapsed" BorderThickness="1,0,0,0" IsReadOnly="True">
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup>
-                                    <VisualState>
-                                        <VisualState.StateTriggers>
-                                            <triggers:IsEqualStateTrigger Value="{Binding Step.Type}" To="CHECKVAL" />
-                                        </VisualState.StateTriggers>
-                                        <VisualState.Setters>
-                                            <Setter Target="ItemsSource" Value="{Binding Data}" />
-                                            <Setter Target="Visibility" Value="Visible" />
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-                        </controls:DataGrid>
+                    <DataTemplate x:DataType="monitoring:TestResults">
+                        <controls:DataGrid Margin="10,0,0,0" ItemsSource="{x:Bind Data,Mode=OneWay}" Visibility="{x:Bind Data,Mode=OneWay,Converter={StaticResource collectionVisibilityConverter}}" BorderThickness="1,0,0,0" IsReadOnly="True" />
                     </DataTemplate>
                 </controls:DataGrid.RowDetailsTemplate>
                 <controls:DataGrid.Columns>
@@ -153,18 +127,29 @@
                     <controls:DataGridTextColumn Header="#" Binding="{Binding Occurence}" Width="Auto" />
                     <controls:DataGridTextColumn Header="Last check" Binding="{Binding LastCheck}" Width="Auto" />
                     <controls:DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto" />
-                    <controls:DataGridTextColumn Header="Duration" Binding="{Binding Duration[_TOTAL_DEFAULT]}" Width="Auto" />
+                    <controls:DataGridTextColumn Header="Duration" Binding="{Binding Duration}" Width="Auto" />
                     <controls:DataGridTemplateColumn Header="Result" Width="*">
                         <controls:DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <controls:SwitchPresenter Value="{Binding ResultCount}">
+                            <DataTemplate x:DataType="monitoring:TestResults">
+                                <controls:SwitchPresenter Value="{x:Bind ResultCount,Mode=OneWay}">
                                     <controls:Case Value="-1">
-                                        <ProgressBar IsIndeterminate="True" />
+                                        <ProgressRing IsIndeterminate="True" />
                                     </controls:Case>
                                     <controls:Case IsDefault="True">
-                                        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ResultCount}" />
+                                        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Text="{x:Bind ResultCount,Mode=OneWay}" />
                                     </controls:Case>
                                 </controls:SwitchPresenter>
+                            </DataTemplate>
+                        </controls:DataGridTemplateColumn.CellTemplate>
+                    </controls:DataGridTemplateColumn>
+                    <controls:DataGridTemplateColumn Header="Details"  Width="Auto" IsReadOnly="True">
+                        <controls:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="monitoring:TestResults">
+                                <StackPanel Orientation="Horizontal" Background="{ThemeResource SystemChromeAltMediumHighColor}" Padding="4">
+                                    <Button CommandParameter="{x:Bind}" Click="resultsDetails_Click" Margin="0,0,4,0">
+                                        <SymbolIcon Symbol="View" />
+                                    </Button>
+                                </StackPanel>
                             </DataTemplate>
                         </controls:DataGridTemplateColumn.CellTemplate>
                     </controls:DataGridTemplateColumn>
@@ -218,17 +203,7 @@
             <CommandBar controls:DockPanel.Dock="Top" Content="Results (graph)">
                 <AppBarButton Label="Copy" ToolTipService.ToolTip="Copy to clipboard" Icon="Copy" IsEnabled="False" Command="{x:Bind MonitorCopyCommand}" CommandParameter="{Binding}" />
             </CommandBar>
-            <charts:CartesianChart x:Name="chart">
-                <!--Series="{x:Bind ResultSeriesMappings.Values}">-->
-                <!--ScrollMode="X" DisableAnimations="True" Margin="0" DataTooltip="{x:Null}" Hoverable="False">
-                <charts:CartesianChart.XAxes>
-                    <charts:Axis></charts:Axis>
-                </charts:CartesianChart.XAxes>
-                <charts:CartesianChart.AxisY>
-                    <charts:LogarithmicAxis></charts:LogarithmicAxis>
-                    <charts:LogarithmicAxis Position="RightTop"></charts:LogarithmicAxis>
-                </charts:CartesianChart.AxisY>-->
-            </charts:CartesianChart>
+            <charts:CartesianChart x:Name="chart" ZoomMode="X" Series="{x:Bind MonitorResultsSeries}" YAxes="{x:Bind YAxes}" XAxes="{x:Bind XAxes}" Margin="0" />
         </controls:DockPanel>
     </Grid>
 </Page>

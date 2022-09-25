@@ -27,9 +27,11 @@
     <_Globbed_Compile Remove="UI\Pages\LocalComparerDefinition.cs" />
     <_Globbed_Compile Remove="UI\Popups\About - Copier.xaml.cs" />
     <_Globbed_Compile Remove="UI\Popups\GenericPopupContainer.xaml.cs" />
+    <_Globbed_Compile Remove="UI\Popups\MonitorResultsViewer.xaml.cs" />
     <_Globbed_Compile Remove="UI\Popups\ProviderEditor - Copier.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
     <_Globbled_Page Remove="UI\Popups\GenericPopupContainer.xaml" />
+    <_Globbled_Page Remove="UI\Popups\MonitorResultsViewer.xaml" />
   </ItemGroup>
 </Project>

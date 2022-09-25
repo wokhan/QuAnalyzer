@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 
 using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace QuAnalyzer.UI.Windows
@@ -45,6 +46,8 @@ namespace QuAnalyzer.UI.Windows
 
         private void Contents_Navigated(object sender, NavigationEventArgs e)
         {
+            Activate();
+
             GoBackCommand.NotifyCanExecuteChanged();
         }
 
@@ -52,7 +55,6 @@ namespace QuAnalyzer.UI.Windows
         {
             GenericPopup window = new(isWizard);
             window.contents.Navigate(typeof(T), parameter);
-            window.Activate();
 
             return window;
         }
