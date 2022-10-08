@@ -29,7 +29,7 @@
             </Grid.ColumnDefinitions>
             <menus:MainMenu HorizontalAlignment="Left" Background="{ThemeResource WindowCaptionBackground}" />
             <Rectangle Grid.Column="1" x:Name="AppTitleBar" />
-            <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="20,0,10,0" VerticalAlignment="Center" Text="{x:Bind quanalyzer:App.Instance.MainWindow.Title}" />
+            <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="20,0,10,0" VerticalAlignment="Center" Text="{x:Bind WindowTitle}" />
         </Grid>
         <menus:SourcesMenu Grid.Row="1" Grid.RowSpan="2" />
         <NavigationView Grid.Row="1" Grid.Column="1" x:Name="NavView" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" ItemInvoked="NavView_ItemInvoked">
@@ -81,7 +81,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{x:Bind quanalyzer:App.Instance.CurrentProject.FilePath,FallbackValue='No project has been loaded nor saved.'}" Margin="0,0,20,0" />
+            <TextBlock Text="{x:Bind CurrentProject.FilePath,FallbackValue='No project has been loaded nor saved.'}" Margin="0,0,20,0" />
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock FontSize="12" Text="{x:Bind x:String.Format('Memory: {0}', helpers:ResourcesWatcher.Instance.MemoryUseFormatted), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />
                 <TextBlock FontSize="12" Text="{x:Bind x:String.Format('CPU: {0}%,', helpers:ResourcesWatcher.Instance.CPUUsage), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />

@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Composition.SystemBackdrops;
+﻿#if !HAS_UNO
+using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 
@@ -238,3 +239,4 @@ public class MicaBackground
     }
 }
 
+#endif

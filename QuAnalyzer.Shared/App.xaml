@@ -9,7 +9,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <XamlControlsResources />
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <ResourceDictionary>
                     <converters:BoolNegationConverter x:Key="booleanNegator" />
                     <converters:BoolToVisibilityConverter x:Key="boolToVisibilityConverter" />

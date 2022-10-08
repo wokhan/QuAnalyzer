@@ -28,7 +28,7 @@
                 </Grid.RowDefinitions>
                 <TextBlock Padding="5" Text="Attributes" />
                 <ListView Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="lstDataSources_SelectionChanged" x:Name="lstAttributes" SelectionMode="Single" Width="200" Padding="5">
-                    <VisualStateManager.VisualStateGroups>
+                    <!--<VisualStateManager.VisualStateGroups>
                         <VisualStateGroup>
                             <VisualState x:Name="Default">
                                 <VisualState.StateTriggers>
@@ -47,7 +47,7 @@
                                 </VisualState.Setters>
                             </VisualState>
                         </VisualStateGroup>
-                    </VisualStateManager.VisualStateGroups>
+                    </VisualStateManager.VisualStateGroups>-->
                 </ListView>
             </Grid>
         </Border>

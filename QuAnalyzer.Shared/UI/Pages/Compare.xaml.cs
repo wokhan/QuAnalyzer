@@ -4,12 +4,12 @@ using OfficeOpenXml;
 
 using QuAnalyzer.Core.Extensions;
 using QuAnalyzer.Core.Helpers;
+using QuAnalyzer.Core.Project;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Comparers;
 using QuAnalyzer.Features.Comparison.Results;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
-using QuAnalyzer.UI.Windows;
 
 using System.Linq.Dynamic.Core;
 
@@ -22,11 +22,17 @@ namespace QuAnalyzer.UI.Pages;
 [ObservableObject]
 public partial class Compare : Page
 {
+    /// <summary>
+    /// This is to bypass a bug with Uno Platform where TwoWay static bindings through x:Bind don't seem to work. Weird since
+    /// according to GitHub, it should...
+    /// </summary>
+    public ProjectSettings CurrentProject => App.Instance.CurrentProject;
+
     public ObservableCollection<LocalComparerDefinition> ComparisonInstances { get; } = new();
 
     private int cpdCount = 0;
 
-    private readonly Dictionary<ComparerDefinition<object[]>, Window> openWindows = new();
+    private readonly Dictionary<ComparerDefinition<object[]>, GenericPopup> openWindows = new();
 
     private readonly Dictionary<string, int> progressDC = new();
 
@@ -118,7 +124,7 @@ public partial class Compare : Page
         openWindows[cmp].Activate();
     }
 
-    private void dWin_Closed(object sender, WindowEventArgs e)
+    private void dWin_Closed(object sender, ContentDialogClosedEventArgs e)
     {
         openWindows.Remove(openWindows.Single(o => o.Value.Equals(sender)).Key);
     }

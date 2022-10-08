@@ -4,8 +4,9 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 
+using QuAnalyzer.Core.Project;
 using QuAnalyzer.UI.Pages;
-using QuAnalyzer.UI.Windows;
+using QuAnalyzer.UI.Popups;
 
 using Windows.Devices.Input;
 using Windows.Foundation;
@@ -17,6 +18,13 @@ namespace QuAnalyzer.UI.Menus;
 [ObservableObject]
 public partial class SourcesMenu : UserControl
 {
+    /// <summary>
+    /// This is to bypass a bug with Uno Platform where TwoWay static bindings through x:Bind don't seem to work. Weird since
+    /// according to GitHub, it should...
+    /// </summary>
+    public ProjectSettings CurrentProject => App.Instance.CurrentProject;
+    public bool CurrentSelectionLinked => App.Instance.CurrentSelectionLinked;
+
     private Point startPoint;
 
     public SourcesMenu()

@@ -18,190 +18,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ColumnDefinitionExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\DataGridExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\ExcelPackageExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Extensions\QueryableExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\MicaBackground.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\NugetManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\NugetPackage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\ResourcesWatcher.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Pages\LocalComparerDefinition.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderPickerTemplateSelector.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditorParameterTemplateSelector.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\GenericMethodHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\GlobalTask.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\ImageSourceConverter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\MRUManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\GenericPopup.xaml.cs">
-      <DependentUpon>GenericPopup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Helpers\ProvidersManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Project\Exceptions\ProjectLoadException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Project\Exceptions\ProjectSaveException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Project\ProjectSettings.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\StatisticsHolder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Controls\ExtendedDataGridView.ComputeStruct.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Controls\ExtendedDataGridView.FilterStruct.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Controls\ExtendedDataGridView.xaml.cs">
-      <DependentUpon>ExtendedDataGridView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Menus\MainMenu.xaml.cs">
-      <SubType>Code</SubType>
-      <DependentUpon>MainMenu.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Menus\SourcesMenu.xaml.cs">
-      <DependentUpon>SourcesMenu.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Pages\Compare.xaml.cs">
-      <DependentUpon>Compare.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Pages\Duplicates.xaml.cs">
-      <DependentUpon>Duplicates.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Pages\DynamicSeriesWrapper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Pages\Monitor.xaml.cs">
-      <DependentUpon>Monitor.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Pages\PatternsPage.xaml.cs">
-      <DependentUpon>PatternsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Pages\StatisticsPage.xaml.cs">
-      <DependentUpon>StatisticsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Pages\ViewerPage.xaml.cs">
-      <DependentUpon>ViewerPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\About.xaml.cs">
-      <DependentUpon>About.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\DetailsWindow.xaml.cs">
-      <DependentUpon>DetailsWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\MappingsEditor.xaml.cs">
-      <DependentUpon>MappingsEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\MonitoringDetails.xaml.cs">
-      <DependentUpon>MonitoringDetails.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\MonitorResultsViewer.xaml.cs">
-      <DependentUpon>MonitorResultsViewer.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditor.xaml.cs">
-      <DependentUpon>ProviderEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditorRepositories.xaml.cs">
-      <DependentUpon>ProviderEditorRepositories.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderPicker.xaml.cs">
-      <DependentUpon>ProviderPicker.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Pages\MainPage.xaml.cs">
-      <DependentUpon>MainPage.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Controls\ExtendedDataGridView.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Menus\MainMenu.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Menus\SourcesMenu.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Pages\Compare.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Pages\Duplicates.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Pages\Monitor.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Pages\PatternsPage.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Pages\StatisticsPage.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Pages\ViewerPage.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Popups\GenericPopup.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Popups\About.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Popups\DetailsWindow.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Popups\MappingsEditor.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Popups\MonitoringDetails.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Popups\MonitorResultsViewer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditorRepositories.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderEditor.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Popups\ProviderPicker.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)UI\Pages\MainPage.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Assets\SharedAssets.md" />
-    <None Include="$(MSBuildThisFileDirectory)Resources\IconNew.ico" />
-    <None Include="$(MSBuildThisFileDirectory)Resources\IconNew.png" />
-    <None Include="$(MSBuildThisFileDirectory)Resources\IconNewTrans.ico" />
+    <None Include="$(MSBuildThisFileDirectory)Example.qap" />
   </ItemGroup>
   <ItemGroup>
     <PRIResource Include="$(MSBuildThisFileDirectory)Strings\en\Resources.resw" />
@@ -213,20 +33,48 @@
 		 without manipulating the projitem file.
 	-->
     <Content Include="$(MSBuildThisFileDirectory)IconNew.ico" />
-    <None Include="$(MSBuildThisFileDirectory)providers\donotremove.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Content Include="$(MSBuildThisFileDirectory)providers\donotremove.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)Resources\IconNew.ico" />
+    <Content Include="$(MSBuildThisFileDirectory)Resources\IconNew.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Resources\IconNewTrans.ico" />
     <_Globbled_Page Include="$(MSBuildThisFileDirectory)**/*.xaml" Exclude="@(Page);@(ApplicationDefinition)">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </_Globbled_Page>
+    <Page Include="@(_Globbled_Page)" />
     <_Globbed_Compile Include="$(MSBuildThisFileDirectory)**/*.xaml.cs" Exclude="@(Compile)">
       <DependentUpon>%(Filename)</DependentUpon>
     </_Globbed_Compile>
     <_Globbed_Compile Include="$(MSBuildThisFileDirectory)**/*.cs" Exclude="@(Compile);@(_Globbed_Compile)" />
+    <Compile Include="@(_Globbed_Compile)" />
     <_Globbed_PRIResource Include="$(MSBuildThisFileDirectory)**/*.resw" Exclude="@(PRIResource)" />
     <PRIResource Include="@(_Globbed_PRIResource)" />
     <_Globbed_Content Include="$(MSBuildThisFileDirectory)Assets/**/*.*" Exclude="@(Content)" />
     <Content Include="@(_Globbed_Content)" />
+    <!-- Mark the files from this folder as being part of WinUI -->
+    <Page Update="$(MSBuildThisFileDirectory)**/*.xaml" XamlRuntime="WinUI" />
+    <ApplicationDefinition Update="$(MSBuildThisFileDirectory)**/*.xaml" XamlRuntime="WinUI" />
+    <!-- Make sure XAML files force reevaluation of up-to-date checks -->
+    <UpToDateCheckInput Include="$(MSBuildThisFileDirectory)**/*.xaml" />
   </ItemGroup>
+
+  <Target Name="MVVMUnoWorkaround1" AfterTargets="MVVMToolkitGatherAnalyzers" Condition="'$(TargetFramework)' != 'net6.0-windows10.0.19041.0' And !Exists('obj\generated\CommunityToolkit.Mvvm.SourceGenerators')">
+    <Message Importance="high" Text="Workaround for MVVM SourceGenerators with Uno (phase 1/2): keeping MVVM generated files. Another build will be required once done!!!" />
+    <PropertyGroup >
+      <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+      <CompilerGeneratedFilesOutputPath>obj\generated</CompilerGeneratedFilesOutputPath>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="MVVMUnoWorkaround2" AfterTargets="MVVMToolkitGatherAnalyzers" Condition="'$(TargetFramework)' != 'net6.0-windows10.0.19041.0' And Exists('obj\generated\CommunityToolkit.Mvvm.SourceGenerators')">
+    <Message Importance="high" Text="Workaround for MVVM SourceGenerators with Uno (phase 2/2): removing the MVVM Analyzer since code has been generated already." />
+    <ItemGroup>
+      <Analyzer Remove="@(MVVMToolkitAnalyzer)" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <Compile Include="obj\generated\CommunityToolkit.Mvvm.SourceGenerators\**\*.cs" Condition="'$(TargetFramework)' != 'net6.0-windows10.0.19041.0' And Exists('obj\generated\CommunityToolkit.Mvvm.SourceGenerators')" />
+  </ItemGroup>
+
 </Project>

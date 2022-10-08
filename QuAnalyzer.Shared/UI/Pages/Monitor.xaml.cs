@@ -6,10 +6,10 @@ using LiveChartsCore.Kernel;
 using LiveChartsCore.Kernel.Sketches;
 using LiveChartsCore.SkiaSharpView;
 
+using QuAnalyzer.Core.Project;
 using QuAnalyzer.Features.Monitoring;
 using QuAnalyzer.Generic.Extensions;
 using QuAnalyzer.UI.Popups;
-using QuAnalyzer.UI.Windows;
 
 using Windows.System.Threading;
 
@@ -18,6 +18,12 @@ namespace QuAnalyzer.UI.Pages;
 [ObservableObject]
 public partial class Monitor : Page
 {
+    /// <summary>
+    /// This is to bypass a bug with Uno Platform where TwoWay static bindings through x:Bind don't seem to work. Weird since
+    /// according to GitHub, it should...
+    /// </summary>
+    public ProjectSettings CurrentProject => App.Instance.CurrentProject;
+
     private TimeSpan chartTimeSpanSeconds = TimeSpan.FromSeconds(30);
 
     private ThreadPoolTimer panningDelayTimer;
@@ -230,7 +236,7 @@ public partial class Monitor : Page
     [RelayCommand]
     private async void MonitorClearAllResults()
     {
-        if (await Confirm("Are you sure you want to clear all results?"))
+        if (await Confirm("Are you sure you want to clear all results? This cannot be undone."))
         {
             MonitorResultsSeries.Clear();
             MonitorResultsView.Clear();
@@ -240,7 +246,7 @@ public partial class Monitor : Page
     [RelayCommand(CanExecute = nameof(CanExecuteClearAll))]
     private async void MonitorClearAll()
     {
-        if (await Confirm("Are you sure you want to remove ALL monitoring definitions?"))
+        if (await Confirm("Are you sure you want to remove all monitoring definitions?"))
         {
             App.Instance.CurrentProject.TestDefinitions.Clear();
             MonitorClearAllCommand.NotifyCanExecuteChanged();
@@ -252,7 +258,7 @@ public partial class Monitor : Page
         var dialog = new ContentDialog()
         {
             Title = "Confirmation",
-            Content = $"{message}\r\nThis can not be undone.",
+            Content = message,
             PrimaryButtonText = "Yes",
             SecondaryButtonText = "No",
             XamlRoot = this.XamlRoot

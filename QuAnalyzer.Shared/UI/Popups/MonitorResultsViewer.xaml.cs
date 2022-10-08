@@ -1,7 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Navigation;
 
 using QuAnalyzer.Features.Monitoring;
-using QuAnalyzer.UI.Windows;
 
 namespace QuAnalyzer.UI.Popups
 {

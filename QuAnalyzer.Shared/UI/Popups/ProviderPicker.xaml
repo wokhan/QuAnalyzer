@@ -49,11 +49,12 @@
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <Image VerticalAlignment="Center" Margin="0,0,10,0">
+                            <!-- UNO: Not working -->
+                            <!--<Image VerticalAlignment="Center" Margin="0,0,10,0">
                                 <Image.Source>
                                     <BitmapImage UriSource="{x:Bind IconPath,FallbackValue={x:Null}}" />
                                 </Image.Source>
-                            </Image>
+                            </Image>-->
                             <TextBlock Grid.Column="1" Text="{x:Bind Name}" FontWeight="Bold" />
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind x:String.Format('Author: {0}',Copyright)}" FontStyle="Italic" FontSize="12" />
                             <TextBlock Grid.Row="2" Grid.Column="1" TextWrapping="Wrap" Text="{x:Bind Description}" />

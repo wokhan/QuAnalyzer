@@ -2,15 +2,21 @@
 
 using Microsoft.UI.Xaml.Navigation;
 
+using QuAnalyzer.Core.Project;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Definition;
-using QuAnalyzer.UI.Windows;
 
 namespace QuAnalyzer.UI.Popups;
 
 [ObservableObject]
 public partial class MappingsEditor : Page
 {
+    /// <summary>
+    /// This is to bypass a bug with Uno Platform where TwoWay static bindings through x:Bind don't seem to work. Weird since
+    /// according to GitHub, it should...
+    /// </summary>
+    public ProjectSettings CurrentProject => App.Instance.CurrentProject;
+
     [ObservableProperty]
     private bool isPopup;
 
@@ -24,7 +30,7 @@ public partial class MappingsEditor : Page
         InitializeComponent();
     }
 
-    private static readonly DependencyProperty InitialMappingProperty = DependencyProperty.Register(nameof(InitialMapping), typeof(SourcesMapper), typeof(MappingsEditor), new PropertyMetadata(null));
+    public static readonly DependencyProperty InitialMappingProperty = DependencyProperty.Register(nameof(InitialMapping), typeof(SourcesMapper), typeof(MappingsEditor), new PropertyMetadata(null));
 
     public SourcesMapper InitialMapping
     {

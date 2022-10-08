@@ -3,7 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 
 using Microsoft.UI.Xaml.Navigation;
 
-using QuAnalyzer.UI.Windows;
+using QuAnalyzer.UI.Popups;
+
 using Wokhan.Data.Providers.Bases;
 using Wokhan.Data.Providers.Contracts;
 

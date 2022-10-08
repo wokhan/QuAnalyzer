@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.Connectivity;
 
 using QuAnalyzer.Core.Helpers;
-using QuAnalyzer.UI.Windows;
+using QuAnalyzer.UI.Popups;
 
 using Wokhan.Data.Providers.Bases;
 

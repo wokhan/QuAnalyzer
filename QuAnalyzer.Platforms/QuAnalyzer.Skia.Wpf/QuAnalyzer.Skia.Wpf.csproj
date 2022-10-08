@@ -1,36 +1,61 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>10</LangVersion>
+    <OutputType Condition="'$(Configuration)'=='Release'">WinExe</OutputType>
+    <OutputType Condition="'$(Configuration)'=='Debug'">Exe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
+  <ItemGroup Label="AssemblyInfo">
+    <AssemblyAttribute Include="System.Runtime.InteropServices.ComVisibleAttribute">
+      <_Parameter1>false</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Windows.ThemeInfo">
+      <_Parameter1>System.Windows.ResourceDictionaryLocation.None</_Parameter1>
+      <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+      <_Parameter2>System.Windows.ResourceDictionaryLocation.SourceAssembly</_Parameter2>
+      <_Parameter2_IsLiteral>true</_Parameter2_IsLiteral>
+    </AssemblyAttribute>
+  </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
-    
-    <PackageReference Include="Uno.CommunityToolkit.WinUI.UI.Controls" Version="7.1.100-dev.15.g12261e2626" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
+    <PackageReference Include="Uno.WinUI.RemoteControl" Version="4.6.0-dev.532" Condition="'$(Configuration)'=='Debug'" />
+    <PackageReference Include="Uno.UI.Adapter.Microsoft.Extensions.Logging" Version="4.6.0-dev.532" />
+
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+
     <PackageReference Include="Uno.CommunityToolkit.WinUI.Connectivity" Version="7.1.100-dev.15.g12261e2626" />
     <PackageReference Include="Uno.CommunityToolkit.WinUI.UI" Version="7.1.100-dev.15.g12261e2626" />
     <PackageReference Include="Uno.CommunityToolkit.WinUI.UI.Animations" Version="7.1.100-dev.15.g12261e2626" />
-    
-    <PackageReference Include="Uno.WinUI.Skia.Wpf" Version="4.3.6" />
-    <PackageReference Include="Uno.WinUI.RemoteControl" Version="4.3.6" Condition="'$(Configuration)'=='Debug'" />
-    <PackageReference Include="Uno.UI.Adapter.Microsoft.Extensions.Logging" Version="4.3.6" />
-    <PackageReference Include="Uno.Core.Extensions.Logging.Singleton" Version="4.0.1" />
+    <PackageReference Include="Uno.CommunityToolkit.WinUI.UI.Controls" Version="7.1.100-dev.15.g12261e2626" />
 
-    <PackageReference Include="EPPlus" Version="6.0.5" />
-    
     <PackageReference Include="LiveChartsCore.SkiaSharpView.Uno.WinUI" Version="2.0.0-beta.330" />
-    
+
+    <PackageReference Include="EPPlus" Version="6.0.8" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="6.0.1" />
     <PackageReference Include="Wokhan.Data.Providers" Version="0.8.7-beta" />
-    
-    <PackageReference Include="NuGet.Protocol" Version="6.2.1" />
-    <PackageReference Include="NuGet.Resolver" Version="6.2.1" />
+    <PackageReference Include="NuGet.Protocol" Version="6.3.0" />
+    <PackageReference Include="NuGet.Resolver" Version="6.3.0" />
+
+    <PackageReference Include="Uno.WinUI.Skia.Wpf" Version="4.6.0-dev.532" />
   </ItemGroup>
-  <ItemGroup>
-    <UpToDateCheckInput Include="..\QuAnalyzer.Shared\**\*.xaml" />
-  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\QuAnalyzer.Features\QuAnalyzer.Features.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Include="..\..\QuAnalyzer.Shared\**\*.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Fonts\uno-fluentui-assets.ttf" />
+  </ItemGroup>
+
   <Import Project="..\..\QuAnalyzer.Shared\QuAnalyzer.Shared.projitems" Label="Shared" />
+
+  <!--<ItemGroup>
+    <Compile Include="obj\generated\Uno.UI.SourceGenerators\**\*.cs" />
+  </ItemGroup>-->
+
 </Project>

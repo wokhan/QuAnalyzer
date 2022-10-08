@@ -3,13 +3,13 @@ using CommunityToolkit.Mvvm.Input;
 
 using Microsoft.UI.Xaml.Navigation;
 
-using QuAnalyzer.UI.Windows;
+using QuAnalyzer.UI.Popups;
 
 using System.Diagnostics.Contracts;
 
 using Windows.Storage.Pickers;
 
-#if NET6_0_OR_GREATER
+#if !HAS_UNO
 using WinRT.Interop;
 #endif
 
@@ -140,7 +140,7 @@ public partial class ProviderEditor : Page
             SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
         };
 
-#if WINDOWS
+#if !HAS_UNO
         var hwnd = WindowNative.GetWindowHandle(App.Instance.MainWindow);
         InitializeWithWindow.Initialize(filePicker, hwnd);
 #endif

@@ -1,13 +1,10 @@
 ﻿namespace QuAnalyzer.UI.Controls;
 
-public partial class ExtendedDataGridView
+public struct ComputeStruct
 {
-    public struct ComputeStruct
-    {
-        public string Attribute { get; set; }
-        public string DisplayName { get; set; }
-        public string Aggregate { get; set; }
-    }
+    public string Attribute { get; set; }
+    public string DisplayName { get; set; }
+    public string Aggregate { get; set; }
 
     public static Dictionary<string, string> Aggregations { get; } = new()
     {
@@ -22,3 +19,4 @@ public partial class ExtendedDataGridView
         { "Max", "Max({0})" }
     };
 }
+

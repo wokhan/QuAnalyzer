@@ -13,7 +13,9 @@ using System.ComponentModel.DataAnnotations;
 using Windows.Storage.Pickers;
 using Windows.UI;
 
+#if !HAS_UNO
 using WinRT.Interop;
+#endif
 
 using Wokhan.Data.Providers.Contracts;
 
@@ -58,7 +60,7 @@ public partial class ProjectSettings : ObservableValidator
             SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
         };
 
-#if WINDOWS
+#if !HAS_UNO
         var hwnd = WindowNative.GetWindowHandle(App.Instance.MainWindow);
         InitializeWithWindow.Initialize(filePicker, hwnd);
 #endif
@@ -146,7 +148,7 @@ public partial class ProjectSettings : ObservableValidator
             SuggestedFileName = App.Instance.CurrentProject.Name + ".qap"
         };
 
-#if WINDOWS
+#if !HAS_UNO
         var hwnd = WindowNative.GetWindowHandle(App.Instance.MainWindow);
         InitializeWithWindow.Initialize(filePicker, hwnd);
 #endif

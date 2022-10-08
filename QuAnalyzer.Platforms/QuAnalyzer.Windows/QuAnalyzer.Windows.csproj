@@ -25,17 +25,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.WinUI.Connectivity" Version="7.1.2" />
-		<PackageReference Include="CommunityToolkit.WinUI.UI" Version="7.1.2" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.5" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+		<PackageReference Include="Uno.Core.Extensions.Logging.Singleton" Version="4.0.1" />
+
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+
+    <PackageReference Include="CommunityToolkit.WinUI.Connectivity" Version="7.1.2" />
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Animations" Version="7.1.2" />
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
-		<PackageReference Include="CommunityToolkit.WinUI.UI.Media" Version="7.1.2" />
-		<PackageReference Include="EPPlus" Version="6.0.6" />
-		<PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-beta.330" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.4" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+    
+		<PackageReference Include="LiveChartsCore.SkiaSharpView.Uno.WinUI" Version="2.0.0-beta.330" />
+    
+		<PackageReference Include="EPPlus" Version="6.0.8" />
 		<PackageReference Include="System.Diagnostics.PerformanceCounter" Version="6.0.1" />
-		<PackageReference Include="Uno.Core.Extensions.Logging.Singleton" Version="4.0.1" />
 		<PackageReference Include="Wokhan.Data.Providers" Version="0.8.7-beta" />
     <PackageReference Include="NuGet.Protocol" Version="6.3.0" />
     <PackageReference Include="NuGet.Resolver" Version="6.3.0" />
@@ -49,6 +53,7 @@
 	<ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnablePreviewMsixTooling)'=='true'">
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
+  
 	<ItemGroup>
 	  <ProjectReference Include="..\..\QuAnalyzer.Features\QuAnalyzer.Features.csproj" />
 	</ItemGroup>

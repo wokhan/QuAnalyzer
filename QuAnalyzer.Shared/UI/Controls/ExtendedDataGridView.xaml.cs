@@ -66,6 +66,7 @@ public partial class ExtendedDataGridView : UserControl
 
     public ObservableCollection<ComputeStruct> Compute { get; } = new();
 
+
     private string SortOrder
     {
         get

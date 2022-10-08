@@ -1,13 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 
-using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Navigation;
 
-namespace QuAnalyzer.UI.Windows
+namespace QuAnalyzer.UI.Popups
 {
     [ObservableObject]
-    public partial class GenericPopup : Window
+    public partial class GenericPopup : ContentDialog
     {
         private bool isWizard;
 
@@ -32,12 +30,14 @@ namespace QuAnalyzer.UI.Windows
             _buttonsBarVisibility = isWizard ? Visibility.Visible : Visibility.Collapsed;
 
             InitializeComponent();
-            
-            if (AppWindowTitleBar.IsCustomizationSupported())
-            {
-                this.ExtendsContentIntoTitleBar = true;
-                this.SetTitleBar(TitleBar);
-            }
+
+//#if !HAS_UNO
+//            if (AppWindowTitleBar.IsCustomizationSupported())
+//            {
+//                this.ExtendsContentIntoTitleBar = true;
+//                this.SetTitleBar(TitleBar);
+//            }
+//#endif
 
             contents.SetValue(OwningWindowProperty, this);
 
@@ -72,9 +72,19 @@ namespace QuAnalyzer.UI.Windows
             return (GenericPopup)page.Frame?.GetValue(OwningWindowProperty);
         }
 
+        public void Close()
+        {
+            this.CloseButtonCommand.Execute(null);
+        }
+
         private void CloseMe(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        public void Activate()
+        {
+            StartBringIntoView();
         }
         public static void UpdateCurrent(Page page, IRelayCommand? nextButtonCommand = null, string? title = null, bool isLastStep = false)
         {

@@ -3,16 +3,33 @@
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 
+using QuAnalyzer.Core.Project;
 using QuAnalyzer.UI.Popups;
 
 using Windows.ApplicationModel;
 
+#if !HAS_UNO
 using WinRT.Interop;
+#endif
 
 namespace QuAnalyzer.UI.Pages;
 
-public partial class MainPage
+public partial class MainPage : Page
 {
+    /// <summary>
+    /// This is to bypass a bug with Uno Platform where TwoWay static bindings through x:Bind don't seem to work. Weird since
+    /// according to GitHub, it should...
+    /// </summary>
+    public ProjectSettings CurrentProject => App.Instance.CurrentProject;
+    public Window MainWindow => App.Instance.MainWindow;
+
+#if HAS_UNO
+    //TODO: update to take this from another place (project properties? assembly name?)
+    public string WindowTitle => "QuAnalyzer";
+#else
+    public string WindowTitle => App.Instance.MainWindow.Title;
+#endif
+
     private About aboutPage;
     private ViewerPage viewerPage;
     private PatternsPage patternsPage;
@@ -35,6 +52,7 @@ public partial class MainPage
 
         InitializeComponent();
 
+#if !HAS_UNO
         // Only works on Win 11 yet.
         if (AppWindowTitleBar.IsCustomizationSupported())
         {
@@ -43,6 +61,7 @@ public partial class MainPage
             window.ExtendsContentIntoTitleBar = true;
             window.SetTitleBar(AppTitleBar);
         }
+#endif
 
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         Application.Current.UnhandledException += CurrentApp_UnhandledException;
@@ -52,9 +71,11 @@ public partial class MainPage
 
     private void MainPage_Loaded(object sender, RoutedEventArgs e)
     {
+#if !HAS_UNO
         var windowId = Win32Interop.GetWindowIdFromWindow(WindowNative.GetWindowHandle(App.Instance.MainWindow));
 
         AppWindow.GetFromWindowId(windowId).SetIcon(Package.Current.InstalledLocation.Path + "\\IconNew.ico");
+#endif
     }
 
     private void CurrentApp_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)

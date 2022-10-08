@@ -16,3 +16,17 @@ Issues
 Fatal crash on ConccurentDictionary.TryAddInternal: ensure you're not updating a databound value (such as an ObservableProperty) from a different thread.
 I had to move all Observable notifications to the caller instead of the corresponding source object (meaning it's not a notification anymore, as it's triggered externally from the UI thread).
 I don't like this but it prevents having to call DispatcherQueue.TryEnqueue from a standalone thread (which might not even have access to DispatcherQueue).
+
+
+Platforms
+=========
+WPF: remove static bindings as it doesn't seem to work. Use proxy local getters instead (public Type MyVar => MyStaticVar);
+Linux : install WSL (obviously) and Ubuntu or any other distro. 
+	Then add GTK (to avoid the "missing libc" error on launch) using :
+	sudo apt update
+	sudo apt install libgtk-3-dev mesa-utils libgl1-mesa-glx ttf-mscorefonts-installer
+	
+	Source: https://platform.uno/docs/articles/get-started-with-linux.html?tabs=ubuntu2004%2Cwindows
+
+GTK: Install GTK from https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases as stated in https://platform.uno/docs/articles/get-started-wizard.html
+

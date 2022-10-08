@@ -7,7 +7,7 @@ using System.Threading;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 
-#if NET6_0_OR_GREATER
+#if !HAS_UNO
 using WinRT.Interop;
 #endif
 
@@ -28,7 +28,7 @@ public static class DataGridExtensions
         {
             var filePicker = new FileSavePicker();
 
-#if WINDOWS
+#if !HAS_UNO
             var hwnd = WindowNative.GetWindowHandle(App.Instance.MainWindow);
             InitializeWithWindow.Initialize(filePicker, hwnd);
 #endif
@@ -88,7 +88,7 @@ public static class DataGridExtensions
             {
                 var filePicker = new FileSavePicker();
 
-#if WINDOWS
+#if !HAS_UNO
                 var hwnd = WindowNative.GetWindowHandle(App.Instance.MainWindow);
                 InitializeWithWindow.Initialize(filePicker, hwnd);
 #endif

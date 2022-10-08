@@ -99,11 +99,11 @@
                                     <controls:DataGrid Margin="-5" AllowDrop="True" AutoGenerateColumns="False" ItemsSource="{x:Bind Filters,Mode=OneWay}" x:Name="gridFilters" Drop="gridFilters_Drop">
                                         <controls:DataGrid.Columns>
                                             <controls:DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" />
-                                            <controls:DataGridComboBoxColumn Width="*" Header="Operator" DisplayMemberPath="Key" Binding="{Binding ComparerExpression,Mode=TwoWay}" ItemsSource="{x:Bind myself:ExtendedDataGridView.Operators}" />
+                                            <controls:DataGridComboBoxColumn Width="*" Header="Operator" DisplayMemberPath="Key" Binding="{Binding ComparerExpression,Mode=TwoWay}" ItemsSource="{x:Bind myself:FilterStruct.Operators}" />
                                             <controls:DataGridTextColumn Width="*" Header="Value" Binding="{Binding TargetValue}"/>
                                             <controls:DataGridTemplateColumn Width="*" CanUserSort="False">
                                                 <controls:DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
+                                                    <DataTemplate x:DataType="myself:FilterStruct">
                                                         <AppBarButton CommandParameter="{Binding}" Command="{Binding DeleteFilterCommand,ElementName=me}" Foreground="OrangeRed" Icon="Delete" />
                                                     </DataTemplate>
                                                 </controls:DataGridTemplateColumn.CellTemplate>
@@ -175,10 +175,10 @@
                                                     </controls:DataGrid.Style>-->
                                 <controls:DataGrid.Columns>
                                     <controls:DataGridTextColumn Width="*" Header="Attribute" Binding="{Binding Attribute}" IsReadOnly="True" />
-                                    <controls:DataGridComboBoxColumn Width="*" Header="Aggregation" DisplayMemberPath="Key" Binding="{Binding Aggregate,Mode=TwoWay}" ItemsSource="{x:Bind myself:ExtendedDataGridView.Aggregations}" />
+                                    <controls:DataGridComboBoxColumn Width="*" Header="Aggregation" DisplayMemberPath="Key" Binding="{Binding Aggregate,Mode=TwoWay}" ItemsSource="{x:Bind myself:ComputeStruct.Aggregations}" />
                                     <controls:DataGridTemplateColumn>
                                         <controls:DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
+                                            <DataTemplate x:DataType="myself:ComputeStruct">
                                                 <AppBarButton CommandParameter="{x:Bind}" Command="{Binding DeleteAggregationCommand,ElementName=me}"  Icon="Delete" />
                                             </DataTemplate>
                                         </controls:DataGridTemplateColumn.CellTemplate>

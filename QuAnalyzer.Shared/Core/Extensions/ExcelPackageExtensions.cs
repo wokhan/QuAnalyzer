@@ -6,7 +6,9 @@ using OfficeOpenXml.Style;
 using Windows.Storage.Pickers;
 using Windows.UI;
 
+#if !HAS_UNO
 using WinRT.Interop;
+#endif
 
 namespace QuAnalyzer.Generic.Extensions;
 
@@ -189,7 +191,7 @@ public static class ExcelPackageExtensions
         {
             var filePicker = new FileSavePicker();
 
-#if WINDOWS
+#if !HAS_UNO
             var hwnd = WindowNative.GetWindowHandle(App.Instance.MainWindow);
             InitializeWithWindow.Initialize(filePicker, hwnd);
 #endif

@@ -4,18 +4,21 @@ using System;
 
 using Uno.UI.Runtime.Skia;
 
-namespace QuAnalyzer.Uno.Skia.Gtk;
-internal class Program
+namespace QuAnalyzer.Skia.Gtk
 {
-    static void Main(string[] args)
+    internal class Program
     {
-        ExceptionManager.UnhandledException += delegate (UnhandledExceptionArgs expArgs) {
-            Console.WriteLine("GLIB UNHANDLED EXCEPTION" + expArgs.ExceptionObject.ToString());
-            expArgs.ExitApplication = true;
-        };
+        static void Main(string[] args)
+        {
+            ExceptionManager.UnhandledException += delegate (UnhandledExceptionArgs expArgs)
+            {
+                Console.WriteLine("GLIB UNHANDLED EXCEPTION" + expArgs.ExceptionObject.ToString());
+                expArgs.ExitApplication = true;
+            };
 
-        var host = new GtkHost(() => new App());
+            var host = new GtkHost(() => new App());
 
-        host.Run();
+            host.Run();
+        }
     }
 }

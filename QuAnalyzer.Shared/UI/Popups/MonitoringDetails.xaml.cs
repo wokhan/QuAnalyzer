@@ -2,8 +2,8 @@
 
 using Microsoft.UI.Xaml.Navigation;
 
+using QuAnalyzer.Core.Project;
 using QuAnalyzer.Features.Monitoring;
-using QuAnalyzer.UI.Windows;
 
 using Windows.UI.Popups;
 
@@ -12,6 +12,11 @@ namespace QuAnalyzer.UI.Popups;
 [ObservableObject]
 public partial class MonitoringDetails : Page
 {
+    /// <summary>
+    /// This is to bypass a bug with Uno Platform where TwoWay static bindings through x:Bind don't seem to work. Weird since
+    /// according to GitHub, it should...
+    /// </summary>
+    public ProjectSettings CurrentProject => App.Instance.CurrentProject;
 
     private TestDefinition initialItem;
 

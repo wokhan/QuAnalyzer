@@ -6,7 +6,7 @@
       xmlns:test="using:QuAnalyzer.UI.Pages"
       xmlns:stats="using:QuAnalyzer.Features.Statistics"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
-      xmlns:chart="using:LiveChartsCore.SkiaSharpView.WinUI"
+      xmlns:chart="using:LiveChartsCore.SkiaSharpView.Uno.WinUI"
       mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="840"
       x:Name="me">
     <controls:DockPanel Grid.Row="1" Grid.Column="1">

@@ -1,29 +1,42 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType Condition="'$(Configuration)'=='Release'">WinExe</OutputType>
     <OutputType Condition="'$(Configuration)'=='Debug'">Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <ItemGroup Condition="exists('..\QuAnalyzer.UWP')">
-    <EmbeddedResource Include="..\QuAnalyzer.UWP\Package.appxmanifest" LogicalName="Package.appxmanifest" />
-    <Content Include="..\QuAnalyzer.UWP\Assets\StoreLogo.png" Link="Assets\StoreLogo.png" />
+  <ItemGroup Condition="exists('..\QuAnalyzer.Windows')">
+    <EmbeddedResource Include="..\QuAnalyzer.Windows\Package.appxmanifest" LogicalName="Package.appxmanifest" />
+    <Content Include="..\QuAnalyzer.Windows\Images\StoreLogo.scale-100.png" Link="Assets\StoreLogo.png" />
     <Content Include="Assets\Fonts\uno-fluentui-assets.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <UpToDateCheckInput Include="..\QuAnalyzer.Shared\**\*.xaml" />
+    <UpToDateCheckInput Include="..\..\QuAnalyzer.Shared\**\*.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="5.8.4" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
+    <PackageReference Include="Uno.WinUI.Skia.Gtk" Version="4.6.0-dev.532" />
+    <PackageReference Include="Uno.WinUI.RemoteControl" Version="4.6.0-dev.532" Condition="'$(Configuration)'=='Debug'" />
+    <PackageReference Include="Uno.UI.Adapter.Microsoft.Extensions.Logging" Version="4.6.0-dev.532" />
+
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+    
+    <PackageReference Include="Uno.CommunityToolkit.WinUI.Connectivity" Version="7.1.100-dev.15.g12261e2626" />
+    <PackageReference Include="Uno.CommunityToolkit.WinUI.UI.Animations" Version="7.1.100-dev.15.g12261e2626" />
     <PackageReference Include="Uno.CommunityToolkit.WinUI.UI.Controls" Version="7.1.100-dev.15.g12261e2626" />
-    <PackageReference Include="Uno.WinUI.Skia.Gtk" Version="4.3.6" />
-    <PackageReference Include="Uno.WinUI.RemoteControl" Version="4.3.6" Condition="'$(Configuration)'=='Debug'" />
-    <PackageReference Include="Uno.UI.Adapter.Microsoft.Extensions.Logging" Version="4.3.6" />
+
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.Uno.WinUI" Version="2.0.0-beta.330" />
+    
+    <PackageReference Include="EPPlus" Version="6.0.8" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="6.0.1" />
+    <PackageReference Include="Wokhan.Data.Providers" Version="0.8.7-beta" />
+    <PackageReference Include="NuGet.Protocol" Version="6.3.0" />
+    <PackageReference Include="NuGet.Resolver" Version="6.3.0" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\QuAnalyzer.Features\QuAnalyzer.Features.csproj" />
   </ItemGroup>
+
   <Import Project="..\..\QuAnalyzer.Shared\QuAnalyzer.Shared.projitems" Label="Shared" />
+  
 </Project>

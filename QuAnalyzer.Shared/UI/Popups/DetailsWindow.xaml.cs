@@ -13,7 +13,6 @@ using QuAnalyzer.Core.Extensions;
 using QuAnalyzer.Features.Comparison;
 using QuAnalyzer.Features.Comparison.Results;
 using QuAnalyzer.UI.Controls;
-using QuAnalyzer.UI.Windows;
 
 using Windows.UI.Text;
 

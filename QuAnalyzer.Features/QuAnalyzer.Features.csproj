@@ -8,8 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.0.0-preview4" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0-preview4" />
+    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.0.0" />
+
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.3.0-2.final" />
     <!--<PackageReference Include="System.Runtime.Loader" Version="4.3.0" />-->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

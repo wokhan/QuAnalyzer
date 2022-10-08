@@ -9,7 +9,7 @@
       x:Name="me">
     <Grid>
         <Grid.Resources>
-            <CollectionViewSource x:Key="groupedItems" ItemsPath="Repositories" Source="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders,Mode=OneWay}" IsSourceGrouped="True" />
+            <CollectionViewSource x:Key="groupedItems" ItemsPath="Repositories" Source="{x:Bind CurrentProject.CurrentProviders,Mode=OneWay}" IsSourceGrouped="True" />
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -20,7 +20,7 @@
             <AppBarButton Label="Add..." Command="{x:Bind SourceNewCommand}" Icon="Add" />
             <!--<Button Content="Import..." Command="{Binding ProviderImportCommand}" IsEnabled="False" BorderBrush="Blue" ext:CustomAdorner.Image="{iconPacks:Material Kind=Import}"/>-->
         </CommandBar>
-        <ListView Grid.Row="2" ItemsSource="{Binding Source={StaticResource groupedItems}}" SelectionChanged="ListView_SelectionChanged" IsEnabled="{x:Bind quanalyzer:App.Instance.CurrentSelectionLinked,Mode=OneWay}">
+        <ListView Grid.Row="2" ItemsSource="{Binding Source={StaticResource groupedItems}}" SelectionChanged="ListView_SelectionChanged" IsEnabled="{x:Bind CurrentSelectionLinked,Mode=OneWay}">
             <!--<ListView.Resources>
                 <Style TargetType="ListViewHeaderItem">
                     <Setter Target="HorizontalAlignment" Value="Stretch" />
@@ -54,9 +54,9 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <!--<controls:SwitchPresenter Grid.Row="2" Value="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders.Count,Mode=OneWay}">
+        <!--<controls:SwitchPresenter Grid.Row="2" Value="{x:Bind CurrentProject.CurrentProviders.Count,Mode=OneWay}">
             <controls:Case Value="1">-->
-        <!--<TreeView Grid.Row="2" ItemsSource="{x:Bind quanalyzer:App.Instance.CurrentProject.CurrentProviders,Mode=OneWay}" ItemTemplateSelector="{x:Bind selector}" ItemInvoked="TreeView_ItemInvoked">
+        <!--<TreeView Grid.Row="2" ItemsSource="{x:Bind CurrentProject.CurrentProviders,Mode=OneWay}" ItemTemplateSelector="{x:Bind selector}" ItemInvoked="TreeView_ItemInvoked">
             <TreeView.Resources>
                 <DataTemplate x:Name="RepositoriesNodeTemplate" x:DataType="x:String">
                     <TreeViewItem Content="{x:Bind}" />

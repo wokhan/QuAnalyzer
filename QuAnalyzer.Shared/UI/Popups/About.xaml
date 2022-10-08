@@ -22,7 +22,7 @@
                                 <x:String>Mica</x:String>
                             </ComboBox>
                             <TextBlock Text="Accent color (for the current project)" Margin="0,10"/>
-                            <ColorPicker HorizontalAlignment="Left" IsAlphaEnabled="False" IsHexInputVisible="False" IsColorChannelTextInputVisible="False" Color="{x:Bind quanalyzer:App.Instance.CurrentProject.AccentColor,Mode=TwoWay}" />
+                            <!--<ColorPicker HorizontalAlignment="Left" IsAlphaEnabled="False" IsHexInputVisible="False" IsColorChannelTextInputVisible="False" Color="{x:Bind quanalyzer:App.Instance.CurrentProject.AccentColor,Mode=TwoWay}" />-->
                         </StackPanel>
                     </ScrollViewer>
                 </NavigationViewItem.Tag>
@@ -32,9 +32,9 @@
                     <ScrollViewer>
                         <StackPanel Margin="20">
                             <TextBlock Text="About" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                            <TextBlock Text="{x:Bind quanalyzer:App.Instance.ApplicationInfo, FallbackValue='Wokhan QuAnalyzer vX.X.X'}" />
+                            <!--<TextBlock Text="{x:Bind quanalyzer:App.Instance.ApplicationInfo, FallbackValue='Wokhan QuAnalyzer vX.X.X'}" />
                             <TextBlock Text="{x:Bind quanalyzer:App.Instance.Copyright, FallbackValue='Copyright notice'}" />
-                            <TextBlock Text="{x:Bind quanalyzer:App.Instance.HelpLink, FallbackValue='Link'}" />
+                            <TextBlock Text="{x:Bind quanalyzer:App.Instance.HelpLink, FallbackValue='Link'}" />-->
                             <TextBlock Text="External resources" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             <TextBlock TextWrapping="Wrap">
             This project uses the following libraries:
