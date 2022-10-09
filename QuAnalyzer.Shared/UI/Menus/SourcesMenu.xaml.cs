@@ -22,7 +22,7 @@ public partial class SourcesMenu : UserControl
     /// This is to bypass a bug with Uno Platform where TwoWay static bindings through x:Bind don't seem to work. Weird since
     /// according to GitHub, it should...
     /// </summary>
-    public ProjectSettings CurrentProject => App.Instance.CurrentProject;
+    public App App => App.Instance;
     public bool CurrentSelectionLinked => App.Instance.CurrentSelectionLinked;
 
     private Point startPoint;

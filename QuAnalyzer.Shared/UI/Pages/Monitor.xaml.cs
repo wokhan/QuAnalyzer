@@ -22,7 +22,7 @@ public partial class Monitor : Page
     /// This is to bypass a bug with Uno Platform where TwoWay static bindings through x:Bind don't seem to work. Weird since
     /// according to GitHub, it should...
     /// </summary>
-    public ProjectSettings CurrentProject => App.Instance.CurrentProject;
+    public App App => App.Instance;
 
     private TimeSpan chartTimeSpanSeconds = TimeSpan.FromSeconds(30);
 
@@ -230,7 +230,7 @@ public partial class Monitor : Page
     [RelayCommand]
     private void MonitorAdd()
     {
-        GenericPopup.OpenNew<MonitoringDetails>();
+        GenericPopup.OpenNew<MonitoringDetails>(isWizard: true);
     }
 
     [RelayCommand]
@@ -285,7 +285,7 @@ public partial class Monitor : Page
         var editButton = (Button)sender;
         var target = (TestDefinition)editButton.CommandParameter;
 
-        GenericPopup.OpenNew<MonitoringDetails>(target);
+        GenericPopup.OpenNew<MonitoringDetails>(target, true);
     }
 
     /// <summary>

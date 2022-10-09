@@ -9,7 +9,7 @@
       x:Name="me">
     <Grid>
         <Grid.Resources>
-            <CollectionViewSource x:Key="groupedItems" ItemsPath="Repositories" Source="{x:Bind CurrentProject.CurrentProviders,Mode=OneWay}" IsSourceGrouped="True" />
+            <CollectionViewSource x:Key="groupedItems" ItemsPath="Repositories" Source="{x:Bind App.CurrentProject.CurrentProviders,Mode=OneWay}" IsSourceGrouped="True" />
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -54,9 +54,9 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <!--<controls:SwitchPresenter Grid.Row="2" Value="{x:Bind CurrentProject.CurrentProviders.Count,Mode=OneWay}">
+        <!--<controls:SwitchPresenter Grid.Row="2" Value="{x:Bind App.CurrentProject.CurrentProviders.Count,Mode=OneWay}">
             <controls:Case Value="1">-->
-        <!--<TreeView Grid.Row="2" ItemsSource="{x:Bind CurrentProject.CurrentProviders,Mode=OneWay}" ItemTemplateSelector="{x:Bind selector}" ItemInvoked="TreeView_ItemInvoked">
+        <!--<TreeView Grid.Row="2" ItemsSource="{x:Bind App.CurrentProject.CurrentProviders,Mode=OneWay}" ItemTemplateSelector="{x:Bind selector}" ItemInvoked="TreeView_ItemInvoked">
             <TreeView.Resources>
                 <DataTemplate x:Name="RepositoriesNodeTemplate" x:DataType="x:String">
                     <TreeViewItem Content="{x:Bind}" />

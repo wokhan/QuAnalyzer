@@ -27,15 +27,15 @@
         <CommandBar Content="Settings" DefaultLabelPosition="Right">
             <AppBarButton HorizontalAlignment="Center" ToolTipService.ToolTip="Start comparisons for the selected items" Command="{x:Bind RunCommand}" Icon="Play" Label="Run" />
             <AppBarSeparator />
-            <AppBarToggleButton Label="Single-mapping mode" ToolTipService.ToolTip="Single-mapping mode" Icon="DisableUpdates" IsChecked="{x:Bind CurrentProject.UseSingleMapping,Mode=TwoWay}" />
+            <AppBarToggleButton Label="Single-mapping mode" ToolTipService.ToolTip="Single-mapping mode" Icon="DisableUpdates" IsChecked="{x:Bind App.CurrentProject.UseSingleMapping,Mode=TwoWay}" />
             <AppBarSeparator />
-            <AppBarButton Label="Add" ToolTipService.ToolTip="Add a mapping" Icon="Add" IsEnabled="{x:Bind CurrentProject.UseSingleMapping,Converter={StaticResource booleanNegator},Mode=OneWay}" Command="{x:Bind CreateMappingCommand}" />
-            <AppBarButton Label="Automap" ToolTipService.ToolTip="Automap" Icon="Shuffle" IsEnabled="{x:Bind CurrentProject.UseSingleMapping,Converter={StaticResource booleanNegator},Mode=OneWay}" Command="{x:Bind AutoMapCommand}" />
+            <AppBarButton Label="Add" ToolTipService.ToolTip="Add a mapping" Icon="Add" IsEnabled="{x:Bind App.CurrentProject.UseSingleMapping,Converter={StaticResource booleanNegator},Mode=OneWay}" Command="{x:Bind CreateMappingCommand}" />
+            <AppBarButton Label="Automap" ToolTipService.ToolTip="Automap" Icon="Shuffle" IsEnabled="{x:Bind App.CurrentProject.UseSingleMapping,Converter={StaticResource booleanNegator},Mode=OneWay}" Command="{x:Bind AutoMapCommand}" />
             <AppBarSeparator />
-            <AppBarButton Label="Sel. all" ToolTipService.ToolTip="Select all" Icon="SelectAll" Click="btnSelectAll_Click" IsEnabled="{x:Bind CurrentProject.UseSingleMapping,Converter={StaticResource booleanNegator},Mode=OneWay}" />
-            <AppBarButton Label="Unsel. all" ToolTipService.ToolTip="Unselect all" Icon="ClearSelection" Click="btnUnSel_Click" IsEnabled="{x:Bind CurrentProject.UseSingleMapping,Converter={StaticResource booleanNegator},Mode=OneWay}" />
+            <AppBarButton Label="Sel. all" ToolTipService.ToolTip="Select all" Icon="SelectAll" Click="btnSelectAll_Click" IsEnabled="{x:Bind App.CurrentProject.UseSingleMapping,Converter={StaticResource booleanNegator},Mode=OneWay}" />
+            <AppBarButton Label="Unsel. all" ToolTipService.ToolTip="Unselect all" Icon="ClearSelection" Click="btnUnSel_Click" IsEnabled="{x:Bind App.CurrentProject.UseSingleMapping,Converter={StaticResource booleanNegator},Mode=OneWay}" />
         </CommandBar>
-        <controls:DataGrid Grid.Row="1" Visibility="{x:Bind CurrentProject.UseSingleMapping,Mode=OneWay,Converter={StaticResource boolToVisibilityNegateConverter}}" SelectionMode="Extended" ItemsSource="{x:Bind CurrentProject.SourceMapper,Mode=OneWay}" ColumnWidth="18*" AutoGenerateColumns="False" x:Name="lstMappings" SelectionChanged="LstMappings_SelectionChanged">
+        <controls:DataGrid Grid.Row="1" Visibility="{x:Bind App.CurrentProject.UseSingleMapping,Mode=OneWay,Converter={StaticResource boolToVisibilityNegateConverter}}" SelectionMode="Extended" ItemsSource="{x:Bind App.CurrentProject.SourceMapper,Mode=OneWay}" ColumnWidth="18*" AutoGenerateColumns="False" x:Name="lstMappings" SelectionChanged="LstMappings_SelectionChanged">
             <controls:DataGrid.Columns>
                 <controls:DataGridTextColumn Binding="{Binding Name}" Header="Mapping name" IsReadOnly="True" />
                 <controls:DataGridTextColumn Binding="{Binding SourceName}" Header="Source" IsReadOnly="True" />
@@ -61,7 +61,7 @@
                 </controls:DataGridTemplateColumn>
             </controls:DataGrid.Columns>
         </controls:DataGrid>
-        <popups:MappingsEditor Grid.Row="1" Visibility="{x:Bind CurrentProject.UseSingleMapping,Mode=OneWay,Converter={StaticResource boolToVisibilityConverter}}" Mapping="{x:Bind CurrentProject.SingleMapper,Mode=OneTime}" />
+        <popups:MappingsEditor Grid.Row="1" Visibility="{x:Bind App.CurrentProject.UseSingleMapping,Mode=OneWay,Converter={StaticResource boolToVisibilityConverter}}" Mapping="{x:Bind App.CurrentProject.SingleMapper,Mode=OneTime}" />
         <controls:GridSplitter Grid.Row="2" />
         <controls:DockPanel Grid.Row="3">
             <CommandBar Content="Results" controls:DockPanel.Dock="Top">

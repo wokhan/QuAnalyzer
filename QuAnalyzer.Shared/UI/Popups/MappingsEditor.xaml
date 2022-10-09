@@ -41,7 +41,7 @@
             </Grid.RowDefinitions>
             <TextBlock Text="SOURCE" Foreground="White" Grid.ColumnSpan="2" />
             <TextBlock Text="Provider:" Grid.Row="1" VerticalAlignment="Center" />
-            <ComboBox x:Name="lstSrc" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{x:Bind CurrentProject.CurrentProviders,Mode=OneWay}" SelectedItem="{x:Bind Mapping.Source,Mode=TwoWay}" ItemTemplate="{StaticResource AttributesTemplate}" HorizontalAlignment="Stretch" SelectionChanged="DefinitionSelectionChanged" />
+            <ComboBox x:Name="lstSrc" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{x:Bind App.CurrentProject.CurrentProviders,Mode=OneWay}" SelectedItem="{x:Bind Mapping.Source,Mode=TwoWay}" ItemTemplate="{StaticResource AttributesTemplate}" HorizontalAlignment="Stretch" SelectionChanged="DefinitionSelectionChanged" />
             <TextBlock Text="Repository:" Grid.Row="2" VerticalAlignment="Center" />
             <ComboBox x:Name="lstSrcRepo" Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{x:Bind Mapping.Source.Repositories.Keys,Mode=OneWay}" SelectedItem="{x:Bind Mapping.SourceRepository,Mode=TwoWay}" DataContext="{x:Bind lstSrc.SelectedItem}" HorizontalAlignment="Stretch" SelectionChanged="DefinitionSelectionChanged" />
         </Grid>
@@ -58,7 +58,7 @@
             </Grid.RowDefinitions>
             <TextBlock Text="TARGET" Foreground="White" Grid.ColumnSpan="2" />
             <TextBlock Text="Provider:" Grid.Row="1" VerticalAlignment="Center" />
-            <ComboBox x:Name="lstTrg" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{x:Bind CurrentProject.CurrentProviders,Mode=OneWay}" SelectedItem="{x:Bind Mapping.Target,Mode=TwoWay}" ItemTemplate="{StaticResource AttributesTemplate}" HorizontalAlignment="Stretch" SelectionChanged="DefinitionSelectionChanged" />
+            <ComboBox x:Name="lstTrg" Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{x:Bind App.CurrentProject.CurrentProviders,Mode=OneWay}" SelectedItem="{x:Bind Mapping.Target,Mode=TwoWay}" ItemTemplate="{StaticResource AttributesTemplate}" HorizontalAlignment="Stretch" SelectionChanged="DefinitionSelectionChanged" />
             <TextBlock Text="Repository:" Grid.Row="2" VerticalAlignment="Center" />
             <ComboBox x:Name="lstTrgRepo" Grid.Row="2" Grid.Column="1" Margin="5" ItemsSource="{x:Bind Mapping.Target.Repositories.Keys,Mode=OneWay}" SelectedItem="{x:Bind Mapping.TargetRepository,Mode=TwoWay}" DataContext="{x:Bind lstTrg.SelectedItem}" HorizontalAlignment="Stretch"  SelectionChanged="DefinitionSelectionChanged"/>
         </Grid>

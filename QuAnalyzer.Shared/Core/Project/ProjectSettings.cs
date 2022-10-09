@@ -34,11 +34,11 @@ public partial class ProjectSettings : ObservableValidator
     [ObservableProperty]
     private bool useParallelism = true;
 
-    public Color AccentColor
-    {
-        get => ((ColorPaletteResources)App.Instance.Resources["ColorPalette"]).Accent.Value;
-        set => ((ColorPaletteResources)App.Instance.Resources["ColorPalette"]).Accent = value;
-    }
+    //public Color AccentColor
+    //{
+    //    get => ((ColorPaletteResources)App.Instance.Resources["ColorPalette"]).Accent.Value;
+    //    set => ((ColorPaletteResources)App.Instance.Resources["ColorPalette"]).Accent = value;
+    //}
 
     [JsonProperty(ItemIsReference = true)]
     public ObservableCollection<IDataProvider> CurrentProviders { get; } = new();

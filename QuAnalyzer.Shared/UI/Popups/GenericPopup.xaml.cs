@@ -1,11 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Navigation;
+
+using Windows.Foundation;
 
 namespace QuAnalyzer.UI.Popups
 {
     [ObservableObject]
-    public partial class GenericPopup : ContentDialog
+    public partial class GenericPopup : Page
     {
         private bool isWizard;
 
@@ -23,21 +26,39 @@ namespace QuAnalyzer.UI.Popups
 
         public static readonly DependencyProperty OwningWindowProperty = DependencyProperty.RegisterAttached(nameof(OwningWindowProperty), typeof(GenericPopup), typeof(Page), new PropertyMetadata(null));
 
-        public GenericPopup(bool isWizard = false)
+        private Window host;
+
+#if HAS_UNO
+        public event WindowClosedEventHandler Closed
+        {
+            add { host.Closed += value; }
+            remove { host.Closed -= value; }
+        }
+#else
+        public event TypedEventHandler<object, WindowEventArgs> Closed
+        {
+            add { host.Closed += value; }
+            remove { host.Closed -= value; }
+        }
+#endif
+        private GenericPopup(Window host, bool isWizard = false)
         {
             this.isWizard = isWizard;
+            this.host = host;
+
+            host.Content = new Frame { Content = this };
 
             _buttonsBarVisibility = isWizard ? Visibility.Visible : Visibility.Collapsed;
 
             InitializeComponent();
 
-//#if !HAS_UNO
-//            if (AppWindowTitleBar.IsCustomizationSupported())
-//            {
-//                this.ExtendsContentIntoTitleBar = true;
-//                this.SetTitleBar(TitleBar);
-//            }
-//#endif
+#if !HAS_UNO
+            if (AppWindowTitleBar.IsCustomizationSupported())
+            {
+                host.ExtendsContentIntoTitleBar = true;
+                host.SetTitleBar(TitleBar);
+            }
+#endif
 
             contents.SetValue(OwningWindowProperty, this);
 
@@ -53,8 +74,13 @@ namespace QuAnalyzer.UI.Popups
 
         internal static GenericPopup OpenNew<T>(object? parameter = null, bool isWizard = false)
         {
-            GenericPopup window = new(isWizard);
+            var host = new Window();
+
+            GenericPopup window = new(host, isWizard);
+
             window.contents.Navigate(typeof(T), parameter);
+
+            host.Activate();
 
             return window;
         }
@@ -74,7 +100,7 @@ namespace QuAnalyzer.UI.Popups
 
         public void Close()
         {
-            this.CloseButtonCommand.Execute(null);
+            host.Close();
         }
 
         private void CloseMe(object sender, RoutedEventArgs e)
@@ -84,9 +110,10 @@ namespace QuAnalyzer.UI.Popups
 
         public void Activate()
         {
-            StartBringIntoView();
+            host.Activate();
         }
-        public static void UpdateCurrent(Page page, IRelayCommand? nextButtonCommand = null, string? title = null, bool isLastStep = false)
+
+        public static void UpdateCurrent(Page page, IRelayCommand? nextButtonCommand = null, string? title = null, bool? isLastStep = null)
         {
             var popup = (GenericPopup)page.Frame.GetValue(OwningWindowProperty);
 
@@ -95,13 +122,19 @@ namespace QuAnalyzer.UI.Popups
                 popup.NextButtonCommand = nextButtonCommand;
             }
 
+#if !HAS_UNO
             if (title is not null)
             {
                 popup.WindowTitle = title;
+                popup.host.Title = title;
             }
+#endif
 
-            popup.IsLastStep = isLastStep;
-            popup.NextButton.Content = isLastStep ? "Apply !" : "Next >";
+            if (isLastStep is not null)
+            {
+                popup.IsLastStep = isLastStep.Value;
+                popup.NextButton.Content = isLastStep.Value ? "Apply !" : "Next >";
+            }
         }
 
         private void NextButton_Click(object sender, RoutedEventArgs e)

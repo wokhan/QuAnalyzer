@@ -81,7 +81,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{x:Bind CurrentProject.FilePath,FallbackValue='No project has been loaded nor saved.'}" Margin="0,0,20,0" />
+            <TextBlock Text="{x:Bind App.CurrentProject.FilePath,FallbackValue='No project has been loaded nor saved.'}" Margin="0,0,20,0" />
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock FontSize="12" Text="{x:Bind x:String.Format('Memory: {0}', helpers:ResourcesWatcher.Instance.MemoryUseFormatted), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />
                 <TextBlock FontSize="12" Text="{x:Bind x:String.Format('CPU: {0}%,', helpers:ResourcesWatcher.Instance.CPUUsage), Mode=OneWay, FallbackValue='-'}" Margin="0,0,20,0" />

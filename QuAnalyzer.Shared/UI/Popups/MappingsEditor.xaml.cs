@@ -15,7 +15,7 @@ public partial class MappingsEditor : Page
     /// This is to bypass a bug with Uno Platform where TwoWay static bindings through x:Bind don't seem to work. Weird since
     /// according to GitHub, it should...
     /// </summary>
-    public ProjectSettings CurrentProject => App.Instance.CurrentProject;
+public App App => App.Instance;
 
     [ObservableProperty]
     private bool isPopup;
@@ -25,8 +25,6 @@ public partial class MappingsEditor : Page
 
     public MappingsEditor()
     {
-        this.Loaded += MappingsEditor_Loaded;
-
         InitializeComponent();
     }
 
@@ -47,6 +45,8 @@ public partial class MappingsEditor : Page
         base.OnNavigatedTo(e);
 
         InitialMapping = (SourcesMapper)e.Parameter;
+
+        isPopup = GenericPopup.FromPage(this) is not null;
 
         if (IsPopup)
         {
@@ -98,12 +98,6 @@ public partial class MappingsEditor : Page
     {
         Mapping.AllMappings.ReplaceAll(SourceAttributes.Take(TargetAttributes.Count()).Zip(TargetAttributes, (s, i) => new SimpleMap(s, i)));
     }
-
-    private void MappingsEditor_Loaded(object sender, RoutedEventArgs e)
-    {
-        IsPopup = GenericPopup.FromPage(this) is not null;
-    }
-
 
     private void removeMapping_Click(object sender, RoutedEventArgs e)
     {

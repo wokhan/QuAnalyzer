@@ -45,7 +45,7 @@
             <!--<Rectangle />
             <ToggleButton Content="Enable chart" ToolTipService.ToolTip="Enable charting" IsChecked="True" BorderBrush="Green" ext:CustomAdorner.Image="{StaticResource appbar_draw_pixel_fill_grid}" x:Name="btnEnable" />-->
         </CommandBar>
-        <controls:DataGrid Grid.Row="1" SelectionMode="Single" ItemsSource="{x:Bind CurrentProject.TestDefinitions,Mode=OneWay}" x:Name="gridSteps" SelectionChanged="gridSteps_SelectionChanged" AutoGenerateColumns="False" HeadersVisibility="All" IsReadOnly="True">
+        <controls:DataGrid Grid.Row="1" SelectionMode="Single" ItemsSource="{x:Bind App.CurrentProject.TestDefinitions,Mode=OneWay}" x:Name="gridSteps" SelectionChanged="gridSteps_SelectionChanged" AutoGenerateColumns="False" HeadersVisibility="All" IsReadOnly="True">
             <controls:DataGrid.Resources>
                 <Color x:Key="DataGridRowHoveredBackgroundColor">Transparent</Color>
                 <Color x:Key="DataGridRowSelectedBackgroundColor">Transparent</Color>

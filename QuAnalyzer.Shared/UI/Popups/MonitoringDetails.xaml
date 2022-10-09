@@ -51,7 +51,7 @@
                         <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <ListView Header="Provider: " ItemsSource="{x:Bind CurrentProject.CurrentProviders}" SelectedItem="{x:Bind CurrentItem.Provider,Mode=TwoWay}">
+                    <ListView Header="Provider: " ItemsSource="{x:Bind App.CurrentProject.CurrentProviders}" SelectedItem="{x:Bind CurrentItem.Provider,Mode=TwoWay}">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="contracts:IDataProvider">
                                 <StackPanel Orientation="Horizontal">
@@ -78,7 +78,7 @@
                             <RowDefinition />
                         </Grid.RowDefinitions>
                         <TextBox Header="Filter: " Text="{x:Bind CurrentItem.Filter,Mode=TwoWay}" />
-                        <ListView Grid.Row="1" Header="Run after the following steps: " HorizontalAlignment="Stretch" x:Name="lstPrec" ItemsSource="{x:Bind CurrentProject.TestDefinitions}" SelectionMode="Multiple" DisplayMemberPath="Name" IsMultiSelectCheckBoxEnabled="True" />
+                        <ListView Grid.Row="1" Header="Run after the following steps: " HorizontalAlignment="Stretch" x:Name="lstPrec" ItemsSource="{x:Bind App.CurrentProject.TestDefinitions}" SelectionMode="Multiple" DisplayMemberPath="Name" IsMultiSelectCheckBoxEnabled="True" />
                     </Grid>
                 </Expander>
             </StackPanel>

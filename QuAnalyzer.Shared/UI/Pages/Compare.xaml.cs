@@ -14,6 +14,7 @@ using QuAnalyzer.UI.Popups;
 using System.Linq.Dynamic.Core;
 
 using Windows.Storage.Pickers;
+using Windows.UI.Core;
 
 using Wokhan.Data.Providers.Contracts;
 
@@ -26,7 +27,7 @@ public partial class Compare : Page
     /// This is to bypass a bug with Uno Platform where TwoWay static bindings through x:Bind don't seem to work. Weird since
     /// according to GitHub, it should...
     /// </summary>
-    public ProjectSettings CurrentProject => App.Instance.CurrentProject;
+    public App App => App.Instance;
 
     public ObservableCollection<LocalComparerDefinition> ComparisonInstances { get; } = new();
 
@@ -94,7 +95,7 @@ public partial class Compare : Page
     [RelayCommand]
     private void CreateMapping()
     {
-        GenericPopup.OpenNew<MappingsEditor>();
+        GenericPopup.OpenNew<MappingsEditor>(isWizard: true);
     }
 
     [RelayCommand]
@@ -124,7 +125,11 @@ public partial class Compare : Page
         openWindows[cmp].Activate();
     }
 
-    private void dWin_Closed(object sender, ContentDialogClosedEventArgs e)
+#if HAS_UNO
+    private void dWin_Closed(object sender, CoreWindowEventArgs e)
+#else
+    private void dWin_Closed(object sender, WindowEventArgs e)
+#endif
     {
         openWindows.Remove(openWindows.Single(o => o.Value.Equals(sender)).Key);
     }
@@ -132,7 +137,7 @@ public partial class Compare : Page
     [RelayCommand]
     private void EditMapping(SourcesMapper mapping)
     {
-        GenericPopup.OpenNew<MappingsEditor>(mapping);
+        GenericPopup.OpenNew<MappingsEditor>(mapping, true);
     }
 
     [RelayCommand]
@@ -307,7 +312,7 @@ public partial class Compare : Page
 
                 break;
         }
-        
+
         // Since ObservableObjects cannot raise property change from another thread without calling DispatcherQueue.TryEnqueue,
         // I'm doing it the other way around: the UI component calls for the change notification itself.
         // For our purpose it should be OK since almost all properties are subject to change anyway.

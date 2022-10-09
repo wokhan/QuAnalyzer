@@ -11,9 +11,9 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <CommandBar Background="Transparent">
-            <AppBarButton Foreground="YellowGreen" ToolTipService.ToolTip="New project" Command="{x:Bind CurrentProject.CreateNewCommand,Mode=OneWay}" Icon="NewFolder" />
+            <AppBarButton Foreground="YellowGreen" ToolTipService.ToolTip="New project" Command="{x:Bind App.CurrentProject.CreateNewCommand,Mode=OneWay}" Icon="NewFolder" />
             <AppBarElementContainer>
-                <SplitButton Foreground="OrangeRed" ToolTipService.ToolTip="Open..." Command="{x:Bind CurrentProject.PickFileCommand,Mode=OneWay}">
+                <SplitButton Foreground="OrangeRed" ToolTipService.ToolTip="Open..." Command="{x:Bind App.CurrentProject.PickFileCommand,Mode=OneWay}">
                     <SymbolIcon Symbol="Folder" />
                     <SplitButton.Flyout>
                         <MenuFlyout x:Name="recentProjects" />
@@ -21,11 +21,11 @@
                 </SplitButton>
             </AppBarElementContainer>
             <AppBarElementContainer>
-                <SplitButton Foreground="DodgerBlue" ToolTipService.ToolTip="Save" Command="{x:Bind CurrentProject.SaveCommand,Mode=OneWay}">
+                <SplitButton Foreground="DodgerBlue" ToolTipService.ToolTip="Save" Command="{x:Bind App.CurrentProject.SaveCommand,Mode=OneWay}">
                     <SymbolIcon Symbol="Save" />
                     <SplitButton.Flyout>
                         <MenuFlyout>
-                            <MenuFlyoutItem Text="Save as..." Icon="Save" Foreground="DodgerBlue" Command="{x:Bind CurrentProject.SaveAsCommand,Mode=OneWay}" />
+                            <MenuFlyoutItem Text="Save as..." Icon="Save" Foreground="DodgerBlue" Command="{x:Bind App.CurrentProject.SaveAsCommand,Mode=OneWay}" />
                         </MenuFlyout>
                     </SplitButton.Flyout>
                 </SplitButton>
@@ -34,6 +34,6 @@
                     <MenuItem IsCheckable="True" Header="Allow multiple parallel comparisons" IsChecked="{Binding CurrentProject.UseParallelism, Source={x:Static quanalyzer:App.Instance}, FallbackValue=True}"  />
                 </MenuItem>-->
         </CommandBar>
-        <TextBox Grid.Column="1" MinWidth="200" x:Name="txt" BorderBrush="Transparent" Background="Transparent" FontSize="14" BorderThickness="1" VerticalAlignment="Center" Text="{x:Bind CurrentProject.Name, FallbackValue='Unamed project',Mode=TwoWay}" />
+        <TextBox Grid.Column="1" MinWidth="200" x:Name="txt" BorderBrush="Transparent" Background="Transparent" FontSize="14" BorderThickness="1" VerticalAlignment="Center" Text="{x:Bind App.CurrentProject.Name, FallbackValue='Unamed project',Mode=TwoWay}" />
     </Grid>
 </UserControl>
