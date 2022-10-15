@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.UI.Xaml;
 
 using QuAnalyzer.Core.Helpers;
 using QuAnalyzer.Core.Project;
@@ -7,6 +8,7 @@ using QuAnalyzer.UI.Pages;
 using System.Globalization;
 
 using Windows.ApplicationModel;
+using Windows.ApplicationModel.Activation;
 
 using Wokhan.Data.Providers.Contracts;
 
@@ -72,16 +74,10 @@ public sealed partial class App : Application
         }
 #endif
 
-#if NET6_0_OR_GREATER && WINDOWS
-        MainWindow = new Window()
-        {
-#if !HAS_UNO
-            Title = "QuAnalyzer" 
-#endif
-        };
-        MainWindow.Activate();
+#if NET6_0_OR_GREATER && WINDOWS && !HAS_UNO
+        MainWindow = new Window() { Title = "QuAnalyzer" };
 #else
-            MainWindow = Microsoft.UI.Xaml.Window.Current;
+        MainWindow = Microsoft.UI.Xaml.Window.Current;
 #endif
 
 #if !(NET6_0_OR_GREATER && WINDOWS)
@@ -95,10 +91,10 @@ public sealed partial class App : Application
                 MicaBackground.TrySetBackdrop(MainWindow, MicaBackground.BackgroundMode.Mica);
 #endif
             }
-
-            // Ensure the current window is active
-            MainWindow.Activate();
         }
+
+        // Ensure the current window is active
+        MainWindow.Activate();
     }
 
     /// <summary>

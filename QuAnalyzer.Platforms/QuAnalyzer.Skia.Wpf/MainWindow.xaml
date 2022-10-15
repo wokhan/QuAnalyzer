@@ -4,7 +4,24 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QuAnalyzer.WPF"
+        xmlns:uicontrols="clr-namespace:Wokhan.UI.Xaml.Controls;assembly=Wokhan.UI" 
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-	<ContentControl x:Name="root"/>
+        ResizeMode="CanResizeWithGrip"
+        Title="QuAnalyzer" Height="600" Width="1030">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <uicontrols:CustomWindowChrome Background="#FF171717" WindowChrome.IsHitTestVisibleInChrome="False" Grid.ColumnSpan="2" Height="35" TitleAlignment="Center">
+            <uicontrols:CustomWindowChrome.TitleStyle>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="#FFFFFFFF" />
+                    <Setter Property="Typography.Capitals" Value="SmallCaps" />
+                    <Setter Property="IsHitTestVisible" Value="False" />
+                </Style>
+            </uicontrols:CustomWindowChrome.TitleStyle>
+        </uicontrols:CustomWindowChrome>
+        <ContentControl Grid.Row="1"  x:Name="root" />
+    </Grid>
 </Window>

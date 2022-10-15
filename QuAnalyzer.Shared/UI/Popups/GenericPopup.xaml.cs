@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 
 using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Navigation;
 
 using Windows.Foundation;

@@ -12,16 +12,16 @@
         </Grid.ColumnDefinitions>
         <CommandBar Background="Transparent">
             <AppBarButton Foreground="YellowGreen" ToolTipService.ToolTip="New project" Command="{x:Bind App.CurrentProject.CreateNewCommand,Mode=OneWay}" Icon="NewFolder" />
-            <AppBarElementContainer>
-                <SplitButton Foreground="OrangeRed" ToolTipService.ToolTip="Open..." Command="{x:Bind App.CurrentProject.PickFileCommand,Mode=OneWay}">
+            <AppBarElementContainer VerticalAlignment="Center">
+                <SplitButton BorderThickness="0" Foreground="OrangeRed" ToolTipService.ToolTip="Open..." Command="{x:Bind App.CurrentProject.PickFileCommand,Mode=OneWay}">
                     <SymbolIcon Symbol="Folder" />
                     <SplitButton.Flyout>
                         <MenuFlyout x:Name="recentProjects" />
                     </SplitButton.Flyout>
                 </SplitButton>
             </AppBarElementContainer>
-            <AppBarElementContainer>
-                <SplitButton Foreground="DodgerBlue" ToolTipService.ToolTip="Save" Command="{x:Bind App.CurrentProject.SaveCommand,Mode=OneWay}">
+            <AppBarElementContainer VerticalContentAlignment="Center">
+                <SplitButton BorderThickness="0" Foreground="DodgerBlue" ToolTipService.ToolTip="Save" Command="{x:Bind App.CurrentProject.SaveCommand,Mode=OneWay}">
                     <SymbolIcon Symbol="Save" />
                     <SplitButton.Flyout>
                         <MenuFlyout>

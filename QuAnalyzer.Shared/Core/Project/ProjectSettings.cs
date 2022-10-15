@@ -10,6 +10,7 @@ using QuAnalyzer.Features.Monitoring;
 
 using System.ComponentModel.DataAnnotations;
 
+using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI;
 
@@ -70,12 +71,17 @@ public partial class ProjectSettings : ObservableValidator
         var file = await filePicker.PickSingleFileAsync();
         if (file is not null)
         {
-            Open(file.Path);
+            Open(file);
         }
     }
 
     [RelayCommand]
-    public void Open(string path)
+    public async void Open(string path)
+    {
+        Open(await StorageFile.GetFileFromPathAsync(path));
+    }
+
+    public async void Open(StorageFile file)
     {
         try
         {
@@ -85,14 +91,16 @@ public partial class ProjectSettings : ObservableValidator
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             };
 
-            using var stream = new JsonTextReader(new StreamReader(path));
+            var contents = await FileIO.ReadTextAsync(file);
 
-            var project = ser.Deserialize<ProjectSettings>(stream);
-            
-            project.FilePath = path;
+            using var jsonreader = new JsonTextReader(new StringReader(contents));
 
-            MRUManager.AddRecentFile(path);
-            
+            var project = ser.Deserialize<ProjectSettings>(jsonreader);
+
+            project.FilePath = file.Path;
+
+            MRUManager.AddRecentFile(file.Path);
+
             App.Instance.CurrentProject = project;
         }
         catch (Exception e)
@@ -114,7 +122,7 @@ public partial class ProjectSettings : ObservableValidator
 
             var ser = new JsonSerializer
             {
-                TypeNameHandling = TypeNameHandling.Auto, 
+                TypeNameHandling = TypeNameHandling.Auto,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             };
 

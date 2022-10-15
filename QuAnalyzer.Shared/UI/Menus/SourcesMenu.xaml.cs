@@ -27,6 +27,8 @@ public partial class SourcesMenu : UserControl
 
     private Point startPoint;
 
+    public DataTemplateSelector TemplateSelector { get; } = new CustomDataTemplateSelector();
+
     public SourcesMenu()
     {
         InitializeComponent();
@@ -81,6 +83,17 @@ public partial class SourcesMenu : UserControl
         //}
     }
 
+    /// <summary>
+    /// Grouping through a CollectionViewSource doesn't seem to work with Uno, so I had to find another (ugly) way, playing
+    /// with the selector.
+    /// </summary>
+    /// <param name="providers"></param>
+    /// <returns></returns>
+    private IEnumerable MimickGroup(IEnumerable<IDataProvider> providers)
+    {
+        return providers.SelectMany(provider => new object[] { provider }.Concat(provider.Repositories.Select(repository => (object)new KeyValuePair<IDataProvider, string>(provider, repository.Key))));
+    }
+
     private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var listview = (ListView)sender;
@@ -89,12 +102,7 @@ public partial class SourcesMenu : UserControl
         //var group = listview.GroupHeaderContainerFromItemContainer(container);
         if (listview.SelectedItem is not null)
         {
-            var item = (KeyValuePair<string, object>)listview.SelectedItem;
-
-            // Ugly hack since I didn't figure out how to get the corresponding group from a ListViewItem...
-            var provider = App.Instance.CurrentProject.CurrentProviders.First(provider => provider.Repositories.Contains(item));
-            var repository = item.Key;
-
+            var (provider, repository) = (KeyValuePair<IDataProvider, string>)listview.SelectedItem;
             App.Instance.CurrentSelection = (provider, repository);
         }
         else

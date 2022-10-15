@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)UI\Menus\CustomDataTemplateSelector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Assets\SharedAssets.md" />
@@ -57,24 +58,20 @@
     <!-- Make sure XAML files force reevaluation of up-to-date checks -->
     <UpToDateCheckInput Include="$(MSBuildThisFileDirectory)**/*.xaml" />
   </ItemGroup>
-
   <Target Name="MVVMUnoWorkaround1" AfterTargets="MVVMToolkitGatherAnalyzers" Condition="'$(TargetFramework)' != 'net6.0-windows10.0.19041.0' And !Exists('obj\generated\CommunityToolkit.Mvvm.SourceGenerators')">
     <Message Importance="high" Text="Workaround for MVVM SourceGenerators with Uno (phase 1/2): keeping MVVM generated files. Another build will be required once done!!!" />
-    <PropertyGroup >
+    <PropertyGroup>
       <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
       <CompilerGeneratedFilesOutputPath>obj\generated</CompilerGeneratedFilesOutputPath>
     </PropertyGroup>
   </Target>
-
   <Target Name="MVVMUnoWorkaround2" AfterTargets="MVVMToolkitGatherAnalyzers" Condition="'$(TargetFramework)' != 'net6.0-windows10.0.19041.0' And Exists('obj\generated\CommunityToolkit.Mvvm.SourceGenerators')">
     <Message Importance="high" Text="Workaround for MVVM SourceGenerators with Uno (phase 2/2): removing the MVVM Analyzer since code has been generated already." />
     <ItemGroup>
       <Analyzer Remove="@(MVVMToolkitAnalyzer)" />
     </ItemGroup>
   </Target>
-
   <ItemGroup>
     <Compile Include="obj\generated\CommunityToolkit.Mvvm.SourceGenerators\**\*.cs" Condition="'$(TargetFramework)' != 'net6.0-windows10.0.19041.0' And Exists('obj\generated\CommunityToolkit.Mvvm.SourceGenerators')" />
   </ItemGroup>
-
 </Project>

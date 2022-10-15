@@ -3,6 +3,10 @@
     <OutputType Condition="'$(Configuration)'=='Release'">WinExe</OutputType>
     <OutputType Condition="'$(Configuration)'=='Debug'">Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>obj\generated</CompilerGeneratedFilesOutputPath>
+
   </PropertyGroup>
   <ItemGroup Condition="exists('..\QuAnalyzer.Windows')">
     <EmbeddedResource Include="..\QuAnalyzer.Windows\Package.appxmanifest" LogicalName="Package.appxmanifest" />

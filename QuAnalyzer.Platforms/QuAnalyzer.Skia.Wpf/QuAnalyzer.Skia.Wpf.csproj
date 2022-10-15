@@ -34,6 +34,7 @@
     <PackageReference Include="EPPlus" Version="6.0.8" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="6.0.1" />
     <PackageReference Include="Wokhan.Data.Providers" Version="0.8.7-beta" />
+    <PackageReference Include="Wokhan.UI" Version="0.9.4-beta" />
     <PackageReference Include="NuGet.Protocol" Version="6.3.0" />
     <PackageReference Include="NuGet.Resolver" Version="6.3.0" />
 
